@@ -6,7 +6,7 @@ contract Deb0x {
 
     mapping (address => string) private encryptionKeys;
 
-    mapping (address => string[]) private messages;
+    mapping (address => mapping(address => string[])) private messages;
 
     function setKey(string memory encryptionKey) public {
         encryptionKeys[msg.sender] = encryptionKey;
@@ -17,10 +17,10 @@ contract Deb0x {
     }
 
     function send(address to, string memory payload) public {
-        messages[to].push(payload);
+        messages[to][msg.sender].push(payload);
     }
 
-    function fetchMessages(address to) public view returns (string[] memory) {
-        return messages[to];
+    function fetchMessages(address to, address from) public view returns (string[] memory) {
+        return messages[to][from];
     }
 }
