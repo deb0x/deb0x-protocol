@@ -8,6 +8,8 @@ contract Deb0x {
 
     mapping (address => mapping(address => string[])) private messages;
 
+    mapping (address => address[]) private messageSenders;
+
     function setKey(string memory encryptionKey) public {
         encryptionKeys[msg.sender] = encryptionKey;
     }
@@ -17,10 +19,17 @@ contract Deb0x {
     }
 
     function send(address to, string memory payload) public {
+        if(messages[to][msg.sender].length == 0){
+            messageSenders[to].push(msg.sender);
+        }
         messages[to][msg.sender].push(payload);
     }
 
     function fetchMessages(address to, address from) public view returns (string[] memory) {
         return messages[to][from];
+    }
+
+    function fetchMessageSenders(address to) public view returns (address[] memory) {
+        return messageSenders[to];
     }
 }
