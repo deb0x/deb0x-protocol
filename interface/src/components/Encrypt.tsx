@@ -3,7 +3,11 @@ import { useWeb3React } from '@web3-react/core';
 import { encrypt } from '@metamask/eth-sig-util'
 import Deb0x from "../ethereum/deb0x"
 import { create } from 'ipfs-http-client'
-const deb0xAddress = "0x6f5dDD41EAb5E6E3be7B7718b9dF6f2E7576fEd5";
+import SendIcon from '@mui/icons-material/Send';
+import {
+    Box, TextField, Button
+} from '@mui/material';
+const deb0xAddress = "0x218c10BAb451BE6A897db102b2f608bC7D3441a0";
 const ethUtil = require('ethereumjs-util')
 
 
@@ -89,43 +93,7 @@ export function Encrypt(): any {
 
     return (
         <>
-            <h4 className="card-title">
-                Encrypt / Decrypt
-            </h4>
-
-            <button
-                className="btn btn-primary btn-lg btn-block mb-3"
-                id="getEncryptionKeyButton"
-                onClick={getEncryptionKey}
-                disabled={encryptionKeyInitialized == ' '}
-            >
-                {encryptionKeyInitialized == '' ? "Get Encryption Key" : "Encryption key provided"}
-            </button>
-
-            <p className="info-text text-truncate alert alert-secondary">
-                Encryption key: {encryptionKey}
-            </p>
-
-            <button
-                className="btn btn-primary btn-lg btn-block mb-3"
-                id="initializeDeb0x"
-                disabled={encryptionKey == ''}
-                onClick={initializeDeb0x}
-            >
-                {encryptionKeyInitialized == '' ? "Initialize Deb0x" : "Deb0x initialized"}
-            </button>
-
-            <hr />
-
-            <div id="encrypt-message-form">
-                <input
-                    className="form-control"
-                    type="text"
-                    placeholder="Message to encrypt"
-                    id="encryptMessageInput"
-                    value={textToEncrypt}
-                    onChange={e => setTextToEncrypt(e.target.value)}
-                />
+            {/* <div id="encrypt-message-form">
 
                 <input
                     className="form-control"
@@ -149,13 +117,43 @@ export function Encrypt(): any {
 
             >
                 Encrypt
-            </button>
+            </button> */}
 
-            <p className="info-text text-truncate alert alert-secondary">
-                Ciphertext: {cipheredText}
-            </p>
+            <Box
+                component="form"
+                sx={{
+                    '& .MuiTextField-root': { m: 1, width: '150ch' },
+                }}
+                noValidate
+                autoComplete="off"
+            >
+                <TextField id="standard-basic" label="Destination Address" variant="standard"
+                    sx={{
+                        '& > :not(style)': { m: 1, width: '44ch' },
+                    }}
+                    value={senderAddress}
+                    onChange={e => setSenderAddress(e.target.value)}
+                />
 
-            
+                <TextField
+                    id="outlined-multiline-static"
+                    label="Message"
+                    multiline
+                    rows={10}
+                    value={textToEncrypt}
+                    onChange={e => setTextToEncrypt(e.target.value)}
+                />
+                <br />
+                <Button variant="contained" endIcon={<SendIcon />}
+                    sx={{ marginLeft: 2, marginTop: 1 }}
+                    disabled={textToEncrypt == '' || senderAddress == ''}
+                    onClick={() => encryptText(textToEncrypt, senderAddress)}
+                >
+                    Send
+                </Button>
+            </Box>
         </>
     )
+
+
 }
