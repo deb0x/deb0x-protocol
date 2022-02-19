@@ -7,7 +7,7 @@ import StepLabel from '@mui/material/StepLabel';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Typography from '@mui/material/Typography';
 import Deb0x from "../ethereum/deb0x"
-
+import SnackbarNotification from './Snackbar';
 const deb0xAddress = "0x218c10BAb451BE6A897db102b2f608bC7D3441a0";
 const steps = ['Provide public encryption key', 'Initialize Deb0x'];
 
@@ -17,6 +17,7 @@ export default function HorizontalLinearStepper(props: any) {
     const [activeStep, setActiveStep] = useState(0);
     const [whichStepFailed, setStepFailed] = useState<number | undefined>(undefined)
     const [loading, setLoading] = useState(false)
+    const [notificationState, setNotificationState] = useState({})
 
     const handleNext = () => {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -37,6 +38,8 @@ export default function HorizontalLinearStepper(props: any) {
                 
             })
             .catch((error: any) => {
+                setNotificationState({message: "You rejected to provide the public encryption key.", open: true,
+                severity:"info"})
                 setStepFailed(0)
                 setLoading(false)
             });
@@ -55,52 +58,62 @@ export default function HorizontalLinearStepper(props: any) {
 
             tx.wait()
             .then((result: any) => {
+                setNotificationState({message: "Deb0x was succesfully initialized.", open: true,
+                severity:"success"})
                 setLoading(false)
                 props.onDeboxInitialization(true)
+                
+            })
+            .catch((error: any) => {
+                setNotificationState({message: "Deb0x couldn't be initialized!", open: true,
+                severity:"error"})
+                setLoading(false)
             })
         } catch(error: any) {
-            setStepFailed(1)
-            setLoading(false)
+            setNotificationState({message: "You rejected the transaction. Deb0x was not initialized.", open: true,
+                severity:"info"})
+                setLoading(false)
         }
-        
 
-        
     }
 
     return (
-        <Box sx={{ width: '100%', maxWidth: 1080 }}>
-            <Stepper activeStep={activeStep}>
-                {steps.map((label, index) => {
-                    const stepProps: { completed?: boolean } = {};
-                    const labelProps: {
-                        optional?: React.ReactNode;
-                        error?: boolean;
-                    } = {};
-                    if (whichStepFailed == index) {
-                        labelProps.optional = (
-                          <Typography variant="caption" color="error">
-                            {(activeStep == 0) ? "User didn't provide encryption key" : "User rejected transaction"}
-                          </Typography>
+        <>
+            <SnackbarNotification state={notificationState} setNotificationState={setNotificationState}/>
+            <Box sx={{ width: '100%', maxWidth: 1080 }}>
+                <Stepper activeStep={activeStep}>
+                    {steps.map((label, index) => {
+                        const stepProps: { completed?: boolean } = {};
+                        const labelProps: {
+                            optional?: React.ReactNode;
+                            error?: boolean;
+                        } = {};
+                        if (whichStepFailed == index) {
+                            labelProps.optional = (
+                            <Typography variant="caption" color="error">
+                                {(activeStep == 0) ? "User didn't provide encryption key" : "User rejected transaction"}
+                            </Typography>
+                            );
+                            labelProps.error = true;
+                        }
+                        return (
+                            <Step key={label} {...stepProps}>
+                                <StepLabel {...labelProps} >{label} </StepLabel>
+                            </Step>
                         );
-                        labelProps.error = true;
-                    }
-                    return (
-                        <Step key={label} {...stepProps}>
-                            <StepLabel {...labelProps} >{label} </StepLabel>
-                        </Step>
-                    );
-                })}
-            </Stepper>
-            {<Fragment>
-                <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-                    <LoadingButton loading={loading} sx={{ marginLeft: 5 }} variant="contained" onClick={
-                        (activeStep == 0) ? getEncryptionKey : initializeDeb0x
-                    }>
-                        {activeStep === steps.length - 1 ? 'Initialize' : 'Provide'}
-                    </LoadingButton>
-                </Box>
-            </Fragment>
-            }
-        </Box>
+                    })}
+                </Stepper>
+                {<Fragment>
+                    <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+                        <LoadingButton loading={loading} sx={{ marginLeft: 5 }} variant="contained" onClick={
+                            (activeStep == 0) ? getEncryptionKey : initializeDeb0x
+                        }>
+                            {activeStep === steps.length - 1 ? 'Initialize' : 'Provide'}
+                        </LoadingButton>
+                    </Box>
+                </Fragment>
+                }
+            </Box>
+        </>
     );
 }

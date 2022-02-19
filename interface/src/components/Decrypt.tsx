@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Deb0x from "../ethereum/deb0x"
 import {
-    TextField, Grid, Button, List, ListItem,
+    Tooltip, List, ListItem,
     ListItemText, ListItemButton, Typography, Box, CircularProgress
 } from '@mui/material';
 import Stepper from './Stepper'
@@ -11,16 +11,18 @@ const deb0xAddress = "0x218c10BAb451BE6A897db102b2f608bC7D3441a0"
 
 export function Decrypt(props: any): any {
     const { account, library } = useWeb3React()
-    const [msgFromAddress, setMsgFromAddress] = useState('')
     const [loading, setLoading] = useState(true)
     const [encryptionKeyInitialized, setEncryptionKeyInitialized] = useState<boolean|undefined>(undefined)
 
     useEffect(() => {
+        console.log("useEffect")
+        setLoading(true)
         getPublicEncryptionKey()
-    }, []);
+    }, [account]);
 
     const getPublicEncryptionKey = async () => {
         const deb0xContract = Deb0x(library, deb0xAddress)
+        console.log(account)
         const key = await deb0xContract.getKey(account)
         console.log(key)
         const initialized = (key != '') ? true : false
@@ -31,16 +33,15 @@ export function Decrypt(props: any): any {
     
 
     async function decrypt(encryptedMessage: any) {
-        let decryptedMessage
         try {
-            decryptedMessage = await library.provider.request({
+            const decryptedMessage = await library.provider.request({
                 method: 'eth_decrypt',
                 params: [encryptedMessage, account],
             });
+            return decryptedMessage
         } catch (error) {
-            console.log(error)
+            return undefined
         }
-        return decryptedMessage
     }
 
     async function fetchMessage(message: any) {
@@ -54,19 +55,23 @@ export function Decrypt(props: any): any {
 
         async function decryptMessage() {
             const decryptedMessage = await decrypt(message)
-            setMessage(decryptedMessage)
+            if(decryptedMessage) {
+                setMessage(decryptedMessage)
+            }
         }
 
         return (
             <ListItem disablePadding key={props.index}>
-                <ListItemButton onClick={() => {
-                    if(message == props.message.data) {
-                        decryptMessage()
-                    }
-                }}>
-                    <ListItemText
-                     primary={(message == props.message.data) ? `${message.substring(0,100)}...` : message}/>
-                </ListItemButton>
+                <Tooltip title={(message == props.message.data) ? "Click to decrypt" : ""} placement="right">
+                    <ListItemButton onClick={() => {
+                        if(message == props.message.data) {
+                            decryptMessage()
+                        }
+                    }}>
+                        <ListItemText
+                        primary={(message == props.message.data) ? `${message.substring(0,120)}...` : message}/>
+                    </ListItemButton>
+                </Tooltip>
             </ListItem>)
     }
 
@@ -81,21 +86,26 @@ export function Decrypt(props: any): any {
         async function processMessages() {
             const deb0xContract = Deb0x(library, deb0xAddress)
             const senderAddresses = await deb0xContract.fetchMessageSenders(account)
-            let messages : any = []
-            senderAddresses.forEach(async function(sender: any) {
-                const messagesFromSender = await deb0xContract.fetchMessages(account, sender)
-                //messages = [...messages, ...messagesFromSender]
-                const processedMessages = messagesFromSender.map(async (message: any) => {
-                    return await fetchMessage(message);
-                })
-                Promise.all(processedMessages).then(values => {
-                   messages = [...messages, ...values]
-                   console.log(messages)
-                   setFetchedMessages(messages)
-                   setLoading(false)
-                })
+
+            const cidsPromises = senderAddresses.map(async function(sender:any){
+                return await deb0xContract.fetchMessages(account, sender)
             })
+
+            const cids = await Promise.all(cidsPromises)
+
+            const encryptedMessagesPromisesArray = cids.map(async function(cidArray: any) {
+                const encryptedMessagesPromises = cidArray.map(async function (cid: any) {
+                    return await fetchMessage(cid)
+                })
+                const promise = await Promise.all(encryptedMessagesPromises)
+
+                return promise
+            })
+
+            const encryptedMessages = await Promise.all(encryptedMessagesPromisesArray)
             
+            setFetchedMessages(encryptedMessages.flat())
+            setLoading(false)
         }
 
         if(!loading) {
@@ -119,7 +129,8 @@ export function Decrypt(props: any): any {
                         <List>
                             {fetchedMessages.map((message: any, i: any) => {
                                 return (
-                                    <Message message={message} index={i} key={i} />
+                                    
+                                        <Message message={message} index={i} key={i} />
                                 )
                             })}
                         </List>
@@ -144,7 +155,7 @@ export function Decrypt(props: any): any {
         )
     } else if(encryptionKeyInitialized == false){
         return (
-            <Stepper onDeboxInitialization={setEncryptionKeyInitialized}/>
+            <Stepper onDeboxInitialization={getPublicEncryptionKey}/>
         )
     } else{
         return(
