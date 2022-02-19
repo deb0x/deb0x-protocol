@@ -7,6 +7,7 @@ import SendIcon from '@mui/icons-material/Send';
 import {
     Box, TextField, Button
 } from '@mui/material';
+import SnackbarNotification from './Snackbar';
 const deb0xAddress = "0x218c10BAb451BE6A897db102b2f608bC7D3441a0";
 const ethUtil = require('ethereumjs-util')
 
@@ -21,9 +22,9 @@ export function Encrypt(): any {
     const { account, library } = useWeb3React()
     const [encryptionKey, setKey] = useState('')
     const [textToEncrypt, setTextToEncrypt] = useState('')
-    const [cipheredText, setCipheredText] = useState('')
     const [encryptionKeyInitialized, setEncryptionKeyInitialized] = useState('')
     const [senderAddress, setSenderAddress] = useState('')
+    const [notificationState, setNotificationState] = useState({})
 
     useEffect(() => {
         if (!encryptionKeyInitialized) {
@@ -55,9 +56,23 @@ export function Encrypt(): any {
 
         console.log(message)
 
-        const tx = await deb0xContract.send(destinationAddress, message.path)
+        try {
+            const tx = await deb0xContract.send(destinationAddress, message.path)
 
-        setCipheredText(encryptedMessage)
+            tx.wait()
+            .then((result: any) => {
+                setNotificationState({message: "Message was succesfully sent.", open: true,
+                severity:"success"})
+            })
+            .catch((error: any) => {
+                setNotificationState({message: "Message couldn't be sent!", open: true,
+                severity:"error"})
+            })
+        } catch(error: any) {
+            setNotificationState({message: "You rejected the transaction. Message was not sent.", open: true,
+                severity:"info"})
+        }
+
     }
 
     async function initializeDeb0x() {
@@ -93,6 +108,7 @@ export function Encrypt(): any {
 
     return (
         <>
+            <SnackbarNotification state={notificationState} setNotificationState={setNotificationState}/>
             {/* <div id="encrypt-message-form">
 
                 <input

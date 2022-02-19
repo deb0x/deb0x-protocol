@@ -49,7 +49,8 @@ export function Decrypt(props: any): any {
     }
 
     function Message(props: any) {
-        const [message, setMessage] = useState(props.message.data)
+        const [message, setMessage] = useState(props.message.fetchedMessage.data)
+        //const [sender, setSender] = useState(props.messsage.sender)
 
 
 
@@ -62,14 +63,14 @@ export function Decrypt(props: any): any {
 
         return (
             <ListItem disablePadding key={props.index}>
-                <Tooltip title={(message == props.message.data) ? "Click to decrypt" : ""} placement="right">
+                <Tooltip title={(message == props.message.fetchedMessage.data) ? "Click to decrypt" : `Sender:${props.message.sender}`} placement="right">
                     <ListItemButton onClick={() => {
-                        if(message == props.message.data) {
+                        if(message == props.message.fetchedMessage.data) {
                             decryptMessage()
                         }
                     }}>
                         <ListItemText
-                        primary={(message == props.message.data) ? `${message.substring(0,120)}...` : message}/>
+                        primary={(message == props.message.fetchedMessage.data) ? `${message.substring(0,120)}...` : message}/>
                     </ListItemButton>
                 </Tooltip>
             </ListItem>)
@@ -88,14 +89,17 @@ export function Decrypt(props: any): any {
             const senderAddresses = await deb0xContract.fetchMessageSenders(account)
 
             const cidsPromises = senderAddresses.map(async function(sender:any){
-                return await deb0xContract.fetchMessages(account, sender)
+                return { cids: await deb0xContract.fetchMessages(account, sender), sender: sender}
             })
 
             const cids = await Promise.all(cidsPromises)
 
+            console.log(cids)
+
             const encryptedMessagesPromisesArray = cids.map(async function(cidArray: any) {
-                const encryptedMessagesPromises = cidArray.map(async function (cid: any) {
-                    return await fetchMessage(cid)
+                console.log(cidArray)
+                const encryptedMessagesPromises = cidArray.cids.map(async function (cid: any) {
+                    return { fetchedMessage:await fetchMessage(cid), sender: cidArray.sender}
                 })
                 const promise = await Promise.all(encryptedMessagesPromises)
 
@@ -103,6 +107,8 @@ export function Decrypt(props: any): any {
             })
 
             const encryptedMessages = await Promise.all(encryptedMessagesPromisesArray)
+            
+            console.log(encryptedMessages)
             
             setFetchedMessages(encryptedMessages.flat())
             setLoading(false)
