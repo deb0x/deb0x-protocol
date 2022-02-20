@@ -6,7 +6,7 @@ import "./Deb0xERC20.sol";
 
 contract Deb0x {
 
-    Deb0xERC20 public debox;
+    Deb0xERC20 public deboxERC20;
 
     uint256 constant public fee = 1000;
 
@@ -25,7 +25,7 @@ contract Deb0x {
     function send(address to, string memory payload) public payable {
         require(msg.value >= gasleft() * fee / 10000, "Deb0x: must pay 10% of transaction cost");
 
-        debox.mint(msg.sender, 7 * (10 * 18));
+        deboxERC20.mint(msg.sender, 7 * (10 * 18));
 
         messages[to].push(payload);
     }
