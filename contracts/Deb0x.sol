@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Deb0x
 
-pragma solidity ^0.8.12;
+pragma solidity ^0.8.11;
 
 import "./Deb0xERC20.sol";
 
@@ -19,7 +19,6 @@ contract Deb0x {
     mapping (address => uint256) public balanceERC20;
 
     constructor(){
-        //use new to creat Deboxerc20
        deboxERC20 = new Deb0xERC20(address(this));
 
     }
@@ -77,4 +76,17 @@ contract Deb0x {
     function fetchMessages(address to) public view returns (string[] memory) {
         return messages[to];
     }
+
+    ////////////////////////////////////
+
+    uint256 rewardPerToken = 4 wei;
+
+    uint256 lastUpdateTime;
+
+    function earned() public view returns (uint) {
+        return 
+            balanceERC20[msg.sender] * rewardPerToken * (block.timestamp - lastUpdateTime);
+            // balanceERC20 * rewardPerToken * nr of blocks
+    }
+
 }
