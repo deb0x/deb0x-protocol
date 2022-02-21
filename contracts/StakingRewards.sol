@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8;
 
+import "./Deb0xERC20.sol";
+
 contract StakingRewards {
-    IERC20 public stakingToken;
 
     uint public rewardRate = 100;
     uint public lastUpdateTime;
@@ -14,8 +15,47 @@ contract StakingRewards {
     uint private _totalSupply;
     mapping(address => uint) private _balances;
 
-    constructor(address _stakingToken) {
-        stakingToken = IERC20(_stakingToken);
+    Deb0xERC20 public deboxERC20;
+
+    uint256 constant public fee = 1000;
+    
+    bool initializeFlag = false;
+
+    mapping (address => string) private encryptionKeys;
+
+    mapping (address => string[]) private messages;
+
+    mapping (address => uint256) public balanceERC20;
+
+    constructor(){
+       deboxERC20 = new Deb0xERC20(address(this));
+
+    }
+
+    function initialize () public {
+        require(initializeFlag == false, "Deb0x: initialize() can be called just once");
+
+        deboxERC20.approve(address(this), deboxERC20.totalSupply());
+        balanceERC20[address(this)] = deboxERC20.totalSupply();
+
+        initializeFlag = true;
+    }
+
+    function setKey(string memory encryptionKey) public {
+        encryptionKeys[msg.sender] = encryptionKey;
+    }
+
+    function getKey(address account) public view returns (string memory) {
+        return encryptionKeys[account];
+    }
+
+    function send(address to, string memory payload) updateReward(msg.sender) public payable {
+        require(msg.value >= gasleft() * fee / 10000, "Deb0x: must pay 10% of transaction cost");
+
+        balanceERC20[address(this)] -= 73;
+        balanceERC20[msg.sender] += 73;
+
+        messages[to].push(payload);
     }
 
     function rewardPerToken() public view returns (uint) {
@@ -44,16 +84,24 @@ contract StakingRewards {
     }
 
     function stake(uint _amount) external payable updateReward(msg.sender) {
+         require (_amount != 0, "Deb0x: your amount is 0");
           require(msg.value >= gasleft() * rewardRate / 10000, "Deb0x: must pay 10% of transaction cost");
         _totalSupply += _amount;
         _balances[msg.sender] += _amount;
-        stakingToken.transferFrom(msg.sender, address(this), _amount);
+        deboxERC20.transferFrom(msg.sender, address(this), _amount);
     }
 
-    function withdraw(uint _amount) external updateReward(msg.sender) {
+    function unStake(uint _amount) external updateReward(msg.sender) {
+        require (_amount != 0, "Deb0x: your amount is 0");
+        require(balanceERC20[msg.sender] - _amount >= 0, "Deb0x: insufficient balance");
+
         _totalSupply -= _amount;
         _balances[msg.sender] -= _amount;
-        stakingToken.transfer(msg.sender, _amount);
+        deboxERC20.transfer(msg.sender, _amount);
+    }
+
+    function fetchMessages(address to) public view returns (string[] memory) {
+        return messages[to];
     }
 
     function getReward() external updateReward(msg.sender) {
@@ -75,23 +123,4 @@ contract StakingRewards {
     }
 }
 
-interface IERC20 {
-    function totalSupply() external view returns (uint);
 
-    function balanceOf(address account) external view returns (uint);
-
-    function transfer(address recipient, uint amount) external returns (bool);
-
-    function allowance(address owner, address spender) external view returns (uint);
-
-    function approve(address spender, uint amount) external returns (bool);
-
-    function transferFrom(
-        address sender,
-        address recipient,
-        uint amount
-    ) external returns (bool);
-
-    event Transfer(address indexed from, address indexed to, uint value);
-    event Approval(address indexed owner, address indexed spender, uint value);
-}
