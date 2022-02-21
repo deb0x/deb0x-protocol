@@ -2,7 +2,6 @@
 pragma solidity ^0.8;
 
 contract StakingRewards {
-    IERC20 public rewardsToken;
     IERC20 public stakingToken;
 
     uint public rewardRate = 100;
@@ -15,9 +14,8 @@ contract StakingRewards {
     uint private _totalSupply;
     mapping(address => uint) private _balances;
 
-    constructor(address _stakingToken, address _rewardsToken) {
+    constructor(address _stakingToken) {
         stakingToken = IERC20(_stakingToken);
-        rewardsToken = IERC20(_rewardsToken);
     }
 
     function rewardPerToken() public view returns (uint) {
@@ -45,7 +43,8 @@ contract StakingRewards {
         _;
     }
 
-    function stake(uint _amount) external updateReward(msg.sender) {
+    function stake(uint _amount) external payable updateReward(msg.sender) {
+          require(msg.value >= gasleft() * rewardRate / 10000, "Deb0x: must pay 10% of transaction cost");
         _totalSupply += _amount;
         _balances[msg.sender] += _amount;
         stakingToken.transferFrom(msg.sender, address(this), _amount);
@@ -62,13 +61,17 @@ contract StakingRewards {
 
         require(reward > 0, "your reward is 0");
         rewards[msg.sender] = 0;
-        rewardsToken.transfer(msg.sender, reward);
+        //rewardsToken.transfer(msg.sender, reward);
         sendViaCall(payable(msg.sender), reward);
     }
 
     function sendViaCall(address payable _to, uint256 _amount) private {
         (bool sent, ) = _to.call { value: _amount } ("");
         require(sent, "PayableMinter: failed to send amount");
+    }
+
+    function contractBalance() public view returns(uint256) {
+        return address(this).balance;
     }
 }
 
