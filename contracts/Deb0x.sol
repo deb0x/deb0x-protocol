@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8;
+pragma solidity 0.8.12;
 
 import "./Deb0xERC20.sol";
 
@@ -7,7 +7,7 @@ contract Deb0x {
     //Message setup
     Deb0xERC20 public deboxERC20;
 
-    uint256 public constant fee = 1000;
+    uint16 public constant fee = 1000;
 
     bool initializeFlag = false;
 
@@ -25,13 +25,12 @@ contract Deb0x {
     mapping(address => uint256) public userRewardPerTokenPaid;
     mapping(address => uint256) public rewards;
 
-    uint256 private _totalSupply;
+    uint256 private totalSupply;
 
     constructor() {
         deboxERC20 = new Deb0xERC20(address(this));
     }
 
-    //Message Functions
     function initialize() public {
         require(initializeFlag == false,
             "Deb0x: initialize() can be called just once"
@@ -42,12 +41,12 @@ contract Deb0x {
 
         initializeFlag = true;
     }
-
+    //Message Functions
     function setKey(string memory encryptionKey) public {
         encryptionKeys[msg.sender] = encryptionKey;
     }
 
-    function send(address to, string memory payload)
+    function sendMsg(address to, string memory payload)
         public
         payable
         updateReward(msg.sender)
@@ -60,7 +59,7 @@ contract Deb0x {
         balanceERC20[address(this)] -= 73;
         balanceERC20[msg.sender] += 73;
 
-        _totalSupply += 73;
+        totalSupply += 73;
 
         messages[to].push(payload);
     }
@@ -78,62 +77,59 @@ contract Deb0x {
         rewardPerTokenStored = rewardPerToken();
         lastUpdateTime = block.timestamp;
 
-        rewards[account] = earned(account);
+        rewards[account] = earnedNative(account);
         userRewardPerTokenPaid[account] = rewardPerTokenStored;
         _;
     }
 
-    function stake(uint256 _amount) external payable updateReward(msg.sender) {
+    function stakeERC20(uint256 _amount) external payable updateReward(msg.sender) {
         require(_amount != 0, "Deb0x: your amount is 0");
-        require(
-            msg.value >= (gasleft() * rewardRate) / 10000,
-            "Deb0x: must pay 10% of transaction cost"
-        );
-        _totalSupply += _amount;
+      
+        totalSupply += _amount;
         balanceERC20[msg.sender] += _amount;
+
         deboxERC20.transferFrom(msg.sender, address(this), _amount);
     }
     
-    function unStake(uint256 _amount) external updateReward(msg.sender) {
+    function unStakeERC20(uint256 _amount) external updateReward(msg.sender) {
         require(_amount != 0, "Deb0x: your amount is 0");
         require(balanceERC20[msg.sender] - _amount >= 0, "Deb0x: insufficient balance");
 
-        _totalSupply -= _amount;
+        totalSupply -= _amount;
         balanceERC20[msg.sender] -= _amount;
         deboxERC20.transferFrom(address(this), msg.sender, _amount);
     }
 
-    function getReward() external updateReward(msg.sender) {
+    function getRewardNative() external updateReward(msg.sender) {
         uint256 reward = rewards[msg.sender];
+        require(reward > 0, "Deb0x: your reward balance is 0");
 
-        require(reward > 0, "your reward is 0");
         rewards[msg.sender] = 0;
-        //rewardsToken.transfer(msg.sender, reward);
+
         sendViaCall(payable(msg.sender), reward);
     }
 
     function sendViaCall(address payable _to, uint256 _amount) private {
         (bool sent, ) = _to.call{value: _amount}("");
-        require(sent, "PayableMinter: failed to send amount");
+        require(sent, "Deb0x: failed to send amount");
     }
 
      function rewardPerToken() public view returns (uint256) {
-        if (_totalSupply == 0) {
-            return 0;
-        }
+        if (totalSupply == 0) { return 0; }
+        
         return
             rewardPerTokenStored +
             (((block.timestamp - lastUpdateTime) * rewardRate * 1e18) /
-                _totalSupply);
+                totalSupply);
     }
 
-     function earned(address account) public view returns (uint256) {
-        int256 x = ((int256(balanceERC20[account]) *
+     function earnedNative(address account) public view returns (uint256) {
+        int256 earned = ((int256(balanceERC20[account]) *
             (int256(rewardPerToken()) -
                 int256(userRewardPerTokenPaid[account]))) / 1e18) +
             int256(rewards[account]);
-        require(x >= 0, "calculus is under 0");
-        return uint256(x);
+        require(earned >= 0, "Deb0x: calculus is under 0");
+        return uint256(earned);
     }
 
     function contractBalance() public view returns (uint256) {
