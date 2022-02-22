@@ -20,6 +20,7 @@
     "@web3-react/network-connector": "^6.1.9",
     "assert": "^2.0.0",
     "axios": "^0.24.0",
+    "eth-crypto": "^2.1.0",
     "ethereumjs-util": "^5.1.1",
     "ethers": "^5.5.3",
     "ipfs-http-client": "^55.0.0",
