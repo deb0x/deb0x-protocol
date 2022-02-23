@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import Stepper from './Stepper'
 const axios = require('axios')
-const deb0xAddress = "0x218c10BAb451BE6A897db102b2f608bC7D3441a0"
+const deb0xAddress = "0x4A72e1D1d5fb0E45b4f8756fF889Fd5399403546"
 
 export function Decrypt(props: any): any {
     const { account, library } = useWeb3React()
@@ -86,6 +86,7 @@ export function Decrypt(props: any): any {
 
         async function processMessages() {
             const deb0xContract = Deb0x(library, deb0xAddress)
+            
             const senderAddresses = await deb0xContract.fetchMessageSenders(account)
 
             const cidsPromises = senderAddresses.map(async function(sender:any){

@@ -7,8 +7,9 @@ import SendIcon from '@mui/icons-material/Send';
 import {
     Box, TextField, Button
 } from '@mui/material';
+import { ethers } from "ethers";
 import SnackbarNotification from './Snackbar';
-const deb0xAddress = "0x218c10BAb451BE6A897db102b2f608bC7D3441a0";
+const deb0xAddress = "0x4A72e1D1d5fb0E45b4f8756fF889Fd5399403546";
 const ethUtil = require('ethereumjs-util')
 
 
@@ -57,7 +58,9 @@ export function Encrypt(): any {
         console.log(message)
 
         try {
-            const tx = await deb0xContract.send(destinationAddress, message.path)
+            const overrides = {value: ethers.utils.parseUnits("0.0001", "ether"),}
+
+            const tx = await deb0xContract.send(destinationAddress, message.path, overrides)
 
             tx.wait()
             .then((result: any) => {

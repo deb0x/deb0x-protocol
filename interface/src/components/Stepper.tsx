@@ -8,7 +8,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import Typography from '@mui/material/Typography';
 import Deb0x from "../ethereum/deb0x"
 import SnackbarNotification from './Snackbar';
-const deb0xAddress = "0x218c10BAb451BE6A897db102b2f608bC7D3441a0";
+const deb0xAddress = "0x4A72e1D1d5fb0E45b4f8756fF889Fd5399403546";
 const steps = ['Provide public encryption key', 'Initialize Deb0x'];
 
 export default function HorizontalLinearStepper(props: any) {

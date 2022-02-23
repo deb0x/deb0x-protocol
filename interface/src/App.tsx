@@ -14,6 +14,7 @@ import Deb0x from "./ethereum/deb0x"
 import { create } from 'ipfs-http-client'
 import { Encrypt } from './components/Encrypt';
 import { Decrypt } from './components/Decrypt';
+import {Stake} from './components/Stake';
 import {Container, Box} from '@mui/material'
 
 
@@ -26,7 +27,8 @@ const client = create({
 })
 
 const ethUtil = require('ethereumjs-util')
-const deb0xAddress = "0x218c10BAb451BE6A897db102b2f608bC7D3441a0";
+//old address: 0x218c10BAb451BE6A897db102b2f608bC7D3441a0
+const deb0xAddress = "0x4A72e1D1d5fb0E45b4f8756fF889Fd5399403546";
 
 
 enum ConnectorNames { Injected = 'Injected', Network = 'Network' };
@@ -246,6 +248,7 @@ function App() {
           <Box sx={{marginLeft: 40, marginTop: 10}}>
              {selectedOption === "Send email" && <Encrypt />}
              {selectedOption === "Deb0x" && <Decrypt account={account}/>}
+             {selectedOption === "Stake" && <Stake />}
           </Box>
       )}
 
