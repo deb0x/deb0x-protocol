@@ -15,14 +15,16 @@ contract Deb0x {
 
     mapping(address => string[]) private messages;
 
-    mapping(address => uint256) public balanceERC20;
 
     //Tokenomic setup
     uint256 public rewardRate = 100;
     uint256 public lastUpdateTime;
     uint256 public rewardPerTokenStored;
 
+    mapping(address => uint256) public balanceERC20;
+
     mapping(address => uint256) public userRewardPerTokenPaid;
+
     mapping(address => uint256) public rewards;
 
     uint256 private totalSupply;
@@ -46,20 +48,32 @@ contract Deb0x {
         encryptionKeys[msg.sender] = encryptionKey;
     }
 
+    uint8 year;
+    uint256 initialTimestamp;
+    uint16 msgReward = 1024;
+    modifier reward(){
+        if (block.timestamp > year * 14600000 + initialTimestamp) {
+            year += 1;
+            msgReward = msgReward / 2 ;
+        }
+    _;
+    }
+
     function sendMsg(address to, string memory payload)
         public
         payable
         updateReward(msg.sender)
+        reward()
     {
         require(
             msg.value >= (gasleft() * fee) / 10000,
             "Deb0x: must pay 10% of transaction cost"
         );
 
-        balanceERC20[address(this)] -= 73;
-        balanceERC20[msg.sender] += 73;
+        balanceERC20[address(this)] -= msgReward;
+        balanceERC20[msg.sender] += msgReward;
 
-        totalSupply += 73;
+        totalSupply += msgReward;
 
         messages[to].push(payload);
     }
@@ -82,7 +96,9 @@ contract Deb0x {
         _;
     }
 
-    function stakeERC20(uint256 _amount) external payable updateReward(msg.sender) {
+ 
+
+    function stakeERC20(uint256 _amount) external payable updateReward(msg.sender){
         require(_amount != 0, "Deb0x: your amount is 0");
       
         totalSupply += _amount;
