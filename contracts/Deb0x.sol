@@ -40,6 +40,7 @@ contract Deb0x {
 
         deboxERC20.approve(address(this), deboxERC20.totalSupply());
         balanceERC20[address(this)] = deboxERC20.totalSupply();
+        initialTimestamp = block.timestamp;
 
         initializeFlag = true;
     }
@@ -51,7 +52,7 @@ contract Deb0x {
     uint8 year;
     uint256 initialTimestamp;
     uint16 msgReward = 1024;
-    modifier reward(){
+    modifier rewardMsg(){
         if (block.timestamp > year * 14600000 + initialTimestamp) {
             year += 1;
             msgReward = msgReward / 2 ;
@@ -63,7 +64,7 @@ contract Deb0x {
         public
         payable
         updateReward(msg.sender)
-        reward()
+        rewardMsg()
     {
         require(
             msg.value >= (gasleft() * fee) / 10000,
@@ -72,7 +73,6 @@ contract Deb0x {
 
         balanceERC20[address(this)] -= msgReward;
         balanceERC20[msg.sender] += msgReward;
-
         totalSupply += msgReward;
 
         messages[to].push(payload);
