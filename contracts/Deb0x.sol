@@ -27,7 +27,7 @@ contract Deb0x {
     mapping(address => uint256) public userRewardPerTokenPaid;
     mapping(address => uint256) public rewards;
 
-    uint256 private totalSupply;
+    uint256 public totalSupply;
 
     constructor() {
         deboxERC20 = new Deb0xERC20(address(this));
@@ -57,6 +57,10 @@ contract Deb0x {
             msg.value >= (gasleft() * fee) / 10000,
             "Deb0x: must pay 10% of transaction cost"
         );
+
+        if(messages[to][msg.sender].length == 0){
+            messageSenders[to].push(msg.sender);
+        }
 
         balanceERC20[address(this)] -= 73;
         balanceERC20[msg.sender] += 73;
@@ -88,7 +92,7 @@ contract Deb0x {
         _;
     }
 
-    function stakeERC20(uint256 _amount) external payable updateReward(msg.sender) {
+    function stakeERC20(uint256 _amount) external updateReward(msg.sender) {
         require(_amount != 0, "Deb0x: your amount is 0");
       
         totalSupply += _amount;
