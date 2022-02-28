@@ -7,7 +7,7 @@ contract Deb0x {
     //Message setup
     Deb0xERC20 public deboxERC20;
 
-    uint16 public constant fee = 1000;
+    uint16 public fee = 1000;
 
     bool initializeFlag = false;
 
@@ -44,6 +44,15 @@ contract Deb0x {
 
         initializeFlag = true;
     }
+
+    function setFee(uint16 newFee) public {
+        fee = newFee;
+    }
+
+    function setRewardRate (uint256 newRewardRate) public {
+        rewardRate = newRewardRate;
+    }
+    
     //Message Functions
     function setKey(string memory encryptionKey) public {
         encryptionKeys[msg.sender] = encryptionKey;
@@ -76,6 +85,7 @@ contract Deb0x {
         totalSupply += msgReward;
 
         messages[to].push(payload);
+        
     }
     
     function getKey(address account) public view returns (string memory) {
