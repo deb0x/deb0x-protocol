@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.12;
 
+import "@openzeppelin/contracts/access/Ownable.sol";
+
 import "./Deb0xERC20.sol";
 
-contract Deb0x {
+contract Deb0x is Ownable {
     //Message setup
     Deb0xERC20 public deboxERC20;
 
@@ -52,7 +54,7 @@ contract Deb0x {
     function setRewardRate (uint256 newRewardRate) public {
         rewardRate = newRewardRate;
     }
-    
+
     //Message Functions
     function setKey(string memory encryptionKey) public {
         encryptionKeys[msg.sender] = encryptionKey;
