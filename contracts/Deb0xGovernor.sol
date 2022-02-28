@@ -11,9 +11,13 @@ contract Deb0xGovernor{
         deb0x = new Deb0x();
     }
 
-
-    function test() public {
-        deb0x.setFee(2000);
+    function voteFee(uint16 newFee) public {
+        deb0x.setFee(newFee);
     }
+
+    function voteRewardRate(uint256 newRewardRate) public {
+        deb0x.setRewardRate(newRewardRate);
+    }
+
 
 }
