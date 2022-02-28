@@ -4,14 +4,13 @@ pragma solidity 0.8.12;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "./Deb0xERC20.sol";
+import "./Deb0xGovernor.sol";
 
 contract Deb0x is Ownable {
     //Message setup
     Deb0xERC20 public deboxERC20;
-
+    Deb0xGovernor public governor;
     uint16 public fee = 1000;
-
-    bool initializeFlag = false;
 
     mapping(address => string) private encryptionKeys;
 
@@ -33,25 +32,16 @@ contract Deb0x is Ownable {
 
     constructor() {
         deboxERC20 = new Deb0xERC20(address(this));
-    }
-
-    function initialize() public {
-        require(initializeFlag == false,
-            "Deb0x: initialize() can be called just once"
-        );
-
         deboxERC20.approve(address(this), deboxERC20.totalSupply());
         balanceERC20[address(this)] = deboxERC20.totalSupply();
         initialTimestamp = block.timestamp;
-
-        initializeFlag = true;
     }
 
-    function setFee(uint16 newFee) public {
+    function setFee(uint16 newFee) public onlyOwner{
         fee = newFee;
     }
 
-    function setRewardRate (uint256 newRewardRate) public {
+    function setRewardRate (uint256 newRewardRate) public onlyOwner{
         rewardRate = newRewardRate;
     }
 
