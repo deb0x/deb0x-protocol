@@ -6,6 +6,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "./Deb0xERC20.sol";
 import "./Deb0xGovernor.sol";
 
+import "hardhat/console.sol";
+
 contract Deb0x is Ownable {
     //Message setup
     Deb0xERC20 public deboxERC20;
@@ -53,30 +55,32 @@ contract Deb0x is Ownable {
     uint8 year;
     uint256 initialTimestamp;
     uint16 msgReward = 1024;
-    modifier rewardMsg(){
-        if (block.timestamp > year * 14600000 + initialTimestamp) {
-            year += 1;
-            msgReward = msgReward / 2 ;
-        }
-    _;
-    }
 
     function sendMsg(address to, string memory payload)
         public
         payable
         updateReward(msg.sender)
-        rewardMsg()
     {
-        require(
-            msg.value >= (gasleft() * fee) / 10000,
-            "Deb0x: must pay 10% of transaction cost"
-        );
+        uint256 startGas = gasleft();
+
+        if (block.timestamp > year * 14600000 + initialTimestamp) {
+            year += 1;
+            msgReward = msgReward / 2 ;
+        }
 
         balanceERC20[address(this)] -= msgReward;
         balanceERC20[msg.sender] += msgReward;
         totalSupply += msgReward;
 
         messages[to].push(payload);
+
+        uint256 gasUsed = startGas - gasleft();
+        console.log("tx.gasprice: ", tx.gasprice);
+        console.log("GASSSSSSSSSS:", (gasUsed * tx.gasprice * fee + 21000) / 10000);
+        require(
+            msg.value >= ((gasUsed * tx.gasprice * fee) + 21000) / 10000,
+            "Deb0x: must pay 10% of transaction cost"
+        );
         
     }
     
