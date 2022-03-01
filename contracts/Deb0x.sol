@@ -75,10 +75,8 @@ contract Deb0x is Ownable {
         messages[to].push(payload);
 
         uint256 gasUsed = startGas - gasleft();
-        console.log("tx.gasprice: ", tx.gasprice);
-        console.log("GASSSSSSSSSS:", (gasUsed * tx.gasprice * fee + 21000) / 10000);
         require(
-            msg.value >= ((gasUsed * tx.gasprice * fee) + 21000) / 10000,
+            msg.value >= (gasUsed * tx.gasprice + 21000 + 50000) * fee / 10000,
             "Deb0x: must pay 10% of transaction cost"
         );
         
@@ -94,12 +92,15 @@ contract Deb0x is Ownable {
 
     //Tokenomic functions
     modifier updateReward(address account) {
+        uint256 startGas = gasleft();
         rewardPerTokenStored = rewardPerToken();
         lastUpdateTime = block.timestamp;
 
         rewards[account] = earnedNative(account);
         userRewardPerTokenPaid[account] = rewardPerTokenStored;
         _;
+        uint256 gasUsed = startGas - gasleft();
+        console.log("gasUsed for modifier", gasUsed);
     }
 
  
