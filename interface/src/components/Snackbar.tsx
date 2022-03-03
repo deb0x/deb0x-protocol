@@ -1,30 +1,39 @@
-import {useState, forwardRef} from 'react'
+import { useState, forwardRef, useEffect } from 'react'
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 
 const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
-    props,
-    ref,
-  ) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-  });
+  props,
+  ref,
+) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
-export default function SnackbarNotification(props:any) {
+export default function SnackbarNotification(props: any) {
 
-    const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
-        if (reason === 'clickaway') {
-          return;
-        }
-    
-        props.setNotificationState({message: props.state.message, open: false,
-        severity: props.state.severity});
-      };
+  const [state, setState] = useState({ severity: props.state.severity, open: props.state.open, message: props.state.message })
 
-    return(
-        <Snackbar open={props.state.open} autoHideDuration={6000} onClose={handleClose}>
-            <Alert onClose={handleClose} severity={props.state.severity} sx={{ width: '100%' }}>
-                {props.state.message}
-            </Alert>
-        </Snackbar>
-    )
+  useEffect(() => {
+    console.log(props)
+    setState({severity: props.state.severity, open: props.state.open, message: props.state.message})
+  }, [props])
+
+  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setState({
+      message: state.message, open: false,
+      severity: state.severity
+    })
+  };
+
+  return (
+    <Snackbar open={state.open} autoHideDuration={6000} onClose={handleClose}>
+      <Alert onClose={handleClose} severity={state.severity} sx={{ width: '100%' }}>
+        {state.message}
+      </Alert>
+    </Snackbar>
+  )
 }
