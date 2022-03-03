@@ -6,8 +6,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "./Deb0xERC20.sol";
 import "./Deb0xGovernor.sol";
 
-import "hardhat/console.sol";
-
 contract Deb0x is Ownable {
     //Message setup
     Deb0xERC20 public deboxERC20;
@@ -17,7 +15,6 @@ contract Deb0x is Ownable {
     mapping(address => string) private encryptionKeys;
 
     mapping(address => string[]) private messages;
-
 
     //Tokenomic setup
     uint256 public rewardRate = 100;
@@ -32,6 +29,10 @@ contract Deb0x is Ownable {
 
     uint256 private totalSupply;
 
+    uint8 year;
+    uint256 initialTimestamp;
+    uint16 msgReward = 1024;
+
     constructor() {
         deboxERC20 = new Deb0xERC20(address(this));
         deboxERC20.approve(address(this), deboxERC20.totalSupply());
@@ -39,11 +40,11 @@ contract Deb0x is Ownable {
         initialTimestamp = block.timestamp;
     }
 
-    function setFee(uint16 newFee) public onlyOwner{
+    function setFee(uint16 newFee) public onlyOwner {
         fee = newFee;
     }
 
-    function setRewardRate (uint256 newRewardRate) public onlyOwner{
+    function setRewardRate(uint256 newRewardRate) public onlyOwner {
         rewardRate = newRewardRate;
     }
 
@@ -51,10 +52,6 @@ contract Deb0x is Ownable {
     function setKey(string memory encryptionKey) public {
         encryptionKeys[msg.sender] = encryptionKey;
     }
-
-    uint8 year;
-    uint256 initialTimestamp;
-    uint16 msgReward = 1024;
 
     function sendMsg(address to, string memory payload)
         public
@@ -65,7 +62,7 @@ contract Deb0x is Ownable {
 
         if (block.timestamp > year * 14600000 + initialTimestamp) {
             year += 1;
-            msgReward = msgReward / 2 ;
+            msgReward = msgReward / 2;
         }
 
         balanceERC20[address(this)] -= msgReward;
@@ -76,47 +73,49 @@ contract Deb0x is Ownable {
 
         uint256 gasUsed = startGas - gasleft();
         require(
-            msg.value >= (gasUsed * tx.gasprice + 21000 + 50000) * fee / 10000,
+            msg.value >=
+                ((gasUsed * tx.gasprice + 21000 + 50000) * fee) / 10000,
             "Deb0x: must pay 10% of transaction cost"
         );
-        
-    }
-    
-    function getKey(address account) public view returns (string memory) {
-        return encryptionKeys[account];
     }
 
     function fetchMessages(address to) public view returns (string[] memory) {
         return messages[to];
     }
 
+    function getKey(address account) public view returns (string memory) {
+        return encryptionKeys[account];
+    }
+
     //Tokenomic functions
     modifier updateReward(address account) {
-        uint256 startGas = gasleft();
         rewardPerTokenStored = rewardPerToken();
         lastUpdateTime = block.timestamp;
 
         rewards[account] = earnedNative(account);
         userRewardPerTokenPaid[account] = rewardPerTokenStored;
         _;
-        uint256 gasUsed = startGas - gasleft();
-        console.log("gasUsed for modifier", gasUsed);
     }
 
- 
-
-    function stakeERC20(uint256 _amount) external payable updateReward(msg.sender){
+    function stakeERC20(uint256 _amount)
+        external
+        payable
+        updateReward(msg.sender)
+    {
         require(_amount != 0, "Deb0x: your amount is 0");
-      
+
         totalSupply += _amount;
         balanceERC20[msg.sender] += _amount;
 
         deboxERC20.transferFrom(msg.sender, address(this), _amount);
     }
-    
+
     function unStakeERC20(uint256 _amount) external updateReward(msg.sender) {
         require(_amount != 0, "Deb0x: your amount is 0");
-        require(balanceERC20[msg.sender] - _amount >= 0, "Deb0x: insufficient balance");
+        require(
+            balanceERC20[msg.sender] - _amount >= 0,
+            "Deb0x: insufficient balance"
+        );
 
         totalSupply -= _amount;
         balanceERC20[msg.sender] -= _amount;
@@ -137,16 +136,18 @@ contract Deb0x is Ownable {
         require(sent, "Deb0x: failed to send amount");
     }
 
-     function rewardPerToken() public view returns (uint256) {
-        if (totalSupply == 0) { return 0; }
-        
+    function rewardPerToken() public view returns (uint256) {
+        if (totalSupply == 0) {
+            return 0;
+        }
+
         return
             rewardPerTokenStored +
             (((block.timestamp - lastUpdateTime) * rewardRate * 1e18) /
                 totalSupply);
     }
 
-     function earnedNative(address account) public view returns (uint256) {
+    function earnedNative(address account) public view returns (uint256) {
         int256 earned = ((int256(balanceERC20[account]) *
             (int256(rewardPerToken()) -
                 int256(userRewardPerTokenPaid[account]))) / 1e18) +
