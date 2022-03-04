@@ -39,7 +39,7 @@ Run deploy script (BSC testnet)
 ```
 npx hardhat run --network testnet scripts/deploy.js
 
-# Tipsy Token Addresses 
+# Deb0x Contract Addresses 
 
 | Contract name            | Commit hash | BSC Testnet                                 | BSC Mainnet                                |
 | ------------------------ | ----------- | ------------------------------------------- | ------------------------------------------ | 
