@@ -13,11 +13,13 @@ import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail'
 import LockIcon from '@mui/icons-material/Lock';
+import GavelIcon from '@mui/icons-material/Gavel';
 import Button from '@mui/material/Button'
 import Popper from '@mui/material/Popper'
 import { injected } from '../connectors';
 import { Spinner } from './Spinner'
 import { useEagerConnect } from '../hooks'
+import Gavel from '@mui/icons-material/Gavel';
 
 enum ConnectorNames { Injected = 'Injected' };
 
@@ -140,12 +142,13 @@ export function PermanentDrawer(props: any): any {
                 <Toolbar />
                 <Divider />
                 <List >
-                    {['Deb0x', 'Send email', 'Stake'].map((text, index) => (
+                    {['Deb0x', 'Send email', 'Stake', 'Governance'].map((text, index) => (
                         <ListItem button key={text} onClick={() => handleChange(text)}>
                             <ListItemIcon >
                                 {index === 0 && <MailIcon />}
                                 {index === 1 && <InboxIcon />}
                                 {index === 2 && <LockIcon />}
+                                {index === 3 && <Gavel />}
                             </ListItemIcon>
                             <ListItemText primary={text} />
                         </ListItem>

@@ -15,6 +15,7 @@ import { create } from 'ipfs-http-client'
 import { Encrypt } from './components/Encrypt';
 import { Decrypt } from './components/Decrypt';
 import {Stake} from './components/Stake';
+import { Governance } from './components/Governance';
 import {Container, Box} from '@mui/material'
 
 
@@ -249,6 +250,7 @@ function App() {
              {selectedOption === "Send email" && <Encrypt />}
              {selectedOption === "Deb0x" && <Decrypt account={account}/>}
              {selectedOption === "Stake" && <Stake />}
+             {selectedOption === "Governance" && <Governance />}
           </Box>
       )}
 
