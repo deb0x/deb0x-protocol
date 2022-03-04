@@ -23,6 +23,10 @@
     "chai": "^4.3.4",
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.5.2",
-    "hardhat": "^2.8.0"
+    "hardhat": "^2.8.0",
+    "react-error-overlay": "^6.0.9"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.5.0"
   }
 }
