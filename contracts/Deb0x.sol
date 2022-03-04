@@ -1,85 +1,90 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.12;
 
-import "./Deb0xERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Deb0x {
+import "./Deb0xERC20.sol";
+import "./Deb0xGovernor.sol";
+
+contract Deb0x is Ownable {
     //Message setup
     Deb0xERC20 public deboxERC20;
-
-    uint16 public constant fee = 1000;
-
-    bool initializeFlag = false;
+    Deb0xGovernor public governor;
+    uint16 public fee = 1000;
 
     mapping(address => string) private encryptionKeys;
 
-    mapping (address => mapping(address => string[])) private messages;
-
-    mapping (address => address[]) private messageSenders;
-
-    mapping(address => uint256) public balanceERC20;
+    mapping(address => string[]) private messages;
 
     //Tokenomic setup
     uint256 public rewardRate = 100;
     uint256 public lastUpdateTime;
     uint256 public rewardPerTokenStored;
 
+    mapping(address => uint256) public balanceERC20;
+
     mapping(address => uint256) public userRewardPerTokenPaid;
+
     mapping(address => uint256) public rewards;
 
-    uint256 public totalSupply;
+    uint256 private totalSupply;
+
+    uint8 year;
+    uint256 initialTimestamp;
+    uint16 msgReward = 1024;
 
     constructor() {
         deboxERC20 = new Deb0xERC20(address(this));
-    }
-
-    function initialize() public {
-        require(initializeFlag == false,
-            "Deb0x: initialize() can be called just once"
-        );
-
         deboxERC20.approve(address(this), deboxERC20.totalSupply());
         balanceERC20[address(this)] = deboxERC20.totalSupply();
-
-        initializeFlag = true;
+        initialTimestamp = block.timestamp;
     }
+
+    function setFee(uint16 newFee) public onlyOwner {
+        fee = newFee;
+    }
+
+    function setRewardRate(uint256 newRewardRate) public onlyOwner {
+        rewardRate = newRewardRate;
+    }
+
     //Message Functions
     function setKey(string memory encryptionKey) public {
         encryptionKeys[msg.sender] = encryptionKey;
     }
 
-    function send(address to, string memory payload)
+    function sendMsg(address to, string memory payload)
         public
         payable
         updateReward(msg.sender)
     {
-        require(
-            msg.value >= (gasleft() * fee) / 10000,
-            "Deb0x: must pay 10% of transaction cost"
-        );
+        uint256 startGas = gasleft();
 
-        if(messages[to][msg.sender].length == 0){
-            messageSenders[to].push(msg.sender);
+        if (block.timestamp > year * 14600000 + initialTimestamp) {
+            year += 1;
+            msgReward = msgReward / 2;
         }
 
-        balanceERC20[address(this)] -= 73;
-        balanceERC20[msg.sender] += 73;
+        balanceERC20[address(this)] -= msgReward;
+        balanceERC20[msg.sender] += msgReward;
+        totalSupply += msgReward;
 
-        totalSupply += 73;
+        messages[to].push(payload);
 
-        messages[to][msg.sender].push(payload);
+        uint256 gasUsed = startGas - gasleft();
+        require(
+            msg.value >=
+                ((gasUsed * tx.gasprice + 21000 + 50000) * fee) / 10000,
+            "Deb0x: must pay 10% of transaction cost"
+        );
     }
-    
+
+    function contractBalance() public view returns (uint256) {
+        return address(this).balance;
+    }
+
     function getKey(address account) public view returns (string memory) {
         return encryptionKeys[account];
-    }
-
-    function fetchMessages(address to, address from) public view returns (string[] memory) {
-        return messages[to][from];
-    }
-
-    function fetchMessageSenders(address to) public view returns (address[] memory) {
-        return messageSenders[to];
     }
 
     //Tokenomic functions
@@ -92,18 +97,25 @@ contract Deb0x {
         _;
     }
 
-    function stakeERC20(uint256 _amount) external updateReward(msg.sender) {
+    function stakeERC20(uint256 _amount)
+        external
+        payable
+        updateReward(msg.sender)
+    {
         require(_amount != 0, "Deb0x: your amount is 0");
-      
+
         totalSupply += _amount;
         balanceERC20[msg.sender] += _amount;
 
         deboxERC20.transferFrom(msg.sender, address(this), _amount);
     }
-    
+
     function unStakeERC20(uint256 _amount) external updateReward(msg.sender) {
         require(_amount != 0, "Deb0x: your amount is 0");
-        require(balanceERC20[msg.sender] - _amount >= 0, "Deb0x: insufficient balance");
+        require(
+            balanceERC20[msg.sender] - _amount >= 0,
+            "Deb0x: insufficient balance"
+        );
 
         totalSupply -= _amount;
         balanceERC20[msg.sender] -= _amount;
@@ -124,16 +136,18 @@ contract Deb0x {
         require(sent, "Deb0x: failed to send amount");
     }
 
-     function rewardPerToken() public view returns (uint256) {
-        if (totalSupply == 0) { return 0; }
-        
+    function rewardPerToken() public view returns (uint256) {
+        if (totalSupply == 0) {
+            return 0;
+        }
+
         return
             rewardPerTokenStored +
             (((block.timestamp - lastUpdateTime) * rewardRate * 1e18) /
                 totalSupply);
     }
 
-     function earnedNative(address account) public view returns (uint256) {
+    function earnedNative(address account) public view returns (uint256) {
         int256 earned = ((int256(balanceERC20[account]) *
             (int256(rewardPerToken()) -
                 int256(userRewardPerTokenPaid[account]))) / 1e18) +
