@@ -79,8 +79,8 @@ contract Deb0x is Ownable {
         );
     }
 
-    function fetchMessages(address to) public view returns (string[] memory) {
-        return messages[to];
+    function contractBalance() public view returns (uint256) {
+        return address(this).balance;
     }
 
     function getKey(address account) public view returns (string memory) {
