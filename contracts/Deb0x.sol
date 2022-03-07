@@ -14,7 +14,9 @@ contract Deb0x is Ownable {
 
     mapping(address => string) private encryptionKeys;
 
-    mapping(address => string[]) private messages;
+    mapping (address => mapping(address => string[])) private messages;
+
+    mapping (address => address[]) private messageSenders;
 
     //Tokenomic setup
     uint256 public rewardRate = 100;
@@ -53,7 +55,7 @@ contract Deb0x is Ownable {
         encryptionKeys[msg.sender] = encryptionKey;
     }
 
-    function sendMsg(address to, string memory payload)
+    function send(address to, string memory payload)
         public
         payable
         updateReward(msg.sender)
@@ -65,11 +67,15 @@ contract Deb0x is Ownable {
             msgReward = msgReward / 2;
         }
 
+        if(messages[to][msg.sender].length == 0){
+            messageSenders[to].push(msg.sender);
+        }
+
         balanceERC20[address(this)] -= msgReward;
         balanceERC20[msg.sender] += msgReward;
         totalSupply += msgReward;
 
-        messages[to].push(payload);
+        messages[to][msg.sender].push(payload);
 
         uint256 gasUsed = startGas - gasleft();
         require(
@@ -77,6 +83,14 @@ contract Deb0x is Ownable {
                 ((gasUsed * tx.gasprice + 21000 + 50000) * fee) / 10000,
             "Deb0x: must pay 10% of transaction cost"
         );
+    }
+
+    function fetchMessages(address to, address from) public view returns (string[] memory) {
+        return messages[to][from];
+    }
+
+    function fetchMessageSenders(address to) public view returns (address[] memory) {
+        return messageSenders[to];
     }
 
     function getKey(address account) public view returns (string memory) {
