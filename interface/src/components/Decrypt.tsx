@@ -6,6 +6,10 @@ import {
     ListItemText, ListItemButton, Typography, Box, CircularProgress
 } from '@mui/material';
 import Stepper from './Stepper'
+import { border } from '@mui/system';
+import IconButton from "@mui/material/IconButton";
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+
 const axios = require('axios')
 const deb0xAddress = "0xD88efe6C4f231cE03EE9f71EA53a7E0028751Ecf"
 
@@ -49,10 +53,9 @@ export function Decrypt(props: any): any {
     }
 
     function Message(props: any) {
+        const encryptMessage = props.message.fetchedMessage.data
         const [message, setMessage] = useState(props.message.fetchedMessage.data)
         //const [sender, setSender] = useState(props.messsage.sender)
-
-
 
         async function decryptMessage() {
             const decryptedMessage = await decrypt(message)
@@ -61,8 +64,20 @@ export function Decrypt(props: any): any {
             }
         }
 
+        async function hideMessage(){
+            console.log("sss")
+            setMessage(encryptMessage)
+        }
+
+
+    
         return (
-            <ListItem disablePadding key={props.index}>
+            <ListItem sx ={{border:1, marginBottom:1}} disablePadding key={props.index}    secondaryAction={ 
+                <IconButton  onClick={()=>{hideMessage()}}  edge="end" aria-label="comments">
+                { (message != props.message.fetchedMessage.data) ? <VisibilityOffIcon  />: null}
+              </IconButton>  
+            }
+            >
                 <Tooltip title={(message == props.message.fetchedMessage.data) ? "Click to decrypt" : `Sender:${props.message.sender}`} placement="right">
                     <ListItemButton onClick={() => {
                         if(message == props.message.fetchedMessage.data) {
@@ -70,7 +85,12 @@ export function Decrypt(props: any): any {
                         }
                     }}>
                         <ListItemText
-                        primary={(message == props.message.fetchedMessage.data) ? `${message.substring(0,120)}...` : message}/>
+                        primary={ `${props.message.sender.substring(0, 5)} ... ${props.message.sender.substring(props.message.sender.length - 4)}:  
+                        
+                        ${(message == props.message.fetchedMessage.data) ? `${message.substring(0,95)}...` : message }
+                            `
+                         }/>
+                         
                     </ListItemButton>
                 </Tooltip>
             </ListItem>)
@@ -132,7 +152,7 @@ export function Decrypt(props: any): any {
                 )
             } else {
                 return (
-                    <Box sx={{ width: '100%', maxWidth: 1080 }}>
+                    <Box sx={{ width: '100%', maxWidth: 1080}}>
                         <List>
                             {fetchedMessages.map((message: any, i: any) => {
                                 return (

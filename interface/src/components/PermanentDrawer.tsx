@@ -21,6 +21,7 @@ import { Spinner } from './Spinner'
 import { useEagerConnect } from '../hooks'
 import Gavel from '@mui/icons-material/Gavel';
 
+
 enum ConnectorNames { Injected = 'Injected' };
 
 const connectorsByName: { [connectorName in ConnectorNames]: any } = {
@@ -41,13 +42,16 @@ export function PermanentDrawer(props: any): any {
     }, [activatingConnector, connector])
 
     const triedEager = useEagerConnect()
+    const [selectedIndex, setSelectedIndex]  = React.useState(0);
 
-    function handleChange(text: any) {
+    function handleChange(text: any, index:any) {
+        setSelectedIndex(index)
         props.onChange(text)
     }
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
+   
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(anchorEl ? null : event.currentTarget);
     };
@@ -143,7 +147,7 @@ export function PermanentDrawer(props: any): any {
                 <Divider />
                 <List >
                     {['Deb0x', 'Send email', 'Stake', 'Governance'].map((text, index) => (
-                        <ListItem button key={text} onClick={() => handleChange(text)}>
+                        <ListItem  button key={text}  selected = { selectedIndex === index}  onClick={() => handleChange(text,index)}>
                             <ListItemIcon >
                                 {index === 0 && <MailIcon />}
                                 {index === 1 && <InboxIcon />}
