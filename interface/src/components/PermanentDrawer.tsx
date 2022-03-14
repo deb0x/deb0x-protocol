@@ -20,6 +20,10 @@ import { injected } from '../connectors';
 import { Spinner } from './Spinner'
 import { useEagerConnect } from '../hooks'
 import Gavel from '@mui/icons-material/Gavel';
+import Paper from "@mui/material/Paper";
+import InputBase from "@mui/material/InputBase";
+import SearchIcon from "@mui/icons-material/Search";
+import IconButton from "@mui/material/IconButton";
 
 
 enum ConnectorNames { Injected = 'Injected' };
@@ -33,6 +37,7 @@ const drawerWidth = 240;
 export function PermanentDrawer(props: any): any {
     const context = useWeb3React()
     const { connector, library, chainId, account, activate, deactivate, active, error } = context
+    
 
     const [activatingConnector, setActivatingConnector] = React.useState<any>()
     React.useEffect(() => {
@@ -41,17 +46,32 @@ export function PermanentDrawer(props: any): any {
         }
     }, [activatingConnector, connector])
 
-    const triedEager = useEagerConnect()
-    const [selectedIndex, setSelectedIndex]  = React.useState(0);
+    // React.useEffect(()=>{
+    //     checkENS();
+    // },[]);
 
-    function handleChange(text: any, index:any) {
+    async function checkENS(){
+        var name = await library.lookupAddress(account);
+        if(name !== null)
+        {   
+            console.log(name)
+            setEnsName(name);
+        }
+    }
+
+    const triedEager = useEagerConnect()
+    const [selectedIndex, setSelectedIndex] = React.useState<any>(0);
+    const [searchBarValue, setSearchBarValue] = React.useState<any>("search");
+    const [ensName, setEnsName] = useState<any>("");
+
+    function handleChange(text: any, index: any) {
         setSelectedIndex(index)
         props.onChange(text)
     }
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
-   
+
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(anchorEl ? null : event.currentTarget);
     };
@@ -65,9 +85,25 @@ export function PermanentDrawer(props: any): any {
             <CssBaseline />
             <AppBar
                 position="fixed"
-                sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px`, zIndex:1 }}
+                sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px`, zIndex: 1 }}
             >
+                <Paper
+                        component="form"
+                        sx={{ mr: "1100px",p: "2px 4px", display: "flex", alignItems: "center", width: 400, position: "absolute" }}
+                    >
+                        <InputBase
+                            sx={{ ml: 1, flex: 1 }}
+                            placeholder="Search messages"
+                            inputProps={{ "aria-label": "search" }}
+                        />
+                        <IconButton type="submit" sx={{ p: "10px" }} aria-label="search">
+                            <SearchIcon />
+                        </IconButton>
+                    </Paper>
+
+
                 <Toolbar>
+                    
                     {(() => {
                         const currentConnector = connectorsByName[ConnectorNames.Injected]
                         const activating = currentConnector === activatingConnector
@@ -76,7 +112,7 @@ export function PermanentDrawer(props: any): any {
                         console.log(account)
                         return (
                             <Button variant="contained" color="warning"
-                                sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `1400px` }}
+                                sx={{ width: `calc(100% - ${drawerWidth}px )`, ml: `1300px` }}
 
                                 key={ConnectorNames.Injected}
                                 aria-describedby={id}
@@ -86,6 +122,8 @@ export function PermanentDrawer(props: any): any {
                                 } : handleClick
                                 }
                             >
+
+
                                 <div
                                     style={{
                                         position: 'absolute',
@@ -107,7 +145,10 @@ export function PermanentDrawer(props: any): any {
                                         {account === undefined
                                             ? 'Unsupported Network'
                                             : account
-                                                ? `${account.substring(0, 5)}...${account.substring(account.length - 4)}`
+                                                ? ensName==="" ? `${account.substring(0, 5)}...${account.substring(account.length - 4)}` :
+                                                     ensName
+                                                
+                                                
                                                 : ''}
                                     </span>
                                 }
@@ -121,11 +162,11 @@ export function PermanentDrawer(props: any): any {
             </AppBar>
             <Popper id={id} open={open} anchorEl={anchorEl}>
                 <Button variant="contained"
-                sx={{top:15}}
-                onClick={(event: any) => {
-                    handleClick(event)
-                    deactivate()
-                }}
+                    sx={{ top: 15 }}
+                    onClick={(event: any) => {
+                        handleClick(event)
+                        deactivate()
+                    }}
                 >
                     Logout
                 </Button>
@@ -147,7 +188,7 @@ export function PermanentDrawer(props: any): any {
                 <Divider />
                 <List >
                     {['Deb0x', 'Send email', 'Stake', 'Governance'].map((text, index) => (
-                        <ListItem  button key={text}  selected = { selectedIndex === index}  onClick={() => handleChange(text,index)}>
+                        <ListItem button key={text} selected={selectedIndex === index} onClick={() => handleChange(text, index)}>
                             <ListItemIcon >
                                 {index === 0 && <MailIcon />}
                                 {index === 1 && <InboxIcon />}

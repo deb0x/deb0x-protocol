@@ -9,6 +9,9 @@ import {
 } from '@mui/material';
 import { ethers } from "ethers";
 import SnackbarNotification from './Snackbar';
+import LoadingButton from '@mui/lab/LoadingButton';
+
+
 const deb0xAddress = "0xD88efe6C4f231cE03EE9f71EA53a7E0028751Ecf";
 const ethUtil = require('ethereumjs-util')
 
@@ -26,6 +29,8 @@ export function Encrypt(): any {
     const [encryptionKeyInitialized, setEncryptionKeyInitialized] = useState('')
     const [senderAddress, setSenderAddress] = useState('')
     const [notificationState, setNotificationState] = useState({})
+    const [messageSessionSentCounter, setMessageSessionSentCounter] = useState(0);
+    const [loading,setLoading] = useState(false);
 
     useEffect(() => {
         if (!encryptionKeyInitialized) {
@@ -34,6 +39,7 @@ export function Encrypt(): any {
     }, []);
 
     async function encryptText(messageToEncrypt: any, destinationAddress: any) {
+        setLoading(true);
         const signer = await library.getSigner(0);
 
         const deb0xContract = Deb0x(signer, deb0xAddress);
@@ -58,23 +64,36 @@ export function Encrypt(): any {
         console.log(message)
 
         try {
-            const overrides = {value: ethers.utils.parseUnits("0.0001", "ether"),}
+            const overrides = { value: ethers.utils.parseUnits("0.0001", "ether"), }
 
             const tx = await deb0xContract.send(destinationAddress, message.path, overrides)
 
-            tx.wait()
-            .then((result: any) => {
-                setNotificationState({message: "Message was succesfully sent.", open: true,
-                severity:"success"})
+            await tx.wait()
+                .then((result: any) => {
+                    setNotificationState({
+                        message: "Message was succesfully sent.", open: true,
+                        severity: "success"
+                    })
+
+                    let count = messageSessionSentCounter + 1;
+                    setMessageSessionSentCounter(count);
+                })
+                .catch((error: any) => {
+                    setNotificationState({
+                        message: "Message couldn't be sent!", open: true,
+                        severity: "error"
+                    })
+                })
+        } catch (error: any) {
+            setNotificationState({
+                message: "You rejected the transaction. Message was not sent.", open: true,
+                severity: "info"
             })
-            .catch((error: any) => {
-                setNotificationState({message: "Message couldn't be sent!", open: true,
-                severity:"error"})
-            })
-        } catch(error: any) {
-            setNotificationState({message: "You rejected the transaction. Message was not sent.", open: true,
-                severity:"info"})
         }
+
+        setTextToEncrypt("");
+        setSenderAddress("");
+        setLoading(false);
 
     }
 
@@ -111,7 +130,7 @@ export function Encrypt(): any {
 
     return (
         <>
-            <SnackbarNotification state={notificationState} setNotificationState={setNotificationState}/>
+            <SnackbarNotification state={notificationState} setNotificationState={setNotificationState} />
             {/* <div id="encrypt-message-form">
 
                 <input
@@ -163,13 +182,30 @@ export function Encrypt(): any {
                     onChange={e => setTextToEncrypt(e.target.value)}
                 />
                 <br />
-                <Button variant="contained" endIcon={<SendIcon />}
-                    sx={{ marginLeft: 2, marginTop: 1 }}
-                    disabled={textToEncrypt == '' || senderAddress == ''}
-                    onClick={() => encryptText(textToEncrypt, senderAddress)}
-                >
-                    Send
-                </Button>
+                {
+                   
+                    messageSessionSentCounter === 0 ? <LoadingButton loading={loading} variant="contained" endIcon={<SendIcon />}
+                        sx={{ marginLeft: 2, marginTop: 1 }}
+                        disabled={textToEncrypt == '' || senderAddress == ''}
+                        onClick={() => encryptText(textToEncrypt, senderAddress)}
+                    >
+                        Send
+                    </LoadingButton> :
+
+                        <LoadingButton loading={loading} variant="contained" endIcon={<SendIcon />}
+                            sx={{ marginLeft: 2, marginTop: 1 }}
+                            disabled={textToEncrypt == '' || senderAddress == ''}
+                            onClick={() => encryptText(textToEncrypt, senderAddress)}
+                        >
+                            Send another message
+                        </LoadingButton>
+
+                
+                  
+
+                }
+
+
             </Box>
         </>
     )
