@@ -617,7 +617,7 @@ export function Stake(props: any): any {
                     <Typography sx={{ mb: 1.5, mt: 1.5, ml: 8.17 }} variant="h6">
                         {userUnstakedAmount}
                     </Typography>
-                    <Divider/>
+                  
 
                     <Grid sx={{ mb: 0.1 }} container spacing={1}>
                         <Grid item xs={8}>
