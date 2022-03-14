@@ -21,22 +21,30 @@ export function Governance(props: any): any {
         return (
             <Card variant="outlined">
                 <CardContent>
-                    <Typography sx={{ mb: 1.5, ml: 10.75 }} variant="h4" component="div">
+                    <Typography sx={{ mb: 1.5,textAlign:"center" }} variant="h4" component="div">
                         Vote Fee
                     </Typography>
                     <Divider />
                     <Typography sx={{ mb: 1.5, mt: 1.5, ml: 7.6 }} variant="h5">
-                        Proposals to change fee
+                        Proposals to change fee to: 
                     </Typography>
-                    <Typography sx={{ mb: 1.5, mt: 1.5, ml: 7.6 }} variant="h6">
+                    <Typography sx={{ textAlign:"center", fontWeight:"bold" }} variant="h4">
+                        11%
                     </Typography>
                     <Divider />
                     <Typography sx={{ mb: 1.5, mt: 1.5, ml: 7.6 }} variant="h5">
                         
                     </Typography>
+                  
                     <Typography sx={{ mb: 1.5, mt: 1.5, ml: 7.6 }} variant="h6">
+                        We want to raise this to 11% because 5% is to low and people can send to many transactions
                     </Typography>
                     <Divider />
+                    <Box sx={{ mt: 3 ,display:"flex", justifyContent:"center"}}>
+                        <Button variant="contained" color="primary" sx={{mr:'20px'}}>Yes</Button>
+                        <Button variant="contained" color="error">No</Button>
+                    </Box>
+
                 </CardContent>
                 <CardActions>
                 </CardActions>
@@ -152,7 +160,7 @@ export function Governance(props: any): any {
     return (
 
         <>
-            <Grid sx={{ mt: 25, ml: 30 }} container spacing={2}>
+            <Grid sx={{ mt: 25, ml: 30, alignItems:"center"}} container spacing={2}>
                 <Grid item xs={3}>
                     <VoteFeePanel />
                 </Grid>

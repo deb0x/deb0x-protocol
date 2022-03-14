@@ -563,30 +563,33 @@ export function Stake(props: any): any {
                 alignment === "stake" ?
                 
                 <CardContent>
-                    <Typography sx={{ mb: 1.5, ml: 8.17 }} variant="h5" component="div">
-                        Stake your tokens... 
-                    </Typography>
-                    <Divider />
+                   
                     <Typography sx={{ mb: 1.5, mt: 1.5, ml: 8.17 }} variant="h5">
                         Your staked amount:
                     </Typography>
                     <Typography sx={{ mb: 1.5, mt: 1.5, ml: 8.17 }} variant="h6">
-                        {userStakedAmount}
+                        {userStakedAmount} DBX
                     </Typography>
                     <Divider/>
                     <Typography sx={{ mb: 1.5, mt: 1.5, ml: 8.17 }} variant="h5">
                     Your tokens in wallet:
                     </Typography>
                     <Typography sx={{ mb: 1.5, mt: 1.5, ml: 8.17 }} variant="h6">
-                        {userUnstakedAmount}
+                        {userUnstakedAmount} DBX
                     </Typography>
-                    {approved && <Grid container spacing={1}>
+                    {approved && <Grid container spacing={2}>
                         <Grid item xs={8}>
                             <TextField id="outlined-basic"
                                 label="Amount to stake"
                                 variant="outlined"
                                 type="number"
+                                value={amountToStake}
                                 onChange={e => setAmountToStake(e.target.value)} />
+                        </Grid>
+                        <Grid item xs={2}>
+                            <Button size="small" variant="contained" color="error" sx={{fontSize:"10px"}} 
+                               onClick = {()=>setAmountToStake(userStakedAmount)  }
+                            >max</Button>
                         </Grid>
                         <Grid item xs={4}>
                             <LoadingButton disabled={!amountToStake} loading={loading} sx={{ mt: 2 }} fullWidth variant="contained" onClick={stake}>Stake</LoadingButton>
@@ -599,15 +602,12 @@ export function Stake(props: any): any {
 
                 
                 <CardContent>
-                    <Typography sx={{ mb: 1.5, ml: 8.17 }} variant="h5" component="div">
-                        Unstake your tokens...
-                    </Typography>
-                    <Divider />
+                    
                     <Typography sx={{ mb: 1.5, mt: 1.5, ml: 8.17 }} variant="h5">
                         Your staked amount:
                     </Typography>
                     <Typography sx={{ mb: 1.5, mt: 1.5, ml: 8.17 }} variant="h6">
-                        {userStakedAmount}
+                        {userStakedAmount} DBX
                     </Typography>
                     <Divider/>
 
@@ -615,19 +615,25 @@ export function Stake(props: any): any {
                         Your tokens in wallet:
                     </Typography>
                     <Typography sx={{ mb: 1.5, mt: 1.5, ml: 8.17 }} variant="h6">
-                        {userUnstakedAmount}
+                        {userUnstakedAmount} DBX
                     </Typography>
                   
 
                     <Grid sx={{ mb: 0.1 }} container spacing={1}>
-                        <Grid item xs={8}>
+                        <Grid item xs={7}>
                             <TextField value={amountToUnstake} id="outlined-basic"
                                 label="Amount to unstake" variant="outlined"
                                 onChange={e => setAmountToUnstake(e.target.value)}
                                 type="number" />
                                
                         </Grid>
-                        <Grid item xs={4}>
+                        <Grid item xs={2}>
+                            <Button size="small" variant="contained" color="error" sx={{fontSize:"10px"}} 
+                                onClick = {()=>setAmountToUnstake(userUnstakedAmount)  }
+                            >max</Button>
+                        </Grid>
+
+                        <Grid item xs={3}>
                             <LoadingButton disabled={!amountToUnstake} loading={loading} sx={{ mt: 2 }} fullWidth variant="contained" onClick={unstake}>Unstake</LoadingButton>
                         </Grid>
                     </Grid>
@@ -661,7 +667,7 @@ export function Stake(props: any): any {
             <CardContent sx={{alignItems:"center"}}>
 
             <Typography sx={{ mb: 1.5, mt: 1.5, ml: 8.17 }} variant="h5">
-                Total Tokens staked: {totalStaked} Deb0x
+                Total tokens staked: {totalStaked} DBX
             </Typography>
 
             </CardContent>

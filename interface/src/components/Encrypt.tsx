@@ -5,7 +5,7 @@ import Deb0x from "../ethereum/deb0x"
 import { create } from 'ipfs-http-client'
 import SendIcon from '@mui/icons-material/Send';
 import {
-    Box, TextField, Button
+    Box, TextField, Button, Typography
 } from '@mui/material';
 import { ethers } from "ethers";
 import SnackbarNotification from './Snackbar';
@@ -30,7 +30,8 @@ export function Encrypt(): any {
     const [senderAddress, setSenderAddress] = useState('')
     const [notificationState, setNotificationState] = useState({})
     const [messageSessionSentCounter, setMessageSessionSentCounter] = useState(0);
-    const [loading,setLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [estimatedReward, setEstimatedReward] = useState("9.32");
 
     useEffect(() => {
         if (!encryptionKeyInitialized) {
@@ -183,25 +184,46 @@ export function Encrypt(): any {
                 />
                 <br />
                 {
-                   
-                    messageSessionSentCounter === 0 ? <LoadingButton loading={loading} variant="contained" endIcon={<SendIcon />}
-                        sx={{ marginLeft: 2, marginTop: 1 }}
-                        disabled={textToEncrypt == '' || senderAddress == ''}
-                        onClick={() => encryptText(textToEncrypt, senderAddress)}
-                    >
-                        Send
-                    </LoadingButton> :
 
-                        <LoadingButton loading={loading} variant="contained" endIcon={<SendIcon />}
-                            sx={{ marginLeft: 2, marginTop: 1 }}
-                            disabled={textToEncrypt == '' || senderAddress == ''}
-                            onClick={() => encryptText(textToEncrypt, senderAddress)}
-                        >
-                            Send another message
-                        </LoadingButton>
+                    messageSessionSentCounter === 0 ?
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                            <LoadingButton loading={loading} variant="contained" endIcon={<SendIcon />}
+                                sx={{ marginLeft: 2, marginTop: 1 }}
+                                disabled={textToEncrypt == '' || senderAddress == ''}
+                                onClick={() => encryptText(textToEncrypt, senderAddress)}
+                            >
+                                Send
+                            </LoadingButton>
 
-                
-                  
+                            {textToEncrypt != '' && senderAddress != '' ?
+                                <Box sx={{ ml: "1000px" }}>
+                                    <Typography>est. rewards: {estimatedReward} DBX</Typography>
+                                </Box> : null
+                            }
+
+                        </Box>
+                        :
+                        <Box  sx={{ display: "flex", alignItems: "center" }}> 
+                            <LoadingButton loading={loading} variant="contained" endIcon={<SendIcon />}
+                                sx={{ marginLeft: 2, marginTop: 1 }}
+                                disabled={textToEncrypt == '' || senderAddress == ''}
+                                onClick={() => encryptText(textToEncrypt, senderAddress)}
+                            >
+                                Send another message
+                            </LoadingButton>
+
+                            {textToEncrypt != '' && senderAddress != '' ?
+                                <Box sx={{ ml: "1000px" }}>
+                                    <Typography>est. rewards: {estimatedReward} DBX</Typography>
+                                </Box> : null
+                            }
+
+                        </Box>
+
+
+
+
+
 
                 }
 

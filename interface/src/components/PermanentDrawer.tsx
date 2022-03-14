@@ -24,7 +24,8 @@ import Paper from "@mui/material/Paper";
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
 import IconButton from "@mui/material/IconButton";
-
+import logo from "../photos/logo.png"
+import GitHubIcon from '@mui/icons-material/GitHub';
 
 enum ConnectorNames { Injected = 'Injected' };
 
@@ -62,7 +63,8 @@ export function PermanentDrawer(props: any): any {
     const triedEager = useEagerConnect()
     const [selectedIndex, setSelectedIndex] = React.useState<any>(0);
     const [searchBarValue, setSearchBarValue] = React.useState<any>("search");
-    const [ensName, setEnsName] = useState<any>("");
+    const [ensName, setEnsName] = useState<any>("negru.eth");
+    const [balance, setBalance] = useState<any>("8.13");
 
     function handleChange(text: any, index: any) {
         setSelectedIndex(index)
@@ -89,7 +91,7 @@ export function PermanentDrawer(props: any): any {
             >
                 <Paper
                         component="form"
-                        sx={{ mr: "1100px",p: "2px 4px", display: "flex", alignItems: "center", width: 400, position: "absolute" }}
+                        sx={{ mr: "1000px",p: "2px 4px", display: "flex", alignItems: "center", width: 400, position: "absolute" }}
                     >
                         <InputBase
                             sx={{ ml: 1, flex: 1 }}
@@ -103,7 +105,11 @@ export function PermanentDrawer(props: any): any {
 
 
                 <Toolbar>
-                    
+                    <Button  sx={{ position:"absolute",ml:'1180px'}} variant ="contained" color="warning"
+                    onClick={() => handleChange("Stake", 2)}
+                    >
+                       {balance} DBX
+                    </Button>
                     {(() => {
                         const currentConnector = connectorsByName[ConnectorNames.Injected]
                         const activating = currentConnector === activatingConnector
@@ -146,7 +152,7 @@ export function PermanentDrawer(props: any): any {
                                             ? 'Unsupported Network'
                                             : account
                                                 ? ensName==="" ? `${account.substring(0, 5)}...${account.substring(account.length - 4)}` :
-                                                     ensName
+                                                ` ${ensName.toLowerCase()} (${account.substring(0, 5)}...${account.substring(account.length - 4)}) `
                                                 
                                                 
                                                 : ''}
@@ -172,19 +178,22 @@ export function PermanentDrawer(props: any): any {
                 </Button>
 
             </Popper>
-            <Drawer
+            <Drawer 
                 sx={{
                     width: drawerWidth,
                     flexShrink: 0,
                     '& .MuiDrawer-paper': {
                         width: drawerWidth,
                         boxSizing: 'border-box',
-                    },
+                    }
                 }}
                 variant="permanent"
                 anchor="left"
-            >
+            ><img src={logo}  />
                 <Toolbar />
+                {/* <MailIcon/> */}
+               
+                
                 <Divider />
                 <List >
                     {['Deb0x', 'Send email', 'Stake', 'Governance'].map((text, index) => (
@@ -200,6 +209,12 @@ export function PermanentDrawer(props: any): any {
                     ))}
                 </List>
                 <Divider />
+                <a href="https://github.com/deb0x">
+                <GitHubIcon  />
+                </a>
+                <a href="https://www.deb0x.org">
+                    www.deb0x.org
+                </a>
             </Drawer>
 
         </Box>

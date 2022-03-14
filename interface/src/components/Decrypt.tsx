@@ -62,7 +62,7 @@ export function Decrypt(props: any): any {
         const [message, setMessage] = useState(props.message.fetchedMessage.data)
         const [ensName,setEnsName] = useState("");
         //const [sender, setSender] = useState(props.messsage.sender)
-
+        const [messageTime,setMessageTime] = useState("Mar 6, 15:56")
         useEffect(()=>{
             checkENS();
         },[])
@@ -107,12 +107,12 @@ export function Decrypt(props: any): any {
                         primary={ 
                          (ensName === "")  ?
                     
-                        ` ${props.message.sender.substring(0, 5)} ... ${props.message.sender.substring(props.message.sender.length - 4)} :  
+                        ` ${props.message.sender.substring(0, 5)} ... ${props.message.sender.substring(props.message.sender.length - 4)}, ${messageTime}  :  
                         
                         ${(message == props.message.fetchedMessage.data) ? `${message.substring(0,95)}...` : message }
                         `:
                         
-                        ` ${ensName}    :  
+                        ` ${ensName},  ${messageTime}  :  
                         
                         ${(message == props.message.fetchedMessage.data) ? `${message.substring(0,95)}...` : message }
                         `
@@ -206,11 +206,16 @@ export function Decrypt(props: any): any {
     if(encryptionKeyInitialized == true){
         return (
             // sx={{display:"flex"}}
-            <Box >
-                <IconButton color="primary" size="large" onClick={()=> setLoading(true) }>
+            <Box sx={{broder:"1px"}}>
+                <Box sx={{display:"flex"}}>
+                <Pagination sx={{marginTop:"10px"}} count={1} showFirstButton showLastButton />
+                <IconButton sx={{ml:"800px"}} color="primary" size="large" onClick={()=> setLoading(true) }>
                     <RefreshIcon fontSize="large"/>
                 </IconButton>
 
+                </Box>
+                
+                
                 {/* <Button variant="contained" sx={{borderRadius:"30px"}}>
                 <RefreshIcon fontSize="large"/>
                 </Button> */}
@@ -219,7 +224,7 @@ export function Decrypt(props: any): any {
                     {
                         <GetMessages />
                     }
-                    <Pagination sx={{marginTop:"10px"}} count={1} showFirstButton showLastButton />
+                    
                 </Box>
 
 
