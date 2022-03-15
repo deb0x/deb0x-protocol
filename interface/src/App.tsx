@@ -16,7 +16,7 @@ import { Encrypt } from './components/Encrypt';
 import { Decrypt } from './components/Decrypt';
 import {Stake} from './components/Stake';
 import { Governance } from './components/Governance';
-import {Container, Box} from '@mui/material'
+import {Container, Box,Typography} from '@mui/material'
 
 
 const axios = require('axios')
@@ -29,7 +29,8 @@ const client = create({
 
 const ethUtil = require('ethereumjs-util')
 //old address: 0x218c10BAb451BE6A897db102b2f608bC7D3441a0
-const deb0xAddress = "0xD88efe6C4f231cE03EE9f71EA53a7E0028751Ecf";
+// 0xf98E2331E4A7a542Da749978E2eDC4a572E81b99
+const deb0xAddress = "0xf98E2331E4A7a542Da749978E2eDC4a572E81b99";
 
 
 enum ConnectorNames { Injected = 'Injected', Network = 'Network' };
@@ -245,14 +246,27 @@ function App() {
         {!!error && <h4 style={{ marginTop: '1rem', marginBottom: '0' }}>{getErrorMessage(error)}</h4>}
       </div>
 
-      {!!(library && account) && (
+      
+      {
+      
+      account ? 
+      !!(library && account) && (
           <Box sx={{marginLeft: 40, marginTop: 10}}>
              {selectedOption === "Send email" && <Encrypt />}
              {selectedOption === "Deb0x" && <Decrypt account={account}/>}
              {selectedOption === "Stake" && <Stake />}
              {selectedOption === "Governance" && <Governance />}
           </Box>
-      )}
+      ):
+        <Box sx={{marginLeft:40, marginTop:30,}}>
+            <Typography sx={{textAlign:"center",color:"gray"}} variant="h1">The End To End Encrypted <br></br>Decentralized Email Protocol <br></br> Owned By Its Users</Typography>
+            <Typography sx={{ mt:10,textAlign:"center"}} variant="h3">Please connect your wallet</Typography>
+        </Box>
+    
+    
+    
+    }
+
 
     </>
   )

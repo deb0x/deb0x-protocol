@@ -38,7 +38,10 @@ const drawerWidth = 240;
 export function PermanentDrawer(props: any): any {
     const context = useWeb3React()
     const { connector, library, chainId, account, activate, deactivate, active, error } = context
-    
+
+    if(library){
+        checkENS();
+    }
 
     const [activatingConnector, setActivatingConnector] = React.useState<any>()
     React.useEffect(() => {
@@ -47,15 +50,12 @@ export function PermanentDrawer(props: any): any {
         }
     }, [activatingConnector, connector])
 
-    // React.useEffect(()=>{
-    //     checkENS();
-    // },[]);
 
     async function checkENS(){
+ 
         var name = await library.lookupAddress(account);
         if(name !== null)
         {   
-            console.log(name)
             setEnsName(name);
         }
     }
@@ -63,7 +63,7 @@ export function PermanentDrawer(props: any): any {
     const triedEager = useEagerConnect()
     const [selectedIndex, setSelectedIndex] = React.useState<any>(0);
     const [searchBarValue, setSearchBarValue] = React.useState<any>("search");
-    const [ensName, setEnsName] = useState<any>("negru.eth");
+    const [ensName, setEnsName] = useState<any>("ss");
     const [balance, setBalance] = useState<any>("8.13");
 
     function handleChange(text: any, index: any) {
@@ -89,33 +89,45 @@ export function PermanentDrawer(props: any): any {
                 position="fixed"
                 sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px`, zIndex: 1 }}
             >
-                <Paper
-                        component="form"
-                        sx={{ mr: "1000px",p: "2px 4px", display: "flex", alignItems: "center", width: 400, position: "absolute" }}
-                    >
-                        <InputBase
-                            sx={{ ml: 1, flex: 1 }}
-                            placeholder="Search messages"
-                            inputProps={{ "aria-label": "search" }}
-                        />
-                        <IconButton type="submit" sx={{ p: "10px" }} aria-label="search">
-                            <SearchIcon />
-                        </IconButton>
-                    </Paper>
 
+                {
+                    account ? 
+                     <Paper
+                     component="form"
+                     sx={{ mr: "1000px",p: "2px 4px", display: "flex", alignItems: "center", width: 400, position: "absolute" }}
+                 >
+                     <InputBase
+                         sx={{ ml: 1, flex: 1 }}
+                         placeholder="Search messages"
+                         inputProps={{ "aria-label": "search" }}
+                     />
+                     <IconButton type="submit" sx={{ p: "10px" }} aria-label="search">
+                         <SearchIcon />
+                     </IconButton>
+                 </Paper>
+                    : null
+
+                }
+               
 
                 <Toolbar>
-                    <Button  sx={{ position:"absolute",ml:'1180px'}} variant ="contained" color="warning"
-                    onClick={() => handleChange("Stake", 2)}
-                    >
-                       {balance} DBX
-                    </Button>
-                    {(() => {
+
+                    {
+                        account  ? <Button  sx={{ position:"absolute",ml:'1180px'}} variant ="contained" color="warning"
+                        onClick={() => handleChange("Stake", 2)}
+                        >
+                           {balance} DBX
+                        </Button>: null
+                    }
+                   
+                    {( () =>  {
                         const currentConnector = connectorsByName[ConnectorNames.Injected]
                         const activating = currentConnector === activatingConnector
                         const connected = currentConnector === connector
                         const disabled = !triedEager || !!activatingConnector || connected || !!error
                         console.log(account)
+
+
                         return (
                             <Button variant="contained" color="warning"
                                 sx={{ width: `calc(100% - ${drawerWidth}px )`, ml: `1300px` }}

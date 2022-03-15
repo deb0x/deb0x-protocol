@@ -14,9 +14,9 @@ contract Deb0x is Ownable {
 
     mapping(address => string) private encryptionKeys;
 
-    mapping (address => mapping(address => string[])) private messages;
+    mapping(address => mapping(address => string[])) private messages;
 
-    mapping (address => address[]) private messageSenders;
+    mapping(address => address[]) private messageSenders;
 
     //Tokenomic setup
     uint256 public rewardRate = 100;
@@ -29,11 +29,11 @@ contract Deb0x is Ownable {
 
     mapping(address => uint256) public rewards;
 
-    uint256 private totalSupply;
+    uint256 public totalSupply;
 
-    uint8 year;
+    uint8 year = 1;
     uint256 initialTimestamp;
-    uint16 msgReward = 1024;
+    uint256 msgReward = 225 * (10**16);
 
     constructor() {
         deboxERC20 = new Deb0xERC20(address(this));
@@ -61,13 +61,13 @@ contract Deb0x is Ownable {
         updateReward(msg.sender)
     {
         uint256 startGas = gasleft();
-
-        if (block.timestamp > year * 14600000 + initialTimestamp) {
+                                     
+        if (block.timestamp > year * 2050000 + initialTimestamp) {
             year += 1;
             msgReward = msgReward / 2;
         }
 
-        if(messages[to][msg.sender].length == 0){
+        if (messages[to][msg.sender].length == 0) {
             messageSenders[to].push(msg.sender);
         }
 
@@ -80,16 +80,24 @@ contract Deb0x is Ownable {
         uint256 gasUsed = startGas - gasleft();
         require(
             msg.value >=
-                ((gasUsed * tx.gasprice + 21000 + 50000) * fee) / 10000,
+                ((gasUsed+ 21000 + 50000) * tx.gasprice  * fee) / 10000,
             "Deb0x: must pay 10% of transaction cost"
         );
     }
 
-    function fetchMessages(address to, address from) public view returns (string[] memory) {
+    function fetchMessages(address to, address from)
+        public
+        view
+        returns (string[] memory)
+    {
         return messages[to][from];
     }
 
-    function fetchMessageSenders(address to) public view returns (address[] memory) {
+    function fetchMessageSenders(address to)
+        public
+        view
+        returns (address[] memory)
+    {
         return messageSenders[to];
     }
 
@@ -148,7 +156,7 @@ contract Deb0x is Ownable {
 
     function rewardPerToken() public view returns (uint256) {
         if (totalSupply == 0) {
-            return 0;
+            return rewardPerTokenStored;
         }
 
         return
@@ -158,12 +166,10 @@ contract Deb0x is Ownable {
     }
 
     function earnedNative(address account) public view returns (uint256) {
-        int256 earned = ((int256(balanceERC20[account]) *
-            (int256(rewardPerToken()) -
-                int256(userRewardPerTokenPaid[account]))) / 1e18) +
-            int256(rewards[account]);
-        require(earned >= 0, "Deb0x: calculus is under 0");
-        return uint256(earned);
+        return
+            ((balanceERC20[account] *
+                (rewardPerToken() - userRewardPerTokenPaid[account])) / 1e18) +
+            rewards[account];
     }
 
     function contractBalance() public view returns (uint256) {

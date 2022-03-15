@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 
 const axios = require('axios')
-const deb0xAddress = "0xD88efe6C4f231cE03EE9f71EA53a7E0028751Ecf"
+const deb0xAddress = "0xf98E2331E4A7a542Da749978E2eDC4a572E81b99"
 
 
 export function Governance(props: any): any {
@@ -28,7 +28,7 @@ export function Governance(props: any): any {
                     <Typography sx={{ mb: 1.5, mt: 1.5, ml: 7.6 }} variant="h5">
                         Proposals to change fee to: 
                     </Typography>
-                    <Typography sx={{ textAlign:"center", fontWeight:"bold" }} variant="h4">
+                    <Typography sx={{ textAlign:"center"}} variant="h4">
                         11%
                     </Typography>
                     <Divider />

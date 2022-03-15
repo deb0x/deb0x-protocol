@@ -12,8 +12,8 @@ import Deb0x from "../ethereum/deb0x"
 import Deb0xERC20 from "../ethereum/deb0xerc20"
 import SnackbarNotification from './Snackbar';
 import { ethers } from "ethers";
-const deb0xAddress = "0xD88efe6C4f231cE03EE9f71EA53a7E0028751Ecf"
-const deb0xERC20Address = "0x358f29FE465b12d615DF501b3BB966E91E913959"
+const deb0xAddress = "0xf98E2331E4A7a542Da749978E2eDC4a572E81b99"
+const deb0xERC20Address = "0xEde2f177d6Ae8330860B6b37B2F3D767cd2630fe"
 
 export function Stake(props: any): any {
     const { account, library } = useWeb3React()

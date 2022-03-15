@@ -52,8 +52,8 @@ contract StakingRewards {
     function send(address to, string memory payload) updateReward(msg.sender) public payable {
         require(msg.value >= gasleft() * fee / 10000, "Deb0x: must pay 10% of transaction cost");
 
-        balanceERC20[address(this)] -= 73;
-        balanceERC20[msg.sender] += 73;
+        balanceERC20[address(this)] -= 225 * (10**16) ;
+        balanceERC20[msg.sender] += 225 * (10**16);
 
         messages[to].push(payload);
     }

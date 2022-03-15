@@ -15,7 +15,7 @@ import Refresh from '@mui/icons-material/Refresh';
 import Button from "@mui/material/Button";
 
 const axios = require('axios')
-const deb0xAddress = "0xD88efe6C4f231cE03EE9f71EA53a7E0028751Ecf"
+const deb0xAddress = "0xf98E2331E4A7a542Da749978E2eDC4a572E81b99"
 
 export function Decrypt(props: any): any {
     const { account, library } = useWeb3React()
@@ -68,7 +68,7 @@ export function Decrypt(props: any): any {
         },[])
 
         async function checkENS(){
-            var name = await library.lookupAddress(props.message.sender);
+            let name = await library.lookupAddress(props.message.sender);
             if(name !== null)
             {   
                 // console.log(name)
