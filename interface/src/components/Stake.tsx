@@ -11,7 +11,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import Deb0x from "../ethereum/deb0x"
 import Deb0xERC20 from "../ethereum/deb0xerc20"
 import SnackbarNotification from './Snackbar';
-import { ethers } from "ethers";
+import { BigNumber,ethers } from "ethers";
 const deb0xAddress = "0xf98E2331E4A7a542Da749978E2eDC4a572E81b99"
 const deb0xERC20Address = "0xEde2f177d6Ae8330860B6b37B2F3D767cd2630fe"
 
@@ -276,14 +276,17 @@ export function Stake(props: any): any {
         }
 
         async function feeShare() {
+            console.log("aicii")
             const deb0xContract = await Deb0x(library, deb0xAddress)
-
-            const balance = (await deb0xContract.balanceERC20(account)).toNumber()
-
-            const totalSupply = (await deb0xContract.totalSupply()).toNumber()
-
+            console.log("1")
+            
+            let balance = parseFloat((ethers.utils.formatEther((await deb0xContract.balanceERC20(account)) )) )
+            console.log(balance + " balance")
+            
+            let totalSupply = parseFloat((ethers.utils.formatEther((await deb0xContract.totalSupply())) ))
+            console.log(totalSupply + " totalSupply")
             const feeShare = balance * 100 / totalSupply
-
+            console.log(feeShare + " feeShare")
             setFeeSharePercentage(((Math.round(feeShare * 100) / 100).toFixed(2)).toString() + "%")
         }
 
@@ -588,7 +591,7 @@ export function Stake(props: any): any {
                         </Grid>
                         <Grid item xs={2}>
                             <Button size="small" variant="contained" color="error" sx={{fontSize:"10px"}} 
-                               onClick = {()=>setAmountToStake(userStakedAmount)  }
+                               onClick = {()=>setAmountToStake(userUnstakedAmount)  }
                             >max</Button>
                         </Grid>
                         <Grid item xs={4}>
@@ -629,7 +632,7 @@ export function Stake(props: any): any {
                         </Grid>
                         <Grid item xs={2}>
                             <Button size="small" variant="contained" color="error" sx={{fontSize:"10px"}} 
-                                onClick = {()=>setAmountToUnstake(userUnstakedAmount)  }
+                                onClick = {()=>setAmountToUnstake(userStakedAmount)  }
                             >max</Button>
                         </Grid>
 

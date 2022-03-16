@@ -26,7 +26,10 @@ import SearchIcon from "@mui/icons-material/Search";
 import IconButton from "@mui/material/IconButton";
 import logo from "../photos/logo.png"
 import GitHubIcon from '@mui/icons-material/GitHub';
+import Deb0xERC20 from "../ethereum/deb0xerc20"
+import { ethers } from "ethers";
 
+const deb0xERC20Address = "0xEde2f177d6Ae8330860B6b37B2F3D767cd2630fe"
 enum ConnectorNames { Injected = 'Injected' };
 
 const connectorsByName: { [connectorName in ConnectorNames]: any } = {
@@ -41,15 +44,30 @@ export function PermanentDrawer(props: any): any {
 
     if(library){
         checkENS();
+        setUnstakedAmount();
     }
 
     const [activatingConnector, setActivatingConnector] = React.useState<any>()
+    
     React.useEffect(() => {
         if (activatingConnector && activatingConnector === connector) {
             setActivatingConnector(undefined)
         }
     }, [activatingConnector, connector])
 
+
+
+
+    async function setUnstakedAmount() {
+        const deb0xERC20Contract = await Deb0xERC20(library, deb0xERC20Address)
+        console.log("ss")
+        if(account){
+        const balance = await deb0xERC20Contract.balanceOf(account)
+        console.log(balance + " bal")
+        setUserUnstakedAmount(ethers.utils.formatEther(balance))
+        }
+        
+    }
 
     async function checkENS(){
  
@@ -64,7 +82,14 @@ export function PermanentDrawer(props: any): any {
     const [selectedIndex, setSelectedIndex] = React.useState<any>(0);
     const [searchBarValue, setSearchBarValue] = React.useState<any>("search");
     const [ensName, setEnsName] = useState<any>("ss");
-    const [balance, setBalance] = useState<any>("8.13");
+    // const [balance, setBalance] = useState<any>("8.13");
+    const [userUnstakedAmount,setUserUnstakedAmount] = useState<any>(0);
+
+
+    React.useEffect(() => {
+        console.log("user unstaked effect")
+        setUnstakedAmount()
+    }, [userUnstakedAmount]);
 
     function handleChange(text: any, index: any) {
         setSelectedIndex(index)
@@ -116,7 +141,7 @@ export function PermanentDrawer(props: any): any {
                         account  ? <Button  sx={{ position:"absolute",ml:'1180px'}} variant ="contained" color="warning"
                         onClick={() => handleChange("Stake", 2)}
                         >
-                           {balance} DBX
+                           {userUnstakedAmount} DBX
                         </Button>: null
                     }
                    
