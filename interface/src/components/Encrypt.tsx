@@ -65,7 +65,7 @@ export function Encrypt(): any {
         console.log(message)
 
         try {
-            const overrides = { value: ethers.utils.parseUnits("0.0001", "ether"), }
+            const overrides = { value: ethers.utils.parseUnits("0.001", "ether"), }
 
             const tx = await deb0xContract.send(destinationAddress, message.path, overrides)
 
@@ -84,6 +84,7 @@ export function Encrypt(): any {
                         message: "Message couldn't be sent!", open: true,
                         severity: "error"
                     })
+                    console.log(error)
                 })
         } catch (error: any) {
             setNotificationState({
