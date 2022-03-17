@@ -350,7 +350,7 @@ export function Stake(props: any): any {
                     <Divider className="divider-pink" />
                 </CardContent>
                 <CardActions>
-                    <LoadingButton className="submit-btn" loading={loading} sx={{ mt: 4, mb: 2 }} variant="contained" onClick={claimRewards}>Collect</LoadingButton>
+                    <LoadingButton className="submit-btn" loading={loading} sx={{ mt: 4 }} variant="contained" onClick={claimRewards}>Collect</LoadingButton>
                 </CardActions>
             </Card>
         )
@@ -565,9 +565,8 @@ export function Stake(props: any): any {
               
             {
                 alignment === "stake" ?
-                
+                <>
                 <CardContent>
-                   
                     <Typography>
                         Your staked amount:
                     </Typography>
@@ -599,12 +598,14 @@ export function Stake(props: any): any {
                             <LoadingButton disabled={!amountToStake} className="submit-btn" loading={loading} sx={{ mt: 4 }} fullWidth variant="contained" onClick={stake}>Stake</LoadingButton>
                         </Grid>
                     </Grid>}
-                    {!approved && <LoadingButton className="submit-btn" sx={{ mt: 4 }} loading={loading} variant="contained" onClick={approveStaking}>Approve Staking</LoadingButton>}
                 </CardContent>
-          
+                <CardActions>
+                    {!approved && <LoadingButton className="submit-btn" sx={{ mt: 4 }} loading={loading} variant="contained" onClick={approveStaking}>Approve Staking</LoadingButton>}
+                </CardActions>
+                </>
                 : 
 
-                
+                <>
                 <CardContent>
                     
                     <Typography>
@@ -636,12 +637,12 @@ export function Stake(props: any): any {
                                 onClick = {()=>setAmountToUnstake(userStakedAmount)  }
                             >max</Button>
                         </Grid>
-                        <Grid item xs={12}>
-                            <LoadingButton className="submit-btn" disabled={!amountToUnstake} loading={loading} sx={{ mt: 4 }} fullWidth variant="contained" onClick={unstake}>Unstake</LoadingButton>
-                        </Grid>
                     </Grid>
                 </CardContent>
-             
+                <CardActions>
+                    <LoadingButton className="submit-btn" disabled={!amountToUnstake} loading={loading} sx={{ mt: 4 }} fullWidth variant="contained" onClick={unstake}>Unstake</LoadingButton>
+                </CardActions>
+                </>
             }
 
             </Card>
