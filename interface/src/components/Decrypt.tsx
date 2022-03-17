@@ -64,7 +64,7 @@ export function Decrypt(props: any): any {
         const [message, setMessage] = useState(props.message.fetchedMessage.data)
         const [ensName,setEnsName] = useState("");
         //const [sender, setSender] = useState(props.messsage.sender)
-        const [messageTime,setMessageTime] = useState("Mar 6, 15:56")
+        const [messageTime,setMessageTime] = useState("Mar 17, 18:36")
         useEffect(()=>{
             checkENS();
         },[])
