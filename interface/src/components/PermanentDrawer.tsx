@@ -28,6 +28,7 @@ import logo from "../photos/logo.png"
 import GitHubIcon from '@mui/icons-material/GitHub';
 import Deb0xERC20 from "../ethereum/deb0xerc20"
 import { ethers } from "ethers";
+import '../componentsStyling/PermanentDrawerStyle.css'
 
 const deb0xERC20Address = "0xEde2f177d6Ae8330860B6b37B2F3D767cd2630fe"
 enum ConnectorNames { Injected = 'Injected' };
@@ -113,6 +114,7 @@ export function PermanentDrawer(props: any): any {
             <AppBar
                 position="fixed"
                 sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px`, zIndex: 1 }}
+                className="app-bar--top"
             >
 
                 {
@@ -125,6 +127,7 @@ export function PermanentDrawer(props: any): any {
                          sx={{ ml: 1, flex: 1 }}
                          placeholder="Search messages"
                          inputProps={{ "aria-label": "search" }}
+                         className="search-input"
                      />
                      <IconButton type="submit" sx={{ p: "10px" }} aria-label="search">
                          <SearchIcon />
@@ -138,7 +141,7 @@ export function PermanentDrawer(props: any): any {
                 <Toolbar>
 
                     {
-                        account  ? <Button  sx={{ position:"absolute",ml:'1180px'}} variant ="contained" color="warning"
+                        account  ? <Button  sx={{ position:"absolute",ml:'1180px'}} variant ="contained"
                         onClick={() => handleChange("Stake", 2)}
                         >
                            {userUnstakedAmount} DBX
@@ -154,7 +157,7 @@ export function PermanentDrawer(props: any): any {
 
 
                         return (
-                            <Button variant="contained" color="warning"
+                            <Button variant="contained"
                                 sx={{ width: `calc(100% - ${drawerWidth}px )`, ml: `1300px` }}
 
                                 key={ConnectorNames.Injected}
@@ -204,12 +207,13 @@ export function PermanentDrawer(props: any): any {
 
             </AppBar>
             <Popper id={id} open={open} anchorEl={anchorEl}>
-                <Button variant="contained"
+                <Button 
                     sx={{ top: 15 }}
                     onClick={(event: any) => {
                         handleClick(event)
                         deactivate()
                     }}
+                    className="logout-btn"
                 >
                     Logout
                 </Button>
@@ -226,12 +230,16 @@ export function PermanentDrawer(props: any): any {
                 }}
                 variant="permanent"
                 anchor="left"
-            ><img src={logo}  />
+                className="side-menu"
+            >
+                <div className="imageContainer">
+                    <img src={logo}  />
+                </div>
                 <Toolbar />
                 {/* <MailIcon/> */}
                
                 
-                <Divider />
+                <Divider className="divider" />
                 <List >
                     {['Deb0x', 'Send email', 'Stake', 'Governance'].map((text, index) => (
                         <ListItem button key={text} selected={selectedIndex === index} onClick={() => handleChange(text, index)}>
@@ -245,13 +253,17 @@ export function PermanentDrawer(props: any): any {
                         </ListItem>
                     ))}
                 </List>
-                <Divider />
-                <a href="https://github.com/deb0x">
-                <GitHubIcon  />
-                </a>
-                <a href="https://www.deb0x.org">
-                    www.deb0x.org
-                </a>
+                <Divider className="divider" />
+                <div className="side-menu--bottom">
+                    <div className="content">
+                        <a href="https://github.com/deb0x">
+                        <GitHubIcon  />
+                        </a>
+                        <a href="https://www.deb0x.org">
+                            www.deb0x.org
+                        </a>
+                    </div>
+                </div>
             </Drawer>
 
         </Box>

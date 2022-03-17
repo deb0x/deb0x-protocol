@@ -13,6 +13,8 @@ import Pagination from "@mui/material/Pagination";
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Refresh from '@mui/icons-material/Refresh';
 import Button from "@mui/material/Button";
+import '../componentsStyling/Decrypt.css';
+import MailOutlineIcon from '@mui/icons-material/MailOutline';
 
 const axios = require('axios')
 const deb0xAddress = "0xf98E2331E4A7a542Da749978E2eDC4a572E81b99"
@@ -92,10 +94,12 @@ export function Decrypt(props: any): any {
     
         return (
             <ListItem sx ={{border:1, marginBottom:1}} disablePadding key={props.index}    secondaryAction={ 
-                <IconButton  onClick={()=>{hideMessage()}}  edge="end" aria-label="comments">
-                { (message != props.message.fetchedMessage.data) ? <VisibilityOffIcon  />: null}
-              </IconButton>  
+                <IconButton className={`${(message != props.message.fetchedMessage.data) ? "list-item-btn" : ""}`}  
+                        onClick={()=>{hideMessage()}}  edge="end" aria-label="comments">
+                    { (message != props.message.fetchedMessage.data) ? <VisibilityOffIcon  />: null}
+                </IconButton>  
             }
+                className="list-item"
             >
                 <Tooltip title={(message == props.message.fetchedMessage.data) ? "Click to decrypt" : `Sender:${props.message.sender}`} placement="right">
                     <ListItemButton onClick={() => {
@@ -103,23 +107,30 @@ export function Decrypt(props: any): any {
                             decryptMessage()
                         }
                     }}>
+                        <div>
+
+                        </div>
                         <ListItemText
                         primary={ 
                          (ensName === "")  ?
                     
-                        ` ${props.message.sender.substring(0, 5)} ... ${props.message.sender.substring(props.message.sender.length - 4)}, ${messageTime}  :  
-                        
-                        ${(message == props.message.fetchedMessage.data) ? `${message.substring(0,95)}...` : message }
-                        `:
-                        
-                        ` ${ensName},  ${messageTime}  :  
-                        
-                        ${(message == props.message.fetchedMessage.data) ? `${message.substring(0,95)}...` : message }
-                        `
-
-
-                        
-                         }/>
+                        <>
+                            <div className="message-heading">
+                                <p><small>From: </small><strong>{props.message.sender.substring(0, 5)} ... {props.message.sender.substring(props.message.sender.length - 4)}</strong></p>
+                                <p><small>{messageTime}</small></p>
+                            </div>
+                            <p>{(message == props.message.fetchedMessage.data) ? `${message.substring(0,95)}...` : message }</p>
+                        </>
+                         
+                        :
+                        <>
+                            <div className="message-heading">
+                                <p><small>From: </small><strong>{ensName}</strong></p>
+                                <p><small>{messageTime}</small></p>
+                            </div>
+                            <p>{(message == props.message.fetchedMessage.data) ? `${message.substring(0,95)}...` : message }</p>
+                        </>
+                        }/>
                          
                     </ListItemButton>
                 </Tooltip>
@@ -170,7 +181,8 @@ export function Decrypt(props: any): any {
             if (fetchedMessages.length == 0) {
                 return (
                     <>
-                        <div >
+                        <div className="message-placeholder">
+                            <MailOutlineIcon />
                             <Typography variant="h5"
                                 gutterBottom
                                 component="div"
@@ -183,7 +195,7 @@ export function Decrypt(props: any): any {
                 )
             } else {
                 return (
-                    <Box sx={{ width: '100%', maxWidth: 1080}}>
+                    <Box sx={{ width: '100%', maxWidth: 1080, margin: '0 auto'}}>
                         <List>
                             {fetchedMessages.map((message: any, i: any) => {
                                 return (
@@ -197,7 +209,9 @@ export function Decrypt(props: any): any {
             }
         } else {
             return (
-                <CircularProgress/>
+                <div className="spinner">
+                    <CircularProgress/>
+                </div>
             )
         }
 
@@ -207,7 +221,7 @@ export function Decrypt(props: any): any {
         return (
             // sx={{display:"flex"}}
             <Box sx={{broder:"1px"}}>
-                <Box sx={{display:"flex"}}>
+                <Box className="pagination" sx={{display:"flex"}}>
                 <Pagination sx={{marginTop:"10px"}} count={1} showFirstButton showLastButton />
                 <IconButton sx={{ml:"800px"}} color="primary" size="large" onClick={()=> setLoading(true) }>
                     <RefreshIcon fontSize="large"/>
@@ -237,7 +251,9 @@ export function Decrypt(props: any): any {
         )
     } else{
         return(
-            <CircularProgress/>
+            <div className="spinner">
+                <CircularProgress/>
+            </div>
         )
     }
 }

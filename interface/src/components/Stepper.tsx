@@ -8,6 +8,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import Typography from '@mui/material/Typography';
 import Deb0x from "../ethereum/deb0x"
 import SnackbarNotification from './Snackbar';
+import '../componentsStyling/Stepper.css';
 const deb0xAddress = "0xf98E2331E4A7a542Da749978E2eDC4a572E81b99";
 const steps = ['Provide public encryption key', 'Initialize Deb0x'];
 
@@ -80,8 +81,8 @@ export default function HorizontalLinearStepper(props: any) {
     return (
         <>
             <SnackbarNotification state={notificationState} setNotificationState={setNotificationState}/>
-            <Box sx={{ width: '100%', maxWidth: 1080 }}>
-                <Stepper activeStep={activeStep}>
+            <Box className="stepper-box" sx={{ width: '100%', maxWidth: 1080 }}>
+                <Stepper activeStep={activeStep} className="stepper">
                     {steps.map((label, index) => {
                         const stepProps: { completed?: boolean } = {};
                         const labelProps: {
@@ -104,8 +105,8 @@ export default function HorizontalLinearStepper(props: any) {
                     })}
                 </Stepper>
                 {<Fragment>
-                    <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-                        <LoadingButton loading={loading} sx={{ marginLeft: 5 }} variant="contained" onClick={
+                    <Box className="button-box" sx={{ display: 'flex', flexDirection: 'row', pt: 5 }}>
+                        <LoadingButton className="init-btn" loading={loading} sx={{ marginLeft: 5 }} variant="contained" onClick={
                             (activeStep == 0) ? getEncryptionKey : initializeDeb0x
                         }>
                             {activeStep === steps.length - 1 ? 'Initialize' : 'Provide'}

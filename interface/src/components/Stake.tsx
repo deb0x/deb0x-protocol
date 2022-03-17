@@ -12,6 +12,7 @@ import Deb0x from "../ethereum/deb0x"
 import Deb0xERC20 from "../ethereum/deb0xerc20"
 import SnackbarNotification from './Snackbar';
 import { BigNumber,ethers } from "ethers";
+import '../componentsStyling/Card.css';
 const deb0xAddress = "0xf98E2331E4A7a542Da749978E2eDC4a572E81b99"
 const deb0xERC20Address = "0xEde2f177d6Ae8330860B6b37B2F3D767cd2630fe"
 
@@ -200,14 +201,14 @@ export function Stake(props: any): any {
     //                 <Typography sx={{ mb: 1.5, ml: 15 }} variant="h4" component="div">
     //                     STAKE
     //                 </Typography>
-    //                 <Divider />
+    //                 <Divider className="divider-pink" />
     //                 <Typography sx={{ mb: 1.5, mt: 1.5, ml: 8.17 }} variant="h5">
     //                     Total amount staked:
     //                 </Typography>
     //                 <Typography sx={{ mb: 1.5, mt: 1.5, ml: 8.17 }} variant="h6">
     //                     {totalStaked}
     //                 </Typography>
-    //                 <Divider />
+    //                 <Divider className="divider-pink" />
     //                 <Typography sx={{ mb: 1.5, mt: 1.5, ml: 8.17 }} variant="h5">
     //                     Your staked amount:
     //                 </Typography>
@@ -225,7 +226,7 @@ export function Stake(props: any): any {
     //                         <LoadingButton disabled={!amountToUnstake} loading={loading} sx={{ mt: 2 }} fullWidth variant="contained" onClick={unstake}>Unstake</LoadingButton>
     //                     </Grid>
     //                 </Grid>
-    //                 <Divider />
+    //                 <Divider className="divider-pink" />
     //                 <Typography sx={{ mb: 1.5, mt: 1.5, ml: 8.17 }} variant="h5">
     //                     Your unstaked amount:
     //                 </Typography>
@@ -327,29 +328,29 @@ export function Stake(props: any): any {
         }
 
         return (
-            <Card variant="outlined">
+            <Card variant="outlined" className="card-container">
                 <CardContent>
-                    <Typography sx={{ mb: 1.5, ml: 10.75 }} variant="h4" component="div">
+                    <Typography sx={{ mb: 1.5 }} variant="h4" component="div">
                         REWARDS
                     </Typography>
-                    <Divider />
-                    <Typography sx={{ mb: 1.5, mt: 1.5, ml: 7.6 }} variant="h5">
+                    <Divider className="divider-pink" />
+                    <Typography sx={{ mt: 1.5 }}>
                         Your unclaimed rewards:
                     </Typography>
-                    <Typography sx={{ mb: 1.5, mt: 1.5, ml: 7.6 }} variant="h6">
-                        {rewardsUnclaimed}
+                    <Typography sx={{ mb: 1.5 }} variant="h6">
+                        <strong>{rewardsUnclaimed}</strong>
                     </Typography>
-                    <Divider />
-                    <Typography sx={{ mb: 1.5, mt: 1.5, ml: 7.6 }} variant="h5">
+                    <Divider className="divider-pink" />
+                    <Typography sx={{ mt: 1.5 }}>
                         Your share from fees:
                     </Typography>
-                    <Typography sx={{ mb: 1.5, mt: 1.5, ml: 7.6 }} variant="h6">
-                        {feeSharePercentage}
+                    <Typography sx={{ mb: 1.5 }} variant="h6">
+                        <strong>{feeSharePercentage}</strong>
                     </Typography>
-                    <Divider />
+                    <Divider className="divider-pink" />
                 </CardContent>
                 <CardActions>
-                    <LoadingButton loading={loading} sx={{ ml: 16 }} variant="contained" onClick={claimRewards}>Collect</LoadingButton>
+                    <LoadingButton className="submit-btn" loading={loading} sx={{ mt: 4, mb: 2 }} variant="contained" onClick={claimRewards}>Collect</LoadingButton>
                 </CardActions>
             </Card>
         )
@@ -540,25 +541,25 @@ export function Stake(props: any): any {
         }
 
         return (
-            <Card variant = "outlined">
-                  <CardContent>
+            <Card variant = "outlined" className="card-container">
+                  {/* <CardContent> */}
                 {/* <Typography sx={{ mb: 1.5, ml: 8.17 }} variant="h5" component="div">
                         Total pool staked Info:  
                     </Typography>
                     <Typography sx={{ mb: 1.5, mt: 1.5, ml: 8.17 }} variant="h6">
                         {totalStaked}
                     </Typography>
-                    <Divider /> */}
-                </CardContent>
+                    <Divider className="divider-pink" /> */}
+                {/* </CardContent> */}
                 <ToggleButtonGroup
-                    sx={{marginTop:"20px"}}
                     color="primary"
                     value={alignment}
                     exclusive
                     onChange={handleChange}
+                    className="tab-container"
                 >
-                    <ToggleButton sx={{width:"100px", marginLeft:"100px"}} value="stake">Stake</ToggleButton>
-                    <ToggleButton sx={{width:"100px", marginRight:"100px"}} value="unstake">Unstake</ToggleButton>
+                    <ToggleButton className="tab-btn" sx={{width:"100px"}} value="stake">Stake</ToggleButton>
+                    <ToggleButton className="tab-btn" sx={{width:"100px"}} value="unstake">Unstake</ToggleButton>
 
                 </ToggleButtonGroup>
               
@@ -567,18 +568,18 @@ export function Stake(props: any): any {
                 
                 <CardContent>
                    
-                    <Typography sx={{ mb: 1.5, mt: 1.5, ml: 8.17 }} variant="h5">
+                    <Typography>
                         Your staked amount:
                     </Typography>
-                    <Typography sx={{ mb: 1.5, mt: 1.5, ml: 8.17 }} variant="h6">
-                        {userStakedAmount} DBX
+                    <Typography sx={{ mb: 1.5 }} variant="h6">
+                        <strong>{userStakedAmount} DBX</strong>
                     </Typography>
-                    <Divider/>
-                    <Typography sx={{ mb: 1.5, mt: 1.5, ml: 8.17 }} variant="h5">
-                    Your tokens in wallet:
+                    <Divider className="divider-pink" />
+                    <Typography sx={{mt: 1.5 }}>
+                        Your tokens in wallet:
                     </Typography>
-                    <Typography sx={{ mb: 1.5, mt: 1.5, ml: 8.17 }} variant="h6">
-                        {userUnstakedAmount} DBX
+                    <Typography sx={{ mb: 1.5 }} variant="h6">
+                        <strong>{userUnstakedAmount} DBX</strong>
                     </Typography>
                     {approved && <Grid container spacing={2}>
                         <Grid item xs={8}>
@@ -589,16 +590,16 @@ export function Stake(props: any): any {
                                 value={amountToStake}
                                 onChange={e => setAmountToStake(e.target.value)} />
                         </Grid>
-                        <Grid item xs={2}>
-                            <Button size="small" variant="contained" color="error" sx={{fontSize:"10px"}} 
+                        <Grid className="max-btn-container" item xs={4}>
+                            <Button className="max-btn" size="small" variant="contained" color="error" sx={{fontSize:"10px"}} 
                                onClick = {()=>setAmountToStake(userUnstakedAmount)  }
                             >max</Button>
                         </Grid>
-                        <Grid item xs={4}>
-                            <LoadingButton disabled={!amountToStake} loading={loading} sx={{ mt: 2 }} fullWidth variant="contained" onClick={stake}>Stake</LoadingButton>
+                        <Grid item xs={12}>
+                            <LoadingButton disabled={!amountToStake} className="submit-btn" loading={loading} sx={{ mt: 4 }} fullWidth variant="contained" onClick={stake}>Stake</LoadingButton>
                         </Grid>
                     </Grid>}
-                    {!approved && <LoadingButton loading={loading} sx={{ ml: 11.5 }} variant="contained" onClick={approveStaking}>Approve Staking</LoadingButton>}
+                    {!approved && <LoadingButton className="submit-btn" sx={{ mt: 4 }} loading={loading} variant="contained" onClick={approveStaking}>Approve Staking</LoadingButton>}
                 </CardContent>
           
                 : 
@@ -606,38 +607,37 @@ export function Stake(props: any): any {
                 
                 <CardContent>
                     
-                    <Typography sx={{ mb: 1.5, mt: 1.5, ml: 8.17 }} variant="h5">
+                    <Typography>
                         Your staked amount:
                     </Typography>
-                    <Typography sx={{ mb: 1.5, mt: 1.5, ml: 8.17 }} variant="h6">
-                        {userStakedAmount} DBX
+                    <Typography sx={{ mb: 1.5 }} variant="h6">
+                        <strong>{userStakedAmount} DBX</strong>
                     </Typography>
-                    <Divider/>
+                    <Divider className="divider-pink" />
 
-                    <Typography sx={{ mb: 1.5, mt: 1.5, ml: 8.17 }} variant="h5">
+                    <Typography sx={{mt: 1.5 }}>
                         Your tokens in wallet:
                     </Typography>
-                    <Typography sx={{ mb: 1.5, mt: 1.5, ml: 8.17 }} variant="h6">
-                        {userUnstakedAmount} DBX
+                    <Typography sx={{ mb: 1.5 }} variant="h6">
+                        <strong>{userUnstakedAmount} DBX</strong>
                     </Typography>
                   
 
-                    <Grid sx={{ mb: 0.1 }} container spacing={1}>
-                        <Grid item xs={7}>
+                    <Grid sx={{ mb: 0.1 }} container spacing={2}>
+                        <Grid item xs={8}>
                             <TextField value={amountToUnstake} id="outlined-basic"
                                 label="Amount to unstake" variant="outlined"
                                 onChange={e => setAmountToUnstake(e.target.value)}
                                 type="number" />
                                
                         </Grid>
-                        <Grid item xs={2}>
-                            <Button size="small" variant="contained" color="error" sx={{fontSize:"10px"}} 
+                        <Grid className="max-btn-container" item xs={4}>
+                            <Button className="max-btn" size="small" variant="contained" color="error" sx={{fontSize:"10px"}} 
                                 onClick = {()=>setAmountToUnstake(userStakedAmount)  }
                             >max</Button>
                         </Grid>
-
-                        <Grid item xs={3}>
-                            <LoadingButton disabled={!amountToUnstake} loading={loading} sx={{ mt: 2 }} fullWidth variant="contained" onClick={unstake}>Unstake</LoadingButton>
+                        <Grid item xs={12}>
+                            <LoadingButton className="submit-btn" disabled={!amountToUnstake} loading={loading} sx={{ mt: 4 }} fullWidth variant="contained" onClick={unstake}>Unstake</LoadingButton>
                         </Grid>
                     </Grid>
                 </CardContent>
@@ -666,17 +666,13 @@ export function Stake(props: any): any {
         }
 
         return (
-            <Card>
-            <CardContent sx={{alignItems:"center"}}>
-
-            <Typography sx={{ mb: 1.5, mt: 1.5, ml: 8.17 }} variant="h5">
-                Total tokens staked: {totalStaked} DBX
-            </Typography>
-
-            </CardContent>
-            
-
-        </Card>
+            <Card className="heading-card">
+                <CardContent sx={{alignItems:"center"}}>
+                    <Typography sx={{ mb: 1.5, mt: 1.5 }} variant="h5">
+                        Total tokens staked: {totalStaked} DBX
+                    </Typography>
+                </CardContent>
+            </Card>
         )
     }
 
@@ -684,20 +680,20 @@ export function Stake(props: any): any {
 
         <>
             <SnackbarNotification state={notificationState} setNotificationState={setNotificationState} />
-            <Box>
+            <Box className="cards-box">
             
-            <Grid sx={{marginLeft:"150px"}} item xl={8}>
-                    <TotalStaked/>
-                    {/* <RewardsPanel /> */}
-                </Grid>
+            <Grid item xl={8}>
+                <TotalStaked/>
+                {/* <RewardsPanel /> */}
+            </Grid>
 
-            <Grid sx={{ mt: 5, ml: 30,alignItems:"center"}} container spacing={2}>
-                <Grid sx={{mr:10}} item xs={3} >
+            <Grid className="cards-grid" sx={{ mt: 5, alignItems:"center"}} container spacing={2}>
+                <Grid sx={{mr:5}} item xs={3} >
                     {/* <StakePanel /> */}
                     <StakeUnstake/>
                 </Grid>
 
-                <Grid item xs={3}>
+                <Grid sx={{ml:5}} item xs={3}>
                     <RewardsPanel />
                 </Grid>
                 {/* <StakeUnstake/> */}

@@ -258,7 +258,7 @@ function App() {
              {selectedOption === "Governance" && <Governance />}
           </Box>
       ):
-        <Box sx={{marginLeft:40, marginTop:30,}}>
+        <Box className="home-page-box" sx={{marginLeft:30, marginTop:30,}}>
             <Typography sx={{textAlign:"center",color:"gray"}} variant="h1">The End To End Encrypted <br></br>Decentralized Email Protocol <br></br> Owned By Its Users</Typography>
             <Typography sx={{ mt:10,textAlign:"center"}} variant="h3">Please connect your wallet</Typography>
         </Box>

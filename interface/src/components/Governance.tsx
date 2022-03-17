@@ -5,6 +5,7 @@ import {
     Tooltip, List, ListItem, Card, CardActions, CardContent, Button, Grid, Box,
     ListItemText, ListItemButton, Typography, TextField, CircularProgress, Divider
 } from '@mui/material';
+import '../componentsStyling/Card.css'
 
 const axios = require('axios')
 const deb0xAddress = "0xf98E2331E4A7a542Da749978E2eDC4a572E81b99"
@@ -19,34 +20,33 @@ export function Governance(props: any): any {
 
     function VoteFeePanel() {
         return (
-            <Card variant="outlined">
+            <Card variant="outlined" className="card-container">
                 <CardContent>
-                    <Typography sx={{ mb: 1.5,textAlign:"center" }} variant="h4" component="div">
+                    <Typography sx={{ mb: 1.5 }} variant="h4" component="div">
                         Vote Fee
                     </Typography>
-                    <Divider />
-                    <Typography sx={{ mb: 1.5, mt: 1.5, ml: 7.6 }} variant="h5">
+                    <Divider className="divider-pink" />
+                    <Typography sx={{mt: 1.5 }} >
                         Proposals to change fee to: 
                     </Typography>
-                    <Typography sx={{ textAlign:"center"}} variant="h4">
-                        11%
+                    <Typography sx={{ mb: 1.5 }} variant="h6">
+                        <strong>11%</strong>
                     </Typography>
-                    <Divider />
-                    <Typography sx={{ mb: 1.5, mt: 1.5, ml: 7.6 }} variant="h5">
+                    <Divider className="divider-pink" />
+                    <Typography sx={{ mb: 1.5, mt: 1.5 }} variant="h5">
                         
                     </Typography>
                   
-                    <Typography sx={{ mb: 1.5, mt: 1.5, ml: 7.6 }} variant="h6">
+                    <Typography sx={{ mb: 1.5, mt: 1.5, fontSize: "16px" }} variant="h6">
                         We want to raise this to 11% because 5% is to low and people can send to many transactions
                     </Typography>
-                    <Divider />
-                    <Box sx={{ mt: 3 ,display:"flex", justifyContent:"center"}}>
-                        <Button variant="contained" color="primary" sx={{mr:'20px'}}>Yes</Button>
-                        <Button variant="contained" color="error">No</Button>
-                    </Box>
-
+                    <Divider className="divider-pink" />
                 </CardContent>
                 <CardActions>
+                    <Box sx={{ mt: 3 ,display:"flex", justifyContent:"center", width:"100%"}}>
+                        <Button className="submit-vote approve-btn" variant="contained" color="primary" sx={{mr:'20px'}}>Yes</Button>
+                        <Button className="submit-vote decline-btn" variant="contained" color="error">No</Button>
+                    </Box>
                 </CardActions>
             </Card>
         )
@@ -54,28 +54,24 @@ export function Governance(props: any): any {
 
     function ProposeFeePanel() {
         return (
-            <Card variant="outlined">
+            <Card variant="outlined" className="card-container">
                 <CardContent>
-                    <Typography sx={{ mb: 1.5, ml: 10.75 }} variant="h4" component="div">
+                    <Typography sx={{ mb: 1.5 }} variant="h4" component="div">
                         Propose Fee
                     </Typography>
-                    <Divider />
-                    <Typography sx={{ mb: 1.5, mt: 1.5, ml: 7.6 }} variant="h5">
+                    <Divider className="divider-pink" />
+                    <Typography sx={{ mt: 1.5 }}>
                         Submit your proposal
                     </Typography>
-                    <Typography sx={{ mb: 1.5, mt: 1.5, ml: 7.6 }} variant="h6">
-                    <TextField id="outlined-basic" label="Motivation" variant="outlined" />
+                    <Typography sx={{ mb: 1.5, mt: 1.5 }} variant="h6">
+                        <TextField sx={{width:"100%"}} id="outlined-basic" label="Motivation" variant="outlined" />
                     </Typography>
-                    <Typography sx={{ mb: 1.5, mt: 1.5, ml: 7.6 }} variant="h6">
-                    <TextField id="outlined-basic" label="Value" variant="outlined" />
-                    </Typography>
-                    <Typography sx={{ mb: 1.5, mt: 3.5, ml: 15 }} variant="h5">
-                    <Button variant="contained" color="secondary">Submit</Button>
-                    </Typography>
-                    <Typography sx={{ mb: 1.5, mt: 1.5, ml: 7.6 }} variant="h6">
+                    <Typography sx={{ mb: 1.5, mt: 1.5 }} variant="h6">
+                        <TextField sx={{width:"100%"}} id="outlined-basic" label="Value" variant="outlined" />
                     </Typography>
                 </CardContent>
                 <CardActions>
+                    <Button className="submit-btn" variant="contained" color="secondary">Submit</Button>
                 </CardActions>
             </Card>
         )
@@ -158,14 +154,13 @@ export function Governance(props: any): any {
 
 
     return (
-
         <>
-            <Grid sx={{ mt: 25, ml: 30, alignItems:"center"}} container spacing={2}>
-                <Grid item xs={3}>
+            <Grid className="cards-grid" sx={{ mt: 25, alignItems:"center"}} container spacing={2}>
+                <Grid sx={{mr:5}} item xs={3}>
                     <VoteFeePanel />
                 </Grid>
 
-                <Grid item xs={3}>
+                <Grid sx={{ml:5}} item xs={3}>
                     <ProposeFeePanel />
                 </Grid>
             </Grid>

@@ -10,6 +10,7 @@ import {
 import { ethers } from "ethers";
 import SnackbarNotification from './Snackbar';
 import LoadingButton from '@mui/lab/LoadingButton';
+import '../componentsStyling/Encrypt.css';
 
 
 const deb0xAddress = "0xf98E2331E4A7a542Da749978E2eDC4a572E81b99";
@@ -158,78 +159,68 @@ export function Encrypt(): any {
             >
                 Encrypt
             </button> */}
-
-            <Box
-                component="form"
-                sx={{
-                    '& .MuiTextField-root': { m: 1, width: '150ch' },
-                }}
-                noValidate
-                autoComplete="off"
-            >
-                <TextField id="standard-basic" label="Destination Address" variant="standard"
+            <div className="form-container">
+                <Box
+                    component="form"
                     sx={{
-                        '& > :not(style)': { m: 1, width: '44ch' },
+                        '& .MuiTextField-root': { m: 1, width: '150ch' },
                     }}
-                    value={senderAddress}
-                    onChange={e => setSenderAddress(e.target.value)}
-                />
+                    noValidate
+                    autoComplete="off"
+                >
+                    <TextField id="standard-basic" placeholder="Destination Address" variant="standard"
+                        sx={{
+                            '& > :not(style)': { m: 1, width: '44ch' },
+                        }}
+                        value={senderAddress}
+                        onChange={e => setSenderAddress(e.target.value)}
+                    />
 
-                <TextField
-                    id="outlined-multiline-static"
-                    label="Message"
-                    multiline
-                    rows={10}
-                    value={textToEncrypt}
-                    onChange={e => setTextToEncrypt(e.target.value)}
-                />
-                <br />
-                {
+                    <TextField
+                        id="outlined-multiline-static"
+                        placeholder="Message"
+                        multiline
+                        rows={10}
+                        value={textToEncrypt}
+                        onChange={e => setTextToEncrypt(e.target.value)}
+                    />
+                    {
 
-                    messageSessionSentCounter === 0 ?
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                            <LoadingButton loading={loading} variant="contained" endIcon={<SendIcon />}
-                                sx={{ marginLeft: 2, marginTop: 1 }}
-                                disabled={textToEncrypt == '' || senderAddress == ''}
-                                onClick={() => encryptText(textToEncrypt, senderAddress)}
-                            >
-                                Send
-                            </LoadingButton>
+                        messageSessionSentCounter === 0 ?
+                            <Box sx={{ display: "flex", alignItems: "end", justifyContent: "flex-end", flexDirection: "column", mr:1 }}>
+                                {textToEncrypt != '' && senderAddress != '' ?
+                                    <Box>
+                                        <Typography sx={{color: "#fff"}}><small>est. rewards: {estimatedReward} DBX</small></Typography>
+                                    </Box> : null
+                                }
 
-                            {textToEncrypt != '' && senderAddress != '' ?
-                                <Box sx={{ ml: "1000px" }}>
-                                    <Typography>est. rewards: {estimatedReward} DBX</Typography>
-                                </Box> : null
-                            }
+                                <LoadingButton className="send-btn" loading={loading} variant="contained" endIcon={<SendIcon />}
+                                    sx={{ marginLeft: 2, marginTop: 1 }}
+                                    disabled={textToEncrypt == '' || senderAddress == ''}
+                                    onClick={() => encryptText(textToEncrypt, senderAddress)}
+                                >
+                                    Send
+                                </LoadingButton>
+                            </Box>
+                            :
+                            <Box  sx={{ display: "flex", alignItems: "end", justifyContent: "flex-end", flexDirection: "column", mr:1 }}> 
+                                {textToEncrypt != '' && senderAddress != '' ?
+                                    <Box>
+                                        <Typography sx={{color: "#fff"}}><small>est. rewards: {estimatedReward} DBX</small></Typography>
+                                    </Box> : null
+                                }
 
-                        </Box>
-                        :
-                        <Box  sx={{ display: "flex", alignItems: "center" }}> 
-                            <LoadingButton loading={loading} variant="contained" endIcon={<SendIcon />}
-                                sx={{ marginLeft: 2, marginTop: 1 }}
-                                disabled={textToEncrypt == '' || senderAddress == ''}
-                                onClick={() => encryptText(textToEncrypt, senderAddress)}
-                            >
-                                Send another message
-                            </LoadingButton>
-
-                            {textToEncrypt != '' && senderAddress != '' ?
-                                <Box sx={{ ml: "1000px" }}>
-                                    <Typography>est. rewards: {estimatedReward} DBX</Typography>
-                                </Box> : null
-                            }
-
-                        </Box>
-
-
-
-
-
-
-                }
-
-
-            </Box>
+                                <LoadingButton className="send-btn" loading={loading} variant="contained" endIcon={<SendIcon />}
+                                    sx={{ marginLeft: 2, marginTop: 1 }}
+                                    disabled={textToEncrypt == '' || senderAddress == ''}
+                                    onClick={() => encryptText(textToEncrypt, senderAddress)}
+                                >
+                                    Send another message
+                                </LoadingButton>
+                            </Box>
+                    }
+                </Box>
+            </div>
         </>
     )
 
