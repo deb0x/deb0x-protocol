@@ -188,7 +188,7 @@ export function Decrypt(props: any): any {
                                 component="div"
                                 sx={{marginLeft: .8, marginTop: 3}}
                             >
-                                No messages found.
+                                No messages yet.
                             </Typography>
                         </div>
                     </>

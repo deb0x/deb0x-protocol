@@ -21,6 +21,8 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    background-color: transparent;
+    color: #fff;
 }
 .card-container::before {
     content: "";
@@ -49,7 +51,7 @@
     top: 3px;
     width: calc(100% - 6px);
     height: calc(100% - 6px);
-    background: white;
+    background: #26121e;
     border-radius: 5px;
 }
 
@@ -94,6 +96,7 @@ div.heading-card h5 {
 
 .card-container .tab-container button.tab-btn {
     border-color: #f0f;
+    color: #fff;
 }
 
 button.submit-btn,
@@ -108,6 +111,12 @@ button.submit-btn:hover {
         0 0 12px #fff,
         -10px 0 40px #f0f,
         10px 0 40px #0ff;
+}
+
+button.submit-btn.Mui-disabled {
+    color: #fff;
+    box-shadow: none;
+    background-color: rgba(255, 0, 255, 0.12);
 }
 
 .max-btn-container {
@@ -135,12 +144,27 @@ button.submit-vote {
     width: 100%;
 }
 
-.card-container input:focus {
-    border-color:#6145b3;
-    box-shadow:0 0 10px #6145b3;
+.card-container input:focus,
+.card-container input {
+    border: 1px solid #fff;
+    box-shadow:0 0 10px #fff;
+}
+
+.card-container .css-9ddj71-MuiInputBase-root-MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: #fff;
+}
+
+.card-container label.Mui-focused {
+    color: #fff;
 }
 
 hr.divider-pink {
     box-shadow: 1px 0 5px 1px rgba(255, 0, 255, 0.5);
     border-color: rgba(255, 0, 255, 0.5)
+}
+
+.card-container input,
+.card-container label,
+.card-container div {
+    color: #fff;
 }

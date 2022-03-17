@@ -5,8 +5,14 @@ header.app-bar--top {
 
 header.app-bar--top form {
     max-height: 35px;
-    border-color:#0ff;
+    border:1px solid #0ff;
     box-shadow:0 0 10px #0ff;
+    background-color: transparent;
+}
+
+header.app-bar--top form input,
+header.app-bar--top form button {
+    color: #fff;
 }
 
 header.app-bar--top div button,
@@ -38,15 +44,26 @@ button.logout-btn {
     color: #fff;
 }
 
-.imageContainer
+.image-container
 {
     max-height: 64px;
+    position: relative;
 }
 
-.imageContainer img {
+.image-container img {
     max-height: 64px;
     width: 100%;
     object-fit: cover;
+}
+
+.image-overlay {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 18px;
+    right: 0;
+    background-image: linear-gradient( to bottom,rgba(23,24,54,0) 0%, rgba(23,24,54,1) 70%);
+    content: "";
 }
 
 hr.divider {

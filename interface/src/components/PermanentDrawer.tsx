@@ -82,7 +82,7 @@ export function PermanentDrawer(props: any): any {
     const triedEager = useEagerConnect()
     const [selectedIndex, setSelectedIndex] = React.useState<any>(0);
     const [searchBarValue, setSearchBarValue] = React.useState<any>("search");
-    const [ensName, setEnsName] = useState<any>("ss");
+    const [ensName, setEnsName] = useState<any>("");
     // const [balance, setBalance] = useState<any>("8.13");
     const [userUnstakedAmount,setUserUnstakedAmount] = useState<any>(0);
 
@@ -232,14 +232,13 @@ export function PermanentDrawer(props: any): any {
                 anchor="left"
                 className="side-menu"
             >
-                <div className="imageContainer">
+                <div className="image-container">
+                    <div className="image-overlay"></div>
                     <img src={logo}  />
                 </div>
                 <Toolbar />
                 {/* <MailIcon/> */}
-               
                 
-                <Divider className="divider" />
                 <List >
                     {['Deb0x', 'Send email', 'Stake', 'Governance'].map((text, index) => (
                         <ListItem button key={text} selected={selectedIndex === index} onClick={() => handleChange(text, index)}>
@@ -253,13 +252,12 @@ export function PermanentDrawer(props: any): any {
                         </ListItem>
                     ))}
                 </List>
-                <Divider className="divider" />
                 <div className="side-menu--bottom">
                     <div className="content">
-                        <a href="https://github.com/deb0x">
+                        <a href="https://github.com/deb0x" target="_blank">
                         <GitHubIcon  />
                         </a>
-                        <a href="https://www.deb0x.org">
+                        <a href="https://www.deb0x.org" target="_blank">
                             www.deb0x.org
                         </a>
                     </div>

@@ -10,7 +10,8 @@
 
 .form-container form input,
 .form-container form textarea {
-    background-color: #fff;
+    background-color: transparent;
+    color: #fff;
     border: 1px solid #0ff;
     box-shadow: 1px 0 5px 0 #0ff;
     border-radius: 4px;

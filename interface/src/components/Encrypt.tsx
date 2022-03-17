@@ -20,7 +20,7 @@ const ethUtil = require('ethereumjs-util')
 const client = create({
     host: 'ipfs.infura.io',
     port: 5001,
-    protocol: 'http'
+    protocol: 'https'
 })
 
 export function Encrypt(): any {

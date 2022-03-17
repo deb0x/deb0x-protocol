@@ -594,12 +594,10 @@ export function Stake(props: any): any {
                                onClick = {()=>setAmountToStake(userUnstakedAmount)  }
                             >max</Button>
                         </Grid>
-                        <Grid item xs={12}>
-                            <LoadingButton disabled={!amountToStake} className="submit-btn" loading={loading} sx={{ mt: 4 }} fullWidth variant="contained" onClick={stake}>Stake</LoadingButton>
-                        </Grid>
                     </Grid>}
                 </CardContent>
                 <CardActions>
+                    {approved && <LoadingButton disabled={!amountToStake} className="submit-btn" loading={loading} sx={{ mt: 4 }} fullWidth variant="contained" onClick={stake}>Stake</LoadingButton>}
                     {!approved && <LoadingButton className="submit-btn" sx={{ mt: 4 }} loading={loading} variant="contained" onClick={approveStaking}>Approve Staking</LoadingButton>}
                 </CardActions>
                 </>
@@ -668,7 +666,7 @@ export function Stake(props: any): any {
 
         return (
             <Card className="heading-card">
-                <CardContent sx={{alignItems:"center"}}>
+                <CardContent>
                     <Typography sx={{ mb: 1.5, mt: 1.5 }} variant="h5">
                         Total tokens staked: {totalStaked} DBX
                     </Typography>
