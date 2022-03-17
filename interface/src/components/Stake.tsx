@@ -681,7 +681,7 @@ export function Stake(props: any): any {
             <SnackbarNotification state={notificationState} setNotificationState={setNotificationState} />
             <Box className="cards-box">
             
-            <Grid item xl={8}>
+            <Grid item>
                 <TotalStaked/>
                 {/* <RewardsPanel /> */}
             </Grid>
