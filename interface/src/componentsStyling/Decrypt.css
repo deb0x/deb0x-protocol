@@ -32,7 +32,7 @@ li.list-item .list-item-btn {
         10px 0 40px #0ff;
 }
 
-li.list-item .css-518kzi-MuiListItemSecondaryAction-root {
+li.list-item div:nth-child(2) {
     top: 0;
     right: 0;
 }
