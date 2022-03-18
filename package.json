@@ -27,6 +27,7 @@
     "react-error-overlay": "^6.0.9"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.5.0"
+    "@openzeppelin/contracts": "^4.5.0",
+    "dotenv": "^10.0.0"
   }
 }
