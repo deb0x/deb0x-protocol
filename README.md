@@ -1,7 +1,24 @@
 # deb0x
-Decentralized Private Mail Protocol
+Decentralized Private Mail App and Protocol
 
 ### Prerequisites
+* npm 6.14+
+* node v14.17+
+* [Metamask.io](https://metamask.io) browser extension
+* Get rinkeby testnet ETH from a faucet (e.g. https://faucet.rinkeby.io/)
+
+### Steps to run the frontend
+
+1. `npm install` in root dir
+2. `cd interface` and then `npm install`
+3. `npm start`
+4. open http://localhost:3000/
+
+For a quick overview and explanations, see the demo video: https://youtu.be/8coLe-z6jHg 
+
+### To redeploy the contracts
+_The contracts for the hackathon version are already deployed and the frontend is linked to it. You only need to do the below steps if you want to change the functionality!_
+
 Add `.secrets.json` file in root directory and put your secret phrase as a json format. For example:
 ```
 {
@@ -9,40 +26,15 @@ Add `.secrets.json` file in root directory and put your secret phrase as a json 
 }
 ```
 
-### Basic Commands
-
-Install dependencies `npm install` 
-
-Compile contracts `npx hardhat compile`
-
-Run tests `npm test`
-
-Run scripts `npx hardhat run --network testnet scripts/[your_script].js`
-
-Run tasks `npx hardhat accounts`
-
-### Insight Commands
-
-Generate test coverage report `npx hardhat coverage --testfiles 'test/**/*.js'`
-
-Gas report `REPORT_GAS=true npx hardhat test`
-
-### Deployment
-In `.env` file you have to add your deployment script configuration. For example:
-
-Deb0xERC20_ADDRESS = 
-Deb0x_ADDRESS = 
-Deb0xGovernor_Address = 
-
+Run deploy script (Rinkeby testnet)
 ```
-Run deploy script (BSC testnet)
+npx hardhat run --network rinkeby scritps/deploy.js
 ```
-npx hardhat run --network testnet scripts/deploy.js
 
 # Deb0x Contract Addresses 
 
-| Contract name            | Commit hash | BSC Testnet                                 | BSC Mainnet                                |
+| Contract name            | Commit hash | Rinkeby Testnet                                 | Mainnet                                |
 | ------------------------ | ----------- | ------------------------------------------- | ------------------------------------------ | 
-| Deb0xERC20               |  -          |   |  |
-| Deb0x                    |  -          |   |  |
-| Deb0xGovernor            |  -          |   |  |
+| Deb0xERC20               |  -          | 0xEde2f177d6Ae8330860B6b37B2F3D767cd2630fe |  |
+| Deb0x                    |  -          | 0xf98E2331E4A7a542Da749978E2eDC4a572E81b99  |  |
+
