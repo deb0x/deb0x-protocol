@@ -15,6 +15,7 @@ Decentralized Private Mail App and Protocol
 4. open http://localhost:3000/
 
 For a quick overview and explanations, see the demo video: https://youtu.be/8coLe-z6jHg 
+Try out deployed app: https://demo.deb0x.org/
 
 ### To redeploy the contracts
 _The contracts for the hackathon version are already deployed and the frontend is linked to it. You only need to do the below steps if you want to change the functionality!_
