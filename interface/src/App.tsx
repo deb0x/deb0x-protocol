@@ -16,6 +16,7 @@ import { Encrypt } from './components/Encrypt';
 import { Decrypt } from './components/Decrypt';
 import {Stake} from './components/Stake';
 import { Governance } from './components/Governance';
+import { Sent } from './components/Sent';
 import {Container, Box,Typography} from '@mui/material'
 
 
@@ -29,8 +30,8 @@ const client = create({
 
 const ethUtil = require('ethereumjs-util')
 //old address: 0x218c10BAb451BE6A897db102b2f608bC7D3441a0
-// 0xf98E2331E4A7a542Da749978E2eDC4a572E81b99
-const deb0xAddress = "0xf98E2331E4A7a542Da749978E2eDC4a572E81b99";
+// 0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61
+const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61";
 
 
 enum ConnectorNames { Injected = 'Injected', Network = 'Network' };
@@ -256,6 +257,7 @@ function App() {
              {selectedOption === "Deb0x" && <Decrypt account={account}/>}
              {selectedOption === "Stake" && <Stake />}
              {selectedOption === "Governance" && <Governance />}
+             {selectedOption === "Sent" && <Sent />}
           </Box>
       ):
         <Box className="home-page-box" sx={{marginLeft:30, marginTop:30,}}>

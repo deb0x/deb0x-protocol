@@ -8,7 +8,7 @@ import {
 import '../componentsStyling/Card.css'
 
 const axios = require('axios')
-const deb0xAddress = "0xf98E2331E4A7a542Da749978E2eDC4a572E81b99"
+const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61"
 
 
 export function Governance(props: any): any {

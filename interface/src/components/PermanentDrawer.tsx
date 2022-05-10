@@ -12,6 +12,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail'
+import SendIcon from '@mui/icons-material/Send';
 import LockIcon from '@mui/icons-material/Lock';
 import GavelIcon from '@mui/icons-material/Gavel';
 import Button from '@mui/material/Button'
@@ -240,13 +241,14 @@ export function PermanentDrawer(props: any): any {
                 {/* <MailIcon/> */}
                 
                 <List >
-                    {['Deb0x', 'Send email', 'Stake', 'Governance'].map((text, index) => (
+                    {['Deb0x', 'Send email', 'Stake', 'Governance', 'Sent'].map((text, index) => (
                         <ListItem button key={text} selected={selectedIndex === index} onClick={() => handleChange(text, index)}>
                             <ListItemIcon >
                                 {index === 0 && <MailIcon />}
                                 {index === 1 && <InboxIcon />}
                                 {index === 2 && <LockIcon />}
                                 {index === 3 && <Gavel />}
+                                {index === 4 && <SendIcon />}
                             </ListItemIcon>
                             <ListItemText primary={text} />
                         </ListItem>

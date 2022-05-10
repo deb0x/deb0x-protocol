@@ -1,22 +1,17 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.12;
+pragma solidity ^0.8.11;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "./Deb0xERC20.sol";
 import "./Deb0xGovernor.sol";
+import "./Deb0xCore.sol";
 
-contract Deb0x is Ownable {
+contract Deb0x is Ownable, Deb0xCore {
     //Message setup
     Deb0xERC20 public deboxERC20;
     Deb0xGovernor public governor;
     uint16 public fee = 1000;
-
-    mapping(address => string) private encryptionKeys;
-
-    mapping(address => mapping(address => string[])) private messages;
-
-    mapping(address => address[]) private messageSenders;
 
     //Tokenomic setup
     uint256 public rewardRate = 100;
@@ -50,14 +45,10 @@ contract Deb0x is Ownable {
         rewardRate = newRewardRate;
     }
 
-    //Message Functions
-    function setKey(string memory encryptionKey) public {
-        encryptionKeys[msg.sender] = encryptionKey;
-    }
-
-    function send(address to, string memory payload)
+    function send(address[] memory to, string[] memory payload)
         public
         payable
+        override
         updateReward(msg.sender)
     {
         uint256 startGas = gasleft();
@@ -67,15 +58,11 @@ contract Deb0x is Ownable {
             msgReward = msgReward / 2;
         }
 
-        if (messages[to][msg.sender].length == 0) {
-            messageSenders[to].push(msg.sender);
-        }
+        super.send(to, payload);
 
         balanceERC20[address(this)] -= msgReward;
         balanceERC20[msg.sender] += msgReward;
         totalSupply += msgReward;
-
-        messages[to][msg.sender].push(payload);
 
         uint256 gasUsed = startGas - gasleft();
         require(
@@ -83,26 +70,6 @@ contract Deb0x is Ownable {
                 ((gasUsed+ 21000 + 50000) * tx.gasprice  * fee) / 10000,
             "Deb0x: must pay 10% of transaction cost"
         );
-    }
-
-    function fetchMessages(address to, address from)
-        public
-        view
-        returns (string[] memory)
-    {
-        return messages[to][from];
-    }
-
-    function fetchMessageSenders(address to)
-        public
-        view
-        returns (address[] memory)
-    {
-        return messageSenders[to];
-    }
-
-    function getKey(address account) public view returns (string memory) {
-        return encryptionKeys[account];
     }
 
     //Tokenomic functions

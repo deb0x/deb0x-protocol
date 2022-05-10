@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Deb0x from "../ethereum/deb0x"
 import {
-    Tooltip, List, ListItem,
-    ListItemText, ListItemButton, Typography, Box, CircularProgress
+    Tooltip, List, ListItem, Chip,
+    ListItemText, ListItemButton, Typography, Box, CircularProgress, Stack
 } from '@mui/material';
 import Stepper from './Stepper'
 import { border } from '@mui/system';
@@ -19,7 +19,7 @@ import MailOutlineIcon from '@mui/icons-material/MailOutline';
 const axios = require('axios')
 const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61"
 
-export function Decrypt(props: any): any {
+export function Sent(props: any): any {
     const { account, library } = useWeb3React()
     const [loading, setLoading] = useState(true)
     const [encryptionKeyInitialized, setEncryptionKeyInitialized] = useState<boolean|undefined>(undefined)
@@ -62,20 +62,30 @@ export function Decrypt(props: any): any {
     function Message(props: any) {
         const encryptMessage = props.message.fetchedMessage.data
         const [message, setMessage] = useState(props.message.fetchedMessage.data)
-        const [ensName,setEnsName] = useState("");
+        const [recipients, setRecipients] = useState<string[]>([]);
         //const [sender, setSender] = useState(props.messsage.sender)
         const [messageTime,setMessageTime] = useState("Mar 17, 18:36")
         useEffect(()=>{
             checkENS();
+            console.log(recipients)
         },[])
 
         async function checkENS(){
-            let name = await library.lookupAddress(props.message.sender);
-            if(name !== null)
-            {   
-                // console.log(name)
-                setEnsName(name);
+            let recipientsTemp:any = []
+            const recipientsFiltered = props.message.recipients.filter((recipient:any) => recipient != account)
+
+            for(let recipient of recipientsFiltered) {
+                let name = await library.lookupAddress(recipient);
+                if(name !== null)
+                {   
+                    console.log("not null")
+                    recipientsTemp = [...recipientsTemp, name];
+                } else {
+                    recipientsTemp = [...recipientsTemp, `${recipient.substring(0, 5)}...${recipient.substring(recipient.length - 4)}`];
+                }
             }
+            
+            setRecipients(recipientsTemp)
         }
 
         async function decryptMessage() {
@@ -111,21 +121,25 @@ export function Decrypt(props: any): any {
 
                         </div>
                         <ListItemText
-                        primary={ 
-                         (ensName === "")  ?
-                    
+                        primary={
                         <>
                             <div className="message-heading">
-                                <p><small>From: </small><strong>{props.message.sender.substring(0, 5)} ... {props.message.sender.substring(props.message.sender.length - 4)}</strong></p>
-                                <p><small>{messageTime}</small></p>
-                            </div>
-                            <p>{(message == props.message.fetchedMessage.data) ? `${message.substring(0,95)}...` : message }</p>
-                        </>
-                         
-                        :
-                        <>
-                            <div className="message-heading">
-                                <p><small>From: </small><strong>{ensName}</strong></p>
+                                <p><small>To: </small></p>
+                                    <Stack direction="row" spacing={1}>
+                                        {
+                                            recipients.map((recipient: any) => {
+                                                console.log(recipients)
+                                                return (
+                                                    <Chip
+                                                        key={recipient}
+                                                        color="primary"
+                                                        label={recipient}
+                                                        variant="outlined"
+                                                    />
+                                                )
+                                            })
+                                        }
+                                    </Stack>
                                 <p><small>{messageTime}</small></p>
                             </div>
                             <p>{(message == props.message.fetchedMessage.data) ? `${message.substring(0,95)}...` : message }</p>
@@ -149,31 +163,19 @@ export function Decrypt(props: any): any {
         async function processMessages() {
             const deb0xContract = Deb0x(library, deb0xAddress)
             
-            const senderAddresses = await deb0xContract.fetchMessageSenders(account)
+            const sentMessages = await deb0xContract.fetchSentMessages(account)   
+            console.log(sentMessages)
 
-            const cidsPromises = senderAddresses.map(async function(sender:any){
-                return { cids: await deb0xContract.fetchMessages(account, sender), sender: sender}
+            const sentMessagesRetrieved = sentMessages.map(async function (item: any) {
+                //console.log(item[0], item[1])
+                return { fetchedMessage: await fetchMessage(item.cid), recipients: item.recipients}
             })
 
-            const cids = await Promise.all(cidsPromises)
+            const messages = await Promise.all(sentMessagesRetrieved)
 
-            console.log(cids)
-
-            const encryptedMessagesPromisesArray = cids.map(async function(cidArray: any) {
-                console.log(cidArray)
-                const encryptedMessagesPromises = cidArray.cids.map(async function (cid: any) {
-                    return { fetchedMessage:await fetchMessage(cid), sender: cidArray.sender}
-                })
-                const promise = await Promise.all(encryptedMessagesPromises)
-
-                return promise
-            })
-
-            const encryptedMessages = await Promise.all(encryptedMessagesPromisesArray)
+            //console.log(messages)
             
-            console.log(encryptedMessages)
-            
-            setFetchedMessages(encryptedMessages.flat())
+            setFetchedMessages(messages)
             setLoading(false)
         }
 
