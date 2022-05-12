@@ -20,7 +20,7 @@ import { Encrypt } from './components/App/Encrypt';
 import { Decrypt } from './components/App/Decrypt';
 import {Stake} from './components/App/Stake';
 import { Governance } from './components/App/Governance';
-import { Sent } from './components/Sent';
+import { Sent } from './components/App/Sent';
 import {Container, Box,Typography} from '@mui/material';
 import ThemeProvider from './components/Contexts/ThemeProvider';
 import ThemeSetter from './components/ThemeSetter';

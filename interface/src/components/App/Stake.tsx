@@ -11,9 +11,9 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import Deb0x from "../../ethereum/deb0x"
 import Deb0xERC20 from "../../ethereum/deb0xerc20"
 import SnackbarNotification from './Snackbar';
-import '../componentsStyling/Card.css';
-const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61"
 import { ethers } from "ethers";
+
+const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61"
 const deb0xERC20Address = "0xEde2f177d6Ae8330860B6b37B2F3D767cd2630fe"
 
 export function Stake(props: any): any {

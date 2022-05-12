@@ -13,7 +13,6 @@ import {
 import { ethers } from "ethers";
 import SnackbarNotification from './Snackbar';
 import LoadingButton from '@mui/lab/LoadingButton';
-import '../componentsStyling/Encrypt.css';
 import { AnyMxRecord } from 'dns';
 
 

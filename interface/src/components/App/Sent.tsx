@@ -13,7 +13,6 @@ import Pagination from "@mui/material/Pagination";
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Refresh from '@mui/icons-material/Refresh';
 import Button from "@mui/material/Button";
-import '../componentsStyling/Decrypt.css';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 
 const axios = require('axios')
