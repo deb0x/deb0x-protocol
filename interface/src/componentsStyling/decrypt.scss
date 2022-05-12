@@ -1,0 +1,33 @@
+ul {
+    li.messages-list-item {
+        margin-bottom: 0;
+        border: none;
+        border-bottom: 1px solid #ccc;
+        &:first-child {
+            border-top: 1px solid #ccc;
+        }
+        div.list-item-button {
+            padding-right: 15px;
+            width: 100%;
+            overflow: hidden;
+            .message-heading {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                .time-stamp {
+                    font-size: 10px;
+                }
+            }
+            .message {
+                font-size: 14px;
+            }
+            .message-overflow {
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            p {
+                margin-bottom: 5px;
+            }
+        }
+    }
+}

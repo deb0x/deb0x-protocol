@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import { encrypt } from '@metamask/eth-sig-util'
-import Deb0x from "../ethereum/deb0x"
+import Deb0x from "../../ethereum/deb0x"
 import { create } from 'ipfs-http-client'
 import SendIcon from '@mui/icons-material/Send';
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {
-    Box, TextField, Button, Typography
+    Box, TextField, Typography
 } from '@mui/material';
 import { ethers } from "ethers";
 import SnackbarNotification from './Snackbar';
@@ -331,31 +331,6 @@ export function Encrypt(): any {
     return (
         <>
             <SnackbarNotification state={notificationState} setNotificationState={setNotificationState} />
-            {/* <div id="encrypt-message-form">
-
-                <input
-                    className="form-control"
-                    type="text"
-                    placeholder="Destination Address"
-                    id="senderAddress"
-                    value={senderAddress}
-                    onChange={e => setSenderAddress(e.target.value)}
-                />
-
-
-            </div>
-
-            <br />
-
-            <button
-                className="btn btn-primary btn-lg btn-block mb-3"
-                id="encryptButton"
-                disabled={textToEncrypt == '' || senderAddress == ''}
-                onClick={() => encryptText(textToEncrypt, senderAddress)}
-
-            >
-                Encrypt
-            </button> */}
             <div className="form-container">
                 <Box
                     component="form"
@@ -430,7 +405,7 @@ export function Encrypt(): any {
 
                                 <LoadingButton className="send-btn" loading={loading} variant="contained" endIcon={<SendIcon />}
                                     sx={{ marginLeft: 2, marginTop: 1 }}
-                                    disabled={textToEncrypt == '' || senderAddress == ''}
+                                    disabled={textToEncrypt === '' || senderAddress === ''}
                                     onClick={() => encryptText(textToEncrypt, senderAddress)}
                                 >
                                     Send another message

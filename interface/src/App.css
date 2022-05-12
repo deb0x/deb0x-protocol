@@ -1,4 +1,4 @@
-.App {
+/* .App {
   text-align: center;
 }
 
@@ -51,11 +51,11 @@ section {
 
 .card {
   margin-bottom: 20px;
-}
+} */
 
 /* Logo & Header */
 
-header {
+/* header {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -73,11 +73,11 @@ header {
 
 #mm-logo {
   width: 100%;
-}
+} */
 
 /* Encrypt/Decrypt */
 
-#encryptMessageInput {
+/* #encryptMessageInput {
   margin-bottom: 1rem;
 }
 
@@ -106,4 +106,4 @@ header {
 
 .warning-invisible {
   display: none;
-}
+} */

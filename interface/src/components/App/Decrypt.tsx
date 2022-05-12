@@ -1,28 +1,27 @@
 import { useState, useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
-import Deb0x from "../ethereum/deb0x"
+import Deb0x from "../../ethereum/deb0x"
 import {
     Tooltip, List, ListItem,
     ListItemText, ListItemButton, Typography, Box, CircularProgress
 } from '@mui/material';
 import Stepper from './Stepper'
-import { border } from '@mui/system';
 import IconButton from "@mui/material/IconButton";
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import Pagination from "@mui/material/Pagination";
 import RefreshIcon from '@mui/icons-material/Refresh';
-import Refresh from '@mui/icons-material/Refresh';
-import Button from "@mui/material/Button";
-import '../componentsStyling/Decrypt.css';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import axios from 'axios';
+import formatAccountName from "../Common/AccountName";
+import "../../componentsStyling/decrypt.scss"
 
-const axios = require('axios')
 const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61"
 
 export function Decrypt(props: any): any {
     const { account, library } = useWeb3React()
     const [loading, setLoading] = useState(true)
-    const [encryptionKeyInitialized, setEncryptionKeyInitialized] = useState<boolean|undefined>(undefined)
+    const [encryptionKeyInitialized, setEncryptionKeyInitialized] = 
+        useState<boolean|undefined>(undefined)
 
 
     useEffect(() => {
@@ -69,11 +68,9 @@ export function Decrypt(props: any): any {
             checkENS();
         },[])
 
-        async function checkENS(){
+        async function checkENS() {
             let name = await library.lookupAddress(props.message.sender);
-            if(name !== null)
-            {   
-                // console.log(name)
+            if(name !== null) {   
                 setEnsName(name);
             }
         }
@@ -85,7 +82,7 @@ export function Decrypt(props: any): any {
             }
         }
 
-        async function hideMessage(){
+        async function hideMessage() {
             console.log("sss")
             setMessage(encryptMessage)
         }
@@ -94,19 +91,23 @@ export function Decrypt(props: any): any {
     
         return (
             <ListItem sx ={{border:1, marginBottom:1}} disablePadding key={props.index}    secondaryAction={ 
-                <IconButton className={`${(message != props.message.fetchedMessage.data) ? "list-item-btn" : ""}`}  
+                <IconButton className={`${(message !== props.message.fetchedMessage.data) ? "list-item-btn" : ""}`}  
                         onClick={()=>{hideMessage()}}  edge="end" aria-label="comments">
-                    { (message != props.message.fetchedMessage.data) ? <VisibilityOffIcon  />: null}
+                    { (message !== props.message.fetchedMessage.data) ? <VisibilityOffIcon  />: null}
                 </IconButton>  
             }
-                className="list-item"
+                className="messages-list-item"
             >
-                <Tooltip title={(message == props.message.fetchedMessage.data) ? "Click to decrypt" : `Sender:${props.message.sender}`} placement="right">
-                    <ListItemButton onClick={() => {
-                        if(message == props.message.fetchedMessage.data) {
-                            decryptMessage()
-                        }
-                    }}>
+                <Tooltip 
+                    title={(message === props.message.fetchedMessage.data) ? 
+                    "Click to decrypt" : `Sender:${props.message.sender}`} 
+                    placement="right">
+                    <ListItemButton className="list-item-button"
+                        onClick={() => {
+                            if(message === props.message.fetchedMessage.data) {
+                                decryptMessage()
+                            }
+                        }}>
                         <div>
 
                         </div>
@@ -116,19 +117,23 @@ export function Decrypt(props: any): any {
                     
                         <>
                             <div className="message-heading">
-                                <p><small>From: </small><strong>{props.message.sender.substring(0, 5)} ... {props.message.sender.substring(props.message.sender.length - 4)}</strong></p>
-                                <p><small>{messageTime}</small></p>
+                                <p><strong>{formatAccountName(props.message.sender)}</strong></p>
+                                <p className="time-stamp"><small>{messageTime}</small></p>
                             </div>
-                            <p>{(message == props.message.fetchedMessage.data) ? `${message.substring(0,95)}...` : message }</p>
+                            <p className={`message ${message === props.message.fetchedMessage.data ? "message-overflow" : ""}` }>
+                                { message }
+                            </p>
                         </>
                          
                         :
                         <>
                             <div className="message-heading">
-                                <p><small>From: </small><strong>{ensName}</strong></p>
-                                <p><small>{messageTime}</small></p>
+                                <p><strong>{ensName}</strong></p>
+                                <p className="time-stamp"><small>{messageTime}</small></p>
                             </div>
-                            <p>{(message == props.message.fetchedMessage.data) ? `${message.substring(0,95)}...` : message }</p>
+                            <p className={`message ${message === props.message.fetchedMessage.data ? "message-overflow" : ""}` }>
+                                { message }
+                            </p>
                         </>
                         }/>
                          
@@ -178,7 +183,7 @@ export function Decrypt(props: any): any {
         }
 
         if(!loading) {
-            if (fetchedMessages.length == 0) {
+            if (fetchedMessages.length === 0) {
                 return (
                     <>
                         <div className="message-placeholder">
@@ -217,39 +222,25 @@ export function Decrypt(props: any): any {
 
     }
     
-    if(encryptionKeyInitialized == true){
+    if (encryptionKeyInitialized === true) {
         return (
-            // sx={{display:"flex"}}
             <Box sx={{broder:"1px"}}>
                 <Box className="pagination" sx={{display:"flex"}}>
-                <Pagination sx={{marginTop:"10px"}} count={1} showFirstButton showLastButton />
-                <IconButton sx={{ml:"800px"}} color="primary" size="large" onClick={()=> setLoading(true) }>
-                    <RefreshIcon fontSize="large"/>
-                </IconButton>
-
+                    <Pagination sx={{marginTop:"10px"}} count={1} showFirstButton showLastButton />
+                    <IconButton color="primary" size="large" onClick={()=> setLoading(true) }>
+                        <RefreshIcon fontSize="large"/>
+                    </IconButton>
                 </Box>
-                
-                
-                {/* <Button variant="contained" sx={{borderRadius:"30px"}}>
-                <RefreshIcon fontSize="large"/>
-                </Button> */}
-
                 <Box>
-                    {
-                        <GetMessages />
-                    }
-                    
+                    <GetMessages />
                 </Box>
-
-
             </Box>
-           
         )
-    } else if(encryptionKeyInitialized == false){
+    } else if (encryptionKeyInitialized === false) {
         return (
             <Stepper onDeboxInitialization={getPublicEncryptionKey}/>
         )
-    } else{
+    } else {
         return(
             <div className="spinner">
                 <CircularProgress/>

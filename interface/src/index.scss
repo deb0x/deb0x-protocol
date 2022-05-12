@@ -1,0 +1,30 @@
+@import './componentsStyling/theme.scss';
+
+
+
+.app-container {
+    height: 100vh;
+    overflow: scroll;
+    @include themed() {
+        color: t('text');
+        background: t('bg');
+        header {
+            z-index: 1201;
+            flex-direction: row;
+            align-items: center;
+            background-color: t('bg');
+            justify-content: flex-end;
+        }
+        img {
+            max-width: 175px;
+            width: 100%;
+        }
+        li svg {
+            color: t('text')
+        }
+        li button.MuiPaginationItem-page {
+            background-color: t('text');
+            color: t('pagination')
+        }
+    }
+}

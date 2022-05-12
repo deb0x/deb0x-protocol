@@ -6,9 +6,8 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Typography from '@mui/material/Typography';
-import Deb0x from "../ethereum/deb0x"
+import Deb0x from "../../ethereum/deb0x"
 import SnackbarNotification from './Snackbar';
-import '../componentsStyling/Stepper.css';
 const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61";
 const steps = ['Provide public encryption key', 'Initialize Deb0x'];
 
@@ -89,10 +88,10 @@ export default function HorizontalLinearStepper(props: any) {
                             optional?: React.ReactNode;
                             error?: boolean;
                         } = {};
-                        if (whichStepFailed == index) {
+                        if (whichStepFailed === index) {
                             labelProps.optional = (
                             <Typography variant="caption" color="error">
-                                {(activeStep == 0) ? "User didn't provide encryption key" : "User rejected transaction"}
+                                {(activeStep === 0) ? "User didn't provide encryption key" : "User rejected transaction"}
                             </Typography>
                             );
                             labelProps.error = true;
@@ -107,7 +106,7 @@ export default function HorizontalLinearStepper(props: any) {
                 {<Fragment>
                     <Box className="button-box" sx={{ display: 'flex', flexDirection: 'row', pt: 5 }}>
                         <LoadingButton className="init-btn" loading={loading} sx={{ marginLeft: 5 }} variant="contained" onClick={
-                            (activeStep == 0) ? getEncryptionKey : initializeDeb0x
+                            (activeStep === 0) ? getEncryptionKey : initializeDeb0x
                         }>
                             {activeStep === steps.length - 1 ? 'Initialize' : 'Provide'}
                         </LoadingButton>

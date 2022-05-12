@@ -2,7 +2,7 @@
 import { InjectedConnector } from '@web3-react/injected-connector'
 import { NetworkConnector } from '@web3-react/network-connector'
 
-const POLLING_INTERVAL = 12000
+// const POLLING_INTERVAL = 12000
 const RPC_URLS: { [chainId: number]: string } = {
     4: 'https://rinkeby.infura.io/v3/84842078b09946638c03157f83405213'
 }

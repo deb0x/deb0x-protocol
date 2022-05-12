@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
-import Deb0x from "../ethereum/deb0x"
+import Deb0x from "../../ethereum/deb0x"
 import {
     Tooltip, List, ListItem, Chip,
     ListItemText, ListItemButton, Typography, Box, CircularProgress, Stack

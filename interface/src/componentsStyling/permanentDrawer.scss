@@ -1,0 +1,56 @@
+@media (max-width: 768px) {
+    header {
+        padding: 5px;
+        form {
+            position: fixed;
+            top: 47px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            div {
+                width: 100%;
+            }
+        }
+    }
+    .image-container {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        position: absolute;
+        bottom: 20px;
+        z-index: 1201;
+        left: 50%;
+        transform: translateX(-50%);
+        img {
+            object-fit: cover;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+    }
+    .side-menu {
+        .MuiDrawer-paper {
+            flex-direction: row;
+            .Mui-selected {
+                background-color: transparent;
+                svg {
+                    color: #1A0A11;
+                }
+            }
+            ul {
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+                .list-item {
+                    .icon {
+                        justify-content: center;
+                        width: 100%;
+                    }
+                    .text {
+                        display: none;
+                    }
+                }
+            }
+        }
+    }
+}
