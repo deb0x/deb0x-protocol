@@ -14,6 +14,9 @@ import { ethers } from "ethers";
 import SnackbarNotification from './Snackbar';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { AnyMxRecord } from 'dns';
+import '../../componentsStyling/encrypt.scss';
+import { Editor } from "react-draft-wysiwyg";
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 
 
 const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61";
@@ -27,125 +30,6 @@ const client = create({
 })
 
 export function Encrypt(): any {
-
-    //     import React from "react";
-    // import ReactDOM from "react-dom";
-
-    // import "./styles.css";
-
-    // class App extends React.Component {
-    //   state = {
-    //     items: [],
-    //     value: "",
-    //     error: null
-    //   };
-
-    //   handleKeyDown = evt => {
-    //     if (["Enter", "Tab", ","].includes(evt.key)) {
-    //       evt.preventDefault();
-
-    //       var value = this.state.value.trim();
-
-    //       if (value && this.isValid(value)) {
-    //         this.setState({
-    //           items: [...this.state.items, this.state.value],
-    //           value: ""
-    //         });
-    //       }
-    //     }
-    //   };
-
-    //   handleChange = evt => {
-    //     this.setState({
-    //       value: evt.target.value,
-    //       error: null
-    //     });
-    //   };
-
-    //   handleDelete = item => {
-    //     this.setState({
-    //       items: this.state.items.filter(i => i !== item)
-    //     });
-    //   };
-
-    //   handlePaste = evt => {
-    //     evt.preventDefault();
-
-    //     var paste = evt.clipboardData.getData("text");
-    //     var emails = paste.match(/[\w\d\.-]+@[\w\d\.-]+\.[\w\d\.-]+/g);
-
-    //     if (emails) {
-    //       var toBeAdded = emails.filter(email => !this.isInList(email));
-
-    //       this.setState({
-    //         items: [...this.state.items, ...toBeAdded]
-    //       });
-    //     }
-    //   };
-
-    //   isValid(email) {
-    //     let error = null;
-
-    //     if (this.isInList(email)) {
-    //       error = `${email} has already been added.`;
-    //     }
-
-    //     if (!this.isEmail(email)) {
-    //       error = `${email} is not a valid email address.`;
-    //     }
-
-    //     if (error) {
-    //       this.setState({ error });
-
-    //       return false;
-    //     }
-
-    //     return true;
-    //   }
-
-    //   isInList(email) {
-    //     return this.state.items.includes(email);
-    //   }
-
-    //   isEmail(email) {
-    //     return /[\w\d\.-]+@[\w\d\.-]+\.[\w\d\.-]+/.test(email);
-    //   }
-
-    //   render() {
-    //     return (
-    //       <>
-    //         {this.state.items.map(item => (
-    //           <div className="tag-item" key={item}>
-    //             {item}
-    //             <button
-    //               type="button"
-    //               className="button"
-    //               onClick={() => this.handleDelete(item)}
-    //             >
-    //               &times;
-    //             </button>
-    //           </div>
-    //         ))}
-
-    //         <input
-    //           className={"input " + (this.state.error && " has-error")}
-    //           value={this.state.value}
-    //           placeholder="Type or paste email addresses and press `Enter`..."
-    //           onKeyDown={this.handleKeyDown}
-    //           onChange={this.handleChange}
-    //           onPaste={this.handlePaste}
-    //         />
-
-    //         {this.state.error && <p className="error">{this.state.error}</p>}
-    //       </>
-    //     );
-    //   }
-    // }
-
-    // const rootElement = document.getElementById("root");
-    // ReactDOM.render(<App />, rootElement);
-
-
     const { account, library } = useWeb3React()
     const [encryptionKey, setKey] = useState('')
     const [textToEncrypt, setTextToEncrypt] = useState('')
@@ -330,19 +214,13 @@ export function Encrypt(): any {
     return (
         <>
             <SnackbarNotification state={notificationState} setNotificationState={setNotificationState} />
-            <div className="form-container">
+            <div className="form-container container">
                 <Box
                     component="form"
-                    sx={{
-                        '& .MuiTextField-root': { m: 1, width: '150ch' },
-                    }}
                     noValidate
                     autoComplete="off"
                 >
-                    <TextField id="standard-basic" variant="standard"
-                        sx={{
-                            '& > :not(style)': { m: 1, width: '44ch' },
-                        }}
+                    <TextField id="standard-basic"
                         placeholder="Type or paste addresses and press `Enter`..."
                         value={senderAddress}
                         onPaste={handlePaste}
@@ -350,30 +228,28 @@ export function Encrypt(): any {
                         onChange={handleChange}
                     />
                     <Stack direction="row" spacing={1}>
-                        <Box sx={{ width: '100%', maxWidth: 1080, margin: '0 auto' }}>
+                        <Box sx={{ width: '100%', margin: '0 auto' }}
+                            className="address-list">
                             {
                                 addressList.map((address: any) => {
                                     return (
                                         <Chip
                                             key={address}
-                                            color="primary"
                                             label={address}
                                             onDelete={() => handleDelete(address)}
                                             deleteIcon={<DeleteIcon />}
-                                            variant="outlined"
                                         />
                                     )
                                 })
                             }
                         </Box>
                     </Stack>
-                    <TextField
-                        id="outlined-multiline-static"
-                        placeholder="Message"
-                        multiline
-                        rows={10}
-                        value={textToEncrypt}
-                        onChange={e => setTextToEncrypt(e.target.value)}
+                    <Editor
+                        // editorState={textToEncrypt}
+                        toolbarClassName="toolbar"
+                        wrapperClassName="wrapper"
+                        editorClassName="editor"
+                        onChange={e => console.log(e.blocks)}
                     />
 
                     {
@@ -382,11 +258,13 @@ export function Encrypt(): any {
                             <Box sx={{ display: "flex", alignItems: "end", justifyContent: "flex-end", flexDirection: "column", mr: 1 }}>
                                 {textToEncrypt != '' && senderAddress != '' ?
                                     <Box>
-                                        <Typography sx={{ color: "#fff" }}><small>est. rewards: {estimatedReward} DBX</small></Typography>
+                                        <Typography>
+                                            <small>est. rewards: {estimatedReward} DBX</small>
+                                        </Typography>
                                     </Box> : null
                                 }
 
-                                <LoadingButton className="send-btn" loading={loading} variant="contained" endIcon={<SendIcon />}
+                                <LoadingButton className="send-btn" loading={loading} endIcon={<SendIcon />}
                                     sx={{ marginLeft: 2, marginTop: 1 }}
                                     disabled={textToEncrypt == '' || addressList == []}
                                     onClick={() => encryptText(textToEncrypt, addressList)}
@@ -398,7 +276,9 @@ export function Encrypt(): any {
                             <Box sx={{ display: "flex", alignItems: "end", justifyContent: "flex-end", flexDirection: "column", mr: 1 }}>
                                 {textToEncrypt != '' && senderAddress != '' ?
                                     <Box>
-                                        <Typography sx={{ color: "#fff" }}><small>est. rewards: {estimatedReward} DBX</small></Typography>
+                                        <Typography>
+                                            <small>est. rewards: {estimatedReward} DBX</small>
+                                        </Typography>
                                     </Box> : null
                                 }
 

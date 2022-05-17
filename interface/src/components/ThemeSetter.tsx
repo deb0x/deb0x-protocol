@@ -7,7 +7,9 @@ export default function ThemeSetter() {
     const { theme, setTheme } = useTheme()!;
 
   return (
-    <select value={theme} onChange={(e) => {setTheme(e.currentTarget.value); console.log(e.currentTarget.value)}}>
+    <select value={theme} 
+        onChange={(e) => setTheme(e.currentTarget.value)}
+        className="form-select">
       {themeOptions.map((option, idx) => (
         <option value={option.value} key={idx}>
           {option.value}

@@ -29,6 +29,7 @@ import Deb0xERC20 from "../../ethereum/deb0xerc20"
 import { ethers } from "ethers";
 import formatAccountName from "../Common/AccountName";
 import "../../componentsStyling/permanentDrawer.scss";
+import ThemeSetter from '../ThemeSetter';
 import ScreenSize from '../Common/ScreenSize';
 
 const deb0xERC20Address = "0xEde2f177d6Ae8330860B6b37B2F3D767cd2630fe"
@@ -48,7 +49,7 @@ export function PermanentDrawer(props: any): any {
     const [ensName, setEnsName] = useState<any>("");
     // const [balance, setBalance] = useState<any>("8.13");
     const [userUnstakedAmount,setUserUnstakedAmount] = useState<any>(0);
-    const menuItems = ['Deb0x', 'Send email', 'Stake', 'Governance', 'Sent'];
+    const menuItems = ['Send', 'Deb0x', 'Stake', 'Sent'];
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popper' : undefined;
@@ -98,13 +99,13 @@ export function PermanentDrawer(props: any): any {
     return (
 
         <Box sx={{ display: 'flex' }}>
-
-            <div className="image-container">
-                <div className="image-overlay"></div>
-                <img src={logo}  />
-            </div>
             <CssBaseline />
             <AppBar className="app-bar--top">
+                <div className="image-container">
+                    <div className="image-overlay"></div>
+                    <img src={logo}  />
+                </div>
+                <Box className="main-menu--right">
                 { account  ? 
                     <>
                         <Paper component="form">
@@ -142,7 +143,7 @@ export function PermanentDrawer(props: any): any {
                                 handleClick
                             }>
                             <div>
-                                {activating && <Spinner color={'black'} style={{ height: '25%', marginLeft: '-1rem' }} />}
+                                {activating && <Spinner color={'black'} />}
                             </div>
 
                             {!connected ? 
@@ -160,35 +161,45 @@ export function PermanentDrawer(props: any): any {
                         </Button>
                     )
                 }) ()}
+                </Box>
             </AppBar>
-            <Popper id={id} open={open} anchorEl={anchorEl}>
-                <Button 
-                    onClick={(event: any) => {
-                        handleClick(event)
-                        deactivate()
-                    }}
-                    className="logout-btn">
-                    Logout 
-                </Button>
+            <Popper className="popper" id={id} open={open} anchorEl={anchorEl}>
+                <List>
+                    <ListItem>
+                        <ThemeSetter />
+                    </ListItem>
+                    <ListItem>
+                        <Button 
+                            onClick={(event: any) => {
+                                handleClick(event)
+                                deactivate()
+                            }}
+                            className="logout-btn">
+                            Logout 
+                        </Button>
+                    </ListItem>
+                </List>
             </Popper>
             <Drawer variant="permanent"
                 anchor={dimensions.width > 768 ? 'left' : 'bottom'}
                 className="side-menu">
                 <List >
                     {menuItems.map((text, index) => (
-                        <ListItem button key={text} 
-                            selected={selectedIndex === index} 
-                            onClick={() => handleChange(text, index)}
-                            className="list-item">
-                            <ListItemIcon className="icon" >
-                                {index === 0 && <MailIcon />}
-                                {index === 1 && <InboxIcon />}
-                                {index === 2 && <LockIcon />}
-                                {index === 3 && <Gavel />}
-                                {index === 4 && <SendIcon />}
-                            </ListItemIcon>
-                            <ListItemText className="text" primary={text} />
-                        </ListItem>
+                        <>
+                            
+                            <ListItem button key={text} 
+                                selected={selectedIndex === index} 
+                                onClick={() => handleChange(text, index)}
+                                className="list-item">
+                                <ListItemIcon className="icon" >
+                                    {index === 0 && <MailIcon />}
+                                    {index === 1 && <InboxIcon />}
+                                    {index === 2 && <Gavel />}
+                                    {index === 3 && <SendIcon />}
+                                </ListItemIcon>
+                                <ListItemText className="text" primary={text} />
+                            </ListItem>
+                        </>
                     ))}
                 </List>
                 {/* <div className="side-menu--bottom">

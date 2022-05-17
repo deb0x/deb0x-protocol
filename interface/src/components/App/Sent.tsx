@@ -14,6 +14,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import Refresh from '@mui/icons-material/Refresh';
 import Button from "@mui/material/Button";
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import '../../componentsStyling/decrypt.scss';
 
 const axios = require('axios')
 const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61"
@@ -108,14 +109,18 @@ export function Sent(props: any): any {
                     { (message != props.message.fetchedMessage.data) ? <VisibilityOffIcon  />: null}
                 </IconButton>  
             }
-                className="list-item"
+                className="messages-list-item"
             >
-                <Tooltip title={(message == props.message.fetchedMessage.data) ? "Click to decrypt" : `Sender:${props.message.sender}`} placement="right">
-                    <ListItemButton onClick={() => {
-                        if(message == props.message.fetchedMessage.data) {
-                            decryptMessage()
-                        }
-                    }}>
+                <Tooltip 
+                    title={(message === props.message.fetchedMessage.data) ? 
+                    "Click to decrypt" : `Sender:${props.message.sender}`} 
+                    placement="right">
+                    <ListItemButton className="list-item-button"
+                        onClick={() => {
+                            if(message === props.message.fetchedMessage.data) {
+                                decryptMessage()
+                            }
+                        }}>
                         <div>
 
                         </div>
@@ -141,7 +146,9 @@ export function Sent(props: any): any {
                                     </Stack>
                                 <p><small>{messageTime}</small></p>
                             </div>
-                            <p>{(message == props.message.fetchedMessage.data) ? `${message.substring(0,95)}...` : message }</p>
+                            <p className={`message ${message === props.message.fetchedMessage.data ? "message-overflow" : ""}` }>
+                                { message }
+                            </p>
                         </>
                         }/>
                          
@@ -221,28 +228,16 @@ export function Sent(props: any): any {
     if(encryptionKeyInitialized == true){
         return (
             // sx={{display:"flex"}}
-            <Box sx={{broder:"1px"}}>
+            <Box>
                 <Box className="pagination" sx={{display:"flex"}}>
-                <Pagination sx={{marginTop:"10px"}} count={1} showFirstButton showLastButton />
-                <IconButton sx={{ml:"800px"}} color="primary" size="large" onClick={()=> setLoading(true) }>
-                    <RefreshIcon fontSize="large"/>
-                </IconButton>
-
+                    <Pagination count={1} showFirstButton showLastButton />
+                    <IconButton size="large" onClick={()=> setLoading(true) }>
+                        <RefreshIcon fontSize="large"/>
+                    </IconButton>
                 </Box>
-                
-                
-                {/* <Button variant="contained" sx={{borderRadius:"30px"}}>
-                <RefreshIcon fontSize="large"/>
-                </Button> */}
-
                 <Box>
-                    {
-                        <GetMessages />
-                    }
-                    
+                    <GetMessages />
                 </Box>
-
-
             </Box>
            
         )

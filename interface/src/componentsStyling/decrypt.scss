@@ -1,10 +1,16 @@
-ul {
+@import './theme.scss';
+
+ul.MuiList-root {
+    padding-top: 0;
     li.messages-list-item {
         margin-bottom: 0;
         border: none;
         border-bottom: 1px solid #ccc;
         &:first-child {
             border-top: 1px solid #ccc;
+        }
+        &:last-child {
+            margin-bottom: 55px;
         }
         div.list-item-button {
             padding-right: 15px;
@@ -29,5 +35,35 @@ ul {
                 margin-bottom: 5px;
             }
         }
+    }
+}
+
+.message-placeholder {
+    height: 50vh;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.pagination {
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    @include themed() {
+        button.MuiIconButton-root {
+            padding: 0;
+            color: t(text)
+        }
+    }
+}
+
+@media (min-width: 769px) {
+    .pagination {
+        max-width: 1080px;
+        margin: 0 auto;
+    }
+    ul.MuiList-root {
+        padding-top: 55px
     }
 }

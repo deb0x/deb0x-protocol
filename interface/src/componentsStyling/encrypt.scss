@@ -1,0 +1,71 @@
+@import './theme.scss';
+
+.form-container {
+    @include themed() {
+        form {
+            padding-top: 15px;
+            .MuiFormControl-root {
+                width: 100%;
+                .MuiOutlinedInput-root {
+                    margin: 5px 0;
+                    input {
+                        box-sizing: inherit;
+                        font-size: 12px;
+                        color: t('text');
+                        background-color: t('bg');
+                        border: 1px solid t('text');
+                        border-radius: 4px;
+                    }
+                    fieldset {
+                        display: none;
+                    }
+                }
+                .MuiInputBase-multiline {
+                    box-sizing: inherit;
+                    font-size: 12px;
+                    color: t('text');
+                    background-color: t('bg');
+                    border: 1px solid t('text');
+                    border-radius: 4px;
+                }
+            }
+            .address-list {
+                display: flex;
+                flex-direction: column;
+                padding: 5px;
+                div.MuiButtonBase-root {
+                    margin: 2px 0;
+                    background-color: t('bg');
+                    color: t('text');
+                    border: 1px solid t('text');
+                }
+            } 
+            .wrapper {
+                border: 1px solid t('text');
+                border-radius: 4px;
+            }
+            .editor {
+                min-height: 250px;
+            }
+            .send-btn {
+                font-size: 12px;
+                color: t('text');
+                background-color: t('bg');
+                border: 1px solid t('text');
+                border-radius: 4px;
+            }
+        }
+    }
+}
+
+@media (min-width: 769px) {
+    .form-container {
+        @include themed() {
+            form {
+                .address-list {
+                    display: inline-block;
+                }
+            }
+        }
+    }    
+}

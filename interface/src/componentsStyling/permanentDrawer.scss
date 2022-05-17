@@ -1,53 +1,139 @@
-@media (max-width: 768px) {
-    header {
-        padding: 5px;
-        form {
-            position: fixed;
-            top: 47px;
-            left: 0;
-            width: 100%;
-            display: flex;
-            div {
-                width: 100%;
-            }
-        }
-    }
-    .image-container {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        position: absolute;
-        bottom: 20px;
-        z-index: 1201;
-        left: 50%;
-        transform: translateX(-50%);
-        img {
-            object-fit: cover;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-        }
-    }
-    .side-menu {
-        .MuiDrawer-paper {
+@import './theme.scss';
+$box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%), 
+    0px 2px 2px 0px rgb(0 0 0 / 14%), 
+    0px 1px 5px 0px rgb(0 0 0 / 12%);
+
+.app-container {
+    @include themed() {
+        header {
+            background-color: t('bg');
             flex-direction: row;
-            .Mui-selected {
-                background-color: transparent;
-                svg {
-                    color: #1A0A11;
-                }
+            align-items: center;
+            z-index: 1201;
+            .MuiButton-contained {
+                background-color: t('bg');
+                color: t('text');
+                border: 1px solid t('text');
             }
-            ul {
-                display: flex;
-                justify-content: space-between;
+            img {
+                max-width: 175px;
                 width: 100%;
-                .list-item {
-                    .icon {
-                        justify-content: center;
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .app-container {
+        @include themed() {
+            header {
+                padding: 5px;
+                justify-content: flex-end;
+                form {
+                    position: fixed;
+                    top: 55px;
+                    left: 0;
+                    width: 100%;
+                    display: flex;
+                    div {
                         width: 100%;
                     }
-                    .text {
-                        display: none;
+                }
+            }
+            .image-container {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                position: fixed;
+                bottom: 20px;
+                z-index: 1201;
+                left: 50%;
+                transform: translateX(-50%);
+                img {
+                    object-fit: cover;
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 50%;
+                }
+            }
+            .side-menu {
+                .MuiDrawer-paper {
+                    flex-direction: row;
+                    .Mui-selected {
+                        background-color: transparent;
+                        svg {
+                            color: #1A0A11;
+                        }
+                    }
+                    ul {
+                        display: flex;
+                        justify-content: space-between;
+                        width: 100%;
+                        .list-item {
+                            .icon {
+                                justify-content: flex-start;
+                                width: 100%;
+                            }
+                            &:nth-last-child(-n + 2) .icon {
+                                justify-content: flex-end;
+                            }
+                            .text {
+                                display: none;
+                            }
+                        }
+                    }
+                }
+            }
+            .popper {
+                z-index: 1203;
+                ul {
+                    border: 1px solid #000;
+                    border-radius: 4px;
+                    background-color: #fff;
+                    box-shadow: $box-shadow;
+                }
+            }
+        }
+    }
+}
+
+@media (min-width: 769px) {
+    .app-container {
+        @include themed(){
+            header {
+                justify-content: space-between;
+                .image-container {
+                    width: 178px;
+                    img {
+                        width: 100%;
+                        height: 55px;
+                        object-fit: cover;
+                    }
+                }
+                .main-menu--right {
+                    display: flex;
+                    padding: 5px 10px;
+                    & > * {
+                        margin: 0 5px;
+                    }
+                    form {
+                        border: 1px solid t('text');
+                        display: flex;
+                        align-items: center;
+                        input {
+                            margin: 0 5px;
+                        }
+                    }
+                }
+            }
+            .side-menu {
+                .MuiDrawer-paperAnchorLeft {
+                    min-width: 175px;
+                    .list-item.Mui-selected {
+                        background-color: #cccccc40;
+                    }
+                    .list-item {
+                        border-bottom: 1px solid #ccc;
                     }
                 }
             }

@@ -12,6 +12,7 @@ import Deb0x from "../../ethereum/deb0x"
 import Deb0xERC20 from "../../ethereum/deb0xerc20"
 import SnackbarNotification from './Snackbar';
 import { ethers } from "ethers";
+import "../../componentsStyling/stake.scss";
 
 const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61"
 const deb0xERC20Address = "0xEde2f177d6Ae8330860B6b37B2F3D767cd2630fe"
@@ -314,15 +315,6 @@ export function Stake(props: any): any {
 
         return (
             <Card variant = "outlined" className="card-container">
-                  {/* <CardContent> */}
-                {/* <Typography sx={{ mb: 1.5, ml: 8.17 }} variant="h5" component="div">
-                        Total pool staked Info:  
-                    </Typography>
-                    <Typography sx={{ mb: 1.5, mt: 1.5, ml: 8.17 }} variant="h6">
-                        {totalStaked}
-                    </Typography>
-                    <Divider className="divider-pink" /> */}
-                {/* </CardContent> */}
                 <ToggleButtonGroup
                     color="primary"
                     value={alignment}
@@ -337,6 +329,7 @@ export function Stake(props: any): any {
               
             {
                 alignment === "stake" ?
+                
                 <>
                 <CardContent>
                     <Typography>
@@ -352,7 +345,7 @@ export function Stake(props: any): any {
                     <Typography variant="h6">
                         <strong>{userUnstakedAmount} DBX</strong>
                     </Typography>
-                    {approved && <Grid container spacing={2}>
+                    {approved && <Grid className="amount-row" container spacing={2}>
                         <Grid item>
                             <TextField id="outlined-basic"
                                 label="Amount to stake"
@@ -362,9 +355,11 @@ export function Stake(props: any): any {
                                 onChange={e => setAmountToStake(e.target.value)} />
                         </Grid>
                         <Grid className="max-btn-container" item>
-                            <Button className="max-btn" size="small" variant="contained" color="error" 
-                               onClick = {()=>setAmountToStake(userUnstakedAmount)  }
-                            >max</Button>
+                            <Button className="max-btn" 
+                                size="small" variant="contained" color="error" 
+                               onClick = {()=>setAmountToStake(userUnstakedAmount)  }>
+                                max
+                            </Button>
                         </Grid>
                     </Grid>}
                 </CardContent>
@@ -394,18 +389,21 @@ export function Stake(props: any): any {
                     </Typography>
                   
 
-                    <Grid container>
+                    <Grid className="amount-row" container spacing={2}>
                         <Grid item>
-                            <TextField value={amountToUnstake} id="outlined-basic"
-                                label="Amount to unstake" variant="outlined"
+                            <TextField value={amountToUnstake}
+                                id="outlined-basic"
+                                label="Amount to unstake"
+                                variant="outlined"
                                 onChange={e => setAmountToUnstake(e.target.value)}
                                 type="number" />
-                               
                         </Grid>
                         <Grid className="max-btn-container" item>
-                            <Button className="max-btn" size="small" variant="contained" color="error" 
-                                onClick = {()=>setAmountToUnstake(userStakedAmount)  }
-                            >max</Button>
+                            <Button className="max-btn"
+                                size="small" variant="contained" color="error" 
+                                onClick = {()=>setAmountToUnstake(userStakedAmount)  }>
+                                max
+                            </Button>
                         </Grid>
                     </Grid>
                 </CardContent>
@@ -450,18 +448,20 @@ export function Stake(props: any): any {
     return (
         <>
             <SnackbarNotification state={notificationState} setNotificationState={setNotificationState} />
-            <Box className="cards-box">
-                <Grid item>
+            <Box className="container">
+                <div>
                     <TotalStaked/>
-                </Grid>
-                <Grid className="cards-grid" container>
-                    <Grid item>
-                        <StakeUnstake/>
-                    </Grid>
-                    <Grid item>
-                        <RewardsPanel />
-                    </Grid>
-                </Grid>
+                </div>
+                <div className="cards-grid">
+                    <div className='row'>
+                        <Grid item className="col col-md-6">
+                            <StakeUnstake/>
+                        </Grid>
+                        <Grid item className="col col-md-6">
+                            <RewardsPanel />
+                        </Grid>
+                    </div>
+                </div>
             </Box>
         </>
     )

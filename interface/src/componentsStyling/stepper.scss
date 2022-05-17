@@ -1,0 +1,29 @@
+@import './theme.scss';
+
+.stepper {
+    padding-top: 25px;
+    @include themed() {
+        .MuiStepLabel-label {
+            font-size: 12px;
+            color: t('text')
+        }
+        svg.Mui-active, svg.Mui-completed {
+            color: t('text');
+            text {
+                color: t('text');
+            }
+        }
+    }
+}
+
+.button-box {
+    @include themed() {
+        .init-btn {
+            font-size: 12px;
+            color: t('text');
+            background-color: t('bg');
+            border: 1px solid t('text');
+            border-radius: 4px;
+        }
+    }
+}

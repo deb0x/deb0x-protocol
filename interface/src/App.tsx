@@ -21,12 +21,12 @@ import { Decrypt } from './components/App/Decrypt';
 import {Stake} from './components/App/Stake';
 import { Governance } from './components/App/Governance';
 import { Sent } from './components/App/Sent';
-import {Container, Box,Typography} from '@mui/material';
+import {Container, Box,Typography, Fab} from '@mui/material';
 import ThemeProvider from './components/Contexts/ThemeProvider';
-import ThemeSetter from './components/ThemeSetter';
 import './index.scss';
 import axios from 'axios';
 import { injected, network } from './connectors';
+import MailIcon from '@mui/icons-material/Mail';
 
 const client = create({
   host: 'ipfs.infura.io',
@@ -106,9 +106,9 @@ function App() {
         
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             {!!error && 
-                <h4 style={{ marginTop: '1rem', marginBottom: '0' }}>
+                <p className='alert alert-danger position-fixed' style={{ marginTop: '4rem', marginBottom: '0' }}>
                     {getErrorMessage(error)}
-                </h4>
+                </p>
             }
         </div>
 
@@ -116,16 +116,14 @@ function App() {
         {
         account ? 
         !!(library && account) && (
-            <Box sx={{marginTop: 12}}>
-                <ThemeSetter />
-                {selectedOption === "Send email" && <Encrypt />}
+            <Box className="main-container" sx={{marginTop: 12}}>
+                {selectedOption === "Send" && <Encrypt />}
                 {selectedOption === "Deb0x" && <Decrypt account={account}/>}
                 {selectedOption === "Stake" && <Stake />}
-                {selectedOption === "Governance" && <Governance />}
                 {selectedOption === "Sent" && <Sent />}
             </Box>
         ):
-            <Box className="home-page-box" sx={{marginTop:40}}>
+            <Box className="home-page-box">
                 <Typography sx={{textAlign:"center",color:"gray"}} variant="h1">
                     The End To End Encrypted 
                     <br></br>

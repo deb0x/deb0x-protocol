@@ -224,10 +224,10 @@ export function Decrypt(props: any): any {
     
     if (encryptionKeyInitialized === true) {
         return (
-            <Box sx={{broder:"1px"}}>
+            <Box>
                 <Box className="pagination" sx={{display:"flex"}}>
-                    <Pagination sx={{marginTop:"10px"}} count={1} showFirstButton showLastButton />
-                    <IconButton color="primary" size="large" onClick={()=> setLoading(true) }>
+                    <Pagination count={1} showFirstButton showLastButton />
+                    <IconButton size="large" onClick={()=> setLoading(true) }>
                         <RefreshIcon fontSize="large"/>
                     </IconButton>
                 </Box>
