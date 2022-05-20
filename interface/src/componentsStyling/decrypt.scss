@@ -1,59 +1,71 @@
 @import './theme.scss';
 
-ul.MuiList-root {
-    padding-top: 0;
-    li.messages-list-item {
-        margin-bottom: 0;
-        border: none;
-        border-bottom: 1px solid #ccc;
-        &:first-child {
-            border-top: 1px solid #ccc;
-        }
-        &:last-child {
-            margin-bottom: 55px;
-        }
-        div.list-item-button {
-            padding-right: 15px;
-            width: 100%;
-            overflow: hidden;
-            .message-heading {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                .time-stamp {
-                    font-size: 10px;
+
+.main-container {
+    @include themed() {
+        ul.MuiList-root {
+            padding-top: 0;
+            li.messages-list-item {
+                margin-bottom: 0;
+                border: none;
+                border-bottom: 1px solid #ccc;
+                &:first-child {
+                    border-top: 1px solid #ccc;
+                }
+                &:last-child {
+                    margin-bottom: 55px;
+                }
+                div.list-item-button {
+                    padding-right: 15px;
+                    width: 100%;
+                    overflow: hidden;
+                    .message-heading {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        .time-stamp {
+                            font-size: 10px;
+                        }
+                    }
+                    .message {
+                        font-size: 14px;
+                    }
+                    .message-overflow {
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+                    p {
+                        margin-bottom: 5px;
+                    }
                 }
             }
-            .message {
-                font-size: 14px;
-            }
-            .message-overflow {
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-            p {
-                margin-bottom: 5px;
+        }
+
+        .message-placeholder {
+            height: 50vh;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .pagination {
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            button.MuiIconButton-root {
+                padding: 0;
+                color: t(text)
             }
         }
-    }
-}
-
-.message-placeholder {
-    height: 50vh;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.pagination {
-    justify-content: space-between;
-    align-items: center;
-    padding: 5px 0;
-    @include themed() {
-        button.MuiIconButton-root {
-            padding: 0;
-            color: t(text)
+        .spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            svg {
+                color: t('text');
+            }
         }
     }
 }
@@ -66,4 +78,5 @@ ul.MuiList-root {
     ul.MuiList-root {
         padding-top: 55px
     }
+    
 }

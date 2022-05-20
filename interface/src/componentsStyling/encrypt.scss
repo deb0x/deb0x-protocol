@@ -43,9 +43,11 @@
             .wrapper {
                 border: 1px solid t('text');
                 border-radius: 4px;
+                margin-bottom: 50px;
             }
             .editor {
                 min-height: 250px;
+                padding: 15px;
             }
             .send-btn {
                 font-size: 12px;
@@ -53,6 +55,12 @@
                 background-color: t('bg');
                 border: 1px solid t('text');
                 border-radius: 4px;
+            }
+            .MuiLoadingButton-loadingIndicator {
+                color: t('text');
+                position: relative;
+                left: 0;
+                transform: none;
             }
         }
     }
@@ -64,6 +72,9 @@
             form {
                 .address-list {
                     display: inline-block;
+                }
+                .wrapper {
+                    margin-bottom: 0;
                 }
             }
         }

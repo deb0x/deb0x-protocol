@@ -19,4 +19,4 @@ export default function ThemeSetter() {
   );
 }
 
-const themeOptions = [{ value: "gmail" }, { value: "dark" }];
+const themeOptions = [{ value: "classic" }, { value: "dark" }];

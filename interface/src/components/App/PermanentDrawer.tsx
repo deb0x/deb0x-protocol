@@ -49,7 +49,7 @@ export function PermanentDrawer(props: any): any {
     const [ensName, setEnsName] = useState<any>("");
     // const [balance, setBalance] = useState<any>("8.13");
     const [userUnstakedAmount,setUserUnstakedAmount] = useState<any>(0);
-    const menuItems = ['Send', 'Deb0x', 'Stake', 'Sent'];
+    const menuItems = ['Deb0x', 'Send', 'Stake', 'Sent'];
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popper' : undefined;
@@ -142,21 +142,21 @@ export function PermanentDrawer(props: any): any {
                                 } : 
                                 handleClick
                             }>
-                            <div>
-                                {activating && <Spinner color={'black'} />}
-                            </div>
-
-                            {!connected ? 
-                                "Connect Wallet" :
-                                <span>
-                                    {account === undefined ? 
-                                        'Unsupported Network' : 
-                                        account ? 
-                                            ensName === "" ? 
-                                                `${formatAccountName(account)}` :
-                                                `${ensName.toLowerCase()} (${formatAccountName(account)})`
-                                        : ''}
-                                </span>
+                            
+                            { activating ? 
+                                <Spinner color={'black'} /> :
+                                !connected ? 
+                                    "Connect Wallet" :
+                                    <span>
+                                        {account === undefined ? 
+                                            'Unsupported Network' : 
+                                            account ? 
+                                                ensName === "" ? 
+                                                    `${formatAccountName(account)}` :
+                                                    `${ensName.toLowerCase()} 
+                                                    (${formatAccountName(account)})`
+                                            : ''}
+                                    </span>
                             }
                         </Button>
                     )
@@ -165,10 +165,10 @@ export function PermanentDrawer(props: any): any {
             </AppBar>
             <Popper className="popper" id={id} open={open} anchorEl={anchorEl}>
                 <List>
-                    <ListItem>
+                    <ListItem className="theme-select">
                         <ThemeSetter />
                     </ListItem>
-                    <ListItem>
+                    <ListItem className='logout'>
                         <Button 
                             onClick={(event: any) => {
                                 handleClick(event)
@@ -192,8 +192,8 @@ export function PermanentDrawer(props: any): any {
                                 onClick={() => handleChange(text, index)}
                                 className="list-item">
                                 <ListItemIcon className="icon" >
-                                    {index === 0 && <MailIcon />}
-                                    {index === 1 && <InboxIcon />}
+                                    {index === 0 && <InboxIcon />}
+                                    {index === 1 && <MailIcon />}
                                     {index === 2 && <Gavel />}
                                     {index === 3 && <SendIcon />}
                                 </ListItemIcon>

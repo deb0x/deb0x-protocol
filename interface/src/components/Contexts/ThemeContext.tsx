@@ -1,7 +1,7 @@
 import React from "react";
 
 export const initialThemeState = {
-  theme: "gmail",
+  theme: "classic",
   setTheme: (_value: string) => {}
 };
 
