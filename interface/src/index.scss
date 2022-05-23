@@ -1,0 +1,47 @@
+@import './componentsStyling/theme.scss';
+
+.app-container {
+    height: 100vh;
+    @include themed() {
+        color: t('text');
+        background: t('bg');
+        li svg {
+            color: t('text');
+        }
+        li button.MuiPaginationItem-page {
+            background-color: t('text');
+            color: t('pagination')
+        }
+        .main-container {
+            height: 77vh;
+            .floating-btn {
+                position: fixed;
+                bottom: 75px;
+                right: 15px;
+            }
+            .pagination {
+                justify-content: space-between;
+            }
+        }
+        .home-page-box {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            h1 {
+                color: t('text');
+                font-size: 26px;
+            }
+            h3 {
+                color: t('text');
+                font-size: 22px;
+            }
+        }
+    }
+}
+
+@media (min-width: 769px) {
+    .app-container {
+        padding-left: 175px;
+    }
+}
