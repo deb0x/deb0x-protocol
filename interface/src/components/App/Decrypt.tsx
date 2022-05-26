@@ -60,10 +60,20 @@ export function Decrypt(props: any): any {
         const [ensName,setEnsName] = useState("");
         //const [sender, setSender] = useState(props.messsage.sender)
         const [messageTime, setMessageTime] = useState("Mar 17, 18:36")
+        const [isDecrypted, setIsDecrypted] = useState(false);
+
         useEffect(()=>{
             checkENS();
         },[])
-        const [isDecrypted, setIsDecrypted] = useState(false);
+
+
+        useEffect(()=>{
+            if(props.index !== props.previousIndex && isDecrypted===true){
+                hideMessage();
+            }
+
+        },[props.previousIndex])
+
 
         async function checkENS() {
             let name = await library.lookupAddress(props.message.sender);
@@ -72,26 +82,22 @@ export function Decrypt(props: any): any {
             }
         }
 
-        async function decryptMessage() {
 
-            // if(props.parentIndex !==props.index)
-            // {
-            //     props.setCurrentIndex(props.index);
-            //     props.hideMessage();
-            // }
+
+        async function decryptMessage() {
 
             const decryptedMessage = await decrypt(message)
             if(decryptedMessage) {
                 setIsDecrypted(false);
                 setMessage(decryptedMessage);
                 setIsDecrypted(true);
+                props.setPreviousIndex(props.index);
             }
         }
 
         async function hideMessage() {
             setMessage(encryptMessage);
             setIsDecrypted(false);
-            console.log("hide", props.message.fetchedMessage.index)
         }
         
         return (
@@ -180,7 +186,7 @@ export function Decrypt(props: any): any {
 
     function GetMessages() {
         const [fetchedMessages, setFetchedMessages] = useState<any>([])
-        const [currentIndex,setCurrentIndex] = useState<number>();
+        const [previousIndex,setPreviousIndex] = useState<number>();
 
 
 
@@ -248,7 +254,7 @@ export function Decrypt(props: any): any {
                             {fetchedMessages.map((message: any, i: any) => {
                                 return (
                                     <>
-                                        <Message message={message} index={i} key={i} parentIndex={currentIndex} setIndex={setCurrentIndex} />
+                                        <Message message={message} index={i} key={i} previousIndex={previousIndex} setPreviousIndex={setPreviousIndex} />
                                     </>
                                 )
                             })}
