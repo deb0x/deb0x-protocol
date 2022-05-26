@@ -146,8 +146,8 @@ export function Sent(props: any): any {
                                     </Stack>
                                 <p><small>{messageTime}</small></p>
                             </div>
-                            <p className={`message ${message === props.message.fetchedMessage.data ? "message-overflow" : ""}` }>
-                                { message }
+                            <p className={`message ${message === props.message.fetchedMessage.data ? "message-overflow" : ""}` }
+                                dangerouslySetInnerHTML={{ __html: message }}>
                             </p>
                         </>
                         }/>

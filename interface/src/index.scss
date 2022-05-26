@@ -1,7 +1,8 @@
 @import './componentsStyling/theme.scss';
+@import './componentsStyling/new-theme.scss';
 
 .app-container {
-    height: 100vh;
+    // height: 100vh;
     @include themed() {
         color: t('text');
         background: t('bg');

@@ -21,7 +21,8 @@ export function Decrypt(props: any): any {
     const { account, library } = useWeb3React()
     const [loading, setLoading] = useState(true)
     const [encryptionKeyInitialized, setEncryptionKeyInitialized] = 
-        useState<boolean|undefined>(undefined)
+        useState<boolean|undefined>(undefined);
+    const [decrypted, setDecrypted] = useState<any>();
 
 
     useEffect(() => {
@@ -62,6 +63,7 @@ export function Decrypt(props: any): any {
         useEffect(()=>{
             checkENS();
         },[])
+        const [isDecrypted, setIsDecrypted] = useState(false);
 
         async function checkENS() {
             let name = await library.lookupAddress(props.message.sender);
@@ -71,14 +73,25 @@ export function Decrypt(props: any): any {
         }
 
         async function decryptMessage() {
+
+            // if(props.parentIndex !==props.index)
+            // {
+            //     props.setCurrentIndex(props.index);
+            //     props.hideMessage();
+            // }
+
             const decryptedMessage = await decrypt(message)
             if(decryptedMessage) {
-                setMessage(decryptedMessage)
+                setIsDecrypted(false);
+                setMessage(decryptedMessage);
+                setIsDecrypted(true);
             }
         }
 
         async function hideMessage() {
-            setMessage(encryptMessage)
+            setMessage(encryptMessage);
+            setIsDecrypted(false);
+            console.log("hide", props.message.fetchedMessage.index)
         }
         
         return (
@@ -94,7 +107,7 @@ export function Decrypt(props: any): any {
                         edge="end" 
                         aria-label="comments">
                         { (message !== props.message.fetchedMessage.data) ? 
-                            <VisibilityOffIcon  /> : null
+                            <VisibilityOffIcon className='visibility-icon' /> : null
                         }
                     </IconButton>  
                 }
@@ -111,34 +124,52 @@ export function Decrypt(props: any): any {
                         }}>
                         <ListItemText primary={ (ensName === "")  ?
                         <>
-                            <div className="message-heading">
-                                <p><strong>
-                                    {formatAccountName(props.message.sender)}
-                                </strong></p>
-                                <p className="time-stamp"><small>
-                                    {messageTime}
-                                </small></p>
+                            <div className="message-left">
+                                <div className="message-heading">
+                                    <p><strong>
+                                        {formatAccountName(props.message.sender)}
+                                    </strong></p>
+                                    <p className="time-stamp"><small>
+                                        {messageTime}
+                                    </small></p>
+                                </div>
+                                <p className="message message-overflow"
+                                    dangerouslySetInnerHTML={{ __html: message }} />
                             </div>
-                            <p className={`message 
-                                    ${message === props.message.fetchedMessage.data ? 
-                                        "message-overflow" : ""
-                                    }` 
-                                } 
-                                dangerouslySetInnerHTML={{ __html: message }} />
+                            {isDecrypted ? <div className="message-right">
+                                <div className="message-heading">
+                                    <p><strong>
+                                        {formatAccountName(props.message.sender)}
+                                    </strong></p>
+                                    <p className="time-stamp"><small>
+                                        {messageTime}
+                                    </small></p>
+                                </div>
+                                <p className="message" 
+                                    dangerouslySetInnerHTML={{ __html: message }} />
+                            </div> : <></> }
                         </> :
                         <>
-                            <div className="message-heading">
-                                <p><strong>{ensName}</strong></p>
-                                <p className="time-stamp"><small>
-                                    {messageTime}
-                                </small></p>
+                            <div className="message-left">
+                                <div className="message-heading">
+                                    <p><strong>{ensName}</strong></p>
+                                    <p className="time-stamp"><small>
+                                        {messageTime}
+                                    </small></p>
+                                </div>
+                                <p className="message message-overflow"
+                                    dangerouslySetInnerHTML={{ __html: message }} />
                             </div>
-                            <p className={`message 
-                                    ${message === props.message.fetchedMessage.data ? 
-                                        "message-overflow" : ""
-                                    }` 
-                                }
-                                dangerouslySetInnerHTML={{ __html: message }} />
+                            {isDecrypted ? <div className="message-right">
+                                <div className="message-heading">
+                                    <p><strong>{ensName}</strong></p>
+                                    <p className="time-stamp"><small>
+                                        {messageTime}
+                                    </small></p>
+                                </div>
+                                <p className="message" 
+                                    dangerouslySetInnerHTML={{ __html: message }} />
+                            </div> : <></> }
                         </>
                         }/>
                     </ListItemButton>
@@ -149,10 +180,16 @@ export function Decrypt(props: any): any {
 
     function GetMessages() {
         const [fetchedMessages, setFetchedMessages] = useState<any>([])
+        const [currentIndex,setCurrentIndex] = useState<number>();
+
+
+
 
         useEffect(() => {
             processMessages()
         }, []);
+
+
 
         async function processMessages() {
             const deb0xContract = Deb0x(library, deb0xAddress)
@@ -187,6 +224,7 @@ export function Decrypt(props: any): any {
             
             setFetchedMessages(encryptedMessages.flat())
             setLoading(false)
+
         }
 
         if(!loading) {
@@ -205,13 +243,18 @@ export function Decrypt(props: any): any {
             } else {
                 return (
                     <Box sx={{ width: '100%', maxWidth: 1080, margin: '0 auto'}}>
-                        <List>
+                    <div className="row messages-list">
+                        <List className="col-3">
                             {fetchedMessages.map((message: any, i: any) => {
                                 return (
-                                    <Message message={message} index={i} key={i} />
+                                    <>
+                                        <Message message={message} index={i} key={i} parentIndex={currentIndex} setIndex={setCurrentIndex} />
+                                    </>
                                 )
                             })}
                         </List>
+                    </div>
+                        
                     </Box>
                 )
             }
@@ -226,17 +269,19 @@ export function Decrypt(props: any): any {
     
     if (encryptionKeyInitialized === true) {
         return (
-            <Box>
-                <Box className="pagination" sx={{display:"flex"}}>
-                    <Pagination count={1} showFirstButton showLastButton />
-                    <IconButton size="large" onClick={()=> setLoading(true) }>
-                        <RefreshIcon fontSize="large"/>
-                    </IconButton>
-                </Box>
+            <div>
                 <Box>
-                    <GetMessages />
+                    <Box className="pagination" sx={{display:"flex"}}>
+                        <Pagination count={1} showFirstButton showLastButton />
+                        <IconButton size="large" onClick={()=> setLoading(true) }>
+                            <RefreshIcon fontSize="large"/>
+                        </IconButton>
+                    </Box>
+                    <Box>
+                        <GetMessages />
+                    </Box>
                 </Box>
-            </Box>
+            </div>
         )
     } else if (encryptionKeyInitialized === false) {
         return (

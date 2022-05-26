@@ -1,0 +1,91 @@
+#root {
+    display: inline-block;
+    padding: 20px;
+    background: #5ba1a9;
+    width: 100%;
+    height: 100vh;
+}
+
+.theme--classic {
+    height: 100%;
+    display: inline-block;
+    width: 100%;
+}
+
+.app-container {
+    height: calc( 100%);
+    border-bottom-right-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+
+.theme--classic .app-container header {
+    margin: 20px;
+    width: calc( 100% - 40px);
+    border-top-right-radius: 20px;
+    background: #e1f1f3;
+}
+
+.theme--classic .app-container .side-menu .MuiDrawer-paperAnchorLeft {
+    margin: 20px;
+    height: calc( 100% - 40px );
+    border-bottom-left-radius: 20px
+}
+
+.theme--classic .app-container header .main-menu--right form {
+    margin: 0 400px 0 0;
+    padding: 0 5px 0 15px;
+    border: 1px solid #ccc;
+}
+
+.theme--classic .app-container header .main-menu--right form input {
+    font-size: 12px;
+    margin: 2px 0 0;
+}
+
+.theme--classic .app-container header .main-menu--right > button:last-child {
+    margin: 0 100px 0 0;   
+}
+
+.theme--classic .app-container header .main-menu--right button {
+    border-color: #ccc;
+    padding: 3px 10px;
+}
+
+.theme--classic .main-container .pagination {
+    margin-bottom: 10px;
+}
+
+.message-left {
+    max-height: 80px;
+    overflow: hidden;
+}
+
+.list-item-button {
+    position: static;
+}
+
+.row.messages-list .message-right {
+    width: 75%;
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #fff;
+    height: 100%;
+    border-left: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    padding: 10px 15px;
+}
+
+.row.messages-list {
+    position: relative;
+    & * {
+        position: static;
+    }
+}
+
+.row.messages-list .MuiListItemSecondaryAction-root,
+.MuiListItemSecondaryAction-root .MuiButtonBase-root,
+.MuiListItemSecondaryAction-root .MuiButtonBase-root > * {
+    position: absolute;
+}
