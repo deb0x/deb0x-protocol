@@ -15,6 +15,7 @@ import Refresh from '@mui/icons-material/Refresh';
 import Button from "@mui/material/Button";
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import '../../componentsStyling/decrypt.scss';
+import empty from '../../photos/empty.png';
 
 const axios = require('axios')
 const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61"
@@ -33,11 +34,8 @@ export function Sent(props: any): any {
 
     const getPublicEncryptionKey = async () => {
         const deb0xContract = Deb0x(library, deb0xAddress)
-        console.log(account)
         const key = await deb0xContract.getKey(account)
-        console.log(key)
         const initialized = (key != '') ? true : false
-        console.log(initialized)
         setEncryptionKeyInitialized(initialized)
     }
 
@@ -65,10 +63,18 @@ export function Sent(props: any): any {
         const [recipients, setRecipients] = useState<string[]>([]);
         //const [sender, setSender] = useState(props.messsage.sender)
         const [messageTime,setMessageTime] = useState("Mar 17, 18:36")
-        useEffect(()=>{
+        const [isDecrypted, setIsDecrypted] = useState(false);
+
+        useEffect(()=> {
             checkENS();
-            console.log(recipients)
         },[])
+
+        useEffect(()=>{
+            if(props.index !== props.previousIndex && isDecrypted===true){
+                hideMessage();
+            }
+
+        },[props.previousIndex])
 
         async function checkENS(){
             let recipientsTemp:any = []
@@ -91,13 +97,16 @@ export function Sent(props: any): any {
         async function decryptMessage() {
             const decryptedMessage = await decrypt(message)
             if(decryptedMessage) {
-                setMessage(decryptedMessage)
+                setIsDecrypted(false);
+                setMessage(decryptedMessage);
+                setIsDecrypted(true);
+                props.setPreviousIndex(props.index);
             }
         }
 
         async function hideMessage(){
-            console.log("sss")
-            setMessage(encryptMessage)
+            setMessage(encryptMessage);
+            setIsDecrypted(false);
         }
 
 
@@ -127,29 +136,59 @@ export function Sent(props: any): any {
                         <ListItemText
                         primary={
                         <>
-                            <div className="message-heading">
-                                <p><small>To: </small></p>
-                                    <Stack direction="row" spacing={1}>
-                                        {
-                                            recipients.map((recipient: any) => {
-                                                console.log(recipients)
-                                                return (
-                                                    <Chip
-                                                        key={recipient}
-                                                        color="primary"
-                                                        label={recipient}
-                                                        variant="outlined"
-                                                    />
-                                                )
-                                            })
-                                        }
-                                    </Stack>
-                                <p><small>{messageTime}</small></p>
+                            <div className="message-left">
+                                <div className="message-heading">
+                                    <p><small>To: </small></p>
+                                        <Stack direction="row" spacing={1}>
+                                            {
+                                                recipients.map((recipient: any) => {
+                                                    console.log(recipients)
+                                                    return (
+                                                        <Chip
+                                                            key={recipient}
+                                                            color="primary"
+                                                            label={recipient}
+                                                            variant="outlined"
+                                                        />
+                                                    )
+                                                })
+                                            }
+                                        </Stack>
+                                    <p><small>{messageTime}</small></p>
+                                </div>
+                                <p className={`message 
+                                        ${message === props.message.fetchedMessage.data ? 
+                                        "message-overflow" : ""}` }
+                                    dangerouslySetInnerHTML={{ __html: message }}>
+                                </p>
                             </div>
-                            <p className={`message ${message === props.message.fetchedMessage.data ? "message-overflow" : ""}` }
-                                dangerouslySetInnerHTML={{ __html: message }}>
-                            </p>
+                            {isDecrypted ? 
+                                <div className="message-right">
+                                    <div className="message-heading">
+                                        <p><small>To: </small></p>
+                                            <Stack direction="row" spacing={1}>
+                                                {
+                                                    recipients.map((recipient: any) => {
+                                                        console.log(recipients)
+                                                        return (
+                                                            <Chip
+                                                                key={recipient}
+                                                                color="primary"
+                                                                label={recipient}
+                                                                variant="outlined"
+                                                            />
+                                                        )
+                                                    })
+                                                }
+                                            </Stack>
+                                        <p><small>{messageTime}</small></p>
+                                    </div>
+                                    <p className={`message ${message === props.message.fetchedMessage.data ? "message-overflow" : ""}` }
+                                        dangerouslySetInnerHTML={{ __html: message }}>
+                                    </p>
+                                </div> : <></>}
                         </>
+                        
                         }/>
                          
                     </ListItemButton>
@@ -159,8 +198,8 @@ export function Sent(props: any): any {
     }
 
     function GetMessages() {
-
-        const [fetchedMessages, setFetchedMessages] = useState<any>([])
+        const [fetchedMessages, setFetchedMessages] = useState<any>([]);
+        const [previousIndex,setPreviousIndex] = useState<number>();
 
         useEffect(() => {
             processMessages()
@@ -173,14 +212,11 @@ export function Sent(props: any): any {
             console.log(sentMessages)
 
             const sentMessagesRetrieved = sentMessages.map(async function (item: any) {
-                //console.log(item[0], item[1])
                 return { fetchedMessage: await fetchMessage(item.cid), recipients: item.recipients}
             })
 
             const messages = await Promise.all(sentMessagesRetrieved)
 
-            //console.log(messages)
-            
             setFetchedMessages(messages)
             setLoading(false)
         }
@@ -204,14 +240,23 @@ export function Sent(props: any): any {
             } else {
                 return (
                     <Box sx={{ width: '100%', maxWidth: 1080, margin: '0 auto'}}>
-                        <List>
-                            {fetchedMessages.map((message: any, i: any) => {
-                                return (
-                                    
-                                        <Message message={message} index={i} key={i} />
-                                )
-                            })}
-                        </List>
+                        <div className="row messages-list">
+                            <List className="col-md-3 col-sm-12">
+                                {fetchedMessages.map((message: any, i: any) => {
+                                    return (
+                                        <Message message={message} index={i} 
+                                            key={i} previousIndex={previousIndex} 
+                                            setPreviousIndex={setPreviousIndex} />
+                                    )
+                                })}
+                            </List>
+                            <Box className="intro-box sent col-md-9">
+                                <div>
+                                    <img src={empty} />
+                                    <p>Open a message from the list to see the details.</p>
+                                </div>
+                            </Box>
+                        </div>
                     </Box>
                 )
             }
