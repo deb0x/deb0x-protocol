@@ -117,7 +117,7 @@ function App() {
         account ? 
         !!(library && account) && (
             <Box className="main-container" sx={{marginTop: 12}}>
-                {selectedOption === "Send" && <Encrypt />}
+                {selectedOption === "Compose" && <Encrypt />}
                 {selectedOption === "Deb0x" && <Decrypt account={account}/>}
                 {selectedOption === "Stake" && <Stake />}
                 {selectedOption === "Sent" && <Sent />}

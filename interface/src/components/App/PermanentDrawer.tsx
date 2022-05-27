@@ -12,6 +12,7 @@ import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import SendIcon from '@mui/icons-material/Send';
+import { Add } from '@mui/icons-material';
 import LockIcon from '@mui/icons-material/Lock';
 import Button from '@mui/material/Button'
 import Popper from '@mui/material/Popper'
@@ -44,16 +45,22 @@ export function PermanentDrawer(props: any): any {
     const { connector, library, chainId, account, activate, deactivate, active, error } = context
     const [activatingConnector, setActivatingConnector] = useState<any>()
     const triedEager = useEagerConnect()
-    const [selectedIndex, setSelectedIndex] = useState<any>(0);
+    const [selectedIndex, setSelectedIndex] = useState<any>(1);
     const [searchBarValue, setSearchBarValue] = useState<any>("search");
     const [ensName, setEnsName] = useState<any>("");
     // const [balance, setBalance] = useState<any>("8.13");
     const [userUnstakedAmount,setUserUnstakedAmount] = useState<any>(0);
-    const menuItems = ['Deb0x', 'Send', 'Stake', 'Sent'];
+    const menuItems = ['Compose', 'Deb0x', 'Stake', 'Sent'];
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popper' : undefined;
     const dimensions = ScreenSize();
+    const contactsList = [
+        {
+            name: "Tudor",
+            address: "0x845A1a2e29095c469e755456AA49b09D366F0bEB"
+        }
+    ];
 
     if(library){
         checkENS();
@@ -94,6 +101,16 @@ export function PermanentDrawer(props: any): any {
     function handleChange(text: any, index: any) {
         setSelectedIndex(index)
         props.onChange(text)
+    }
+
+    const [display, setDisplay] = useState(false);
+
+    function displayAddress(index: any) {
+        if(display) {
+            setDisplay(false);
+        } else {
+            setDisplay(true);
+        }
     }
 
     return (
@@ -190,10 +207,10 @@ export function PermanentDrawer(props: any): any {
                             <ListItem button key={text} 
                                 selected={selectedIndex === index} 
                                 onClick={() => handleChange(text, index)}
-                                className="list-item">
+                                className={`list-item ${index === 0 ? "send-item" : ""}` }>
                                 <ListItemIcon className="icon" >
-                                    {index === 0 && <InboxIcon />}
-                                    {index === 1 && <MailIcon />}
+                                    {index === 0 && <Add />}
+                                    {index === 1 && <InboxIcon />}
                                     {index === 2 && <Gavel />}
                                     {index === 3 && <SendIcon />}
                                 </ListItemIcon>
@@ -202,16 +219,39 @@ export function PermanentDrawer(props: any): any {
                         </>
                     ))}
                 </List>
-                {/* <div className="side-menu--bottom">
-                    <div className="content">
-                        <a href="https://github.com/deb0x" target="_blank">
-                        <GitHubIcon  />
-                        </a>
-                        <a href="https://www.deb0x.org" target="_blank">
-                            www.deb0x.org
-                        </a>
-                    </div>
-                </div> */}
+                
+                <div className="side-menu--bottom">
+                    <>
+                        <div className="contacts">
+                            <List>
+                                <p>Contacts</p>
+                                {
+                                    contactsList.map((contact, index) => (
+                                        <>
+                                            <ListItem button key={contact.name}
+                                                onClick={() => displayAddress(index)}>
+                                                <ListItemText className="text" primary={contact.name} />
+                                            </ListItem>
+                                            {display ? 
+                                                <ListItem>
+                                                    <ListItemText className="text" primary={contact.address} />
+                                                </ListItem> : <></>}
+                                            
+                                        </>
+                                    ))
+                                }
+                            </List>
+                        </div>
+                        <div className="content">
+                            <a href="https://github.com/deb0x" target="_blank">
+                            <GitHubIcon  />
+                            </a>
+                            <a href="https://www.deb0x.org" target="_blank">
+                                www.deb0x.org
+                            </a>
+                        </div>
+                    </>
+                </div>
             </Drawer>
         </Box>
     );

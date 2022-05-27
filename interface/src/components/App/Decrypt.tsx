@@ -3,7 +3,8 @@ import { useWeb3React } from '@web3-react/core';
 import Deb0x from "../../ethereum/deb0x"
 import {
     Tooltip, List, ListItem, ListItemText, ListItemButton, Typography, Box, 
-    CircularProgress
+    CircularProgress,
+    Modal
 } from '@mui/material';
 import Stepper from './Stepper'
 import IconButton from "@mui/material/IconButton";
@@ -14,6 +15,7 @@ import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import axios from 'axios';
 import formatAccountName from "../Common/AccountName";
 import "../../componentsStyling/decrypt.scss"
+import { Add } from '@mui/icons-material';
 
 const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61"
 
@@ -21,8 +23,8 @@ export function Decrypt(props: any): any {
     const { account, library } = useWeb3React()
     const [loading, setLoading] = useState(true)
     const [encryptionKeyInitialized, setEncryptionKeyInitialized] = 
-        useState<boolean|undefined>(undefined)
-
+        useState<boolean|undefined>(undefined);
+    const [decrypted, setDecrypted] = useState<any>();
 
     useEffect(() => {
         setLoading(true)
@@ -59,9 +61,28 @@ export function Decrypt(props: any): any {
         const [ensName,setEnsName] = useState("");
         //const [sender, setSender] = useState(props.messsage.sender)
         const [messageTime, setMessageTime] = useState("Mar 17, 18:36")
+        const [isDecrypted, setIsDecrypted] = useState(false);
+        const [open, setOpen] = useState(false);
+        const handleOpen = () => setOpen(true);
+        const handleClose = () => setOpen(false);
+        const initial = [{
+            name: "Tudor",
+            address: "0x845A1a2e29095c469e755456AA49b09D366F0bEB"
+        }];
+        const [contacts, setContacts] = useState<any>(JSON.parse(localStorage.getItem('contacts') || '{}'));
+        let temp: any[] = [];
+
         useEffect(()=>{
             checkENS();
         },[])
+
+        useEffect(()=>{
+            if(props.index !== props.previousIndex && isDecrypted===true){
+                hideMessage();
+            }
+
+        },[props.previousIndex])
+
 
         async function checkENS() {
             let name = await library.lookupAddress(props.message.sender);
@@ -73,14 +94,48 @@ export function Decrypt(props: any): any {
         async function decryptMessage() {
             const decryptedMessage = await decrypt(message)
             if(decryptedMessage) {
-                setMessage(decryptedMessage)
+                setIsDecrypted(false);
+                setMessage(decryptedMessage);
+                setIsDecrypted(true);
+                props.setPreviousIndex(props.index);
             }
         }
 
         async function hideMessage() {
-            setMessage(encryptMessage)
+            setMessage(encryptMessage);
+            setIsDecrypted(false);
         }
-        
+
+
+        const addContact = () => {
+            console.log("CONTACTS1", contacts)
+            // setContacts({
+            //     [props.index]: props.message.sender
+            // })
+
+
+            temp[temp.length+1] = {"Test": props.message.sender}
+
+            // temp.push({"test": props.message.sender})
+
+            setContacts([...contacts, {"test": props.message.sender}])
+            setOpen(false);
+
+        }
+
+        useEffect(() => {
+            console.log("CONTACTS2", contacts)
+
+            localStorage.setItem('contacts', JSON.stringify(contacts));
+        }, [contacts]);
+
+        useEffect(() => {
+            const items = JSON.parse(localStorage.getItem('contacts') || '{}');
+            // if (items) {
+            //     setContacts(items);
+            // }
+        }, []);
+
         return (
             <ListItem sx ={{border:1, marginBottom:1}} 
                 disablePadding 
@@ -94,7 +149,7 @@ export function Decrypt(props: any): any {
                         edge="end" 
                         aria-label="comments">
                         { (message !== props.message.fetchedMessage.data) ? 
-                            <VisibilityOffIcon  /> : null
+                            <VisibilityOffIcon className='visibility-icon' /> : null
                         }
                     </IconButton>  
                 }
@@ -103,43 +158,74 @@ export function Decrypt(props: any): any {
                     title={(message === props.message.fetchedMessage.data) ? 
                     "Click to decrypt" : `Sender:${props.message.sender}`} 
                     placement="right">
-                    <ListItemButton className="list-item-button"
+                    <ListItemButton 
+                        className={`list-item-button ${isDecrypted ? "active" : ""}` }
                         onClick={() => {
                             if(message === props.message.fetchedMessage.data) {
                                 decryptMessage()
                             }
                         }}>
-                        <ListItemText primary={ (ensName === "")  ?
-                        <>
-                            <div className="message-heading">
-                                <p><strong>
-                                    {formatAccountName(props.message.sender)}
-                                </strong></p>
-                                <p className="time-stamp"><small>
-                                    {messageTime}
-                                </small></p>
-                            </div>
-                            <p className={`message 
-                                    ${message === props.message.fetchedMessage.data ? 
-                                        "message-overflow" : ""
-                                    }` 
-                                } 
-                                dangerouslySetInnerHTML={{ __html: message }} />
-                        </> :
-                        <>
-                            <div className="message-heading">
-                                <p><strong>{ensName}</strong></p>
-                                <p className="time-stamp"><small>
-                                    {messageTime}
-                                </small></p>
-                            </div>
-                            <p className={`message 
-                                    ${message === props.message.fetchedMessage.data ? 
-                                        "message-overflow" : ""
-                                    }` 
+                        <ListItemText primary={
+                            <>
+                                <div className="message-left">
+                                    <div className="message-heading">
+                                        <p><strong>
+                                            {ensName !== "" ? ensName : formatAccountName(props.message.sender)}
+                                        </strong></p>
+                                        <p className="time-stamp"><small>
+                                            {messageTime}
+                                        </small></p>
+                                    </div>
+                                    <p className="message message-overflow"
+                                        dangerouslySetInnerHTML={{ __html: message }} />
+                                </div>
+                                {isDecrypted ? 
+                                    <div className="message-right">
+                                        <div className="message-heading">
+                                            <div className="address">
+                                                <p>From: 
+                                                    <strong>
+                                                        {ensName !== "" ? 
+                                                            ensName : 
+                                                            formatAccountName(
+                                                                props.message.sender
+                                                            )
+                                                        }
+                                                    </strong>
+                                                </p>
+                                                <IconButton onClick={handleOpen}>
+                                                    <Add />
+                                                </IconButton>
+                                                <Modal
+                                                    open={open}
+                                                    onClose={handleClose}
+                                                    aria-labelledby="modal-modal-title"
+                                                    aria-describedby="modal-modal-description"
+                                                >
+                                                    <Box className="modal-box">
+                                                        <Typography id="modal-modal-title" variant="h6" component="h2">
+                                                            Text in a modal
+                                                        </Typography>
+                                                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                                                            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
+                                                        </Typography>
+                                                        <button type="button" onClick={addContact}>
+                                                            Add Contact
+                                                        </button>
+                                                    </Box>
+                                                </Modal>
+                                            </div>
+                                            
+                                            <p className="time-stamp"><small>
+                                                {messageTime}
+                                            </small></p>
+                                        </div>
+                                        <p className="message" 
+                                            dangerouslySetInnerHTML={{ __html: message }} />
+                                    </div> : 
+                                    <></> 
                                 }
-                                dangerouslySetInnerHTML={{ __html: message }} />
-                        </>
+                            </> 
                         }/>
                     </ListItemButton>
                 </Tooltip>
@@ -149,10 +235,13 @@ export function Decrypt(props: any): any {
 
     function GetMessages() {
         const [fetchedMessages, setFetchedMessages] = useState<any>([])
+        const [previousIndex, setPreviousIndex] = useState<number>();
 
         useEffect(() => {
             processMessages()
         }, []);
+
+
 
         async function processMessages() {
             const deb0xContract = Deb0x(library, deb0xAddress)
@@ -187,6 +276,7 @@ export function Decrypt(props: any): any {
             
             setFetchedMessages(encryptedMessages.flat())
             setLoading(false)
+
         }
 
         if(!loading) {
@@ -205,13 +295,48 @@ export function Decrypt(props: any): any {
             } else {
                 return (
                     <Box sx={{ width: '100%', maxWidth: 1080, margin: '0 auto'}}>
-                        <List>
-                            {fetchedMessages.map((message: any, i: any) => {
-                                return (
-                                    <Message message={message} index={i} key={i} />
-                                )
-                            })}
-                        </List>
+                        <div className="row messages-list">
+                            <List className="col-md-3 col-sm-12">
+                                {fetchedMessages.map((message: any, i: any) => {
+                                    return (
+                                        <Message message={message} index={i} 
+                                            key={i} previousIndex={previousIndex} 
+                                            setPreviousIndex={setPreviousIndex} />
+                                    )
+                                })}
+                            </List>
+                            <Box className="intro-box col-md-9">
+                                <div>
+                                    <h2>What is Lorem Ipsum?</h2>
+                                    <p>
+                                        <strong>Lorem Ipsum</strong> 
+                                        is simply dummy text of the printing and typesetting industry. 
+                                        Lorem Ipsum has been the industry's standard dummy text ever 
+                                        since the 1500s, when an unknown printer took a galley of 
+                                        type and scrambled it to make a type specimen book. It has 
+                                        survived not only five centuries, but also the leap into 
+                                        electronic typesetting, remaining essentially unchanged. 
+                                        It was popularised in the 1960s with the release of Letraset 
+                                        sheets containing Lorem Ipsum passages, and more recently 
+                                        with desktop publishing software like Aldus PageMaker 
+                                        including versions of Lorem Ipsum.
+                                    </p>
+                                    <div id="lipsum">
+                                        <ul>
+                                            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
+                                            <li>Ut hendrerit eros sit amet nibh vehicula, non commodo nibh imperdiet.</li>
+                                            <li>Sed bibendum augue a tortor fringilla viverra.</li>
+                                            <li>Sed lobortis urna et dapibus lobortis.</li>
+                                            <li>Aenean lacinia neque tincidunt sapien aliquet, in efficitur orci ornare.</li>
+                                            <li>Integer ultrices mi interdum elit porta, eget auctor leo auctor.</li>
+                                            <li>Praesent sodales urna quis quam molestie pulvinar.</li>
+                                            <li>Duis sagittis neque porttitor, mollis tortor dignissim, suscipit felis.</li>
+                                            <li>Donec at dui eget elit congue consectetur ac quis erat.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </Box>
+                        </div>
                     </Box>
                 )
             }
@@ -226,17 +351,19 @@ export function Decrypt(props: any): any {
     
     if (encryptionKeyInitialized === true) {
         return (
-            <Box>
-                <Box className="pagination" sx={{display:"flex"}}>
-                    <Pagination count={1} showFirstButton showLastButton />
-                    <IconButton size="large" onClick={()=> setLoading(true) }>
-                        <RefreshIcon fontSize="large"/>
-                    </IconButton>
-                </Box>
+            <div>
                 <Box>
-                    <GetMessages />
+                    <Box className="pagination" sx={{display:"flex"}}>
+                        <Pagination count={1} showFirstButton showLastButton />
+                        <IconButton size="large" onClick={()=> setLoading(true) }>
+                            <RefreshIcon fontSize="large"/>
+                        </IconButton>
+                    </Box>
+                    <Box>
+                        <GetMessages />
+                    </Box>
                 </Box>
-            </Box>
+            </div>
         )
     } else if (encryptionKeyInitialized === false) {
         return (
