@@ -27,6 +27,7 @@ import './index.scss';
 import axios from 'axios';
 import { injected, network } from './connectors';
 import MailIcon from '@mui/icons-material/Mail';
+import ContactsProvider from './components/Contexts/ContactsProvider';
 
 const client = create({
   host: 'ipfs.infura.io',
@@ -98,45 +99,49 @@ function App() {
   function handleChange(newValue: any) {
     setSelectedOption(newValue)
   }
-
+  const [username, setUsername] = useState('Default username');
   return (
     <ThemeProvider>
-        <div className="app-container">
-        <PermanentDrawer onChange={handleChange} />
-        
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            {!!error && 
-                <p className='alert alert-danger position-fixed' style={{ marginTop: '4rem', marginBottom: '0' }}>
-                    {getErrorMessage(error)}
-                </p>
-            }
-        </div>
+        {/* <ContactsProvider> */}
+            <div className="app-container">
+            <PermanentDrawer onChange={handleChange}/>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                {!!error && 
+                    <p className='alert alert-danger position-fixed' style={{ marginTop: '4rem', marginBottom: '0' }}>
+                        {getErrorMessage(error)}
+                    </p>
+                }
+            </div>
 
-        
-        {
-        account ? 
-        !!(library && account) && (
-            <Box className="main-container" sx={{marginTop: 12}}>
-                {selectedOption === "Compose" && <Encrypt />}
-                {selectedOption === "Deb0x" && <Decrypt account={account}/>}
-                {selectedOption === "Stake" && <Stake />}
-                {selectedOption === "Sent" && <Sent />}
-            </Box>
-        ):
-            <Box className="home-page-box">
-                <Typography sx={{textAlign:"center",color:"gray"}} variant="h1">
-                    The End To End Encrypted 
-                    <br></br>
-                    Decentralized Email Protocol 
-                    <br></br> 
-                    Owned By Its Users
-                </Typography>
-                <Typography sx={{ mt:10,textAlign:"center"}} variant="h3">
-                    Please connect your wallet
-                </Typography>
-            </Box>
-        }
-        </div>
+            
+            {
+            account ? 
+            !!(library && account) && (
+                <Box className="main-container" sx={{marginTop: 12}}>
+                    {selectedOption === "Compose" && <Encrypt />}
+                    {selectedOption === "Deb0x" && <Decrypt account={account}/>}
+                    {selectedOption === "Stake" && <Stake />}
+                    {selectedOption === "Sent" && <Sent />}
+                </Box>
+            ):
+                <Box className="home-page-box">
+                    <Typography sx={{textAlign:"center",color:"gray"}} variant="h1">
+                        The End To End Encrypted 
+                        <br></br>
+                        Decentralized Email Protocol 
+                        <br></br> 
+                        Owned By Its Users
+                    </Typography>
+                    <Typography sx={{ mt:10,textAlign:"center"}} variant="h3">
+                        Please connect your wallet
+                    </Typography>
+                </Box>
+            }
+            </div>
+        {/* </ContactsProvider> */}
     </ThemeProvider>
   )
 }
+
+

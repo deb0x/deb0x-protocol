@@ -59,8 +59,20 @@ export function PermanentDrawer(props: any): any {
         {
             name: "Tudor",
             address: "0x845A1a2e29095c469e755456AA49b09D366F0bEB"
+        }, 
+        {
+            name: "Csilla",
+            address: "0x845A1a2e29095c469e755456AA49b09D366F0bEB"
         }
     ];
+
+    // useEffect(() => {
+    //     let items = JSON.parse(localStorage.getItem('contacts') || '{}');
+    //     // if (items) {
+    //     //     setContacts(items);
+    //     // }
+    //     console.log("ITEMS", items)
+    // }, []);
 
     if(library){
         checkENS();

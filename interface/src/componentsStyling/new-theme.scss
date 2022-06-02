@@ -212,15 +212,21 @@
     font-size: 12px;
 }
 
-@media (max-width: 769px) {
+@media (max-width: 767px) {
     .message-right,
-    .intro-box {
+    .intro-box,
+    .side-menu--bottom .contacts,
+    .side-menu--bottom .content {
         display: none;
     }
     .theme--classic .app-container header form {
         top: 75px;
         width: calc( 100% - 40px);
         left: 20px;
+    }
+    .list-item.send-item {
+        padding: 8px 16px;
+        background-color: transparent;
     }
 }
 
