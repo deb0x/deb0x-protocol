@@ -4,6 +4,7 @@ import Deb0x from "../../ethereum/deb0x"
 import {
     Tooltip, List, ListItem, ListItemText, ListItemButton, Typography, Box, 
     CircularProgress,
+    Button,
     Modal
 } from '@mui/material';
 import Stepper from './Stepper'
@@ -16,6 +17,11 @@ import axios from 'axios';
 import formatAccountName from "../Common/AccountName";
 import "../../componentsStyling/decrypt.scss"
 import { Add } from '@mui/icons-material';
+import ContactsSetter from '../ContactsSetter';
+import lock from '../../photos/lock.svg';
+import airplane from '../../photos/airplane.svg';
+import users from '../../photos/users.svg';
+import hand from '../../photos/hand.svg';
 
 const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61"
 
@@ -25,6 +31,7 @@ export function Decrypt(props: any): any {
     const [encryptionKeyInitialized, setEncryptionKeyInitialized] = 
         useState<boolean|undefined>(undefined);
     const [decrypted, setDecrypted] = useState<any>();
+
 
     useEffect(() => {
         setLoading(true)
@@ -62,15 +69,6 @@ export function Decrypt(props: any): any {
         //const [sender, setSender] = useState(props.messsage.sender)
         const [messageTime, setMessageTime] = useState("Mar 17, 18:36")
         const [isDecrypted, setIsDecrypted] = useState(false);
-        const [open, setOpen] = useState(false);
-        const handleOpen = () => setOpen(true);
-        const handleClose = () => setOpen(false);
-        const initial = [{
-            name: "Tudor",
-            address: "0x845A1a2e29095c469e755456AA49b09D366F0bEB"
-        }];
-        const [contacts, setContacts] = useState<any>(JSON.parse(localStorage.getItem('contacts') || '{}'));
-        let temp: any[] = [];
 
         useEffect(()=>{
             checkENS();
@@ -106,36 +104,6 @@ export function Decrypt(props: any): any {
             setIsDecrypted(false);
         }
 
-
-        const addContact = () => {
-            console.log("CONTACTS1", contacts)
-            // setContacts({
-            //     [props.index]: props.message.sender
-            // })
-
-
-            temp[temp.length+1] = {"Test": props.message.sender}
-
-            // temp.push({"test": props.message.sender})
-
-            setContacts([...contacts, {"test": props.message.sender}])
-            setOpen(false);
-
-        }
-
-        useEffect(() => {
-            console.log("CONTACTS2", contacts)
-
-            localStorage.setItem('contacts', JSON.stringify(contacts));
-        }, [contacts]);
-
-        useEffect(() => {
-            const items = JSON.parse(localStorage.getItem('contacts') || '{}');
-            // if (items) {
-            //     setContacts(items);
-            // }
-        }, []);
-
         return (
             <ListItem sx ={{border:1, marginBottom:1}} 
                 disablePadding 
@@ -154,81 +122,56 @@ export function Decrypt(props: any): any {
                     </IconButton>  
                 }
                 className="messages-list-item">
-                <Tooltip 
-                    title={(message === props.message.fetchedMessage.data) ? 
-                    "Click to decrypt" : `Sender:${props.message.sender}`} 
-                    placement="right">
-                    <ListItemButton 
-                        className={`list-item-button ${isDecrypted ? "active" : ""}` }
-                        onClick={() => {
-                            if(message === props.message.fetchedMessage.data) {
-                                decryptMessage()
-                            }
-                        }}>
-                        <ListItemText primary={
-                            <>
-                                <div className="message-left">
+                <ListItemButton 
+                    className={`list-item-button ${isDecrypted ? "active" : ""}` }
+                    onClick={() => {
+                        if(message === props.message.fetchedMessage.data) {
+                            decryptMessage()
+                        }
+                    }}>
+                    <ListItemText primary={
+                        <>
+                            <div className="message-left">
+                                <div className="message-heading">
+                                    <p><strong>
+                                        {ensName !== "" ? ensName : formatAccountName(props.message.sender)}
+                                    </strong></p>
+                                    <p className="time-stamp"><small>
+                                        {messageTime}
+                                    </small></p>
+                                </div>
+                                <p className="message message-overflow"
+                                    dangerouslySetInnerHTML={{ __html: message }} />
+                            </div>
+                            {isDecrypted ? 
+                                <div className="message-right">
                                     <div className="message-heading">
-                                        <p><strong>
-                                            {ensName !== "" ? ensName : formatAccountName(props.message.sender)}
-                                        </strong></p>
+                                        <div className="address">
+                                            <p>From: 
+                                                <strong>
+                                                    {ensName !== "" ? 
+                                                        ensName : 
+                                                        formatAccountName(
+                                                            props.message.sender
+                                                        )
+                                                    }
+                                                </strong>
+                                            </p>
+                                            <ContactsSetter props={props.message.sender}/>
+                                        </div>
+                                        
                                         <p className="time-stamp"><small>
                                             {messageTime}
                                         </small></p>
                                     </div>
-                                    <p className="message message-overflow"
+                                    <p className="message" 
                                         dangerouslySetInnerHTML={{ __html: message }} />
-                                </div>
-                                {isDecrypted ? 
-                                    <div className="message-right">
-                                        <div className="message-heading">
-                                            <div className="address">
-                                                <p>From: 
-                                                    <strong>
-                                                        {ensName !== "" ? 
-                                                            ensName : 
-                                                            formatAccountName(
-                                                                props.message.sender
-                                                            )
-                                                        }
-                                                    </strong>
-                                                </p>
-                                                <IconButton onClick={handleOpen}>
-                                                    <Add />
-                                                </IconButton>
-                                                <Modal
-                                                    open={open}
-                                                    onClose={handleClose}
-                                                    aria-labelledby="modal-modal-title"
-                                                    aria-describedby="modal-modal-description"
-                                                >
-                                                    <Box className="modal-box">
-                                                        <Typography id="modal-modal-title" variant="h6" component="h2">
-                                                            Text in a modal
-                                                        </Typography>
-                                                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                                                            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-                                                        </Typography>
-                                                        <button type="button" onClick={addContact}>
-                                                            Add Contact
-                                                        </button>
-                                                    </Box>
-                                                </Modal>
-                                            </div>
-                                            
-                                            <p className="time-stamp"><small>
-                                                {messageTime}
-                                            </small></p>
-                                        </div>
-                                        <p className="message" 
-                                            dangerouslySetInnerHTML={{ __html: message }} />
-                                    </div> : 
-                                    <></> 
-                                }
-                            </> 
-                        }/>
-                    </ListItemButton>
-                </Tooltip>
+                                </div> : 
+                                <></> 
+                            }
+                        </> 
+                    }/>
+                </ListItemButton>
             </ListItem>
         )
     }
@@ -307,32 +250,66 @@ export function Decrypt(props: any): any {
                             </List>
                             <Box className="intro-box col-md-9">
                                 <div>
-                                    <h2>What is Lorem Ipsum?</h2>
-                                    <p>
-                                        <strong>Lorem Ipsum</strong> 
-                                        is simply dummy text of the printing and typesetting industry. 
-                                        Lorem Ipsum has been the industry's standard dummy text ever 
-                                        since the 1500s, when an unknown printer took a galley of 
-                                        type and scrambled it to make a type specimen book. It has 
-                                        survived not only five centuries, but also the leap into 
-                                        electronic typesetting, remaining essentially unchanged. 
-                                        It was popularised in the 1960s with the release of Letraset 
-                                        sheets containing Lorem Ipsum passages, and more recently 
-                                        with desktop publishing software like Aldus PageMaker 
-                                        including versions of Lorem Ipsum.
-                                    </p>
-                                    <div id="lipsum">
-                                        <ul>
-                                            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
-                                            <li>Ut hendrerit eros sit amet nibh vehicula, non commodo nibh imperdiet.</li>
-                                            <li>Sed bibendum augue a tortor fringilla viverra.</li>
-                                            <li>Sed lobortis urna et dapibus lobortis.</li>
-                                            <li>Aenean lacinia neque tincidunt sapien aliquet, in efficitur orci ornare.</li>
-                                            <li>Integer ultrices mi interdum elit porta, eget auctor leo auctor.</li>
-                                            <li>Praesent sodales urna quis quam molestie pulvinar.</li>
-                                            <li>Duis sagittis neque porttitor, mollis tortor dignissim, suscipit felis.</li>
-                                            <li>Donec at dui eget elit congue consectetur ac quis erat.</li>
-                                        </ul>
+                                    <div className="row">
+                                        <div className="col-6">
+                                            <h2>The End To End Encrypted...</h2>
+                                            <p>
+                                                Leverages the greatest social repository of public key cryptography to 
+                                                enable the ability to send encrypted messages to any person that owns 
+                                                an Ethereum address or ENS domain name. This way it makes end to end 
+                                                message encryption a practical, built-in feature that is accessible 
+                                                to any wallet owner (like Metamask, Trustwallet and others).
+                                            </p>
+                                        </div>
+                                        <div className="col-6">
+                                            <img src={ lock }/>
+                                        </div>
+                                    </div>
+                                    <div className="row">
+                                        <div className="col-6">
+                                            <img src={ airplane }/>
+                                        </div>
+                                        <div className="col-6">
+                                            <h2>Decentralized Email Protocol...</h2>
+                                            <p>
+                                            There is no centralized place of control that can censor deb0x email 
+                                            transmission. The immutable smart contract implementation of the 
+                                            protocol inherits the security and decentralization of the blockchain 
+                                            that it is deployed to. At the same time, the pluggable storage 
+                                            architecture and multiple incentivized frontend providers offer 
+                                            various options for degrees of privacy and usability to the end users.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="row">
+                                        <div className="col-6">
+                                            <h2>Owned By Its Users!</h2>
+                                            <p>
+                                                All deb0x users earn tokens that represent equity and revenue share for 
+                                                future programmed usage fees of the protocol. Thanks to the distribution 
+                                                curve, adopters earn more tokens the earlier they use the protocol. 
+                                                The frontend application builders are also incentivised, while the 
+                                                referral scheme creates an attractive token earning context that 
+                                                drives the overall deb0x protocol adoption.
+                                            </p>
+                                        </div>
+                                        <div className="col-6">
+                                            <img src={ users }/>
+                                        </div>
+                                    </div>
+                                    <div className="row">
+                                        <div className="col-6">
+                                            <img src={ hand }/>
+                                        </div>
+                                        <div className="col-6">
+                                            <h2>... and there are</h2>
+                                            <p>
+                                                no premines, no treasury allocations, no private sales, no dev fees! The 
+                                                token distribution algorithm is pre-programmed and can never be changed. 
+                                                The launch date that will kick off the rewards will be announced one to 
+                                                two weeks in advance on this page.
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </Box>
