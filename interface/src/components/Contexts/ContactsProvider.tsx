@@ -11,22 +11,21 @@ const ContactsProvider = ( { children }: Props ) => {
     const localStorage = window.localStorage;
   
     useEffect(() => {
-        const savedContacts = JSON.parse(localStorage.getItem('contacts') || '{}');
+        const savedContacts = JSON.parse(localStorage.getItem('contacts') || 'null');
         
         if (!!savedContacts) {
-            setContacts([...contacts, savedContacts]);
+            setContacts(savedContacts);
         }
-      
-        console.log("Saved", savedContacts);
     }, [localStorage]);
+  
   
     useEffect(() => {
         localStorage.setItem('contacts', JSON.stringify(contacts));
     }, [contacts, localStorage]);
-  
+    
     return (
       <ContactsContext.Provider value={{ contacts, setContacts }}>
-        <div>{children}</div>
+        <>{children}</>
       </ContactsContext.Provider>
     );
   };

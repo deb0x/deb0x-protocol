@@ -72,12 +72,6 @@ export function Decrypt(props: any): any {
         const [open, setOpen] = useState(false);
         const handleOpen = () => setOpen(true);
         const handleClose = () => setOpen(false);
-        const initial = [{
-            name: "Tudor",
-            address: "0x845A1a2e29095c469e755456AA49b09D366F0bEB"
-        }];
-        // const [contacts, setContacts] = useState<any>(JSON.parse(localStorage.getItem('contacts') || '{}'));
-        let temp: any[] = [];
 
         useEffect(()=>{
             checkENS();
@@ -113,22 +107,6 @@ export function Decrypt(props: any): any {
             setIsDecrypted(false);
         }
 
-
-        
-
-        // useEffect(() => {
-        //     console.log("CONTACTS2", contacts)
-
-        //     localStorage.setItem('contacts', JSON.stringify(contacts));
-        // }, [contacts]);
-
-        // useEffect(() => {
-        //     const items = JSON.parse(localStorage.getItem('contacts') || '{}');
-        //     // if (items) {
-        //     //     setContacts(items);
-        //     // }
-        // }, []);
-
         return (
             <ListItem sx ={{border:1, marginBottom:1}} 
                 disablePadding 
@@ -147,74 +125,68 @@ export function Decrypt(props: any): any {
                     </IconButton>  
                 }
                 className="messages-list-item">
-                <Tooltip 
-                    title={(message === props.message.fetchedMessage.data) ? 
-                    "Click to decrypt" : `Sender:${props.message.sender}`} 
-                    placement="left">
-                    <ListItemButton 
-                        className={`list-item-button ${isDecrypted ? "active" : ""}` }
-                        onClick={() => {
-                            if(message === props.message.fetchedMessage.data) {
-                                decryptMessage()
-                            }
-                        }}>
-                        <ListItemText primary={
-                            <>
-                                <div className="message-left">
+                <ListItemButton 
+                    className={`list-item-button ${isDecrypted ? "active" : ""}` }
+                    onClick={() => {
+                        if(message === props.message.fetchedMessage.data) {
+                            decryptMessage()
+                        }
+                    }}>
+                    <ListItemText primary={
+                        <>
+                            <div className="message-left">
+                                <div className="message-heading">
+                                    <p><strong>
+                                        {ensName !== "" ? ensName : formatAccountName(props.message.sender)}
+                                    </strong></p>
+                                    <p className="time-stamp"><small>
+                                        {messageTime}
+                                    </small></p>
+                                </div>
+                                <p className="message message-overflow"
+                                    dangerouslySetInnerHTML={{ __html: message }} />
+                            </div>
+                            {isDecrypted ? 
+                                <div className="message-right">
                                     <div className="message-heading">
-                                        <p><strong>
-                                            {ensName !== "" ? ensName : formatAccountName(props.message.sender)}
-                                        </strong></p>
+                                        <div className="address">
+                                            <p>From: 
+                                                <strong>
+                                                    {ensName !== "" ? 
+                                                        ensName : 
+                                                        formatAccountName(
+                                                            props.message.sender
+                                                        )
+                                                    }
+                                                </strong>
+                                            </p>
+                                            <IconButton onClick={handleOpen}>
+                                                <Add />
+                                            </IconButton>
+                                            <Modal
+                                                open={open}
+                                                onClose={handleClose}
+                                                aria-labelledby="modal-modal-title"
+                                                aria-describedby="modal-modal-description"
+                                            >
+                                                <Box className="modal-box">
+                                                    <ContactsSetter props={props.message.sender}/>
+                                                </Box>
+                                            </Modal>
+                                        </div>
+                                        
                                         <p className="time-stamp"><small>
                                             {messageTime}
                                         </small></p>
                                     </div>
-                                    <p className="message message-overflow"
+                                    <p className="message" 
                                         dangerouslySetInnerHTML={{ __html: message }} />
-                                </div>
-                                {isDecrypted ? 
-                                    <div className="message-right">
-                                        <div className="message-heading">
-                                            <div className="address">
-                                                <p>From: 
-                                                    <strong>
-                                                        {ensName !== "" ? 
-                                                            ensName : 
-                                                            formatAccountName(
-                                                                props.message.sender
-                                                            )
-                                                        }
-                                                    </strong>
-                                                </p>
-                                                <IconButton onClick={handleOpen}>
-                                                    <Add />
-                                                </IconButton>
-                                                <Modal
-                                                    open={open}
-                                                    onClose={handleClose}
-                                                    aria-labelledby="modal-modal-title"
-                                                    aria-describedby="modal-modal-description"
-                                                >
-                                                    <Box className="modal-box">
-                                                        <ContactsSetter/>
-                                                        
-                                                    </Box>
-                                                </Modal>
-                                            </div>
-                                            
-                                            <p className="time-stamp"><small>
-                                                {messageTime}
-                                            </small></p>
-                                        </div>
-                                        <p className="message" 
-                                            dangerouslySetInnerHTML={{ __html: message }} />
-                                    </div> : 
-                                    <></> 
-                                }
-                            </> 
-                        }/>
-                    </ListItemButton>
-                </Tooltip>
+                                </div> : 
+                                <></> 
+                            }
+                        </> 
+                    }/>
+                </ListItemButton>
             </ListItem>
         )
     }

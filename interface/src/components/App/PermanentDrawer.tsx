@@ -1,19 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
 import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 import SendIcon from '@mui/icons-material/Send';
 import { Add } from '@mui/icons-material';
-import LockIcon from '@mui/icons-material/Lock';
 import Button from '@mui/material/Button'
 import Popper from '@mui/material/Popper'
 import { injected } from '../../connectors';
@@ -32,6 +29,9 @@ import formatAccountName from "../Common/AccountName";
 import "../../componentsStyling/permanentDrawer.scss";
 import ThemeSetter from '../ThemeSetter';
 import ScreenSize from '../Common/ScreenSize';
+import ContactsContext from '../Contexts/ContactsContext';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import SnackbarNotification from './Snackbar';
 
 const deb0xERC20Address = "0xEde2f177d6Ae8330860B6b37B2F3D767cd2630fe"
 enum ConnectorNames { Injected = 'Injected' };
@@ -55,24 +55,9 @@ export function PermanentDrawer(props: any): any {
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popper' : undefined;
     const dimensions = ScreenSize();
-    const contactsList = [
-        {
-            name: "Tudor",
-            address: "0x845A1a2e29095c469e755456AA49b09D366F0bEB"
-        }, 
-        {
-            name: "Csilla",
-            address: "0x845A1a2e29095c469e755456AA49b09D366F0bEB"
-        }
-    ];
-
-    // useEffect(() => {
-    //     let items = JSON.parse(localStorage.getItem('contacts') || '{}');
-    //     // if (items) {
-    //     //     setContacts(items);
-    //     // }
-    //     console.log("ITEMS", items)
-    // }, []);
+    const useContacts = () => useContext(ContactsContext);
+    const { contacts, setContacts } = useContacts()!;
+    const [notificationState, setNotificationState] = useState({})
 
     if(library){
         checkENS();
@@ -113,158 +98,184 @@ export function PermanentDrawer(props: any): any {
     function handleChange(text: any, index: any) {
         setSelectedIndex(index)
         props.onChange(text)
+        if(index !== 0)
+            localStorage.removeItem('input')
     }
 
-    const [display, setDisplay] = useState(false);
+    const [display, setDisplay] = useState();
 
     function displayAddress(index: any) {
-        if(display) {
-            setDisplay(false);
-        } else {
-            setDisplay(true);
-        }
+        setNotificationState({});
+        display === index ? setDisplay(undefined) : setDisplay(index);
     }
 
+    const event = new CustomEvent('localdatachanged');
+    document.dispatchEvent(event);
+
     return (
-
-        <Box sx={{ display: 'flex' }}>
-            <CssBaseline />
-            <AppBar className="app-bar--top">
-                <div className="image-container">
-                    <div className="image-overlay"></div>
-                    <img src={logo}  />
-                </div>
-                <Box className="main-menu--right">
-                { account  ? 
-                    <>
-                        <Paper component="form">
-                            <InputBase
-                                placeholder="Search messages"
-                                inputProps={{ "aria-label": "search" }}
-                                className="search-input" />
-                            <IconButton type="submit" aria-label="search">
-                                <SearchIcon />
-                            </IconButton>
-                        </Paper>
-                        <Button variant ="contained"
-                                onClick={() => handleChange("Stake", 2)}>
-                            {userUnstakedAmount} DBX
-                        </Button>
-                    </>
-                    : 
-                    null }
-                
-                { (() =>  {
-                    const currentConnector = connectorsByName[ConnectorNames.Injected]
-                    const activating = currentConnector === activatingConnector
-                    const connected = currentConnector === connector
-                    const disabled = !triedEager || !!activatingConnector || connected || !!error
-
-                    return (
-                        <Button variant="contained"
-                            key={ConnectorNames.Injected}
-                            aria-describedby={id}
-                            onClick={!connected ? 
-                                () => {
-                                    setActivatingConnector(currentConnector)
-                                    activate(currentConnector)
-                                } : 
-                                handleClick
-                            }>
-                            
-                            { activating ? 
-                                <Spinner color={'black'} /> :
-                                !connected ? 
-                                    "Connect Wallet" :
-                                    <span>
-                                        {account === undefined ? 
-                                            'Unsupported Network' : 
-                                            account ? 
-                                                ensName === "" ? 
-                                                    `${formatAccountName(account)}` :
-                                                    `${ensName.toLowerCase()} 
-                                                    (${formatAccountName(account)})`
-                                            : ''}
-                                    </span>
-                            }
-                        </Button>
-                    )
-                }) ()}
-                </Box>
-            </AppBar>
-            <Popper className="popper" id={id} open={open} anchorEl={anchorEl}>
-                <List>
-                    <ListItem className="theme-select">
-                        <ThemeSetter />
-                    </ListItem>
-                    <ListItem className='logout'>
-                        <Button 
-                            onClick={(event: any) => {
-                                handleClick(event)
-                                deactivate()
-                            }}
-                            className="logout-btn">
-                            Logout 
-                        </Button>
-                    </ListItem>
-                </List>
-            </Popper>
-            <Drawer variant="permanent"
-                anchor={dimensions.width > 768 ? 'left' : 'bottom'}
-                className="side-menu">
-                <List >
-                    {menuItems.map((text, index) => (
+        <>
+            <SnackbarNotification state={notificationState} 
+                setNotificationState={setNotificationState} />
+            <Box sx={{ display: 'flex' }}>
+                <CssBaseline />
+                <AppBar className="app-bar--top">
+                    <div className="image-container">
+                        <div className="image-overlay"></div>
+                        <img src={logo}  />
+                    </div>
+                    <Box className="main-menu--right">
+                    { account  ? 
                         <>
-                            
-                            <ListItem button key={text} 
-                                selected={selectedIndex === index} 
-                                onClick={() => handleChange(text, index)}
-                                className={`list-item ${index === 0 ? "send-item" : ""}` }>
-                                <ListItemIcon className="icon" >
-                                    {index === 0 && <Add />}
-                                    {index === 1 && <InboxIcon />}
-                                    {index === 2 && <Gavel />}
-                                    {index === 3 && <SendIcon />}
-                                </ListItemIcon>
-                                <ListItemText className="text" primary={text} />
-                            </ListItem>
+                            <Paper component="form">
+                                <InputBase
+                                    placeholder="Search messages"
+                                    inputProps={{ "aria-label": "search" }}
+                                    className="search-input" />
+                                <IconButton type="submit" aria-label="search">
+                                    <SearchIcon />
+                                </IconButton>
+                            </Paper>
+                            <Button variant ="contained"
+                                    onClick={() => handleChange("Stake", 2)}>
+                                {userUnstakedAmount} DBX
+                            </Button>
                         </>
-                    ))}
-                </List>
-                
-                <div className="side-menu--bottom">
-                    <>
-                        <div className="contacts">
-                            <List>
-                                <p>Contacts</p>
-                                {
-                                    contactsList.map((contact, index) => (
-                                        <>
-                                            <ListItem button key={contact.name}
-                                                onClick={() => displayAddress(index)}>
-                                                <ListItemText className="text" primary={contact.name} />
-                                            </ListItem>
-                                            {display ? 
-                                                <ListItem>
-                                                    <ListItemText className="text" primary={contact.address} />
-                                                </ListItem> : <></>}
-                                            
-                                        </>
-                                    ))
+                        : 
+                        null }
+                    
+                    { (() =>  {
+                        const currentConnector = connectorsByName[ConnectorNames.Injected]
+                        const activating = currentConnector === activatingConnector
+                        const connected = currentConnector === connector
+                        const disabled = !triedEager || !!activatingConnector || connected || !!error
+
+                        return (
+                            <Button variant="contained"
+                                key={ConnectorNames.Injected}
+                                aria-describedby={id}
+                                onClick={!connected ? 
+                                    () => {
+                                        setActivatingConnector(currentConnector)
+                                        activate(currentConnector)
+                                    } : 
+                                    handleClick
+                                }>
+                                
+                                { activating ? 
+                                    <Spinner color={'black'} /> :
+                                    !connected ? 
+                                        "Connect Wallet" :
+                                        <span>
+                                            {account === undefined ? 
+                                                'Unsupported Network' : 
+                                                account ? 
+                                                    ensName === "" ? 
+                                                        `${formatAccountName(account)}` :
+                                                        `${ensName.toLowerCase()} 
+                                                        (${formatAccountName(account)})`
+                                                : ''}
+                                        </span>
                                 }
-                            </List>
-                        </div>
-                        <div className="content">
-                            <a href="https://github.com/deb0x" target="_blank">
-                            <GitHubIcon  />
-                            </a>
-                            <a href="https://www.deb0x.org" target="_blank">
-                                www.deb0x.org
-                            </a>
-                        </div>
-                    </>
-                </div>
-            </Drawer>
-        </Box>
+                            </Button>
+                        )
+                    }) ()}
+                    </Box>
+                </AppBar>
+                <Popper className="popper" id={id} open={open} anchorEl={anchorEl}>
+                    <List>
+                        <ListItem className="theme-select">
+                            <ThemeSetter />
+                        </ListItem>
+                        <ListItem className='logout'>
+                            <Button 
+                                onClick={(event: any) => {
+                                    handleClick(event)
+                                    deactivate()
+                                }}
+                                className="logout-btn">
+                                Logout 
+                            </Button>
+                        </ListItem>
+                    </List>
+                </Popper>
+                <Drawer variant="permanent"
+                    anchor={dimensions.width > 768 ? 'left' : 'bottom'}
+                    className="side-menu">
+                    <List >
+                        {menuItems.map((text, index) => (
+                            <>
+                                
+                                <ListItem button key={text} 
+                                    selected={selectedIndex === index} 
+                                    onClick={() => handleChange(text, index)}
+                                    className={`list-item ${index === 0 ? "send-item" : ""}` }>
+                                    <ListItemIcon className="icon" >
+                                        {index === 0 && <Add />}
+                                        {index === 1 && <InboxIcon />}
+                                        {index === 2 && <Gavel />}
+                                        {index === 3 && <SendIcon />}
+                                    </ListItemIcon>
+                                    <ListItemText className="text" primary={text} />
+                                </ListItem>
+                            </>
+                        ))}
+                    </List>
+                    
+                    <div className="side-menu--bottom">
+                        <>
+                            <div className="contacts">
+                                <List>
+                                    <p>Contacts</p>
+                                    {
+                                        contacts.map((contact: any, index: any) => (
+                                                <>
+                                                <ListItem button key={contact.name}
+                                                    onClick={() => displayAddress(index)}>
+                                                    <ListItemText className="text" primary={contact.name} />
+                                                </ListItem>
+                                                {display == index ? 
+                                                    <ListItem className="row contact-item" key={index}>
+                                                        <ListItemText className="text col-8" primary={contact.address} />
+                                                        <div className="col-4 buttons">
+                                                            <IconButton size="small"
+                                                                onClick={() => {
+                                                                        navigator.clipboard.writeText(contact.address);
+                                                                        setNotificationState({
+                                                                            message: "Address added to clipboard.",
+                                                                            open: true,
+                                                                            severity: "success"
+                                                                        })
+                                                                    }}>
+                                                                <ContentCopyIcon fontSize="small"/>
+                                                            </IconButton>
+                                                            <IconButton size="small"
+                                                                onClick={() => {
+                                                                    setNotificationState({})
+                                                                    localStorage.setItem("input", JSON.stringify(contact.address))
+                                                                    handleChange("Compose", 0)
+                                                                }}>
+                                                                <SendIcon fontSize="small"/>
+                                                            </IconButton>
+                                                        </div>
+                                                    </ListItem>
+                                                    : <></>}
+                                                </>
+                                        ))
+                                    }
+                                </List>
+                            </div>
+                            <div className="content">
+                                <a href="https://github.com/deb0x" target="_blank">
+                                <GitHubIcon  />
+                                </a>
+                                <a href="https://www.deb0x.org" target="_blank">
+                                    www.deb0x.org
+                                </a>
+                            </div>
+                        </>
+                    </div>
+                </Drawer>
+            </Box>
+        </>
     );
 }

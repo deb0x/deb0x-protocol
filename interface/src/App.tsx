@@ -28,6 +28,7 @@ import axios from 'axios';
 import { injected, network } from './connectors';
 import MailIcon from '@mui/icons-material/Mail';
 import ContactsProvider from './components/Contexts/ContactsProvider';
+import ContactsSetter from './components/ContactsSetter';
 
 const client = create({
   host: 'ipfs.infura.io',
@@ -99,10 +100,15 @@ function App() {
   function handleChange(newValue: any) {
     setSelectedOption(newValue)
   }
+
+  useEffect(() => {
+    localStorage.removeItem('input')
+  }, [])
+
   const [username, setUsername] = useState('Default username');
   return (
     <ThemeProvider>
-        {/* <ContactsProvider> */}
+        <ContactsProvider>
             <div className="app-container">
             <PermanentDrawer onChange={handleChange}/>
             
@@ -139,7 +145,7 @@ function App() {
                 </Box>
             }
             </div>
-        {/* </ContactsProvider> */}
+        </ContactsProvider>
     </ThemeProvider>
   )
 }

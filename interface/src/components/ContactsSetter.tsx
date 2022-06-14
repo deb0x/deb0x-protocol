@@ -1,24 +1,37 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import ContactsContext from "./Contexts/ContactsContext";
 
-export default function ContactsSetter() {
+export default function ContactsSetter(props: any) {
     const useContacts = () => useContext(ContactsContext);
     const { contacts, setContacts } = useContacts()!;
     const [name, setName] = useState<string>("");
-    const [address, setAddress] = useState<string>("");
+    const [address, setAddress] = useState<string>(props.props);
 
     const addContact = () => {
-        const savedContacts = JSON.parse(localStorage.getItem('contacts') || '{}');
-
-        setContacts([...contacts, {name: name, address: address}])
+        contacts.push({name: name, address: address})
+        setContacts([...contacts])
     }
+  
+    useEffect(() => {
+        localStorage.setItem('contacts', JSON.stringify(contacts));
+    }, [contacts, localStorage]);
 
-  return (
-    <>
-        <input key="name" onChange={(e) => setName(e.currentTarget.value)}/>
-        <input key="address" onChange={(e) => setAddress(e.currentTarget.value)}/>
-        <button type="button" onClick={addContact}>ADD</button>
-    </>
-  );
+    return (
+        <form>
+            <div className="form-group">
+                <label>Name</label>
+                <input key="name" className="form-control"
+                    onChange={(e) => setName(e.currentTarget.value)}/>
+            </div>
+            <div className="form-group">
+                <label>Address</label>
+                <input readOnly key="address" className="form-control"
+                    value={props.props}/>
+            </div>
+            <button className="btn btn-outline-dark mt-2" type="button" onClick={addContact}>
+                ADD
+            </button>
+        </form>
+    );
 }

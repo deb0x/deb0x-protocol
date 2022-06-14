@@ -212,6 +212,25 @@
     font-size: 12px;
 }
 
+.row.contact-item {
+    width: 100%;
+    margin-left: 0;
+    padding: 0;
+    .text {
+        span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+    .buttons {
+        display: flex;
+        justify-content: flex-end;
+        svg {
+            font-size: 12px;
+        }
+    }
+}
+
 @media (max-width: 767px) {
     .message-right,
     .intro-box,
