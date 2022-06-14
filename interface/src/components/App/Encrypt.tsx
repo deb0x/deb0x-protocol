@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import { encrypt } from '@metamask/eth-sig-util'
 import Deb0x from "../../ethereum/deb0x"
@@ -40,7 +40,14 @@ export function Encrypt(): any {
     const [loading, setLoading] = useState(false)
     const [estimatedReward, setEstimatedReward] = useState("9.32");
     const [addressList, setAddressList] = useState<string[]>([])
-    const [error, setError] = useState<string | null>(null)
+    const [error, setError] = useState<string | null>(null);
+    const [ input, setInput ] = useState(JSON.parse(localStorage.getItem('input') || 'null'));
+    
+
+    useEffect(() => {
+        if(input !== null && input.match(/^0x[a-fA-F0-9]{40}$/g))
+            addressList.push(input)
+    }, []);
 
     useEffect(() => {
         if (!encryptionKeyInitialized) {

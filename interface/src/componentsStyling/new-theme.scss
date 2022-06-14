@@ -212,15 +212,40 @@
     font-size: 12px;
 }
 
-@media (max-width: 769px) {
+.row.contact-item {
+    width: 100%;
+    margin-left: 0;
+    padding: 0;
+    .text {
+        span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+    .buttons {
+        display: flex;
+        justify-content: flex-end;
+        svg {
+            font-size: 12px;
+        }
+    }
+}
+
+@media (max-width: 767px) {
     .message-right,
-    .intro-box {
+    .intro-box,
+    .side-menu--bottom .contacts,
+    .side-menu--bottom .content {
         display: none;
     }
     .theme--classic .app-container header form {
         top: 75px;
         width: calc( 100% - 40px);
         left: 20px;
+    }
+    .list-item.send-item {
+        padding: 8px 16px;
+        background-color: transparent;
     }
 }
 
