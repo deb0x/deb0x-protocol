@@ -69,9 +69,6 @@ export function Decrypt(props: any): any {
         //const [sender, setSender] = useState(props.messsage.sender)
         const [messageTime, setMessageTime] = useState("Mar 17, 18:36")
         const [isDecrypted, setIsDecrypted] = useState(false);
-        const [open, setOpen] = useState(false);
-        const handleOpen = () => setOpen(true);
-        const handleClose = () => setOpen(false);
 
         useEffect(()=>{
             checkENS();
@@ -160,19 +157,7 @@ export function Decrypt(props: any): any {
                                                     }
                                                 </strong>
                                             </p>
-                                            <IconButton onClick={handleOpen}>
-                                                <Add />
-                                            </IconButton>
-                                            <Modal
-                                                open={open}
-                                                onClose={handleClose}
-                                                aria-labelledby="modal-modal-title"
-                                                aria-describedby="modal-modal-description"
-                                            >
-                                                <Box className="modal-box">
-                                                    <ContactsSetter props={props.message.sender}/>
-                                                </Box>
-                                            </Modal>
+                                            <ContactsSetter props={props.message.sender}/>
                                         </div>
                                         
                                         <p className="time-stamp"><small>
