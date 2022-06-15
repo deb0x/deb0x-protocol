@@ -34,7 +34,7 @@ describe.only("Test contract", async function () {
 
 
   it("Should claim share of rewards after sending a message in the previous day", async () => {
-    //console.log(await rewardedAlice.getCurrentCycle())
+    //console.log(await rewardedAlice.getCurrentCycleReward())
     await rewardedAlice.send()
     await rewardedBob.send()
     await rewardedBob.send()
@@ -47,7 +47,7 @@ describe.only("Test contract", async function () {
   });
   
   it("Should be able to claim previous cycle rewards and not reset current messages counter", async () => {
-    //console.log(await rewardedAlice.getCurrentCycle())
+    //console.log(await rewardedAlice.getCycleReward(0), await rewardedAlice.getCycleReward(1))
     await rewardedAlice.send()
     await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
     await hre.ethers.provider.send("evm_mine")
@@ -79,7 +79,8 @@ describe.only("Test contract", async function () {
     console.log(await rewardedAlice.rewardsStored(alice.address))
   });
 
-  it.only("Should claim share of rewards after sending a message in the previous day", async () => {
+  it("Should claim share of rewards after sending a message in the previous day", async () => {
+    
     await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
     await hre.ethers.provider.send("evm_mine")
 
@@ -100,7 +101,9 @@ describe.only("Test contract", async function () {
     await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
     await hre.ethers.provider.send("evm_mine")
 
-
+    for(let i = 0; i < 5; i++) {
+      console.log(await rewardedAlice.rewardPerCycle(i))
+    }
 
     await rewardedAlice.claimRewards()
     await rewardedBob.claimRewards()
