@@ -1,17 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.11;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-
 import "./Deb0xCore.sol";
 import "./DBX.sol";
 
-contract Deb0x is Ownable, Deb0xCore {
+contract Deb0x is Deb0xCore {
     //Message setup
     DBX public dbx;
-    uint16 public fee = 1000;
-    uint256 initialTimestamp;
-    uint256 periodDuration;
+    uint16 public constant MAIL_FEE = 1000;
+    uint256 immutable i_initialTimestamp;
+    uint256 immutable i_periodDuration;
     uint256 currentCycleReward;
     uint256 lastCycleReward;
 
@@ -29,8 +27,8 @@ contract Deb0x is Ownable, Deb0xCore {
 
     constructor() {
         dbx = new DBX();
-        initialTimestamp = block.timestamp;
-        periodDuration = 1 days;
+        i_initialTimestamp = block.timestamp;
+        i_periodDuration = 1 days;
         currentCycleReward = 100 * 1e18;
         rewardPerCycle[0] = 100 * 1e18;
     }
@@ -71,10 +69,6 @@ contract Deb0x is Ownable, Deb0xCore {
         }
     }
 
-    function setFee(uint16 newFee) public onlyOwner {
-        fee = newFee;
-    }
-
     function send(address[] memory to, string[] memory payload, address feeReceiver, uint256 msgFee)
         public
         notify(msg.sender)
@@ -89,7 +83,7 @@ contract Deb0x is Ownable, Deb0xCore {
         cycleTotalMessages[currentCycle]++;
         lastActiveCycle[msg.sender] = currentCycle;
 
-        if(feeReceiver != address(0) && fee != 0) {
+        if(feeReceiver != address(0) && MAIL_FEE != 0) {
             userCycleFeePercent[msg.sender]+= msgFee;
             frontendCycleFeePercent[feeReceiver]+= msgFee;
         }
@@ -109,6 +103,7 @@ contract Deb0x is Ownable, Deb0xCore {
 
     function claimRewards() public notify(msg.sender) {
         uint256 reward = addressRewards[msg.sender];
+        require(reward > 0, "Deb0x: You do not have rewards");
         addressRewards[msg.sender] = 0;
         dbx.mintReward(msg.sender, reward);
     }
@@ -118,6 +113,7 @@ contract Deb0x is Ownable, Deb0xCore {
         updateFrontEndReward(msg.sender, currentCycle);
 
         uint256 reward = frontendRewards[msg.sender];
+        require(reward > 0, "Deb0x: You do not have rewards");
         frontendRewards[msg.sender] = 0;
         dbx.mintReward(msg.sender, reward);
     }
@@ -152,7 +148,7 @@ contract Deb0x is Ownable, Deb0xCore {
     }
 
     function getCurrentCycle() public view returns(uint256){
-        return (block.timestamp - initialTimestamp) / periodDuration ;
+        return (block.timestamp - i_initialTimestamp) / i_periodDuration ;
     }
 
     function calculateCycleReward() public view returns(uint256){
