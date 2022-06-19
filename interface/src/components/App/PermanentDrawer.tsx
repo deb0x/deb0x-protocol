@@ -13,7 +13,7 @@ import SendIcon from '@mui/icons-material/Send';
 import { Add } from '@mui/icons-material';
 import Button from '@mui/material/Button'
 import Popper from '@mui/material/Popper'
-import { injected } from '../../connectors';
+import { injected, walletconnect } from '../../connectors';
 import { Spinner } from './Spinner'
 import { useEagerConnect } from '../../hooks'
 import Gavel from '@mui/icons-material/Gavel';
@@ -34,10 +34,11 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import SnackbarNotification from './Snackbar';
 
 const deb0xERC20Address = "0xEde2f177d6Ae8330860B6b37B2F3D767cd2630fe"
-enum ConnectorNames { Injected = 'Injected' };
+enum ConnectorNames { Injected = 'Injected', WalletConnect = 'WalletConnect' };
 
 const connectorsByName: { [connectorName in ConnectorNames]: any } = {
-    [ConnectorNames.Injected]: injected
+    [ConnectorNames.Injected]: injected,
+    [ConnectorNames.WalletConnect]: walletconnect
 }
 
 export function PermanentDrawer(props: any): any {
@@ -54,6 +55,9 @@ export function PermanentDrawer(props: any): any {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popper' : undefined;
+    const [connectionChoieAnchorEL, setConnectionChoiceAnchorEl] = useState<null | HTMLElement>(null);
+    const connectionChoiceOpen = Boolean(connectionChoieAnchorEL);
+    const idConnectionChoice = open ? 'simple-popper' : undefined;
     const dimensions = ScreenSize();
     const useContacts = () => useContext(ContactsContext);
     const { contacts, setContacts } = useContacts()!;
@@ -93,6 +97,11 @@ export function PermanentDrawer(props: any): any {
 
     function handleClick (event: React.MouseEvent<HTMLElement>) {
         setAnchorEl(anchorEl ? null : event.currentTarget);
+    };
+
+    function handleConnectionChoieClick (event: React.MouseEvent<HTMLElement>) {
+        console.log("click")
+        setConnectionChoiceAnchorEl(connectionChoieAnchorEL ? null : event.currentTarget);
     };
 
     function handleChange(text: any, index: any) {
@@ -144,26 +153,18 @@ export function PermanentDrawer(props: any): any {
                         null }
                     
                     { (() =>  {
-                        const currentConnector = connectorsByName[ConnectorNames.Injected]
-                        const activating = currentConnector === activatingConnector
-                        const connected = currentConnector === connector
-                        const disabled = !triedEager || !!activatingConnector || connected || !!error
-
                         return (
                             <Button variant="contained"
-                                key={ConnectorNames.Injected}
+                                key={ConnectorNames.WalletConnect}
                                 aria-describedby={id}
-                                onClick={!connected ? 
-                                    () => {
-                                        setActivatingConnector(currentConnector)
-                                        activate(currentConnector)
-                                    } : 
+                                onClick={
+                                    !connector ? handleConnectionChoieClick : 
                                     handleClick
                                 }>
                                 
-                                { activating ? 
+                                { activatingConnector ? 
                                     <Spinner color={'black'} /> :
-                                    !connected ? 
+                                    !connector ? 
                                         "Connect Wallet" :
                                         <span>
                                             {account === undefined ? 
@@ -181,6 +182,44 @@ export function PermanentDrawer(props: any): any {
                     }) ()}
                     </Box>
                 </AppBar>
+                <Popper className="popper" id={idConnectionChoice} open={connectionChoiceOpen} anchorEl={connectionChoieAnchorEL}>
+                    <List>
+                        {(() =>{
+                            const currentConnector = connectorsByName[ConnectorNames.Injected]
+                            const connected = currentConnector === connector
+
+                            return(
+                                <ListItem className="logout">
+                                    <Button 
+                                        onClick={() => {
+                                                setActivatingConnector(currentConnector)
+                                                activate(currentConnector)
+                                            }}
+                                        className="logout-btn">
+                                        MetaMask 
+                                    </Button>
+                                </ListItem>
+                            )
+                        }) ()}
+                        {(() =>{
+                            const currentConnector = connectorsByName[ConnectorNames.WalletConnect]
+                            const connected = currentConnector === connector
+
+                            return(
+                                <ListItem className="logout">
+                                    <Button 
+                                        onClick={() => {
+                                                setActivatingConnector(currentConnector)
+                                                activate(currentConnector)
+                                            }}
+                                        className="logout-btn">
+                                        WalletConnect 
+                                    </Button>
+                                </ListItem>
+                            )
+                        }) ()}
+                    </List>
+                </Popper>
                 <Popper className="popper" id={id} open={open} anchorEl={anchorEl}>
                     <List>
                         <ListItem className="theme-select">

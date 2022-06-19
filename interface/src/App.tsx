@@ -25,7 +25,7 @@ import {Container, Box,Typography, Fab} from '@mui/material';
 import ThemeProvider from './components/Contexts/ThemeProvider';
 import './index.scss';
 import axios from 'axios';
-import { injected, network } from './connectors';
+import { injected, network, walletconnect } from './connectors';
 import MailIcon from '@mui/icons-material/Mail';
 import ContactsProvider from './components/Contexts/ContactsProvider';
 import ContactsSetter from './components/ContactsSetter';
@@ -42,11 +42,12 @@ const ethUtil = require('ethereumjs-util')
 const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61";
 
 
-enum ConnectorNames { Injected = 'Injected', Network = 'Network' };
+enum ConnectorNames { Injected = 'Injected', Network = 'Network', WalletConnect = 'WalletConnect', };
 
 const connectorsByName: { [connectorName in ConnectorNames]: any } = {
   [ConnectorNames.Injected]: injected,
-  [ConnectorNames.Network]: network
+  [ConnectorNames.Network]: network,
+  [ConnectorNames.WalletConnect]: walletconnect,
 }
 
 function getErrorMessage(error: Error) {
