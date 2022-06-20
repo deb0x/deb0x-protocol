@@ -287,12 +287,13 @@ export function Encrypt(): any {
 
                             <LoadingButton className="send-btn" 
                                 loading={loading} endIcon={ loading ? null : <SendIcon />}
+                                loadingPosition="end"
                                 sx={{ marginLeft: 2, marginTop: 1 }}
                                 disabled={textToEncrypt == '' || addressList == []}
                                 onClick={() => 
                                     encryptText(textToEncrypt, addressList)
                                 } >
-                                { loading ? null : 'Send'}
+                                { loading ? 'Sending...' : 'Send'}
                             </LoadingButton>
                         </Box>
                         :
@@ -316,7 +317,6 @@ export function Encrypt(): any {
                                 loading={loading} variant="contained" 
                                 endIcon={ <SendIcon /> }
                                 sx={{ marginLeft: 2, marginTop: 1 }}
-                                disabled={textToEncrypt === '' || senderAddress === ''}
                                 onClick={() => encryptText(textToEncrypt, senderAddress)}>
                                 Send another message
                             </LoadingButton>

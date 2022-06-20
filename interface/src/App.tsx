@@ -13,22 +13,16 @@ import { ethers } from "ethers";
 import { useEagerConnect, useInactiveListener } from './hooks'
 import { PermanentDrawer } from './components/App/PermanentDrawer'
 
-import { encrypt } from '@metamask/eth-sig-util'
-import Deb0x from "./ethereum/deb0x"
-import { create } from 'ipfs-http-client'
+import { create } from 'ipfs-http-client';
 import { Encrypt } from './components/App/Encrypt';
 import { Decrypt } from './components/App/Decrypt';
 import {Stake} from './components/App/Stake';
-import { Governance } from './components/App/Governance';
 import { Sent } from './components/App/Sent';
-import {Container, Box,Typography, Fab} from '@mui/material';
+import { Box,Typography } from '@mui/material';
 import ThemeProvider from './components/Contexts/ThemeProvider';
 import './index.scss';
-import axios from 'axios';
 import { injected, network } from './connectors';
-import MailIcon from '@mui/icons-material/Mail';
 import ContactsProvider from './components/Contexts/ContactsProvider';
-import ContactsSetter from './components/ContactsSetter';
 
 const client = create({
   host: 'ipfs.infura.io',
@@ -50,10 +44,13 @@ const connectorsByName: { [connectorName in ConnectorNames]: any } = {
 }
 
 function getErrorMessage(error: Error) {
+    let networkName;
+
+    injected.supportedChainIds?.forEach(chainId => networkName = (ethers.providers.getNetwork(chainId)).name)
   if (error instanceof NoEthereumProviderError) {
     return 'No Ethereum browser extension detected, install MetaMask on desktop or visit from a dApp browser on mobile.'
   } else if (error instanceof UnsupportedChainIdError) {
-    return "You're connected to an unsupported network."
+    return `You're connected to an unsupported network. Switch to ${networkName}`
   } else if (
     error instanceof UserRejectedRequestErrorInjected
   ) {
@@ -66,6 +63,7 @@ function getErrorMessage(error: Error) {
 
 function getLibrary(provider: any): ethers.providers.Web3Provider {
   const library = new ethers.providers.Web3Provider(provider)
+
   library.pollingInterval = 12000
   return library
 }

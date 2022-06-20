@@ -40,6 +40,12 @@ const connectorsByName: { [connectorName in ConnectorNames]: any } = {
     [ConnectorNames.Injected]: injected
 }
 
+declare global {
+    interface Window {
+        ethereum: any;
+    }
+}
+
 export function PermanentDrawer(props: any): any {
     const context = useWeb3React()
     const { connector, library, chainId, account, activate, deactivate, active, error } = context
@@ -57,7 +63,9 @@ export function PermanentDrawer(props: any): any {
     const dimensions = ScreenSize();
     const useContacts = () => useContext(ContactsContext);
     const { contacts, setContacts } = useContacts()!;
-    const [notificationState, setNotificationState] = useState({})
+    const [notificationState, setNotificationState] = useState({});
+    const [networkName, setNetworkName] = useState<any>();
+    let errorMessage;
 
     if(library){
         checkENS();
@@ -65,6 +73,8 @@ export function PermanentDrawer(props: any): any {
     }
 
     useEffect(() => {
+        injected.supportedChainIds?.forEach(chainId => 
+            setNetworkName((ethers.providers.getNetwork(chainId).name)));
         if (activatingConnector && activatingConnector === connector) {
             setActivatingConnector(undefined)
         }
@@ -105,15 +115,63 @@ export function PermanentDrawer(props: any): any {
     const [display, setDisplay] = useState();
 
     function displayAddress(index: any) {
-        setNotificationState({});
         display === index ? setDisplay(undefined) : setDisplay(index);
     }
 
-    const event = new CustomEvent('localdatachanged');
-    document.dispatchEvent(event);
+    useEffect(() => {    
+        window.ethereum ?
+            window.ethereum.request({method: "eth_requestAccounts"}).then(() => {
+                switchNetwork();               
+            }).catch((err: any) => getErrorMessage(err))
+            : getErrorMessage("Please install MetaMask")
+    }, [])
+
+    async function switchNetwork() {
+        try {
+            await window.ethereum.request({
+              method: 'wallet_switchEthereumChain',
+              params: [{ chainId: "0x4"}],
+            }).then(
+                getErrorMessage("You have switched to the right network")
+            );            
+        } catch (switchError) {
+            getErrorMessage("Cannot switch to the network");
+            try {
+                await window.ethereum.request({
+                  method: 'wallet_addEthereumChain',
+                  params: [
+                      {
+                        chainId: '0x4', 
+                        chainName:'Rinkeby Test Network',
+                        rpcUrls:['https://rinkeby.infura.io/v3/'],                   
+                        blockExplorerUrls:['https://rinkeby.etherscan.io'],  
+                        nativeCurrency: { 
+                          symbol:'ETH',   
+                          decimals: 18
+                        }     
+                      }
+                    ]});
+              } catch (err) {
+                console.log(err);
+            }
+        }
+        
+    }
+
+    function getErrorMessage(error: string) {
+        errorMessage = error;
+        return errorMessage;
+    }
 
     return (
         <>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                {!!errorMessage && 
+                    <p className='alert alert-danger position-fixed' style={{ marginTop: '4rem', marginBottom: '0' }}>
+                        {getErrorMessage(errorMessage)}
+                    </p>
+                }
+            </div>
             <SnackbarNotification state={notificationState} 
                 setNotificationState={setNotificationState} />
             <Box sx={{ display: 'flex' }}>
@@ -167,7 +225,7 @@ export function PermanentDrawer(props: any): any {
                                         "Connect Wallet" :
                                         <span>
                                             {account === undefined ? 
-                                                'Unsupported Network' : 
+                                                `Unsupported Network. Switch to ${networkName}` : 
                                                 account ? 
                                                     ensName === "" ? 
                                                         `${formatAccountName(account)}` :
@@ -201,69 +259,73 @@ export function PermanentDrawer(props: any): any {
                 <Drawer variant="permanent"
                     anchor={dimensions.width > 768 ? 'left' : 'bottom'}
                     className="side-menu">
-                    <List >
-                        {menuItems.map((text, index) => (
-                            <>
-                                
-                                <ListItem button key={text} 
-                                    selected={selectedIndex === index} 
-                                    onClick={() => handleChange(text, index)}
-                                    className={`list-item ${index === 0 ? "send-item" : ""}` }>
-                                    <ListItemIcon className="icon" >
-                                        {index === 0 && <Add />}
-                                        {index === 1 && <InboxIcon />}
-                                        {index === 2 && <Gavel />}
-                                        {index === 3 && <SendIcon />}
-                                    </ListItemIcon>
-                                    <ListItemText className="text" primary={text} />
-                                </ListItem>
-                            </>
-                        ))}
-                    </List>
+                    { account  && 
+                        <List >
+                            {menuItems.map((text, index) => (
+                                <>
+                                    
+                                    <ListItem button key={text} 
+                                        selected={selectedIndex === index} 
+                                        onClick={() => handleChange(text, index)}
+                                        className={`list-item ${index === 0 ? "send-item" : ""}` }>
+                                        <ListItemIcon className="icon" >
+                                            {index === 0 && <Add />}
+                                            {index === 1 && <InboxIcon />}
+                                            {index === 2 && <Gavel />}
+                                            {index === 3 && <SendIcon />}
+                                        </ListItemIcon>
+                                        <ListItemText className="text" primary={text} />
+                                    </ListItem>
+                                </>
+                            ))}
+                        </List>
+                    }
                     
                     <div className="side-menu--bottom">
                         <>
-                            <div className="contacts">
-                                <List>
-                                    <p>Contacts</p>
-                                    {
-                                        contacts.map((contact: any, index: any) => (
-                                                <>
-                                                <ListItem button key={contact.name}
-                                                    onClick={() => displayAddress(index)}>
-                                                    <ListItemText className="text" primary={contact.name} />
-                                                </ListItem>
-                                                {display == index ? 
-                                                    <ListItem className="row contact-item" key={index}>
-                                                        <ListItemText className="text col-8" primary={contact.address} />
-                                                        <div className="col-4 buttons">
-                                                            <IconButton size="small"
-                                                                onClick={() => {
-                                                                        navigator.clipboard.writeText(contact.address);
-                                                                        setNotificationState({
-                                                                            message: "Address added to clipboard.",
-                                                                            open: true,
-                                                                            severity: "success"
-                                                                        })
-                                                                    }}>
-                                                                <ContentCopyIcon fontSize="small"/>
-                                                            </IconButton>
-                                                            <IconButton size="small"
-                                                                onClick={() => {
-                                                                    setNotificationState({})
-                                                                    localStorage.setItem("input", JSON.stringify(contact.address))
-                                                                    handleChange("Compose", 0)
-                                                                }}>
-                                                                <SendIcon fontSize="small"/>
-                                                            </IconButton>
-                                                        </div>
+                            { account && 
+                                <div className="contacts">
+                                    <List>
+                                        <p>Contacts</p>
+                                        {
+                                            contacts.map((contact: any, index: any) => (
+                                                    <>
+                                                    <ListItem button key={contact.name}
+                                                        onClick={() => displayAddress(index)}>
+                                                        <ListItemText className="text" primary={contact.name} />
                                                     </ListItem>
-                                                    : <></>}
-                                                </>
-                                        ))
-                                    }
-                                </List>
-                            </div>
+                                                    {display == index ? 
+                                                        <ListItem className="row contact-item" key={index}>
+                                                            <ListItemText className="text col-8" primary={contact.address} />
+                                                            <div className="col-4 buttons">
+                                                                <IconButton size="small"
+                                                                    onClick={() => {
+                                                                            navigator.clipboard.writeText(contact.address);
+                                                                            setNotificationState({
+                                                                                message: "Address added to clipboard.",
+                                                                                open: true,
+                                                                                severity: "success"
+                                                                            })
+                                                                        }}>
+                                                                    <ContentCopyIcon fontSize="small"/>
+                                                                </IconButton>
+                                                                <IconButton size="small"
+                                                                    onClick={() => {
+                                                                        setNotificationState({})
+                                                                        localStorage.setItem("input", JSON.stringify(contact.address))
+                                                                        handleChange("Compose", 0)
+                                                                    }}>
+                                                                    <SendIcon fontSize="small"/>
+                                                                </IconButton>
+                                                            </div>
+                                                        </ListItem>
+                                                        : <></>}
+                                                    </>
+                                            ))
+                                        }
+                                    </List>
+                                </div>
+                            }
                             <div className="content">
                                 <a href="https://github.com/deb0x" target="_blank">
                                 <GitHubIcon  />
