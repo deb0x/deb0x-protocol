@@ -19,6 +19,7 @@ contract Deb0x is Deb0xCore {
     uint256 immutable i_periodDuration;
     uint256 currentCycleReward;
     uint256 lastCycleReward;
+    uint256 pendingStake;
 
     mapping(address => uint256) userCycleFeePercent;
     mapping(address => uint256) frontendCycleFeePercent;
@@ -64,28 +65,9 @@ contract Deb0x is Deb0xCore {
         uint256 currentCycle = getCurrentCycle();
         if(summedCycleStakes[currentCycle] == 0) {
             uint256 calculatedCycleReward = calculateCycleReward();
-            summedCycleStakes[currentCycle] = summedCycleStakes[currentCycle - 1] + calculatedCycleReward;
+            summedCycleStakes[currentCycle] += summedCycleStakes[currentCycle - 1] + pendingStake + calculatedCycleReward;
             uint256 feePerStake = cycleAccruedFees[currentCycle - 1] * 1e18 / summedCycleStakes[currentCycle - 1];
             cycleFeesPerStakeSummed[currentCycle] = cycleFeesPerStakeSummed[currentCycle - 1] + feePerStake;
-        }
-
-        if(userFirstStake[account] != 0) {
-            if(userFirstStake[account] - currentCycle > 1){
-                addressRewards[account] += userStakeCycle[account][userFirstStake[account]];
-                userStakeCycle[account][userFirstStake[account]] = 0;
-                userFirstStake[account] = 0;
-
-                if(userSecondStake[account] != 0) {
-                    if(userSecondStake[account] - currentCycle > 1) {
-                        addressRewards[account] += userStakeCycle[account][userSecondStake[account]];
-                        userStakeCycle[account][userSecondStake[account]] = 0;
-                        userSecondStake[account] = 0;
-                        } else {
-                            userFirstStake[account] = userSecondStake[account];
-                            userSecondStake[account] = 0;
-                        }
-                    }
-            }
         }
 
         if(currentCycle > lastActiveCycle[account] && cycleTotalMessages[lastActiveCycle[account]] != 0) {
@@ -107,6 +89,29 @@ contract Deb0x is Deb0xCore {
             addressAccruedFees[account] = addressAccruedFees[account] + ((addressRewards[account] 
                 * (cycleFeesPerStakeSummed[currentCycle] - cycleFeesPerStakeSummed[lastFeeUpdateCycle[account]]))) / 1e18;
             lastFeeUpdateCycle[account] = currentCycle;
+        }
+
+        if(userFirstStake[account] != 0 && currentCycle - userFirstStake[account] > 1) {
+            addressRewards[account] += userStakeCycle[account][userFirstStake[account] + 1];
+            addressAccruedFees[account] = addressAccruedFees[account] + 
+                ((userStakeCycle[account][userFirstStake[account] + 1] 
+                * (cycleFeesPerStakeSummed[currentCycle] - cycleFeesPerStakeSummed[userFirstStake[account] + 1]))) / 1e18;
+            userStakeCycle[account][userFirstStake[account] + 1] = 0;
+            userFirstStake[account] = 0;
+
+            if(userSecondStake[account] != 0) {
+                if(currentCycle - userSecondStake[account] > 1) {
+                        addressRewards[account] += userStakeCycle[account][userSecondStake[account] + 1];
+                        addressAccruedFees[account] = addressAccruedFees[account] + 
+                            ((userStakeCycle[account][userSecondStake[account] + 1] 
+                            * (cycleFeesPerStakeSummed[currentCycle] - cycleFeesPerStakeSummed[userSecondStake[account] + 1]))) / 1e18;
+                        userStakeCycle[account][userSecondStake[account] + 1] = 0;
+                        userSecondStake[account] = 0;
+                        } else {
+                            userFirstStake[account] = userSecondStake[account];
+                            userSecondStake[account] = 0;
+                        }
+                    }
         }
         _;
     }
@@ -188,7 +193,7 @@ contract Deb0x is Deb0xCore {
     {
         require(_amount != 0, "Deb0x: your amount is 0");
         uint256 currentCycle = getCurrentCycle();
-        summedCycleStakes[currentCycle] += _amount;
+        pendingStake += _amount;
 
         if(userFirstStake[msg.sender] == 0) {
             userFirstStake[msg.sender] = currentCycle;
@@ -196,7 +201,7 @@ contract Deb0x is Deb0xCore {
         } else if(userSecondStake[msg.sender] == 0) {
             userSecondStake[msg.sender] = currentCycle;
         }
-        userStakeCycle[msg.sender][currentCycle] += _amount;
+        userStakeCycle[msg.sender][currentCycle + 1] += _amount;
         userTotalStake[msg.sender] += _amount;
 
         dbx.transferFrom(msg.sender, address(this), _amount);
