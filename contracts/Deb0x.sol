@@ -27,7 +27,7 @@ contract Deb0x is Deb0xCore {
     mapping(uint256 => uint256) cycleTotalMessages;
     mapping(address => uint256) lastActiveCycle;
     mapping(address => uint256) frontEndLastCycleUpdate;
-    mapping(address => uint256) addressRewards;
+    mapping(address => uint256) public addressRewards;
     mapping(address => uint256) public addressAccruedFees;
     mapping(address => uint256) frontendRewards;
     mapping(uint256 => uint256) public rewardPerCycle;
@@ -37,7 +37,7 @@ contract Deb0x is Deb0xCore {
     mapping(uint256 => uint256) public cycleFeesPerStake;
     mapping(uint256 => uint256) public cycleFeesPerStakeSummed;
     mapping(address => mapping(uint256 => uint256)) userStakeCycle;
-    mapping(address => uint256) userTotalStake;
+    mapping(address => uint256) public userWithdrawableStake;
     mapping(address => uint256) userFirstStake;
     mapping(address => uint256) userSecondStake;
 
@@ -92,7 +92,9 @@ contract Deb0x is Deb0xCore {
         }
 
         if(userFirstStake[account] != 0 && currentCycle - userFirstStake[account] > 1) {
-            addressRewards[account] += userStakeCycle[account][userFirstStake[account] + 1];
+            uint256 unlockedFirstStake = userStakeCycle[account][userFirstStake[account] + 1];
+            addressRewards[account] += unlockedFirstStake;
+            userWithdrawableStake[account] += unlockedFirstStake;
             addressAccruedFees[account] = addressAccruedFees[account] + 
                 ((userStakeCycle[account][userFirstStake[account] + 1] 
                 * (cycleFeesPerStakeSummed[currentCycle] - cycleFeesPerStakeSummed[userFirstStake[account] + 1]))) / 1e18;
@@ -101,7 +103,9 @@ contract Deb0x is Deb0xCore {
 
             if(userSecondStake[account] != 0) {
                 if(currentCycle - userSecondStake[account] > 1) {
-                        addressRewards[account] += userStakeCycle[account][userSecondStake[account] + 1];
+                        uint256 unlockedSecondStake = userStakeCycle[account][userSecondStake[account] + 1];
+                        addressRewards[account] += unlockedSecondStake;
+                        userWithdrawableStake[account] += unlockedSecondStake;
                         addressAccruedFees[account] = addressAccruedFees[account] + 
                             ((userStakeCycle[account][userSecondStake[account] + 1] 
                             * (cycleFeesPerStakeSummed[currentCycle] - cycleFeesPerStakeSummed[userSecondStake[account] + 1]))) / 1e18;
@@ -162,9 +166,9 @@ contract Deb0x is Deb0xCore {
 
     function claimRewards() public setUpNewCycle notify(msg.sender) {
         uint256 currentCycle = getCurrentCycle();
-        uint256 reward = addressRewards[msg.sender];
+        uint256 reward = addressRewards[msg.sender] - userWithdrawableStake[msg.sender];
         require(reward > 0, "Deb0x: You do not have rewards");
-        addressRewards[msg.sender] = 0;
+        addressRewards[msg.sender] -= reward;
         summedCycleStakes[currentCycle] = summedCycleStakes[currentCycle] - reward;
         dbx.mintReward(msg.sender, reward);
     }
@@ -202,9 +206,25 @@ contract Deb0x is Deb0xCore {
             userSecondStake[msg.sender] = currentCycle;
         }
         userStakeCycle[msg.sender][currentCycle + 1] += _amount;
-        userTotalStake[msg.sender] += _amount;
 
         dbx.transferFrom(msg.sender, address(this), _amount);
+    }
+
+    function unstake(uint256 _amount) 
+        external
+        setUpNewCycle
+        notify(msg.sender)
+    {
+        require(_amount != 0, "Deb0x: your amount is 0");
+        require(_amount <= userWithdrawableStake[msg.sender], "Deb0x: can not unstake more than you've staked");
+
+        uint256 currentCycle = getCurrentCycle();
+
+        userWithdrawableStake[msg.sender] -= _amount;
+        addressRewards[msg.sender] -= _amount;
+        summedCycleStakes[currentCycle] -= _amount;
+
+        dbx.transfer(msg.sender, _amount);
     }
 
     function sendViaCall(address payable _to, uint256 _amount) private {
@@ -223,5 +243,18 @@ contract Deb0x is Deb0xCore {
 
     function calculateCycleReward() public view returns(uint256){
         return lastCycleReward * 10000 / 10019;
+    }
+
+    function getUserWithdrawableStake(address staker) public view returns(uint256) {
+        uint256 currentCycle = getCurrentCycle();
+        uint256 unlockedStake = 0;
+        if(userFirstStake[staker] != 0 && currentCycle - userFirstStake[staker] > 1) {
+            unlockedStake += userStakeCycle[staker][userFirstStake[staker] + 1];
+
+            if(userSecondStake[staker] != 0 && currentCycle - userSecondStake[staker] > 1) {
+                unlockedStake += userStakeCycle[staker][userSecondStake[staker] + 1];
+            }
+        }
+        return userWithdrawableStake[staker] + unlockedStake;
     }
 }
