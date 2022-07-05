@@ -26,7 +26,9 @@ contract Deb0x is Deb0xCore {
     mapping(address => uint256) userCycleMessages;
     mapping(uint256 => uint256) cycleTotalMessages;
     mapping(address => uint256) lastActiveCycle;
-    mapping(address => uint256) frontEndLastCycleUpdate;
+    mapping(address => uint256) frontEndLastRewardUpdate;
+    mapping(address => uint256) frontEndLastFeeUpdate;
+    mapping(address => uint256) frontEndAccruedFees;
     mapping(address => uint256) public addressRewards;
     mapping(address => uint256) public addressAccruedFees;
     mapping(address => uint256) frontendRewards;
@@ -40,6 +42,8 @@ contract Deb0x is Deb0xCore {
     mapping(address => uint256) public userWithdrawableStake;
     mapping(address => uint256) userFirstStake;
     mapping(address => uint256) userSecondStake;
+
+    event FeesClaimed(uint256 fees);
 
     constructor() {
         dbx = new DBX();
@@ -66,6 +70,7 @@ contract Deb0x is Deb0xCore {
         if(summedCycleStakes[currentCycle] == 0) {
             uint256 calculatedCycleReward = calculateCycleReward();
             summedCycleStakes[currentCycle] += summedCycleStakes[currentCycle - 1] + pendingStake + calculatedCycleReward;
+            pendingStake = 0;
             uint256 feePerStake = cycleAccruedFees[currentCycle - 1] * 1e18 / summedCycleStakes[currentCycle - 1];
             cycleFeesPerStakeSummed[currentCycle] = cycleFeesPerStakeSummed[currentCycle - 1] + feePerStake;
         }
@@ -120,15 +125,20 @@ contract Deb0x is Deb0xCore {
         _;
     }
 
-    function updateFrontEndReward(address frontend, uint256 currentCycle) internal {
-        if(currentCycle > frontEndLastCycleUpdate[frontend]) {
+    function updateFrontEndStats(address frontend, uint256 currentCycle) internal {
+        if(currentCycle > frontEndLastRewardUpdate[frontend]) {
             if(frontendCycleFeePercent[frontend] != 0) {
-                uint256 lastUpdatedCycle = frontEndLastCycleUpdate[frontend];
+                uint256 lastUpdatedCycle = frontEndLastRewardUpdate[frontend];
                 uint256 rewardPerMsg = rewardPerCycle[lastUpdatedCycle] / cycleTotalMessages[lastUpdatedCycle];
                 frontendRewards[frontend] += rewardPerMsg * frontendCycleFeePercent[frontend] / 10000;
                 frontendCycleFeePercent[frontend] = 0;
             }
-            frontEndLastCycleUpdate[frontend] = currentCycle;
+            frontEndLastRewardUpdate[frontend] = currentCycle;
+        }
+        if(currentCycle > frontEndLastFeeUpdate[frontend]) {
+            frontEndAccruedFees[frontend] += (frontendRewards[frontend] 
+                * (cycleFeesPerStakeSummed[currentCycle] - cycleFeesPerStakeSummed[frontEndLastFeeUpdate[frontend]])) / 1e18;
+            frontEndLastFeeUpdate[frontend] = currentCycle;
         }
     }
 
@@ -140,7 +150,7 @@ contract Deb0x is Deb0xCore {
     {
         uint256 currentCycle = getCurrentCycle();
 
-        updateFrontEndReward(feeReceiver, currentCycle);
+        updateFrontEndStats(feeReceiver, currentCycle);
 
         uint256 startGas = gasleft();
 
@@ -175,12 +185,22 @@ contract Deb0x is Deb0xCore {
 
     function claimFrontEndRewards() public {
         uint256 currentCycle = getCurrentCycle();
-        updateFrontEndReward(msg.sender, currentCycle);
+        updateFrontEndStats(msg.sender, currentCycle);
 
         uint256 reward = frontendRewards[msg.sender];
         require(reward > 0, "Deb0x: You do not have rewards");
         frontendRewards[msg.sender] = 0;
         dbx.mintReward(msg.sender, reward);
+    }
+    
+    function claimFrontEndFees() public {
+        uint256 currentCycle = getCurrentCycle();
+        updateFrontEndStats(msg.sender, currentCycle);
+        uint256 fees = frontEndAccruedFees[msg.sender];
+        require(fees > 0, "Deb0x: You do not have accrued fees");
+        frontEndAccruedFees[msg.sender] = 0;
+        sendViaCall(payable(msg.sender), fees);
+        emit FeesClaimed(fees);
     }
 
     function claimFees() public setUpNewCycle notify(msg.sender){
@@ -188,6 +208,7 @@ contract Deb0x is Deb0xCore {
         require(fees > 0, "Deb0x: You do not have accrued fees");
         addressAccruedFees[msg.sender] = 0;
         sendViaCall(payable(msg.sender), fees);
+        emit FeesClaimed(fees);
     }
 
     function stakeDBX(uint256 _amount)
@@ -229,7 +250,6 @@ contract Deb0x is Deb0xCore {
 
     function sendViaCall(address payable _to, uint256 _amount) private {
         (bool sent, ) = _to.call{value: _amount}("");
-        console.log(_amount);
         require(sent, "Deb0x: failed to send amount");
     }
 
