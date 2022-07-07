@@ -5,6 +5,9 @@
     @include themed() {
         ul.MuiList-root {
             padding-top: 0;
+            height: 55vh;
+            overflow-y: auto;
+            overflow-x: hidden;
             li.messages-list-item {
                 margin-bottom: 0;
                 border: none;
@@ -67,6 +70,31 @@
                 color: t('text');
             }
         }
+        .row.messages-list .message-right {
+            width: 75%;
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 100%;
+            border-left: 1px solid #ccc;
+            border-top: 1px solid #ccc;
+            .message-heading {
+                background-color: t('logo-bg');
+                padding: 10px 15px;
+            }
+            .message {
+                padding: 10px 15px;
+            }
+            .address {
+                display: flex;
+                button {
+                    padding: 0 5px;
+                }
+                p {
+                    margin-bottom: 0 !important;
+                }
+            }
+        }
     }
 }
 
@@ -76,7 +104,7 @@
         margin: 0 auto;
     }
     ul.MuiList-root {
-        padding-top: 55px
+        padding-top: 55px;
     }
     
 }

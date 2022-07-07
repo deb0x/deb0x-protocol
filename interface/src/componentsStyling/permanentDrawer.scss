@@ -9,7 +9,7 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
             background-color: t('bg');
             flex-direction: row;
             align-items: center;
-            z-index: 1201;
+            box-shadow: none;
             .MuiButton-contained {
                 background-color: t('bg');
                 color: t('text');
@@ -104,14 +104,6 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
         @include themed(){
             header {
                 justify-content: space-between;
-                .image-container {
-                    width: 178px;
-                    img {
-                        width: 100%;
-                        height: 55px;
-                        object-fit: cover;
-                    }
-                }
                 .main-menu--right {
                     display: flex;
                     padding: 5px 10px;
@@ -130,13 +122,69 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
             }
             .side-menu {
                 .MuiDrawer-paperAnchorLeft {
-                    min-width: 175px;
+                    min-width: 20%;
+                    margin: 75px;
+                    height: calc(100% - 150px);
+                    border-bottom-left-radius: 100px;
+                    border-top-left-radius: 60px;
+                    max-width: 174px;
+                    overflow: hidden;
+                    background-color: t('bg');
+                    position: absolute;
+                    .image-container {
+                        height: 148px;
+                        background-color: t('logo-bg');
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        box-shadow: 4px 0px 13px #1A152033;
+                        img {
+                            max-width: 159px;
+                            width: 100%;
+                            height: 50px;
+                            object-fit: cover;
+                        }
+                    }
+                    .MuiTypography-root {
+                        font-size: 24px;
+
+                    }
                     .list-item.Mui-selected {
                         background-color: #cccccc40;
+                        .MuiTypography-root {
+                            font-weight: 800;
+                        }
                     }
-                    .list-item {
-                        border-bottom: 1px solid #ccc;
+                    .send-item {
+                        color: #F5B700;
+                        .icon {
+                            color: #F5B700;
+                        }
                     }
+                    ul.menu-list {
+                        box-shadow: 4px 0px 11px #1A152036;
+                        .list-item {
+                            &:nth-child(2) {
+                                color: #91C499;
+                                .icon {
+                                    color: #91C499;
+                                }
+                            }
+                            &:nth-child(3) {
+                                color: #D64933;
+                                .icon {
+                                    color: #D64933;
+                                }
+                            }
+                            &:nth-child(4) {
+                                color: #809BCE;
+                                .icon {
+                                    color: #809BCE;
+                                }
+                            }
+                        }
+                    }
+                    
                 }
             }
         }

@@ -10,18 +10,18 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import SendIcon from '@mui/icons-material/Send';
-import { Add } from '@mui/icons-material';
+import add from '../../photos/icons/ios-compose.svg';
+import trophy from '../../photos/icons/trophy.svg';
 import Button from '@mui/material/Button'
 import Popper from '@mui/material/Popper'
 import { injected } from '../../connectors';
 import { Spinner } from './Spinner'
 import { useEagerConnect } from '../../hooks'
-import Gavel from '@mui/icons-material/Gavel';
 import Paper from "@mui/material/Paper";
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
 import IconButton from "@mui/material/IconButton";
-import logo from "../../photos/logo.png"
+import logo from "../../photos/logo-dark.svg"
 import GitHubIcon from '@mui/icons-material/GitHub';
 import Deb0xERC20 from "../../ethereum/deb0xerc20"
 import { ethers } from "ethers";
@@ -119,10 +119,6 @@ export function PermanentDrawer(props: any): any {
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
                 <AppBar className="app-bar--top">
-                    <div className="image-container">
-                        <div className="image-overlay"></div>
-                        <img src={logo}  />
-                    </div>
                     <Box className="main-menu--right">
                     { account  ? 
                         <>
@@ -201,7 +197,10 @@ export function PermanentDrawer(props: any): any {
                 <Drawer variant="permanent"
                     anchor={dimensions.width > 768 ? 'left' : 'bottom'}
                     className="side-menu">
-                    <List >
+                    <div className="image-container">
+                        <img src={logo} />
+                    </div>
+                    <List className="menu-list">
                         {menuItems.map((text, index) => (
                             <>
                                 
@@ -210,9 +209,9 @@ export function PermanentDrawer(props: any): any {
                                     onClick={() => handleChange(text, index)}
                                     className={`list-item ${index === 0 ? "send-item" : ""}` }>
                                     <ListItemIcon className="icon" >
-                                        {index === 0 && <Add />}
+                                        {index === 0 && <img src={add} />}
                                         {index === 1 && <InboxIcon />}
-                                        {index === 2 && <Gavel />}
+                                        {index === 2 && <img src={trophy} />}
                                         {index === 3 && <SendIcon />}
                                     </ListItemIcon>
                                     <ListItemText className="text" primary={text} />
