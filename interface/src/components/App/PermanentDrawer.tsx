@@ -122,7 +122,7 @@ export function PermanentDrawer(props: any): any {
                     <Box className="main-menu--right">
                     { account  ? 
                         <>
-                            <Paper component="form">
+                            {/* <Paper component="form">
                                 <InputBase
                                     placeholder="Search messages"
                                     inputProps={{ "aria-label": "search" }}
@@ -130,7 +130,7 @@ export function PermanentDrawer(props: any): any {
                                 <IconButton type="submit" aria-label="search">
                                     <SearchIcon />
                                 </IconButton>
-                            </Paper>
+                            </Paper> */}
                             <Button variant ="contained"
                                     onClick={() => handleChange("Stake", 2)}>
                                 {userUnstakedAmount} DBX
@@ -224,40 +224,41 @@ export function PermanentDrawer(props: any): any {
                         <>
                             <div className="contacts">
                                 <List>
-                                    <p>Contacts</p>
                                     {
                                         contacts.map((contact: any, index: any) => (
                                                 <>
                                                 <ListItem button key={contact.name}
-                                                    onClick={() => displayAddress(index)}>
-                                                    <ListItemText className="text" primary={contact.name} />
-                                                </ListItem>
-                                                {display == index ? 
-                                                    <ListItem className="row contact-item" key={index}>
-                                                        <ListItemText className="text col-8" primary={contact.address} />
-                                                        <div className="col-4 buttons">
-                                                            <IconButton size="small"
-                                                                onClick={() => {
-                                                                        navigator.clipboard.writeText(contact.address);
-                                                                        setNotificationState({
-                                                                            message: "Address added to clipboard.",
-                                                                            open: true,
-                                                                            severity: "success"
-                                                                        })
-                                                                    }}>
-                                                                <ContentCopyIcon fontSize="small"/>
-                                                            </IconButton>
-                                                            <IconButton size="small"
-                                                                onClick={() => {
-                                                                    setNotificationState({})
-                                                                    localStorage.setItem("input", JSON.stringify(contact.address))
-                                                                    handleChange("Compose", 0)
+                                                    className="row">
+                                                    <ListItemText className="text col-8" primary={contact.name}
+                                                        onClick={() => displayAddress(index)} />
+                                                    <div className="col-4 buttons">
+                                                        <IconButton size="small"
+                                                            onClick={() => {
+                                                                    navigator.clipboard.writeText(contact.address);
+                                                                    setNotificationState({
+                                                                        message: "Address added to clipboard.",
+                                                                        open: true,
+                                                                        severity: "success"
+                                                                    })
                                                                 }}>
-                                                                <SendIcon fontSize="small"/>
-                                                            </IconButton>
-                                                        </div>
-                                                    </ListItem>
-                                                    : <></>}
+                                                            <ContentCopyIcon fontSize="small"/>
+                                                        </IconButton>
+                                                        <IconButton size="small"
+                                                            onClick={() => {
+                                                                setNotificationState({})
+                                                                localStorage.setItem("input", JSON.stringify(contact.address))
+                                                                handleChange("Compose", 0)
+                                                            }}>
+                                                            <SendIcon fontSize="small"/>
+                                                        </IconButton>
+                                                    </div>
+
+                                                    {display == index ? 
+                                                        <ListItem className="row contact-item" key={index}>
+                                                            <ListItemText className="text col-8" primary={contact.address} />
+                                                        </ListItem>
+                                                        : <></>}
+                                                </ListItem>
                                                 </>
                                         ))
                                     }

@@ -122,7 +122,7 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
             }
             .side-menu {
                 .MuiDrawer-paperAnchorLeft {
-                    min-width: 20%;
+                    min-width: 300px;
                     margin: 75px;
                     height: calc(100% - 150px);
                     border-bottom-left-radius: 100px;
@@ -133,6 +133,7 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
                     position: absolute;
                     .image-container {
                         height: 148px;
+                        min-height: 148px;
                         background-color: t('logo-bg');
                         display: flex;
                         justify-content: center;
@@ -155,6 +156,11 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
                             font-weight: 800;
                         }
                     }
+                    .icon {
+                        svg {
+                            font-size: 35px;
+                        }
+                    }
                     .send-item {
                         color: #F5B700;
                         .icon {
@@ -164,6 +170,7 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
                     ul.menu-list {
                         box-shadow: 4px 0px 11px #1A152036;
                         .list-item {
+                            padding: 10px 10px 10px 35px;
                             &:nth-child(2) {
                                 color: #91C499;
                                 .icon {
@@ -185,6 +192,54 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
                         }
                     }
                     
+                }
+            }
+            .side-menu--bottom {
+                display: flex;
+                height: 100%;
+                align-items: center;
+                justify-content: space-between;
+                flex-direction: column;
+                .contacts {
+                    width: 100%;
+                    display: flex;
+                    justify-content: center;
+                    border-bottom: 1px solid #ccc;
+                    ul {
+                        padding-bottom: 0;
+                        padding-top: 0;
+                        width: 100%;
+                        text-align: center;
+                        .MuiTypography-root {
+                            font-size: 16px;
+                        }
+                    }
+                    .row.contact-item {
+                        width: 100%;
+                        margin-left: 0;
+                        padding: 0;
+                        .text {
+                            span {
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                font-size: 14px;
+                            }
+                        }
+                    }
+                    .buttons {
+                        display: flex;
+                        justify-content: flex-end;
+                        svg {
+                            font-size: 14px;
+                        }
+                    }
+                }
+                .content {
+                    display: flex;
+                    padding-bottom: 10px;
+                    align-items: center;
+                    flex-direction: column;
+                    padding-top: 10px;
                 }
             }
         }

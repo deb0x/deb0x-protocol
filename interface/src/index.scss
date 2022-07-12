@@ -55,7 +55,6 @@ body * {
             color: t('pagination')
         }
         .main-container {
-            height: 75%;
             overflow: hidden;
             margin-top: 155px;
             .floating-btn {
@@ -71,6 +70,8 @@ body * {
                 margin: 15px 30px 15px 15px;
                 padding: 0 15px;
                 box-shadow: t('box-shadow');
+                height: 65vh;
+                border-radius: 25px 10px 85px 25px;
             }
         }
         .home-page-box {

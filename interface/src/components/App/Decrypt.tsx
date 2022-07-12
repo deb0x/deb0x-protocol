@@ -105,7 +105,7 @@ export function Decrypt(props: any): any {
         }
 
         return (
-            <ListItem sx ={{border:1, marginBottom:1}} 
+            <ListItem
                 disablePadding 
                 key={props.index}    
                 secondaryAction={ 
@@ -121,7 +121,7 @@ export function Decrypt(props: any): any {
                         }
                     </IconButton>  
                 }
-                className="messages-list-item">
+                className="messages-list-item card">
                 <ListItemButton 
                     className={`list-item-button ${isDecrypted ? "active" : ""}` }
                     onClick={() => {
@@ -237,24 +237,22 @@ export function Decrypt(props: any): any {
                 )
             } else {
                 return (
-                    <Box sx={{ width: '100%', maxWidth: 1080, margin: '0 auto'}}>
-                        <div className="row messages-list">
-                            <List className="col-md-3 col-sm-12">
-                                {fetchedMessages.map((message: any, i: any) => {
-                                    return (
-                                        <Message message={message} index={i} 
-                                            key={i} previousIndex={previousIndex} 
-                                            setPreviousIndex={setPreviousIndex} />
-                                    )
-                                })}
-                            </List>
-                            <Box className="intro-box col-md-9">
-                                <div>
-                                    
-                                </div>
-                            </Box>
-                        </div>
-                    </Box>
+                    <div className="row messages-list">
+                        <List className="col-md-4 col-sm-12">
+                            {fetchedMessages.map((message: any, i: any) => {
+                                return (
+                                    <Message message={message} index={i} 
+                                        key={i} previousIndex={previousIndex} 
+                                        setPreviousIndex={setPreviousIndex} />
+                                )
+                            })}
+                        </List>
+                        <Box className="intro-box col-md-8">
+                            <div>
+                                
+                            </div>
+                        </Box>
+                    </div>
                 )
             }
         } else {
@@ -271,7 +269,7 @@ export function Decrypt(props: any): any {
             <div className="content-box">
                 <Box>
                     <Box className="pagination" sx={{display:"flex"}}>
-                        <Pagination count={1} showFirstButton showLastButton />
+                        <Pagination count={1} />
                         <IconButton size="large" onClick={()=> setLoading(true) }>
                             <RefreshIcon fontSize="large"/>
                         </IconButton>

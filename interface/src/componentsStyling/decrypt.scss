@@ -5,13 +5,14 @@
     @include themed() {
         ul.MuiList-root {
             padding-top: 0;
-            height: 55vh;
+            height: 60vh;
             overflow-y: auto;
             overflow-x: hidden;
+            padding-right: 15px;
             li.messages-list-item {
-                margin-bottom: 0;
+                margin: 10px 5px;
                 border: none;
-                border-bottom: 1px solid #ccc;
+                border-radius: 25px;
                 &:first-child {
                     border-top: 1px solid #ccc;
                 }
@@ -22,6 +23,9 @@
                     padding-right: 15px;
                     width: 100%;
                     overflow: hidden;
+                    background-color: t('bg');
+                    border-radius: 25px;
+                    box-shadow: t('box-shadow');
                     .message-heading {
                         display: flex;
                         justify-content: space-between;
@@ -39,6 +43,9 @@
                     }
                     p {
                         margin-bottom: 5px;
+                    }
+                    &.active {
+                        background-color: t('logo-bg');
                     }
                 }
             }
@@ -70,14 +77,18 @@
                 color: t('text');
             }
         }
+        .row.messages-list .MuiListItemSecondaryAction-root,
+        .MuiListItemSecondaryAction-root .MuiButtonBase-root,
+        .MuiListItemSecondaryAction-root .MuiButtonBase-root > * {
+            position: absolute;
+        }
+        
         .row.messages-list .message-right {
-            width: 75%;
+            width: 66%;
             position: absolute;
             top: 0;
             right: 0;
             height: 100%;
-            border-left: 1px solid #ccc;
-            border-top: 1px solid #ccc;
             .message-heading {
                 background-color: t('logo-bg');
                 padding: 10px 15px;
