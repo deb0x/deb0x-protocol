@@ -8,15 +8,22 @@
                 font-size: 24px;
                 border: 0;
                 box-shadow: none;
-                background-color: t('logo-bg');
+                background-color: t('bg');
                 color: t('text');
                 margin-bottom: 25px;
-                box-shadow: t('box-shadow');
+                color: #D64933;
+                padding: 50px;
+                h4 {
+                    .logo {
+                        padding-right: 15px;
+                    }
+                }
             }
             .card-container {
                 background-color: t('logo-bg');
                 color: t('text');
                 box-shadow: t('box-shadow');
+                margin: 15px;
                 .tab-container {
                     width: 100%;
                     .tab-btn {

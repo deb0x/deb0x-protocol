@@ -13,6 +13,7 @@ import Deb0xERC20 from "../../ethereum/deb0xerc20"
 import SnackbarNotification from './Snackbar';
 import { ethers } from "ethers";
 import "../../componentsStyling/stake.scss";
+import token from "../../photos/icons/token.svg"
 
 const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61"
 const deb0xERC20Address = "0xEde2f177d6Ae8330860B6b37B2F3D767cd2630fe"
@@ -106,21 +107,18 @@ export function Stake(props: any): any {
                     <Typography variant="h4" component="div">
                         REWARDS
                     </Typography>
-                    <Divider className="divider-pink" />
                     <Typography>
                         Your unclaimed rewards:
                     </Typography>
                     <Typography variant="h6">
                         <strong>{rewardsUnclaimed}</strong>
                     </Typography>
-                    <Divider className="divider-pink" />
                     <Typography>
                         Your share from fees:
                     </Typography>
                     <Typography variant="h6">
                         <strong>{feeSharePercentage}</strong>
                     </Typography>
-                    <Divider className="divider-pink" />
                 </CardContent>
                 <CardActions>
                     <LoadingButton className="submit-btn" loading={loading} variant="contained" onClick={claimRewards}>Collect</LoadingButton>
@@ -379,8 +377,6 @@ export function Stake(props: any): any {
                     <Typography variant="h6">
                         <strong>{userStakedAmount} DBX</strong>
                     </Typography>
-                    <Divider className="divider-pink" />
-
                     <Typography>
                         Your tokens in wallet:
                     </Typography>
@@ -438,7 +434,11 @@ export function Stake(props: any): any {
             <Card className="heading-card">
                 <CardContent>
                     <Typography variant="h5">
-                        Total tokens staked: {totalStaked} DBX
+                        Total tokens staked:
+                    </Typography>
+                    <Typography variant="h4">
+                        <img className="logo" src={token} />
+                        {totalStaked} DBX
                     </Typography>
                 </CardContent>
             </Card>
@@ -449,15 +449,13 @@ export function Stake(props: any): any {
         <>
             <SnackbarNotification state={notificationState} setNotificationState={setNotificationState} />
             <Box className="container">
-                <div>
-                    <TotalStaked/>
-                </div>
                 <div className="cards-grid">
                     <div className='row'>
                         <Grid item className="col col-md-6">
-                            <StakeUnstake/>
+                            <TotalStaked/>
                         </Grid>
                         <Grid item className="col col-md-6">
+                            <StakeUnstake/>
                             <RewardsPanel />
                         </Grid>
                     </div>

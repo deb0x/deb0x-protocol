@@ -135,6 +135,46 @@ body * {
     }
 }
 
+@media (max-width: 768px) {
+    #root {
+        .theme {
+            padding: 55px 10px;
+            .app-container {
+                height: 98%;
+                header {
+                    background-color: transparent;
+                    margin: 30px 55px;
+                }
+                .main-container {
+                    margin-top: 75px;
+                    .content-box {
+                        height: 70vh;
+                        border-radius: 25px;
+                        margin: 15px;
+                    }
+                    ul.MuiList-root {
+                        height: 63vh;
+                        li.messages-list-item {
+                            div.list-item-button {
+                                .message-overflow {
+                                    height: 25px;
+                                }
+                                &.active {
+                                    .message-overflow {
+                                        height: auto;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+       
+        
+    }
+}
+
 ::-webkit-scrollbar {
     width: 5px;
 }
