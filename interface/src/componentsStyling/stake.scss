@@ -4,6 +4,7 @@
     @include themed() {
         .container{
             min-height: 55vh;
+            
             .heading-card {
                 font-size: 24px;
                 border: 0;
@@ -43,5 +44,13 @@
                 align-items: center;
             }
         }
+    }
+}
+
+@media (max-width: 768px) {
+    .cards-grid {
+        height: 69vh;
+        overflow-y: scroll;
+        overflow-x: hidden;
     }
 }

@@ -147,20 +147,20 @@ function App() {
                 <div className="app-container p-0">
                     <div className="initial-page">
                         <div className="row">
-                            <div className="col-8 img-container">
+                            <div className="col-md-7 img-container">
                                 <img className="image--left" src={elephant} />
                                 <div className="img-content">
                                     <p>Hey, you!</p>
-                                    <img className="content-logo" src={logoGreen} />
-                                    <p>needs to have your wallet connected</p>
+                                    
+                                    <p>To use <img className="content-logo" src={logoGreen} /> you need to have your wallet connected</p>
                                 </div>
                             </div>
-                            <div className="col-4">
+                            <div className="col-md-5">
                                 <div className="text-container">
-                                    <img className="dark-logo" src={logoDark} />
+                                    <img className="dark-logo" src={logoGreen} />
                                     <p>
                                         The End to End Encrypted Decentralized 
-                                        Email Protocol 
+                                        Email Protocol <br />
                                         <span className="text-green">
                                             Owned by its Users
                                         </span>

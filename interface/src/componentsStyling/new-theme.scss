@@ -144,9 +144,13 @@
         & * {
             position: static;
         }
+        .intro-box {
+            background: url(../photos/no-message.svg) no-repeat 98% 98%;
+            background-size: 40%;
+        }
     }
     .message-left {
-        max-height: 46px;
+        max-height: 48px;
         overflow: hidden;
     }
 }
