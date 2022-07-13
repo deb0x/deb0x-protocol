@@ -17,7 +17,7 @@ import { Encrypt } from './components/App/Encrypt';
 import { Decrypt } from './components/App/Decrypt';
 import {Stake} from './components/App/Stake';
 import { Sent } from './components/App/Sent';
-import { Box,Typography, Fab} from '@mui/material';
+import { Box,Typography, Fab, Button} from '@mui/material';
 import ThemeProvider from './components/Contexts/ThemeProvider';
 import './index.scss';
 import { injected, network } from './connectors';
@@ -25,6 +25,7 @@ import ContactsProvider from './components/Contexts/ContactsProvider';
 import elephant from './photos/icons/elephant.svg';
 import logoGreen from './photos/icons/logo-green.svg';
 import logoDark from "./photos/logo-dark.svg";
+import { Spinner } from './components/App/Spinner';
 
 const client = create({
   host: 'ipfs.infura.io',
@@ -76,7 +77,7 @@ export default function () {
 
 function App() {
   const context = useWeb3React<ethers.providers.Web3Provider>()
-  const { connector, library, chainId, account, active, error } = context
+  const { connector, library, chainId, account, active, error, activate } = context
 
   // handle logic to recognize the connector currently being activated
   const [activatingConnector, setActivatingConnector] = useState<any>()
@@ -100,6 +101,11 @@ function App() {
   useEffect(() => {
     localStorage.removeItem('input')
   }, [])
+
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    function handleClick (event: React.MouseEvent<HTMLElement>) {
+        setAnchorEl(anchorEl ? null : event.currentTarget);
+    };
 
   const [username, setUsername] = useState('Default username');
   return (
@@ -153,6 +159,35 @@ function App() {
                                     <p>Hey, you!</p>
                                     
                                     <p>To use <img className="content-logo" src={logoGreen} /> you need to have your wallet connected</p>
+                                    <div>
+                                    { (() =>  {
+                                        const currentConnector = connectorsByName[ConnectorNames.Injected]
+                                        const activating = currentConnector === activatingConnector
+                                        const connected = currentConnector === connector
+                                        const disabled = !triedEager || !!activatingConnector || connected || !!error
+
+                                        return (
+                                            <Button variant="contained"
+                                                key={ConnectorNames.Injected}
+                                                // aria-describedby={id}
+                                                onClick={!connected ? 
+                                                    () => {
+                                                        setActivatingConnector(currentConnector)
+                                                        activate(currentConnector)
+                                                    } : 
+                                                    handleClick}
+                                                    className="connect-button">
+                                                
+                                                { activating ? 
+                                                    <Spinner color={'black'} /> :
+                                                    !connected ? 
+                                                        "Connect Wallet" :
+                                                        ""
+                                                }
+                                            </Button>
+                                        )
+                                    }) ()}
+                                    </div>
                                 </div>
                             </div>
                             <div className="col-md-5">
