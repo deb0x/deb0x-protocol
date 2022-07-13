@@ -1,11 +1,52 @@
 @import './componentsStyling/theme.scss';
 @import './componentsStyling/new-theme.scss';
 
+$randomNumber: random(4);
+
+@font-face {
+    font-family: 'Karla';
+    src: url('../src/fonts/Karla/Karla-Regular.ttf');
+}
+
+body * {
+    font-family: 'Karla'!important;
+}
+
+#root {
+    height: 100vh;
+    overflow: hidden;
+    .theme {
+        display: inline-block;
+        padding: 75px;
+        width: 100%;
+        height: 100vh;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+    & .theme--dark {
+        background-image: url('./photos/backgrounds/dark-bg-'+$randomNumber+'.png');
+    }
+    & .theme--classic {
+        background-image: url('./photos/backgrounds/light-bg-'+$randomNumber+'.png');
+    }
+}
 .app-container {
-    // height: 100vh;
+    height: calc( 100%);
+    border-radius: 100px;
+    box-shadow: 0px 3px 25px #0f0b1382;
     @include themed() {
         color: t('text');
         background: t('bg');
+        header {
+            margin: 80px;
+            width: 75%;
+            height: 80px;
+            border-top-right-radius: 100px;
+            background: t('bg');
+            position: absolute;
+            justify-content: end;
+        }
         li svg {
             color: t('text');
         }
@@ -14,7 +55,8 @@
             color: t('pagination')
         }
         .main-container {
-            height: 77vh;
+            overflow: hidden;
+            margin-top: 155px;
             .floating-btn {
                 position: fixed;
                 bottom: 75px;
@@ -22,6 +64,14 @@
             }
             .pagination {
                 justify-content: space-between;
+            }
+            .content-box {
+                background-color: t('logo-bg');
+                margin: 15px 30px 15px 15px;
+                padding: 0 15px;
+                box-shadow: t('box-shadow');
+                height: 65vh;
+                border-radius: 25px 10px 85px 25px;
             }
         }
         .home-page-box {
@@ -39,10 +89,174 @@
             }
         }
     }
+    .initial-page {
+        height: 100%;
+        .row {
+            height: 100%;
+            .img-container {
+                align-items: center;
+                height: 100%;
+                position: relative;
+                .image--left {
+                    height: 100%;
+                    width: 100%;
+                    height: 520px;
+                    position: absolute;
+                    top: 70px;
+                }
+                .img-content {
+                    position: absolute;
+                    color: #91C499;
+                    font-size: 2rem;
+                    font-weight: 800;
+                    top: 100px;
+                    left: 28%;
+                    width: 450px;
+                    p:first-child {
+                        text-align: center;
+                        font-size: 27px;
+                        margin-bottom: 5px;
+                    }
+                    p:nth-child(2) {
+                        display: inline;
+                        margin-bottom: 0;
+                        vertical-align: sub;
+                        font-size: 27px;
+                    }
+                    .content-logo {
+                        display: inline;
+                        height: 35px;
+                        margin: -15px 0 0 0;
+                    }
+                }
+            }
+            .text-container {
+                @include themed() {
+                    text-align: center;
+                    img {
+                        margin: 200px 0 50px;
+                        width: 50%;
+                    }
+                    * {
+                        color: t('text');
+                        font-size: 30px;
+                        font-weight: bold;
+                        line-height: 35px;
+                    }
+                    .text-green {
+                        margin-top: 10px;
+                        color: #91C499;
+                        display: inline-block;
+                    }
+                }
+            }
+        }
+
+        @media (max-width: 768px) {
+            .row {
+                overflow-y: scroll;
+                padding: 0;
+                margin: 0 -9px 0 0;
+            }
+
+            .col-md-5 {
+                display: none;
+            }
+
+            .img-container {
+                height: auto;
+            }
+
+            .image--left,
+            .img-content {
+                position: relative !important;
+            }
+
+            .image--left {
+                height: 100px !important;
+            }
+
+            .img-content {
+                width: 100% !important;
+                left: 0 !important;
+                padding: 20px;
+                text-align: center;
+            }
+        }
+    }
 }
+
+.modal-box {
+    width: 33%;
+    margin: 20vh 33% 0;
+    button {
+        background: #F5B700;
+    }
+}
+
 
 @media (min-width: 769px) {
     .app-container {
-        padding-left: 175px;
+        padding-left: 300px;
     }
+}
+
+@media (max-width: 768px) {
+    #root {
+        .theme {
+            padding: 55px 10px;
+            .app-container {
+                height: 98%;
+                header {
+                    background-color: transparent;
+                    margin: 60px 55px 30px;
+                }
+                .main-container {
+                    margin-top: 75px;
+                    .content-box {
+                        height: 70vh;
+                        border-radius: 25px;
+                        margin: 15px;
+                    }
+                    ul.MuiList-root {
+                        height: 63vh;
+                        li.messages-list-item {
+                            div.list-item-button {
+                                .message-overflow {
+                                    height: 25px;
+                                }
+                                &.active {
+                                    .message-overflow {
+                                        height: auto;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-height: 920px) {
+    .app-container {
+        .main-container {
+            margin-top: 80px !important;
+        }
+    }
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+}
+  
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px rgb(204, 204, 204); 
+    border-radius: 10px;
+}
+   
+::-webkit-scrollbar-thumb {
+    background: rgb(204, 204, 204); 
+    border-radius: 10px;
 }
