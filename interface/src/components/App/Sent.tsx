@@ -239,25 +239,23 @@ export function Sent(props: any): any {
                 )
             } else {
                 return (
-                    <Box sx={{ width: '100%', maxWidth: 1080, margin: '0 auto'}}>
-                        <div className="row messages-list">
-                            <List className="col-md-3 col-sm-12">
-                                {fetchedMessages.map((message: any, i: any) => {
-                                    return (
-                                        <Message message={message} index={i} 
-                                            key={i} previousIndex={previousIndex} 
-                                            setPreviousIndex={setPreviousIndex} />
-                                    )
-                                })}
-                            </List>
-                            <Box className="intro-box sent col-md-9">
-                                <div>
-                                    <img src={empty} />
-                                    <p>Open a message from the list to see the details.</p>
-                                </div>
-                            </Box>
-                        </div>
-                    </Box>
+                    <div className="row messages-list">
+                        <List className="col-md-4 col-sm-12">
+                            {fetchedMessages.map((message: any, i: any) => {
+                                return (
+                                    <Message message={message} index={i} 
+                                        key={i} previousIndex={previousIndex} 
+                                        setPreviousIndex={setPreviousIndex} />
+                                )
+                            })}
+                        </List>
+                        <Box className="intro-box sent col-md-8">
+                            <div>
+                                {/* <img src={empty} /> */}
+                                <p>Open a message from the list to see the details.</p>
+                            </div>
+                        </Box>
+                    </div>
                 )
             }
         } else {
@@ -272,19 +270,19 @@ export function Sent(props: any): any {
     
     if(encryptionKeyInitialized == true){
         return (
-            // sx={{display:"flex"}}
-            <Box>
-                <Box className="pagination" sx={{display:"flex"}}>
-                    <Pagination count={1} showFirstButton showLastButton />
-                    <IconButton size="large" onClick={()=> setLoading(true) }>
-                        <RefreshIcon fontSize="large"/>
-                    </IconButton>
-                </Box>
+            <div className="content-box">
                 <Box>
-                    <GetMessages />
+                    <Box className="pagination" sx={{display:"flex"}}>
+                        <Pagination count={1} showFirstButton showLastButton />
+                        <IconButton size="large" onClick={()=> setLoading(true) }>
+                            <RefreshIcon fontSize="large"/>
+                        </IconButton>
+                    </Box>
+                    <Box>
+                        <GetMessages />
+                    </Box>
                 </Box>
-            </Box>
-           
+           </div>
         )
     } else if(encryptionKeyInitialized == false){
         return (
