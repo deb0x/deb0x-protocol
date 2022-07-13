@@ -3,16 +3,25 @@
 .app-container {
     @include themed() {
         .container{
+            min-height: 55vh;
             .heading-card {
                 font-size: 24px;
                 border: 0;
                 box-shadow: none;
+                background-color: t('logo-bg');
+                color: t('text');
+                margin-bottom: 25px;
+                box-shadow: t('box-shadow');
             }
             .card-container {
+                background-color: t('logo-bg');
+                color: t('text');
+                box-shadow: t('box-shadow');
                 .tab-container {
                     width: 100%;
                     .tab-btn {
                         width: 100%;
+                        color: t('text');
                     }
                 }
             }

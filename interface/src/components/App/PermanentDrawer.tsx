@@ -16,12 +16,10 @@ import Button from '@mui/material/Button'
 import Popper from '@mui/material/Popper'
 import { injected } from '../../connectors';
 import { Spinner } from './Spinner'
-import { useEagerConnect } from '../../hooks'
-import Paper from "@mui/material/Paper";
-import InputBase from "@mui/material/InputBase";
-import SearchIcon from "@mui/icons-material/Search";
+import { useEagerConnect } from '../../hooks';
 import IconButton from "@mui/material/IconButton";
-import logo from "../../photos/logo-dark.svg"
+import logoDark from "../../photos/logo-dark.svg";
+import logoLight from "../../photos/logo-light.svg";
 import GitHubIcon from '@mui/icons-material/GitHub';
 import Deb0xERC20 from "../../ethereum/deb0xerc20"
 import { ethers } from "ethers";
@@ -57,7 +55,7 @@ export function PermanentDrawer(props: any): any {
     const dimensions = ScreenSize();
     const useContacts = () => useContext(ContactsContext);
     const { contacts, setContacts } = useContacts()!;
-    const [notificationState, setNotificationState] = useState({})
+    const [notificationState, setNotificationState] = useState({});
 
     if(library){
         checkENS();
@@ -175,13 +173,13 @@ export function PermanentDrawer(props: any): any {
                             </Button>
                         )
                     }) ()}
+
+                        <ThemeSetter />
                     </Box>
                 </AppBar>
                 <Popper className="popper" id={id} open={open} anchorEl={anchorEl}>
                     <List>
-                        <ListItem className="theme-select">
-                            <ThemeSetter />
-                        </ListItem>
+                        
                         <ListItem className='logout'>
                             <Button 
                                 onClick={(event: any) => {
@@ -198,7 +196,7 @@ export function PermanentDrawer(props: any): any {
                     anchor={dimensions.width > 768 ? 'left' : 'bottom'}
                     className="side-menu">
                     <div className="image-container">
-                        <img src={logo} />
+                        <div className="img"></div>
                     </div>
                     <List className="menu-list">
                         {menuItems.map((text, index) => (
@@ -241,7 +239,7 @@ export function PermanentDrawer(props: any): any {
                                                                         severity: "success"
                                                                     })
                                                                 }}>
-                                                            <ContentCopyIcon fontSize="small"/>
+                                                            <ContentCopyIcon fontSize="small" className="copy-icon"/>
                                                         </IconButton>
                                                         <IconButton size="small"
                                                             onClick={() => {
@@ -249,7 +247,7 @@ export function PermanentDrawer(props: any): any {
                                                                 localStorage.setItem("input", JSON.stringify(contact.address))
                                                                 handleChange("Compose", 0)
                                                             }}>
-                                                            <SendIcon fontSize="small"/>
+                                                            <SendIcon fontSize="small" className="send-icon"/>
                                                         </IconButton>
                                                     </div>
 
