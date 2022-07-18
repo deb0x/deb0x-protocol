@@ -10,18 +10,16 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import SendIcon from '@mui/icons-material/Send';
-import { Add } from '@mui/icons-material';
+import add from '../../photos/icons/ios-compose.svg';
+import trophy from '../../photos/icons/trophy.svg';
 import Button from '@mui/material/Button'
 import Popper from '@mui/material/Popper'
 import { injected } from '../../connectors';
 import { Spinner } from './Spinner'
-import { useEagerConnect } from '../../hooks'
-import Gavel from '@mui/icons-material/Gavel';
-import Paper from "@mui/material/Paper";
-import InputBase from "@mui/material/InputBase";
-import SearchIcon from "@mui/icons-material/Search";
+import { useEagerConnect } from '../../hooks';
 import IconButton from "@mui/material/IconButton";
-import logo from "../../photos/logo.png"
+import logoDark from "../../photos/logo-dark.svg";
+import logoLight from "../../photos/logo-light.svg";
 import GitHubIcon from '@mui/icons-material/GitHub';
 import Deb0xERC20 from "../../ethereum/deb0xerc20"
 import { ethers } from "ethers";
@@ -177,14 +175,10 @@ export function PermanentDrawer(props: any): any {
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
                 <AppBar className="app-bar--top">
-                    <div className="image-container">
-                        <div className="image-overlay"></div>
-                        <img src={logo}  />
-                    </div>
                     <Box className="main-menu--right">
                     { account  ? 
                         <>
-                            <Paper component="form">
+                            {/* <Paper component="form">
                                 <InputBase
                                     placeholder="Search messages"
                                     inputProps={{ "aria-label": "search" }}
@@ -192,7 +186,7 @@ export function PermanentDrawer(props: any): any {
                                 <IconButton type="submit" aria-label="search">
                                     <SearchIcon />
                                 </IconButton>
-                            </Paper>
+                            </Paper> */}
                             <Button variant ="contained"
                                     onClick={() => handleChange("Stake", 2)}>
                                 {userUnstakedAmount} DBX
@@ -237,13 +231,13 @@ export function PermanentDrawer(props: any): any {
                             </Button>
                         )
                     }) ()}
+
+                        <ThemeSetter />
                     </Box>
                 </AppBar>
                 <Popper className="popper" id={id} open={open} anchorEl={anchorEl}>
                     <List>
-                        <ListItem className="theme-select">
-                            <ThemeSetter />
-                        </ListItem>
+                        
                         <ListItem className='logout'>
                             <Button 
                                 onClick={(event: any) => {
@@ -269,9 +263,9 @@ export function PermanentDrawer(props: any): any {
                                         onClick={() => handleChange(text, index)}
                                         className={`list-item ${index === 0 ? "send-item" : ""}` }>
                                         <ListItemIcon className="icon" >
-                                            {index === 0 && <Add />}
+                                            {index === 0 && <img src={add} />}
                                             {index === 1 && <InboxIcon />}
-                                            {index === 2 && <Gavel />}
+                                            {index === 2 && <img src={trophy} />}
                                             {index === 3 && <SendIcon />}
                                         </ListItemIcon>
                                         <ListItemText className="text" primary={text} />

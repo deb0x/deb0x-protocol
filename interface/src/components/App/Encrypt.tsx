@@ -267,6 +267,7 @@ export function Encrypt(): any {
                         wrapperClassName="wrapper"
                         editorClassName="editor"
                     />
+                    <div className="editor-overlay"></div>
 
                     { messageSessionSentCounter === 0 ?
                         <Box sx={{ display: "flex", 

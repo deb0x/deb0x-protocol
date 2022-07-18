@@ -44,6 +44,16 @@
                 border: 1px solid t('text');
                 border-radius: 4px;
                 margin-bottom: 50px;
+                .rdw-editor-toolbar {
+                    border-radius: 25px;
+                    background-color: rgba(255, 255, 255, 0.5);
+                    border: none;
+                    .rdw-option-wrapper, 
+                    .rdw-dropdown-wrapper {
+                        border: none;
+                        background-color: transparent;
+                    }
+                }
             }
             .editor {
                 min-height: 250px;

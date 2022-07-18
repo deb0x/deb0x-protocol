@@ -127,7 +127,7 @@ export function Decrypt(props: any): any {
         }
 
         return (
-            <ListItem sx ={{border:1, marginBottom:1}} 
+            <ListItem
                 disablePadding 
                 key={props.index}    
                 secondaryAction={ 
@@ -143,7 +143,7 @@ export function Decrypt(props: any): any {
                         }
                     </IconButton>  
                 }
-                className="messages-list-item">
+                className="messages-list-item card">
                 <ListItemButton 
                     className={`list-item-button ${isDecrypted ? "active" : ""}` }
                     onClick={() => {
@@ -263,84 +263,22 @@ export function Decrypt(props: any): any {
                 )
             } else {
                 return (
-                    <Box sx={{ width: '100%', maxWidth: 1080, margin: '0 auto'}}>
-                        <div className="row messages-list">
-                            <List className="col-md-3 col-sm-12">
-                                {fetchedMessages.map((message: any, i: any) => {
-                                    return (
-                                        <Message message={message} index={i} 
-                                            key={i} previousIndex={previousIndex} 
-                                            setPreviousIndex={setPreviousIndex} />
-                                    )
-                                })}
-                            </List>
-                            <Box className="intro-box col-md-9">
-                                <div>
-                                    <div className="row">
-                                        <div className="col-6">
-                                            <h2>The End To End Encrypted...</h2>
-                                            <p>
-                                                Leverages the greatest social repository of public key cryptography to 
-                                                enable the ability to send encrypted messages to any person that owns 
-                                                an Ethereum address or ENS domain name. This way it makes end to end 
-                                                message encryption a practical, built-in feature that is accessible 
-                                                to any wallet owner (like Metamask, Trustwallet and others).
-                                            </p>
-                                        </div>
-                                        <div className="col-6">
-                                            <img src={ lock }/>
-                                        </div>
-                                    </div>
-                                    <div className="row">
-                                        <div className="col-6">
-                                            <img src={ airplane }/>
-                                        </div>
-                                        <div className="col-6">
-                                            <h2>Decentralized Email Protocol...</h2>
-                                            <p>
-                                            There is no centralized place of control that can censor deb0x email 
-                                            transmission. The immutable smart contract implementation of the 
-                                            protocol inherits the security and decentralization of the blockchain 
-                                            that it is deployed to. At the same time, the pluggable storage 
-                                            architecture and multiple incentivized frontend providers offer 
-                                            various options for degrees of privacy and usability to the end users.
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="row">
-                                        <div className="col-6">
-                                            <h2>Owned By Its Users!</h2>
-                                            <p>
-                                                All deb0x users earn tokens that represent equity and revenue share for 
-                                                future programmed usage fees of the protocol. Thanks to the distribution 
-                                                curve, adopters earn more tokens the earlier they use the protocol. 
-                                                The frontend application builders are also incentivised, while the 
-                                                referral scheme creates an attractive token earning context that 
-                                                drives the overall deb0x protocol adoption.
-                                            </p>
-                                        </div>
-                                        <div className="col-6">
-                                            <img src={ users }/>
-                                        </div>
-                                    </div>
-                                    <div className="row">
-                                        <div className="col-6">
-                                            <img src={ hand }/>
-                                        </div>
-                                        <div className="col-6">
-                                            <h2>... and there are</h2>
-                                            <p>
-                                                no premines, no treasury allocations, no private sales, no dev fees! The 
-                                                token distribution algorithm is pre-programmed and can never be changed. 
-                                                The launch date that will kick off the rewards will be announced one to 
-                                                two weeks in advance on this page.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Box>
-                        </div>
-                    </Box>
+                    <div className="row messages-list">
+                        <List className="col-md-4 col-sm-12">
+                            {fetchedMessages.map((message: any, i: any) => {
+                                return (
+                                    <Message message={message} index={i} 
+                                        key={i} previousIndex={previousIndex} 
+                                        setPreviousIndex={setPreviousIndex} />
+                                )
+                            })}
+                        </List>
+                        <Box className="intro-box col-md-8">
+                            <div>
+                                
+                            </div>
+                        </Box>
+                    </div>
                 )
             }
         } else {
@@ -354,10 +292,10 @@ export function Decrypt(props: any): any {
     
     if (encryptionKeyInitialized === true) {
         return (
-            <div>
+            <div className="content-box">
                 <Box>
                     <Box className="pagination" sx={{display:"flex"}}>
-                        <Pagination count={1} showFirstButton showLastButton />
+                        <Pagination count={1} />
                         <IconButton size="large" onClick={()=> setLoading(true) }>
                             <RefreshIcon fontSize="large"/>
                         </IconButton>
