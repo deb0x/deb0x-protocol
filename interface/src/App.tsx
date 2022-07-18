@@ -47,10 +47,13 @@ const connectorsByName: { [connectorName in ConnectorNames]: any } = {
 }
 
 function getErrorMessage(error: Error) {
+    let networkName;
+
+    injected.supportedChainIds?.forEach(chainId => networkName = (ethers.providers.getNetwork(chainId)).name)
   if (error instanceof NoEthereumProviderError) {
     return 'No Ethereum browser extension detected, install MetaMask on desktop or visit from a dApp browser on mobile.'
   } else if (error instanceof UnsupportedChainIdError) {
-    return "You're connected to an unsupported network."
+    return `You're connected to an unsupported network. Switch to ${networkName}`
   } else if (
     error instanceof UserRejectedRequestErrorInjected
   ) {
@@ -63,6 +66,7 @@ function getErrorMessage(error: Error) {
 
 function getLibrary(provider: any): ethers.providers.Web3Provider {
   const library = new ethers.providers.Web3Provider(provider)
+
   library.pollingInterval = 12000
   return library
 }

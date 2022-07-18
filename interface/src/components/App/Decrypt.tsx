@@ -31,6 +31,7 @@ export function Decrypt(props: any): any {
     const [encryptionKeyInitialized, setEncryptionKeyInitialized] = 
         useState<boolean|undefined>(undefined);
     const [decrypted, setDecrypted] = useState<any>();
+    const savedContacts = JSON.parse(localStorage.getItem('contacts') || 'null'); 
 
 
     useEffect(() => {
@@ -69,6 +70,7 @@ export function Decrypt(props: any): any {
         //const [sender, setSender] = useState(props.messsage.sender)
         const [messageTime, setMessageTime] = useState("Mar 17, 18:36")
         const [isDecrypted, setIsDecrypted] = useState(false);
+        let [show, setShow] = useState(false);
 
         useEffect(()=>{
             checkENS();
@@ -104,6 +106,26 @@ export function Decrypt(props: any): any {
             setIsDecrypted(false);
         }
 
+        function checkSenderInLocalStorage(sender: any) {
+            let user = '';
+
+            if (ensName !== "") {
+                user = ensName;
+            } else {
+                savedContacts.forEach((contact: any) => {
+                    if (sender == contact.address) {
+                        user = contact.name;
+                    } else {
+                        user = formatAccountName(
+                            props.message.sender
+                        )
+                    }
+                })
+            }
+
+            return user;
+        }
+
         return (
             <ListItem
                 disablePadding 
@@ -134,7 +156,9 @@ export function Decrypt(props: any): any {
                             <div className="message-left">
                                 <div className="message-heading">
                                     <p><strong>
-                                        {ensName !== "" ? ensName : formatAccountName(props.message.sender)}
+                                        {
+                                            checkSenderInLocalStorage(props.message.sender)
+                                        }
                                     </strong></p>
                                     <p className="time-stamp"><small>
                                         {messageTime}
@@ -149,15 +173,17 @@ export function Decrypt(props: any): any {
                                         <div className="address">
                                             <p>From: 
                                                 <strong>
-                                                    {ensName !== "" ? 
-                                                        ensName : 
-                                                        formatAccountName(
-                                                            props.message.sender
-                                                        )
+                                                    {
+                                                        checkSenderInLocalStorage(props.message.sender)
                                                     }
                                                 </strong>
                                             </p>
-                                            <ContactsSetter props={props.message.sender}/>
+                                            <>
+                                                <IconButton onClick={() => setShow(true)}>
+                                                    <Add />
+                                                </IconButton>
+                                                <ContactsSetter show={show} props={props.message.sender} onClickOutside={() => setShow(false)}/>
+                                            </>
                                         </div>
                                         
                                         <p className="time-stamp"><small>
