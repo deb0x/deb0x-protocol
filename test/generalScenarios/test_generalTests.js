@@ -32,12 +32,12 @@ describe("Test DBX tokens distributions", async function() {
         await user1Reward.claimRewards();
         let balanceForUser1 = await dbxERC20.balanceOf(user1.address);
         let expectedValueUser1Cycle1 = BigNumber.from("50000000000000000000");
-        expect(BigNumber.from(balanceForUser1)).to.equal(expectedValueUser1Cycle1)
+        expect(expectedValueUser1Cycle1).to.equal(balanceForUser1)
 
         await user2Reward.claimRewards();
         let balanceForUser2 = await dbxERC20.balanceOf(user2.address);
         let expectedValueUser2Cycle1 = BigNumber.from("50000000000000000000");
-        expect(BigNumber.from(balanceForUser2)).to.equal(expectedValueUser2Cycle1)
+        expect(expectedValueUser2Cycle1).to.equal(balanceForUser2)
     });
 
     it(`Claim rewards after multiple cycle with no fees`, async() => {
@@ -49,12 +49,12 @@ describe("Test DBX tokens distributions", async function() {
         await user1Reward.claimRewards();
         let balanceForUser1Cycle1 = await dbxERC20.balanceOf(user1.address);
         let expectedValueUser1Cycle1 = BigNumber.from("50000000000000000000");
-        expect(BigNumber.from(expectedValueUser1Cycle1)).to.equal(balanceForUser1Cycle1)
+        expect(expectedValueUser1Cycle1).to.equal(balanceForUser1Cycle1)
 
         await user2Reward.claimRewards();
         let balanceForUser2Cycle1 = await dbxERC20.balanceOf(user2.address);
         let expectedValueUser2Cycle1 = BigNumber.from("50000000000000000000");
-        expect(BigNumber.from(expectedValueUser2Cycle1)).to.equal(balanceForUser2Cycle1)
+        expect(expectedValueUser2Cycle1).to.equal(balanceForUser2Cycle1)
 
         await user1Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
@@ -86,9 +86,9 @@ describe("Test DBX tokens distributions", async function() {
         //Reward to distribute in cycle 3: 99.621080262901226266 
 
         await user1Reward.claimRewards();
-        let balanceForUser111 = await dbxERC20.balanceOf(user1.address);
+        let balanceForUser1Cycle3 = await dbxERC20.balanceOf(user1.address);
         let expectedValueCycle3 = BigNumber.from("99621080262901226266").add(BigNumber.from("99905180157700369298"));
-        expect(BigNumber.from(balanceForUser111)).to.equal(expectedValueCycle3)
+        expect(expectedValueCycle3).to.equal(balanceForUser1Cycle3)
     });
 
 
@@ -101,7 +101,7 @@ describe("Test DBX tokens distributions", async function() {
         await user1Reward.claimRewards();
         let balanceForUser1Cycle1 = await dbxERC20.balanceOf(user1.address);
         let expectedValueCycle1 = BigNumber.from("100000000000000000000");
-        expect(BigNumber.from(balanceForUser1Cycle1)).to.equal(expectedValueCycle1)
+        expect(expectedValueCycle1).to.equal(balanceForUser1Cycle1)
 
         await user1Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
@@ -115,7 +115,7 @@ describe("Test DBX tokens distributions", async function() {
         await user1Reward.claimRewards();
         let balanceForUser1Cycle2 = await dbxERC20.balanceOf(user1.address);
         let expectedValueCycle2 = BigNumber.from("100000000000000000000").add(BigNumber.from("99810360315400738596"));
-        expect(BigNumber.from(balanceForUser1Cycle2)).to.equal(expectedValueCycle2)
+        expect(expectedValueCycle2).to.equal(balanceForUser1Cycle2)
 
         await user1Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
         await user1Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
@@ -137,16 +137,15 @@ describe("Test DBX tokens distributions", async function() {
         await user1Reward.claimRewards();
         let balanceForUser1Cycle3 = await dbxERC20.balanceOf(user1.address);
         let expectedValueCycle3 = BigNumber.from("199810360315400738596").add(BigNumber.from("99621080262901226266"));
-        expect(BigNumber.from(balanceForUser1Cycle3)).to.equal(expectedValueCycle3)
+        expect(expectedValueCycle3).to.equal(balanceForUser1Cycle3)
     });
 
 
-    it.only(`Claim rewards after multiple cycle with no fees using multiple accounts`, async() => {
+    it(`Claim rewards after multiple cycle with no fees using multiple accounts`, async() => {
         await user1Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
         await user3Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-
         await hre.ethers.provider.send("evm_mine")
 
         await user1Reward.claimRewards();
@@ -247,8 +246,9 @@ describe("Test DBX tokens distributions", async function() {
         await hre.ethers.provider.send("evm_mine")
 
         await user1Reward.claimRewards()
-        let rewardToClaim = ethers.utils.formatEther(await dbxERC20.balanceOf(user1.address));
-        expect(rewardToClaim).to.equal('82.0')
+        let rewardToClaim = await dbxERC20.balanceOf(user1.address);
+        let expectedValue = BigNumber.from("82000000000000000000");
+        expect(expectedValue).to.equal(rewardToClaim)
     });
 
     it(`Single cycle distribution, two messages - 100 DBX reward, USER1 A(F1-18%) => A claimable rewards = 41 DBX 
@@ -261,12 +261,14 @@ describe("Test DBX tokens distributions", async function() {
         await hre.ethers.provider.send("evm_mine")
 
         await user1Reward.claimRewards()
-        let rewardToClaimForUser1 = ethers.utils.formatEther(await dbxERC20.balanceOf(user1.address));
-        expect(rewardToClaimForUser1).to.equal('41.0')
+        let rewardToClaimForUser1 = await dbxERC20.balanceOf(user1.address);
+        let expectedValueUser1 = BigNumber.from("41000000000000000000");
+        expect(expectedValueUser1).to.equal(rewardToClaimForUser1)
 
         await user2Reward.claimRewards();
-        let rewardToClaimForUser2 = ethers.utils.formatEther(await dbxERC20.balanceOf(user2.address));
-        expect(rewardToClaimForUser2).to.equal('45.0')
+        let rewardToClaimForUser2 = await dbxERC20.balanceOf(user2.address);
+        let expectedValueUser2 = BigNumber.from("45000000000000000000");
+        expect(expectedValueUser2).to.equal(rewardToClaimForUser2)
     });
 
     it(`Three-cycle distribution, three messages - Cycle 1: 100 DBX reward, USER1 A(F1-18%) => A claimable rewards = 30 DBX 
@@ -288,16 +290,19 @@ describe("Test DBX tokens distributions", async function() {
         await hre.ethers.provider.send("evm_mine")
 
         await user1Reward.claimRewards()
-        let rewardToClaimForUser1 = ethers.utils.formatEther(await dbxERC20.balanceOf(user1.address));
-        expect(rewardToClaimForUser1).to.equal('30.0')
+        let rewardToClaimForUser1 = await dbxERC20.balanceOf(user1.address);
+        let expectedValueUser1 = BigNumber.from("30000000000000000000");
+        expect(expectedValueUser1).to.equal(rewardToClaimForUser1)
 
         await user2Reward.claimRewards();
-        let rewardToClaimForUser2 = ethers.utils.formatEther(await dbxERC20.balanceOf(user2.address));
-        expect(rewardToClaimForUser2).to.equal('30.0');
+        let rewardToClaimForUser2 = await dbxERC20.balanceOf(user2.address);
+        let expectedValueUser2 = BigNumber.from("30000000000000000000");
+        expect(expectedValueUser2).to.equal(rewardToClaimForUser2)
 
         await user3Reward.claimRewards();
-        let rewardToClaimForUser3 = ethers.utils.formatEther(await dbxERC20.balanceOf(user2.address));
-        expect(rewardToClaimForUser3).to.equal('30.0')
+        let rewardToClaimForUser3 = await dbxERC20.balanceOf(user3.address);
+        let expectedValueUser3 = BigNumber.from("30000000000000000000");
+        expect(expectedValueUser3).to.equal(rewardToClaimForUser3)
 
         let rewardToDistributeCycle2 = ethers.utils.formatEther(await userReward.calculateCycleReward());
         console.log("Reward for cycle 2 " + rewardToDistributeCycle2)
@@ -310,18 +315,23 @@ describe("Test DBX tokens distributions", async function() {
         await hre.ethers.provider.send("evm_mine")
 
         //old balance + actual reward distribution
+        let balanceBeforeClaimRewardUser1Cycle2 = await dbxERC20.balanceOf(user1.address);
         await user1Reward.claimRewards()
-        let rewardToClaimForUser1Cycle2 = ethers.utils.formatEther(await dbxERC20.balanceOf(user1.address));
-        expect(rewardToClaimForUser1Cycle2).to.equal('59.943108094620221579');
+        let rewardToClaimForUser1Cycle2 = await dbxERC20.balanceOf(user1.address);
+        let expectedValueUser1Cycle2 = BigNumber.from("29943108094620221579").add(BigNumber.from(balanceBeforeClaimRewardUser1Cycle2))
+        expect(expectedValueUser1Cycle2).to.equal(rewardToClaimForUser1Cycle2)
 
+        let balanceBeforeClaimRewardUser2Cycle2 = await dbxERC20.balanceOf(user2.address);
         await user2Reward.claimRewards();
-        let rewardToClaimForUser2Cycle2 = ethers.utils.formatEther(await dbxERC20.balanceOf(user2.address));
-        expect(rewardToClaimForUser2Cycle2).to.equal('59.943108094620221579');
+        let rewardToClaimForUser2Cycle2 = await dbxERC20.balanceOf(user2.address);
+        let expectedValueUser2Cycle2 = BigNumber.from("29943108094620221579").add(BigNumber.from(balanceBeforeClaimRewardUser2Cycle2))
+        expect(expectedValueUser2Cycle2).to.equal(rewardToClaimForUser2Cycle2)
 
+        let balanceBeforeClaimRewardUser3Cycle2 = await dbxERC20.balanceOf(user3.address);
         await user3Reward.claimRewards();
-        let rewardToClaimForUser3Cycle2 = ethers.utils.formatEther(await dbxERC20.balanceOf(user2.address));
-        expect(rewardToClaimForUser3Cycle2).to.equal('59.943108094620221579');
-
+        let rewardToClaimForUser3Cycle2 = await dbxERC20.balanceOf(user3.address);
+        let expectedValueUser3Cycle2 = BigNumber.from("29943108094620221579").add(BigNumber.from(balanceBeforeClaimRewardUser3Cycle2))
+        expect(expectedValueUser3Cycle2).to.equal(rewardToClaimForUser3Cycle2)
 
         let rewardToDistributeCycle3 = ethers.utils.formatEther(await userReward.calculateCycleReward());
         console.log("Reward for cycle 3 " + rewardToDistributeCycle3);
@@ -333,18 +343,24 @@ describe("Test DBX tokens distributions", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        //old balance + actual reward distribution
+        //old balance + actual reward distributio        
+        let balanceBeforeClaimRewardUser1Cycle3 = await dbxERC20.balanceOf(user1.address);
         await user1Reward.claimRewards()
-        let rewardToClaimForUser1Cycle3 = ethers.utils.formatEther(await dbxERC20.balanceOf(user1.address));
-        expect(rewardToClaimForUser1Cycle3).to.equal('89.829432173490589459');
+        let expectedValueUser1Cycle3 = BigNumber.from("29886324078870367880").add(BigNumber.from(balanceBeforeClaimRewardUser1Cycle3))
+        let rewardToClaimForUser1Cycle3 = await dbxERC20.balanceOf(user1.address);
+        expect(expectedValueUser1Cycle3).to.equal(rewardToClaimForUser1Cycle3);
 
+        let balanceBeforeClaimRewardUser2Cycle3 = await dbxERC20.balanceOf(user2.address);
         await user2Reward.claimRewards();
-        let rewardToClaimForUser2Cycle3 = ethers.utils.formatEther(await dbxERC20.balanceOf(user2.address));
-        expect(rewardToClaimForUser2Cycle3).to.equal('89.829432173490589459');
+        let expectedValueUser2Cycle3 = BigNumber.from("29886324078870367880").add(BigNumber.from(balanceBeforeClaimRewardUser2Cycle3))
+        let rewardToClaimForUser2Cycle3 = await dbxERC20.balanceOf(user2.address);
+        expect(expectedValueUser2Cycle3).to.equal(rewardToClaimForUser2Cycle3);
 
+        let balanceBeforeClaimRewardUser3Cycle3 = await dbxERC20.balanceOf(user3.address);
         await user3Reward.claimRewards();
-        let rewardToClaimForUser3Cycle3 = ethers.utils.formatEther(await dbxERC20.balanceOf(user2.address));
-        expect(rewardToClaimForUser3Cycle3).to.equal('89.829432173490589459');
+        let expectedValueUser3Cycle3 = BigNumber.from("29886324078870367880").add(BigNumber.from(balanceBeforeClaimRewardUser3Cycle3))
+        let rewardToClaimForUser3Cycle3 = await dbxERC20.balanceOf(user3.address);
+        expect(expectedValueUser3Cycle3).to.equal(rewardToClaimForUser3Cycle3);
 
     });
 
@@ -356,18 +372,18 @@ describe("Test DBX tokens distributions", async function() {
                                                                         USER3 A(F1-30%) => A claimable rewards = 23.2890... DBX`, async() => {
         await user1Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], feeReceiver.address, 2000, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
-
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
         await user1Reward.claimRewards()
-        let rewardToClaimUser1Cycle1 = ethers.utils.formatEther(await dbxERC20.balanceOf(user1.address));
-        expect(rewardToClaimUser1Cycle1).to.equal('40.0')
-
+        let expectedValueUser1 = BigNumber.from("40000000000000000000");
+        let rewardToClaimUser1Cycle1 = await dbxERC20.balanceOf(user1.address);
+        expect(expectedValueUser1).to.equal(rewardToClaimUser1Cycle1)
 
         await user2Reward.claimRewards()
-        let rewardToClaimUser2Cycle1 = ethers.utils.formatEther(await dbxERC20.balanceOf(user2.address));
-        expect(rewardToClaimUser2Cycle1).to.equal('50.0')
+        let expectedValueUser2 = BigNumber.from("50000000000000000000");
+        let rewardToClaimUser2Cycle1 = await dbxERC20.balanceOf(user2.address);
+        expect(expectedValueUser2).to.equal(rewardToClaimUser2Cycle1)
 
         await user1Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], feeReceiver.address, 2000, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
@@ -376,33 +392,35 @@ describe("Test DBX tokens distributions", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine");
 
-        let rewardToDistributeCycle3 = ethers.utils.formatEther(await userReward.calculateCycleReward());
-        console.log("Reward for cycle 2 " + rewardToDistributeCycle3);
+        // Only for check
+        //let rewardToDistributeCycle3 = ethers.utils.formatEther(await userReward.calculateCycleReward());
+        //console.log("Reward for cycle 2 " + rewardToDistributeCycle3);
 
+        let balanceBeforeClaimRewardUser1Cycle2 = await dbxERC20.balanceOf(user1.address);
         await user1Reward.claimRewards()
-        let rewardToClaimUser1Cycle2 = ethers.utils.formatEther(await dbxERC20.balanceOf(user1.address));
-        expect(rewardToClaimUser1Cycle2).to.equal('66.616096084106863626')
+        let expectedValueUser1Cycle2 = BigNumber.from("26616096084106863626").add(BigNumber.from(balanceBeforeClaimRewardUser1Cycle2))
+        let rewardToClaimUser1Cycle2 = await dbxERC20.balanceOf(user1.address);
+        expect(expectedValueUser1Cycle2).to.equal(rewardToClaimUser1Cycle2);
 
-
+        let balanceBeforeClaimRewardUser2Cycle2 = await dbxERC20.balanceOf(user2.address);
         await user2Reward.claimRewards()
-        let rewardToClaimUser2Cycle2 = ethers.utils.formatEther(await dbxERC20.balanceOf(user2.address));
-        expect(rewardToClaimUser2Cycle2).to.equal('83.270120105133579532')
-
+        let expectedValueUser2Cycle2 = BigNumber.from("33270120105133579532").add(BigNumber.from(balanceBeforeClaimRewardUser2Cycle2))
+        let rewardToClaimUser2Cycle2 = await dbxERC20.balanceOf(user2.address);
+        expect(expectedValueUser2Cycle2).to.equal(rewardToClaimUser2Cycle2)
 
         await user3Reward.claimRewards()
-        let rewardToClaimUser3Cycle2 = ethers.utils.formatEther(await dbxERC20.balanceOf(user3.address));
-        expect(rewardToClaimUser3Cycle2).to.equal('23.289084073593505673')
+        let expectedValueUser3Cycle2 = BigNumber.from("23289084073593505673");
+        let rewardToClaimUser3Cycle2 = await dbxERC20.balanceOf(user3.address);
+        expect(expectedValueUser3Cycle2).to.equal(rewardToClaimUser3Cycle2)
     });
 
     //Claim fees without staking tokens
 
     it(`A single cycle, 2 ether gathered as fees should be fully distributed back to users/frontends`, async() => {
-
         await user1Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"],
             feeReceiver.address, 1000, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"],
             feeReceiver.address, 1000, { value: ethers.utils.parseEther("1") })
-
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
@@ -445,7 +463,6 @@ describe("Test DBX tokens distributions", async function() {
             feeReceiver.address, 1000, { value: ethers.utils.parseEther("1") })
         await user3Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"],
             feeReceiver.address, 1000, { value: ethers.utils.parseEther("1") })
-
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
@@ -459,11 +476,10 @@ describe("Test DBX tokens distributions", async function() {
         for (let entry of feesClaimed2) {
             totalFeesClaimedCycle2 = totalFeesClaimedCycle2.add(entry.args.fees)
         }
-        expect(totalFeesClaimedCycle2).to.equal(BigNumber.from("4999999999999999908"))
+        expect(totalFeesClaimedCycle2).to.equal(BigNumber.from("4999999999999999996"))
     });
 
     it(`Three cycle, 11 ether gathered as fees should be fully distributed back to users/frontends`, async() => {
-
         await user1Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"],
             feeReceiver.address, 1000, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"],
@@ -472,7 +488,6 @@ describe("Test DBX tokens distributions", async function() {
             feeReceiver.address, 1000, { value: ethers.utils.parseEther("1") })
         await user3Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"],
             feeReceiver.address, 1000, { value: ethers.utils.parseEther("1") })
-
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
@@ -498,7 +513,6 @@ describe("Test DBX tokens distributions", async function() {
             feeReceiver.address, 1000, { value: ethers.utils.parseEther("1") })
         await user3Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"],
             feeReceiver.address, 1000, { value: ethers.utils.parseEther("1") })
-
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
@@ -518,7 +532,6 @@ describe("Test DBX tokens distributions", async function() {
             feeReceiver.address, 1000, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"],
             feeReceiver.address, 1000, { value: ethers.utils.parseEther("1") })
-
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
@@ -532,5 +545,112 @@ describe("Test DBX tokens distributions", async function() {
             totalFeesClaimedCycle3 = totalFeesClaimedCycle3.add(entry.args.fees)
         }
         expect(totalFeesClaimedCycle3).to.equal(BigNumber.from("10609715468751757410"))
+    });
+
+    it("11 ether gathered as fees should be fully distributed back to users and stake check stake and unstake action", async() => {
+        await user1Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+
+        await user3Reward.claimRewards()
+        await dbxERC20.connect(user3).approve(user1Reward.address, await dbxERC20.balanceOf(user3.address))
+        await user3Reward.stakeDBX(await dbxERC20.balanceOf(user3.address))
+
+        await user1Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await user1Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+
+
+        await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward.claimRewards()
+        await user3Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+
+        //Check reward distribution in cycle 3
+        await user3Reward.claimRewards()
+        let expectedValueUser3 = BigNumber.from("49810540131450613133");
+        let actualBalanceUser3 = await dbxERC20.balanceOf(user3.address);
+        expect(expectedValueUser3).to.equal(actualBalanceUser3)
+
+        await user3Reward.unstake(await user3Reward.getUserWithdrawableStake(user3.address))
+        let expectedValueUser3ForUnstakeValue = BigNumber.from("50000000000000000000");
+        let actualBalanceUser3AfterUnstake = await dbxERC20.balanceOf(user3.address);
+        //50 DBX tokens was staed + balance before unstake action
+        let excepetedValue = expectedValueUser3ForUnstakeValue.add(BigNumber.from(actualBalanceUser3))
+        expect(excepetedValue).to.equal(actualBalanceUser3AfterUnstake)
+
+        await user1Reward.claimFees()
+        await user2Reward.claimFees()
+        await user3Reward.claimFees()
+        const feesClaimed = await user1Reward.queryFilter("FeesClaimed")
+        let totalFeesClaimed = BigNumber.from("0")
+        for (let entry of feesClaimed) {
+            totalFeesClaimed = totalFeesClaimed.add(entry.args.fees)
+        }
+        expect(totalFeesClaimed).to.equal(BigNumber.from("10999999999999999695"))
+
+    });
+
+    it("Stake/Unstake and fronted fees", async() => {
+        await user1Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], feeReceiver.address, 2000, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], feeReceiver.address, 2000, { value: ethers.utils.parseEther("1") })
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+
+        await user2Reward.claimRewards()
+        await dbxERC20.connect(user2).approve(user1Reward.address, await dbxERC20.balanceOf(user2.address))
+        await user2Reward.stakeDBX(await dbxERC20.balanceOf(user2.address))
+
+        await user1Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], feeReceiver.address, 2000, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], feeReceiver.address, 2000, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], feeReceiver.address, 2000, { value: ethers.utils.parseEther("1") })
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+
+        //Cycle 2: user3 reward = 26616096084106863626
+
+        await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+
+        //Cycle 3: user3 reward =  49810540131450613133
+        //Check reward distribution in cycle 3
+
+        await user3Reward.claimRewards()
+        let expectedValueUser3 = BigNumber.from("76426636215557476759");
+        let actualBalanceUser3 = await dbxERC20.balanceOf(user3.address);
+        expect(expectedValueUser3).to.equal(actualBalanceUser3)
+
+        await user2Reward.claimRewards()
+        let actualBalanceUser2AfterUnstake22 = await dbxERC20.balanceOf(user2.address);
+        await user2Reward.unstake(await user2Reward.getUserWithdrawableStake(user2.address))
+        let actualBalanceUser2AfterUnstake = await dbxERC20.balanceOf(user2.address);
+        //50 DBX tokens was staed + balance before unstake action
+        let cycle2AndCycle3Value = BigNumber.from("26616096084106863626").add(BigNumber.from("49810540131450613133"))
+            //fee frontent 20 in first cycle, two messages send => user1 have 40 DBX and user2 40 DBX
+        let excepetedValue = cycle2AndCycle3Value.add(BigNumber.from("40000000000000000000"))
+        expect(excepetedValue).to.equal(actualBalanceUser2AfterUnstake)
+
+        await user1Reward.claimFees()
+        await user2Reward.claimFees()
+        await user3Reward.claimFees()
+        const feesClaimed = await user1Reward.queryFilter("FeesClaimed")
+        let totalFeesClaimed = BigNumber.from("0")
+        for (let entry of feesClaimed) {
+            totalFeesClaimed = totalFeesClaimed.add(entry.args.fees)
+        }
+        expect(totalFeesClaimed).to.equal(BigNumber.from("5582902322407938031"))
+
     });
 });
