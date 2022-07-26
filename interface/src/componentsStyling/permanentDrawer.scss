@@ -100,6 +100,7 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
                         justify-content: space-between;
                         width: 100%;
                         .list-item {
+
                             .icon {
                                 justify-content: flex-start;
                                 width: 100%;
@@ -124,6 +125,8 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
             header {
                 justify-content: space-between;
                 .main-menu--right {
+                    position: absolute;
+                    right: 0;
                     display: flex;
                     padding: 5px 10px;
                     & > * {
@@ -140,6 +143,22 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
                 }
             }
             .side-menu {
+                .gap {
+                    margin-top: 118px;
+                }
+                .plus-full-circle {
+                    top: 887px;
+                    left: 125px;
+                    width: 200px;
+                    height: 16px;
+                    bottom: 0;
+                    margin-top: 180px;
+                }
+                .add-new {
+                    display: inline;
+                    color: #809BCE;
+                    padding-left: 10px;
+                }
                 .MuiDrawer-paperAnchorLeft {
                     min-width: 300px;
                     margin: 75px;
@@ -196,6 +215,15 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
                             font-weight: 800;
                         }
                     }
+                    .inbox-icon-color1 {
+                        color: #285943;
+                    }
+                    .inbox-icon-color2 {
+                        color: #91C499;
+                    }
+                    .sent-icon-color {
+                        color: #809BCE;
+                    }
                     .icon {
                         img {
                             max-width: 25px;
@@ -210,8 +238,9 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
                     }
                     ul.menu-list {
                         box-shadow: 4px 0px 11px #1A152036;
+                        padding-top: 0;
                         .list-item {
-                            padding: 15px 10px 15px 35px;
+                            padding:  15px 10px 15px 35px;
                             &:nth-child(2) {
                                 color: #91C499;
                                 .icon {

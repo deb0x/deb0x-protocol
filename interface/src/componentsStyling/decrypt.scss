@@ -10,6 +10,7 @@
             overflow-x: hidden;
             padding-right: 15px;
             li.messages-list-item {
+                height: 126px;
                 margin: 10px 5px;
                 border: none;
                 border-radius: 25px;
@@ -19,24 +20,69 @@
                 div.list-item-button {
                     padding-right: 15px;
                     width: 100%;
+                    height: 125px;
                     overflow: hidden;
                     background-color: t('bg');
                     border-radius: 25px;
                     box-shadow: t('box-shadow');
+                    
                     .message-heading {
                         display: flex;
                         justify-content: space-between;
                         align-items: center;
+                        text-align: left;
+                        font: normal normal bold 20px/23px Karla;
+                        letter-spacing: 0px;
+                        
+                        color: #285943;
+                        opacity: 0.85;
                         .time-stamp {
+                            top: 321px;
+                            left: 886px;
+                            width: 120px;
+                            height: 23px;
+                            text-align: left;
                             font-size: 10px;
+                            font: italic normal bold 20px/23px Karla;
+                            letter-spacing: 0px;
+                            color: #285943;
+                            opacity: 0.85;
+                        }
+                        .date-for-open-message {
+                            top: 289px;
+                            left: 1076px;
+                            width: 80px;
+                            height: 19px;
+                            text-align: left;
+                            font: normal normal normal 16px/19px Karla;
+                            letter-spacing: 0px;
+                            color: #F2E9DC;
+                            opacity: 0.85;
                         }
                     }
                     .message {
                         font-size: 14px;
+                        top: 359px;
+                        left: 570px;
+                        width: 360px;
+                        height: 51px;
+                        text-align: left;
+                        font: normal normal medium 26px/31px Karla;
+                        letter-spacing: 0px;
+                        opacity: 1;
                     }
                     .message-overflow {
+                        margin-top:5px;
                         overflow: hidden;
                         text-overflow: ellipsis;
+                        text-align: left;
+                        font: normal normal bold 20px/23px Karla;
+                        letter-spacing: 0px;
+                        color: #285943;
+                        opacity: 1;
+                    }
+                    .for-date {
+                        margin-left: 15px;
                     }
                     p {
                         margin-bottom: 5px;
@@ -80,6 +126,81 @@
             position: absolute;
         }
         
+        .message-right-box {
+            
+            width: 66%;
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 100%;
+            .message-heading {
+                background-color: t('logo-bg');
+                padding: 10px 15px;
+            }
+            .message {
+                padding: 10px 15px;
+                background-color: t('logo-bg');
+            }
+            .address {
+                display: flex;
+                top: 261px;
+                left: 1071px;
+                width: 157px;
+                height: 19px;
+                button {
+                    padding: 5px 5px 0;
+                }
+                p {
+                    margin-bottom: 0 !important;
+                }
+            }
+        }
+
+        .clouds {
+            margin-top: 20px;
+        }
+
+        .cloudOne {
+            top: 319px;
+            left: 576px;
+            width: 131px;
+            height: 94px;
+            margin-bottom: -30px;
+            margin-left: 113px;
+        }
+
+        .cloudTwo {
+            top: 392px;
+            left: 724px;
+            width: 93px;
+            height: 67px;
+            margin-left: 262px;
+            margin-bottom: 3px;
+        }
+
+        .cloudThree {
+            top: 457px;
+            left: 626px;
+            width: 63px;
+            height: 45px;
+            margin-bottom: -20px;
+            margin-left: 163px;
+        }
+
+        .cloudText {
+            top: 556px;
+            left: 529px;
+            width: 354px;
+            height: 71px;
+            margin-top: 70px;
+            margin-left: 50px;
+            text-align: center;
+            font: normal normal normal 20px/23px Karla;
+            letter-spacing: 0px;
+            color: #78C3FB;
+            opacity: 1;
+        }
+
         .row.messages-list .message-right {
             width: 66%;
             position: absolute;

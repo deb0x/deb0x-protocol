@@ -24,7 +24,7 @@ export function Sent(props: any): any {
     const { account, library } = useWeb3React()
     const [loading, setLoading] = useState(true)
     const [encryptionKeyInitialized, setEncryptionKeyInitialized] = useState<boolean|undefined>(undefined)
-
+    const [messageSent, setmessageSent] = useState(false);
 
     useEffect(() => {
         console.log("useEffect")
@@ -39,7 +39,11 @@ export function Sent(props: any): any {
         setEncryptionKeyInitialized(initialized)
     }
 
-    
+    const checkIfMessageWasSent = () => {
+        if (encryptionKeyInitialized == true) {
+            setmessageSent(true);
+        }
+    }
 
     async function decrypt(encryptedMessage: any) {
         try {
@@ -109,61 +113,58 @@ export function Sent(props: any): any {
             setIsDecrypted(false);
         }
 
+        function generateRandomNumber() {
+            const min = 1;
+            const max = 50;
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
 
-    
-        return (
-            <ListItem sx ={{border:1, marginBottom:1}} disablePadding key={props.index}    secondaryAction={ 
-                <IconButton className={`${(message != props.message.fetchedMessage.data) ? "list-item-btn" : ""}`}  
-                        onClick={()=>{hideMessage()}}  edge="end" aria-label="comments">
-                    { (message != props.message.fetchedMessage.data) ? <VisibilityOffIcon  />: null}
-                </IconButton>  
-            }
-                className="messages-list-item"
-            >
-                <Tooltip 
-                    title={(message === props.message.fetchedMessage.data) ? 
-                    "Click to decrypt" : `Sender:${props.message.sender}`} 
-                    placement="right">
-                    <ListItemButton className="list-item-button"
-                        onClick={() => {
-                            if(message === props.message.fetchedMessage.data) {
-                                decryptMessage()
-                            }
-                        }}>
-                        <div>
-
-                        </div>
-                        <ListItemText
-                        primary={
-                        <>
-                            <div className="message-left">
-                                <div className="message-heading">
-                                    <p><small>To: </small></p>
-                                        <Stack direction="row" spacing={1}>
-                                            {
-                                                recipients.map((recipient: any) => {
-                                                    console.log(recipients)
-                                                    return (
-                                                        <Chip
-                                                            key={recipient}
-                                                            color="primary"
-                                                            label={recipient}
-                                                            variant="outlined"
-                                                        />
-                                                    )
-                                                })
-                                            }
-                                        </Stack>
-                                    <p><small>{messageTime}</small></p>
-                                </div>
-                                <p className={`message 
-                                        ${message === props.message.fetchedMessage.data ? 
-                                        "message-overflow" : ""}` }
-                                    dangerouslySetInnerHTML={{ __html: message }}>
-                                </p>
+        checkIfMessageWasSent();
+        if ( !messageSent ) {
+            return (
+                <div className='clouds'>
+                    <div className="cloudOne">
+                        <img src={require(`../../photos/icons/clouds/cloud-2.svg`).default} alt="cloud-1" />
+                    </div>
+                    <div className="cloudTwo">
+                        <img src={require(`../../photos/icons/clouds/cloud-1.svg`).default} alt="cloud-2" />
+                    </div>
+                    <div className="cloudThree">
+                        <img src={require(`../../photos/icons/clouds/cloud-3.svg`).default} alt="cloud-3" />
+                    </div>
+                    <div className="cloudText">
+                        Cloudy with a chance of messages
+                    </div>
+                </div>
+            )
+        }
+        else {
+            return (
+                <ListItem sx ={{border:1, marginBottom:1}} disablePadding key={props.index}    secondaryAction={ 
+                    <IconButton className={`${(message != props.message.fetchedMessage.data) ? "list-item-btn" : ""}`}  
+                            onClick={()=>{hideMessage()}}  edge="end" aria-label="comments">
+                        { (message != props.message.fetchedMessage.data) ? <VisibilityOffIcon  />: null}
+                    </IconButton>  
+                }
+                    className="messages-list-item"
+                >
+                    <Tooltip 
+                        title={(message === props.message.fetchedMessage.data) ? 
+                        "Click to decrypt" : `Sender:${props.message.sender}`} 
+                        placement="right">
+                        <ListItemButton className="list-item-button"
+                            onClick={() => {
+                                if(message === props.message.fetchedMessage.data) {
+                                    decryptMessage()
+                                }
+                            }}>
+                            <div>
+                            <img width="58px" height="58px" src={require(`../../photos/icons/avatars/animal-${generateRandomNumber()}.svg`).default} alt="avatar"/>
                             </div>
-                            {isDecrypted ? 
-                                <div className="message-right">
+                            <ListItemText
+                            primary={
+                            <>
+                                <div className="message-left">
                                     <div className="message-heading">
                                         <p><small>To: </small></p>
                                             <Stack direction="row" spacing={1}>
@@ -183,18 +184,46 @@ export function Sent(props: any): any {
                                             </Stack>
                                         <p><small>{messageTime}</small></p>
                                     </div>
-                                    <p className={`message ${message === props.message.fetchedMessage.data ? "message-overflow" : ""}` }
+                                    <p className={`message 
+                                            ${message === props.message.fetchedMessage.data ? 
+                                            "message-overflow" : ""}` }
                                         dangerouslySetInnerHTML={{ __html: message }}>
                                     </p>
-                                </div> : <></>}
-                        </>
-                        
-                        }/>
-                         
-                    </ListItemButton>
-                </Tooltip>
-            </ListItem>
-            )
+                                </div>
+                                {isDecrypted ? 
+                                    <div className="message-right">
+                                        <div className="message-heading">
+                                            <p><small>To: </small></p>
+                                                <Stack direction="row" spacing={1}>
+                                                    {
+                                                        recipients.map((recipient: any) => {
+                                                            console.log(recipients)
+                                                            return (
+                                                                <Chip
+                                                                    key={recipient}
+                                                                    color="primary"
+                                                                    label={recipient}
+                                                                    variant="outlined"
+                                                                />
+                                                            )
+                                                        })
+                                                    }
+                                                </Stack>
+                                            <p><small>{messageTime}</small></p>
+                                        </div>
+                                        <p className={`message ${message === props.message.fetchedMessage.data ? "message-overflow" : ""}` }
+                                            dangerouslySetInnerHTML={{ __html: message }}>
+                                        </p>
+                                    </div> : <></>}
+                            </>
+                            
+                            }/>
+                             
+                        </ListItemButton>
+                    </Tooltip>
+                </ListItem>
+                )
+        }
     }
 
     function GetMessages() {
@@ -250,9 +279,9 @@ export function Sent(props: any): any {
                             })}
                         </List>
                         <Box className="intro-box sent col-md-8">
-                            <div>
+                            <div className="open-message">
                                 {/* <img src={empty} /> */}
-                                <p>Open a message from the list to see the details.</p>
+                                <p>Come on, don't be shy. Open a message</p>
                             </div>
                         </Box>
                     </div>

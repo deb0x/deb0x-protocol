@@ -157,7 +157,7 @@ function App() {
                 <div className="app-container p-0">
                     <div className="initial-page">
                         <div className="row">
-                            <div className="col-md-7 img-container">
+                            <div className="col-md-7 img-container mr-4">
                                 <img className="image--left" src={elephant} />
                                 <div className="img-content">
                                     <p>Hey, you!</p>
