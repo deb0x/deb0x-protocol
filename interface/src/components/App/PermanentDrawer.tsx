@@ -267,9 +267,7 @@ export function PermanentDrawer(props: any): any {
                                         
                                         <ListItemIcon className="icon" >
                                             {index === 0 && <img src={add} />}
-                                            {index === 1 && <InboxIcon className="inbox-icon-color1" />} 
-                                            {// {`${theme === "classic" ? "inbox-icon-color1" : "inbox-icon-color2"}`}/>}
-                                            }
+                                            {index === 1 && <InboxIcon />} 
                                             {index === 2 && <img src={trophy} />}
                                             {index === 3 && <SendIcon className="sent-icon-color"/>}
                                         </ListItemIcon>

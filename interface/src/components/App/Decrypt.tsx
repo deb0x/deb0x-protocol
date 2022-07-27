@@ -133,104 +133,85 @@ export function Decrypt(props: any): any {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        if ( !props.message.sender ) {
-            return (
-                <div className='clouds'>
-                    <div className="cloudOne">
-                        <img src={require(`../../photos/icons/clouds/cloud-2.svg`).default} alt="cloud-1" />
+        return (
+            <ListItem
+                disablePadding 
+                key={props.index}    
+                secondaryAction={ 
+                    <IconButton className={`${
+                            (message !== props.message.fetchedMessage.data) ? 
+                            "list-item-btn" : ""}`
+                        }  
+                        onClick={()=>{hideMessage()}}  
+                        edge="end" 
+                        aria-label="comments">
+                        { (message !== props.message.fetchedMessage.data) ? 
+                            <VisibilityOffIcon className='visibility-icon' /> : null
+                        }
+                    </IconButton>  
+                }
+                className="messages-list-item card">
+                <ListItemButton 
+                    className={`list-item-button ${isDecrypted ? "active" : ""}` }
+                    onClick={() => {
+                        if(message === props.message.fetchedMessage.data) {
+                            decryptMessage()
+                        }
+                    }}>
+                    <div>
+                        <img width="58px" height="58px" src={require(`../../photos/icons/avatars/animal-${generateRandomNumber()}.svg`).default} alt="avatar"/>
                     </div>
-                    <div className="cloudTwo">
-                        <img src={require(`../../photos/icons/clouds/cloud-1.svg`).default} alt="cloud-2" />
-                    </div>
-                    <div className="cloudThree">
-                        <img src={require(`../../photos/icons/clouds/cloud-3.svg`).default} alt="cloud-3" />
-                    </div>
-                    <div className="cloudText">
-                        Cloudy with a chance of messages
-                    </div>
-                </div>
-            )
-        } else {
-            return (
-                <ListItem
-                    disablePadding 
-                    key={props.index}    
-                    secondaryAction={ 
-                        <IconButton className={`${
-                                (message !== props.message.fetchedMessage.data) ? 
-                                "list-item-btn" : ""}`
-                            }  
-                            onClick={()=>{hideMessage()}}  
-                            edge="end" 
-                            aria-label="comments">
-                            { (message !== props.message.fetchedMessage.data) ? 
-                                <VisibilityOffIcon className='visibility-icon' /> : null
-                            }
-                        </IconButton>  
-                    }
-                    className="messages-list-item card">
-                    <ListItemButton 
-                        className={`list-item-button ${isDecrypted ? "active" : ""}` }
-                        onClick={() => {
-                            if(message === props.message.fetchedMessage.data) {
-                                decryptMessage()
-                            }
-                        }}>
-                        <div>
-                            <img width="58px" height="58px" src={require(`../../photos/icons/avatars/animal-${generateRandomNumber()}.svg`).default} alt="avatar"/>
-                        </div>
-                        <ListItemText primary={
-                            <>
-                                <div className="message-left">
-                                    <div className="message-heading">
-                                        <p>From: <strong> 
-                                            {
-                                                checkSenderInLocalStorage(props.message.sender)
-                                            }
-                                        </strong></p>
-                                        <p className="time-stamp">
-                                            {messageTime}
-                                        </p>
-                                    </div>
-                                    <p className="message message-overflow"
-                                        dangerouslySetInnerHTML={{ __html: message }} />
+                    <ListItemText primary={
+                        <>
+                            <div className="message-left">
+                                <div className="message-heading">
+                                    <p>From: <strong> 
+                                        {
+                                            checkSenderInLocalStorage(props.message.sender)
+                                        }
+                                    </strong></p>
+                                    <p className="time-stamp">
+                                        {messageTime}
+                                    </p>
                                 </div>
-                                {isDecrypted ? 
-                                    <div className="message-right-box">
-                                        <div className="message-heading">
-                                            <div className="address">
-                                                <p>From: 
-                                                    <strong>
-                                                        {
-                                                            checkSenderInLocalStorage(props.message.sender)
-                                                        }
-                                                    </strong>
-                                                </p>
-                                                <>
-                                                    <IconButton onClick={() => setShow(true)}>
-                                                        <Add />
-                                                    </IconButton>
-                                                    <ContactsSetter show={show} props={props.message.sender} onClickOutside={() => setShow(false)}/>
-                                                </>
-                                            </div>
-                                            
+                                <p className="message message-overflow"
+                                    dangerouslySetInnerHTML={{ __html: message }} />
+                            </div>
+                            {isDecrypted ? 
+                                <div className="message-right-box">
+                                    <div className="message-heading">
+                                        <div className="address">
+                                            <p>From: 
+                                                <strong>
+                                                    {
+                                                        checkSenderInLocalStorage(props.message.sender)
+                                                    }
+                                                </strong>
+                                            </p>
+                                            <>
+                                                <IconButton onClick={() => setShow(true)}>
+                                                    <Add />
+                                                </IconButton>
+                                                <ContactsSetter show={show} props={props.message.sender} onClickOutside={() => setShow(false)}/>
+                                            </>
                                         </div>
-                                        <p className="date-for-open-message">
-                                            <small className="for-date">
-                                                {messageTime}
-                                            </small>
-                                        </p>
-                                        <p className="message" 
-                                            dangerouslySetInnerHTML={{ __html: message }} />
-                                    </div> : 
-                                    <></> 
-                                }
-                            </> 
-                        }/>
-                    </ListItemButton>
-                </ListItem>
-            )
-        }
+                                        
+                                    </div>
+                                    <p className="date-for-open-message">
+                                        <small className="for-date">
+                                            {messageTime}
+                                        </small>
+                                    </p>
+                                    <p className="message" 
+                                        dangerouslySetInnerHTML={{ __html: message }} />
+                                </div> : 
+                                <></> 
+                            }
+                        </> 
+                    }/>
+                </ListItemButton>
+            </ListItem>
+        )
     }
 
     function GetMessages() {
@@ -282,14 +263,19 @@ export function Decrypt(props: any): any {
         if(!loading) {
             if (fetchedMessages.length === 0) {
                 return (
-                    <div className="message-placeholder">
-                        <MailOutlineIcon />
-                        <Typography variant="h5"
-                            gutterBottom
-                            component="div"
-                            sx={{marginLeft: .8, marginTop: 3}}>
-                            No messages yet.
-                        </Typography>
+                    <div className='clouds'>
+                        <div className="cloudOne">
+                            <img src={require(`../../photos/icons/clouds/cloud-2.svg`).default} alt="cloud-1" />
+                        </div>
+                        <div className="cloudTwo">
+                            <img src={require(`../../photos/icons/clouds/cloud-1.svg`).default} alt="cloud-2" />
+                        </div>
+                        <div className="cloudThree">
+                            <img src={require(`../../photos/icons/clouds/cloud-3.svg`).default} alt="cloud-3" />
+                        </div>
+                        <div className="cloudText">
+                            Cloudy with a chance of messages
+                        </div>
                     </div>
                 )
             } else {

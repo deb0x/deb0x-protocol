@@ -39,12 +39,6 @@ export function Sent(props: any): any {
         setEncryptionKeyInitialized(initialized)
     }
 
-    const checkIfMessageWasSent = () => {
-        if (encryptionKeyInitialized == true) {
-            setmessageSent(true);
-        }
-    }
-
     async function decrypt(encryptedMessage: any) {
         try {
             const decryptedMessage = await library.provider.request({
@@ -119,52 +113,60 @@ export function Sent(props: any): any {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        checkIfMessageWasSent();
-        if ( !messageSent ) {
-            return (
-                <div className='clouds'>
-                    <div className="cloudOne">
-                        <img src={require(`../../photos/icons/clouds/cloud-2.svg`).default} alt="cloud-1" />
-                    </div>
-                    <div className="cloudTwo">
-                        <img src={require(`../../photos/icons/clouds/cloud-1.svg`).default} alt="cloud-2" />
-                    </div>
-                    <div className="cloudThree">
-                        <img src={require(`../../photos/icons/clouds/cloud-3.svg`).default} alt="cloud-3" />
-                    </div>
-                    <div className="cloudText">
-                        Cloudy with a chance of messages
-                    </div>
-                </div>
-            )
-        }
-        else {
-            return (
-                <ListItem sx ={{border:1, marginBottom:1}} disablePadding key={props.index}    secondaryAction={ 
-                    <IconButton className={`${(message != props.message.fetchedMessage.data) ? "list-item-btn" : ""}`}  
-                            onClick={()=>{hideMessage()}}  edge="end" aria-label="comments">
-                        { (message != props.message.fetchedMessage.data) ? <VisibilityOffIcon  />: null}
-                    </IconButton>  
-                }
-                    className="messages-list-item"
-                >
-                    <Tooltip 
-                        title={(message === props.message.fetchedMessage.data) ? 
-                        "Click to decrypt" : `Sender:${props.message.sender}`} 
-                        placement="right">
-                        <ListItemButton className="list-item-button"
-                            onClick={() => {
-                                if(message === props.message.fetchedMessage.data) {
-                                    decryptMessage()
-                                }
-                            }}>
-                            <div>
-                            <img width="58px" height="58px" src={require(`../../photos/icons/avatars/animal-${generateRandomNumber()}.svg`).default} alt="avatar"/>
+        
+        return (
+            <ListItem sx ={{border:1, marginBottom:1}} disablePadding key={props.index}    secondaryAction={ 
+                <IconButton className={`${(message != props.message.fetchedMessage.data) ? "list-item-btn" : ""}`}  
+                        onClick={()=>{hideMessage()}}  edge="end" aria-label="comments">
+                    { (message != props.message.fetchedMessage.data) ? <VisibilityOffIcon  />: null}
+                </IconButton>  
+            }
+                className="messages-list-item"
+            >
+                <Tooltip 
+                    title={(message === props.message.fetchedMessage.data) ? 
+                    "Click to decrypt" : `Sender:${props.message.sender}`} 
+                    placement="right">
+                    <ListItemButton className="list-item-button"
+                        onClick={() => {
+                            if(message === props.message.fetchedMessage.data) {
+                                decryptMessage()
+                            }
+                        }}>
+                        <div>
+                        <img width="58px" height="58px" src={require(`../../photos/icons/avatars/animal-${generateRandomNumber()}.svg`).default} alt="avatar"/>
+                        </div>
+                        <ListItemText
+                        primary={
+                        <>
+                            <div className="message-left">
+                                <div className="message-heading">
+                                    <p><small>To: </small></p>
+                                        <Stack direction="row" spacing={1}>
+                                            {
+                                                recipients.map((recipient: any) => {
+                                                    console.log(recipients)
+                                                    return (
+                                                        <Chip
+                                                            key={recipient}
+                                                            color="primary"
+                                                            label={recipient}
+                                                            variant="outlined"
+                                                        />
+                                                    )
+                                                })
+                                            }
+                                        </Stack>
+                                    <p><small>{messageTime}</small></p>
+                                </div>
+                                <p className={`message 
+                                        ${message === props.message.fetchedMessage.data ? 
+                                        "message-overflow" : ""}` }
+                                    dangerouslySetInnerHTML={{ __html: message }}>
+                                </p>
                             </div>
-                            <ListItemText
-                            primary={
-                            <>
-                                <div className="message-left">
+                            {isDecrypted ? 
+                                <div className="message-right">
                                     <div className="message-heading">
                                         <p><small>To: </small></p>
                                             <Stack direction="row" spacing={1}>
@@ -184,46 +186,18 @@ export function Sent(props: any): any {
                                             </Stack>
                                         <p><small>{messageTime}</small></p>
                                     </div>
-                                    <p className={`message 
-                                            ${message === props.message.fetchedMessage.data ? 
-                                            "message-overflow" : ""}` }
+                                    <p className={`message ${message === props.message.fetchedMessage.data ? "message-overflow" : ""}` }
                                         dangerouslySetInnerHTML={{ __html: message }}>
                                     </p>
-                                </div>
-                                {isDecrypted ? 
-                                    <div className="message-right">
-                                        <div className="message-heading">
-                                            <p><small>To: </small></p>
-                                                <Stack direction="row" spacing={1}>
-                                                    {
-                                                        recipients.map((recipient: any) => {
-                                                            console.log(recipients)
-                                                            return (
-                                                                <Chip
-                                                                    key={recipient}
-                                                                    color="primary"
-                                                                    label={recipient}
-                                                                    variant="outlined"
-                                                                />
-                                                            )
-                                                        })
-                                                    }
-                                                </Stack>
-                                            <p><small>{messageTime}</small></p>
-                                        </div>
-                                        <p className={`message ${message === props.message.fetchedMessage.data ? "message-overflow" : ""}` }
-                                            dangerouslySetInnerHTML={{ __html: message }}>
-                                        </p>
-                                    </div> : <></>}
-                            </>
+                                </div> : <></>}
+                        </>
+                        
+                        }/>
                             
-                            }/>
-                             
-                        </ListItemButton>
-                    </Tooltip>
-                </ListItem>
-                )
-        }
+                    </ListItemButton>
+                </Tooltip>
+            </ListItem>
+            )
     }
 
     function GetMessages() {
@@ -254,15 +228,19 @@ export function Sent(props: any): any {
             if (fetchedMessages.length == 0) {
                 return (
                     <>
-                        <div className="message-placeholder">
-                            <MailOutlineIcon />
-                            <Typography variant="h5"
-                                gutterBottom
-                                component="div"
-                                sx={{marginLeft: .8, marginTop: 3}}
-                            >
-                                No messages yet.
-                            </Typography>
+                        <div className='clouds'>
+                            <div className="cloudOne">
+                                <img src={require(`../../photos/icons/clouds/cloud-2.svg`).default} alt="cloud-1" />
+                            </div>
+                            <div className="cloudTwo">
+                                <img src={require(`../../photos/icons/clouds/cloud-1.svg`).default} alt="cloud-2" />
+                            </div>
+                            <div className="cloudThree">
+                                <img src={require(`../../photos/icons/clouds/cloud-3.svg`).default} alt="cloud-3" />
+                            </div>
+                            <div className="cloudText">
+                                Cloudy with a chance of messages
+                            </div>
                         </div>
                     </>
                 )
