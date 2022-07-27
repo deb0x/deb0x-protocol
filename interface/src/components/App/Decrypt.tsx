@@ -22,8 +22,9 @@ import lock from '../../photos/lock.svg';
 import airplane from '../../photos/airplane.svg';
 import users from '../../photos/users.svg';
 import hand from '../../photos/hand.svg';
+import avatar from '../../photos/icons/avatars/test-avatar-1.svg';
 
-const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61"
+const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61";
 
 export function Decrypt(props: any): any {
     const { account, library } = useWeb3React()
@@ -126,6 +127,12 @@ export function Decrypt(props: any): any {
             return user;
         }
 
+        function generateRandomNumber() {
+            const min = 1;
+            const max = 50;
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
         return (
             <ListItem
                 disablePadding 
@@ -151,24 +158,27 @@ export function Decrypt(props: any): any {
                             decryptMessage()
                         }
                     }}>
+                    <div>
+                        <img width="58px" height="58px" src={require(`../../photos/icons/avatars/animal-${generateRandomNumber()}.svg`).default} alt="avatar"/>
+                    </div>
                     <ListItemText primary={
                         <>
                             <div className="message-left">
                                 <div className="message-heading">
-                                    <p><strong>
+                                    <p>From: <strong> 
                                         {
                                             checkSenderInLocalStorage(props.message.sender)
                                         }
                                     </strong></p>
-                                    <p className="time-stamp"><small>
+                                    <p className="time-stamp">
                                         {messageTime}
-                                    </small></p>
+                                    </p>
                                 </div>
                                 <p className="message message-overflow"
                                     dangerouslySetInnerHTML={{ __html: message }} />
                             </div>
                             {isDecrypted ? 
-                                <div className="message-right">
+                                <div className="message-right-box">
                                     <div className="message-heading">
                                         <div className="address">
                                             <p>From: 
@@ -186,10 +196,12 @@ export function Decrypt(props: any): any {
                                             </>
                                         </div>
                                         
-                                        <p className="time-stamp"><small>
-                                            {messageTime}
-                                        </small></p>
                                     </div>
+                                    <p className="date-for-open-message">
+                                        <small className="for-date">
+                                            {messageTime}
+                                        </small>
+                                    </p>
                                     <p className="message" 
                                         dangerouslySetInnerHTML={{ __html: message }} />
                                 </div> : 
@@ -251,14 +263,19 @@ export function Decrypt(props: any): any {
         if(!loading) {
             if (fetchedMessages.length === 0) {
                 return (
-                    <div className="message-placeholder">
-                        <MailOutlineIcon />
-                        <Typography variant="h5"
-                            gutterBottom
-                            component="div"
-                            sx={{marginLeft: .8, marginTop: 3}}>
-                            No messages yet.
-                        </Typography>
+                    <div className='clouds'>
+                        <div className="cloudOne">
+                            <img src={require(`../../photos/icons/clouds/cloud-2.svg`).default} alt="cloud-1" />
+                        </div>
+                        <div className="cloudTwo">
+                            <img src={require(`../../photos/icons/clouds/cloud-1.svg`).default} alt="cloud-2" />
+                        </div>
+                        <div className="cloudThree">
+                            <img src={require(`../../photos/icons/clouds/cloud-3.svg`).default} alt="cloud-3" />
+                        </div>
+                        <div className="cloudText">
+                            Cloudy with a chance of messages
+                        </div>
                     </div>
                 )
             } else {
@@ -273,7 +290,7 @@ export function Decrypt(props: any): any {
                                 )
                             })}
                         </List>
-                        <Box className="intro-box col-md-8">
+                        <Box className="corner-image col-md-8">
                             <div>
                                 
                             </div>

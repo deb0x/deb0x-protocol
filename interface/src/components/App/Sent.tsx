@@ -24,7 +24,7 @@ export function Sent(props: any): any {
     const { account, library } = useWeb3React()
     const [loading, setLoading] = useState(true)
     const [encryptionKeyInitialized, setEncryptionKeyInitialized] = useState<boolean|undefined>(undefined)
-
+    const [messageSent, setmessageSent] = useState(false);
 
     useEffect(() => {
         console.log("useEffect")
@@ -38,8 +38,6 @@ export function Sent(props: any): any {
         const initialized = (key != '') ? true : false
         setEncryptionKeyInitialized(initialized)
     }
-
-    
 
     async function decrypt(encryptedMessage: any) {
         try {
@@ -109,8 +107,13 @@ export function Sent(props: any): any {
             setIsDecrypted(false);
         }
 
+        function generateRandomNumber() {
+            const min = 1;
+            const max = 50;
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
 
-    
+        
         return (
             <ListItem sx ={{border:1, marginBottom:1}} disablePadding key={props.index}    secondaryAction={ 
                 <IconButton className={`${(message != props.message.fetchedMessage.data) ? "list-item-btn" : ""}`}  
@@ -131,7 +134,7 @@ export function Sent(props: any): any {
                             }
                         }}>
                         <div>
-
+                        <img width="58px" height="58px" src={require(`../../photos/icons/avatars/animal-${generateRandomNumber()}.svg`).default} alt="avatar"/>
                         </div>
                         <ListItemText
                         primary={
@@ -190,7 +193,7 @@ export function Sent(props: any): any {
                         </>
                         
                         }/>
-                         
+                            
                     </ListItemButton>
                 </Tooltip>
             </ListItem>
@@ -225,15 +228,19 @@ export function Sent(props: any): any {
             if (fetchedMessages.length == 0) {
                 return (
                     <>
-                        <div className="message-placeholder">
-                            <MailOutlineIcon />
-                            <Typography variant="h5"
-                                gutterBottom
-                                component="div"
-                                sx={{marginLeft: .8, marginTop: 3}}
-                            >
-                                No messages yet.
-                            </Typography>
+                        <div className='clouds'>
+                            <div className="cloudOne">
+                                <img src={require(`../../photos/icons/clouds/cloud-2.svg`).default} alt="cloud-1" />
+                            </div>
+                            <div className="cloudTwo">
+                                <img src={require(`../../photos/icons/clouds/cloud-1.svg`).default} alt="cloud-2" />
+                            </div>
+                            <div className="cloudThree">
+                                <img src={require(`../../photos/icons/clouds/cloud-3.svg`).default} alt="cloud-3" />
+                            </div>
+                            <div className="cloudText">
+                                Cloudy with a chance of messages
+                            </div>
                         </div>
                     </>
                 )
@@ -250,9 +257,9 @@ export function Sent(props: any): any {
                             })}
                         </List>
                         <Box className="intro-box sent col-md-8">
-                            <div>
+                            <div className="open-message">
                                 {/* <img src={empty} /> */}
-                                <p>Open a message from the list to see the details.</p>
+                                <p>Come on, don't be shy. Open a message</p>
                             </div>
                         </Box>
                     </div>
