@@ -233,98 +233,114 @@ export function Encrypt(): any {
         <>
             <SnackbarNotification state={notificationState} 
                 setNotificationState={setNotificationState} />
-            <div className="form-container container">
-                <Box component="form"
-                    noValidate
-                    autoComplete="off">
-                    <TextField id="standard-basic"
-                        placeholder="Type or paste addresses and press `Enter`..."
-                        value={senderAddress}
-                        onPaste={handlePaste}
-                        onKeyDown={handleKeyDown}
-                        onChange={handleChange} />
-                    <Stack direction="row" spacing={1}>
-                        <Box sx={{ width: '100%', margin: '0 auto' }}
-                            className="address-list">
-                            {
-                                addressList.map((address: any) => {
-                                    return (
-                                        <Chip
+            {/* <div className='big-box-shadow'> */}
+                <div className="form-container container">
+
+                    <Box component="form"
+                        noValidate
+                        autoComplete="off">
+                        <TextField id="standard-basic"
+                            placeholder="To whom?"
+                            value={senderAddress}
+                            onPaste={handlePaste}
+                            onKeyDown={handleKeyDown}
+                            onChange={handleChange} />    
+                        <Stack direction="row" spacing={1}>
+                            <Box sx={{ width: '100%', margin: '0 auto' }}
+                                className="address-list">
+                                {
+                                    addressList.map((address: any) => {
+                                        return (
+                                            <Chip
                                             key={address}
                                             label={address}
                                             onDelete={() => handleDelete(address)}
                                             deleteIcon={<DeleteIcon />}
-                                        />
-                                    )
-                                })
-                            }
-                        </Box>
-                    </Stack>
-                    <Editor
-                        editorState={editorState}
-                        onEditorStateChange={handleEditorChange}
-                        toolbarClassName="toolbar"
-                        wrapperClassName="wrapper"
-                        editorClassName="editor"
-                    />
-                    <div className="editor-overlay"></div>
+                                            />
+                                        )
+                                    })
+                                }
+                            </Box>
+                        </Stack>
+                        <div className='yellow-bar'></div>
+                        <Editor
+                            editorState={editorState}
+                            onEditorStateChange={handleEditorChange}
+                            toolbarClassName="toolbar"
+                            wrapperClassName="wrapper"
+                            editorClassName="editor"
+                            placeholder='Write your message here'
+                        />
+                        <div className="editor-overlay"></div>
 
-                    { messageSessionSentCounter === 0 ?
-                        <Box sx={{ display: "flex", 
-                            alignItems: "end", 
-                            justifyContent: "flex-end", 
-                            flexDirection: "column", 
-                            mr: 1 }}>
-                            {textToEncrypt != '' && senderAddress != '' ?
-                                <Box>
-                                    <Typography>
-                                        <small>
-                                            est. rewards: {estimatedReward} DBX
-                                        </small>
-                                    </Typography>
-                                </Box> : 
-                                null
-                            }
+                        { messageSessionSentCounter === 0 ?
+                            <Box sx={{ display: "flex", 
+                                alignItems: "end", 
+                                justifyContent: "flex-end", 
+                                flexDirection: "column", 
+                                mr: 1 }}>
+                                {textToEncrypt != '' && senderAddress != '' ?
+                                    <Box>
+                                        <Typography>
+                                            <div className='estimated-reward'>
+                                                <small>
+                                                    est. rewards: {estimatedReward} DBX
+                                                </small>   
+                                            </div>
+                                        </Typography>
+                                    </Box> : 
+                                    null
+                                }
 
-                            <LoadingButton className="send-btn" 
-                                loading={loading} endIcon={ loading ? null : <SendIcon />}
-                                loadingPosition="end"
-                                sx={{ marginLeft: 2, marginTop: 1 }}
-                                disabled={textToEncrypt == '' || addressList == []}
-                                onClick={() => 
-                                    encryptText(textToEncrypt, addressList)
-                                } >
-                                { loading ? 'Sending...' : 'Send'}
-                            </LoadingButton>
-                        </Box>
-                        :
-                        <Box sx={{ display: "flex", 
-                            alignItems: "end", 
-                            justifyContent: "flex-end",
-                            flexDirection: "column",
-                            mr: 1 }}>
-                            {textToEncrypt != '' && senderAddress != '' ?
-                                <Box>
-                                    <Typography>
-                                        <small>
-                                            est. rewards: {estimatedReward} DBX
-                                        </small>
-                                    </Typography>
-                                </Box> : 
-                                null
-                            }
+                                <button disabled={textToEncrypt == '' || addressList == []}
+                                        onClick={() => encryptText(textToEncrypt, addressList)}
+                                        className="send-button" type="button"
+                                >
+                                    <img src={require('../../photos/icons/send-1.svg').default} className="send-papper-airplane" alt="send-button"></img>
+                                </button>
 
-                            <LoadingButton className="send-btn" 
-                                loading={loading} variant="contained" 
-                                endIcon={ <SendIcon /> }
-                                sx={{ marginLeft: 2, marginTop: 1 }}
-                                onClick={() => encryptText(textToEncrypt, senderAddress)}>
-                                Send another message
-                            </LoadingButton>
-                        </Box>
-                    }
-                </Box>
-            </div>
+                                {/* <LoadingButton className="send-btn" 
+                                    loading={loading} endIcon={ loading ? null : <SendIcon />}
+                                    loadingPosition="end"
+                                    sx={{ marginLeft: 2, marginTop: 1 }}
+                                    disabled={textToEncrypt == '' || addressList == []}
+                                    onClick={() => 
+                                        encryptText(textToEncrypt, addressList)
+                                    } >
+                                    { loading ? 'Sending...' : 'Send'}
+                                </LoadingButton> */}
+                            </Box>
+                            :
+                            <Box sx={{ display: "flex", 
+                                alignItems: "end", 
+                                justifyContent: "flex-end",
+                                flexDirection: "column",
+                                mr: 1 }}>
+                                {textToEncrypt != '' && senderAddress != '' ?
+                                    <Box>
+                                        <Typography>
+                                            <div className='estimated-reward'>
+                                                <small>
+                                                    est. rewards: {estimatedReward} DBX
+                                                </small>
+                                            </div>
+                                        </Typography>
+                                    </Box> : 
+                                    null
+                                }
+
+                                <LoadingButton className="send-btn" 
+                                    loading={loading} variant="contained" 
+                                    endIcon={ <SendIcon /> }
+                                    sx={{ marginLeft: 2, marginTop: 1 }}
+                                    onClick={() => encryptText(textToEncrypt, senderAddress)}>
+                                    Send another message
+                                </LoadingButton>
+                            </Box>
+                        }
+                    </Box>
+                </div>
+            {/* </div> */}
         </>
     )
 }

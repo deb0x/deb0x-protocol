@@ -178,7 +178,7 @@ export function Decrypt(props: any): any {
                                     dangerouslySetInnerHTML={{ __html: message }} />
                             </div>
                             {isDecrypted ? 
-                                <div className="message-right-box">
+                                <div className="message-right">
                                     <div className="message-heading">
                                         <div className="address">
                                             <p>From: 
