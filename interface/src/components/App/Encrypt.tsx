@@ -238,11 +238,11 @@ export function Encrypt(): any {
                     noValidate
                     autoComplete="off">
                     <TextField id="standard-basic"
-                        placeholder="Type or paste addresses and press `Enter`..."
+                        placeholder="To whom?"
                         value={senderAddress}
                         onPaste={handlePaste}
                         onKeyDown={handleKeyDown}
-                        onChange={handleChange} />
+                        onChange={handleChange} />    
                     <Stack direction="row" spacing={1}>
                         <Box sx={{ width: '100%', margin: '0 auto' }}
                             className="address-list">
@@ -250,22 +250,24 @@ export function Encrypt(): any {
                                 addressList.map((address: any) => {
                                     return (
                                         <Chip
-                                            key={address}
-                                            label={address}
-                                            onDelete={() => handleDelete(address)}
-                                            deleteIcon={<DeleteIcon />}
+                                        key={address}
+                                        label={address}
+                                        onDelete={() => handleDelete(address)}
+                                        deleteIcon={<DeleteIcon />}
                                         />
                                     )
                                 })
                             }
                         </Box>
                     </Stack>
+                    <div className='yellow-bar'></div>
                     <Editor
                         editorState={editorState}
                         onEditorStateChange={handleEditorChange}
                         toolbarClassName="toolbar"
                         wrapperClassName="wrapper"
                         editorClassName="editor"
+                        placeholder='Write your message here'
                     />
                     <div className="editor-overlay"></div>
 
@@ -278,14 +280,15 @@ export function Encrypt(): any {
                             {textToEncrypt != '' && senderAddress != '' ?
                                 <Box>
                                     <Typography>
-                                        <small>
-                                            est. rewards: {estimatedReward} DBX
-                                        </small>
+                                        <div className='estimated-reward'>
+                                            <small>
+                                                est. rewards: {estimatedReward} DBX
+                                            </small>   
+                                        </div>
                                     </Typography>
                                 </Box> : 
                                 null
                             }
-
                             <LoadingButton className="send-btn" 
                                 loading={loading} endIcon={ loading ? null : <SendIcon className="SEND" />}
                                 loadingPosition="end"
@@ -297,7 +300,7 @@ export function Encrypt(): any {
                                 { loading ? 'Sending...' : 'Send'}
                             </LoadingButton>
                         </Box>
-                        :
+                    :
                         <Box sx={{ display: "flex", 
                             alignItems: "end", 
                             justifyContent: "flex-end",
@@ -313,7 +316,6 @@ export function Encrypt(): any {
                                 </Box> : 
                                 null
                             }
-
                             <LoadingButton className="send-btn" 
                                 loading={loading} variant="contained" 
                                 endIcon={ <SendIcon /> }

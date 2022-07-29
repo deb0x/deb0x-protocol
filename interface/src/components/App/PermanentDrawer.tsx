@@ -283,10 +283,6 @@ export function PermanentDrawer(props: any): any {
                                     </List>
                                 </div>
                             }
-                            <div className="plus-full-circle">
-                                <img src={require(`../../photos/icons/plus-circle-fill.svg`).default} alt="plus-circle-fill"></img>
-                                <div className="add-new">Add new</div>
-                            </div>
                             <div className="content">
                                 <a href="https://github.com/deb0x" target="_blank">
                                 <GitHubIcon  />

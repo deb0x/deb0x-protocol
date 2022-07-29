@@ -122,36 +122,6 @@
         .MuiListItemSecondaryAction-root .MuiButtonBase-root > * {
             position: absolute;
         }
-        
-        .message-right-box {
-            
-            width: 66%;
-            position: absolute;
-            top: 0;
-            right: 0;
-            height: 100%;
-            .message-heading {
-                background-color: t('logo-bg');
-                padding: 10px 15px;
-            }
-            .message {
-                padding: 10px 15px;
-                background-color: t('logo-bg');
-            }
-            .address {
-                display: flex;
-                top: 261px;
-                left: 1071px;
-                width: 157px;
-                height: 19px;
-                button {
-                    padding: 5px 5px 0;
-                }
-                p {
-                    margin-bottom: 0 !important;
-                }
-            }
-        }
 
         .clouds {
             margin-top: 20px;
