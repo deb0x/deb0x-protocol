@@ -1,19 +1,5 @@
 @import './theme.scss';
 
-.big-box-shadow {
-    @include themed() {
-        top: 238px;
-        left: 462px;
-        width: 1414px;
-        height: 635px;
-        background: t('box-bg');
-        box-shadow: 4px 0px 11px t('box-shadow');
-        border-radius: 25px 10px 85px 25px;
-        opacity: 1;
-        margin-left: 25px;
-    }
-}
-
 .main-container {
     @include themed() {
         .form-container {
@@ -111,27 +97,26 @@
                 }
                 .send-btn {
                     font-size: 12px;
-                    color: t('text');
-                    background-color: t('bg');
-                    border: 1px solid t('text');
-                    border-radius: 4px;
-                }
-                .send-button {
-                    background-color: #F5B700;
+                    color:  #F5B700;
+                    background-color:  #F5B700;
+                    border: 1px solid  #F5B700;
                     border-radius: 50%;
-                    border: 1px solid #F5B700;
-                    box-shadow: 0px 3px 6px #00000029;
                     width: 88px;
                     height: 88px;
                     position: absolute;
-                    top: 420px;
+                    margin-bottom: 35px;
+                    .MuiLoadingButton-loadingIndicator {
+                        color: black;
+                        .MuiCircularProgress-root {
+                            width: 32px !important;
+                            height: 32px !important;
+                        }
+                    }
+                    
                 }
                 .send-papper-airplane {
-                    color: #19141F 0% 0% no-repeat padding-box;
-                    margin-right: 7px;
+                    margin-right: 17px;
                     height: 47px;
-                    opacity: 1;
-                    filter: grayscale(100%) invert(1);
                 }
                 .MuiLoadingButton-loadingIndicator {
                     color: t('text');

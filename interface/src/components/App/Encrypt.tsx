@@ -18,7 +18,7 @@ import { EditorState, convertToRaw } from 'draft-js';
 import draftToHtml from 'draftjs-to-html';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { Editor } from 'react-draft-wysiwyg';
-import { PropaneSharp } from '@mui/icons-material';
+import airplaneBlack from '../../photos/icons/airplane-black.svg';
 
 const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61";
 const ethUtil = require('ethereumjs-util')
@@ -233,100 +233,105 @@ export function Encrypt(): any {
         <>
             <SnackbarNotification state={notificationState} 
                 setNotificationState={setNotificationState} />
-            <div className="form-container container">
-                <Box component="form"
-                    noValidate
-                    autoComplete="off">
-                    <TextField id="standard-basic"
-                        placeholder="To whom?"
-                        value={senderAddress}
-                        onPaste={handlePaste}
-                        onKeyDown={handleKeyDown}
-                        onChange={handleChange} />    
-                    <Stack direction="row" spacing={1}>
-                        <Box sx={{ width: '100%', margin: '0 auto' }}
-                            className="address-list">
-                            {
-                                addressList.map((address: any) => {
-                                    return (
-                                        <Chip
-                                        key={address}
-                                        label={address}
-                                        onDelete={() => handleDelete(address)}
-                                        deleteIcon={<DeleteIcon />}
-                                        />
-                                    )
-                                })
-                            }
-                        </Box>
-                    </Stack>
-                    <div className='yellow-bar'></div>
-                    <Editor
-                        editorState={editorState}
-                        onEditorStateChange={handleEditorChange}
-                        toolbarClassName="toolbar"
-                        wrapperClassName="wrapper"
-                        editorClassName="editor"
-                        placeholder='Write your message here'
-                    />
-                    <div className="editor-overlay"></div>
+                <div className="form-container container">
+                    <Box component="form"
+                        noValidate
+                        autoComplete="off">
+                        <TextField id="standard-basic"
+                            placeholder="To whom?"
+                            value={senderAddress}
+                            onPaste={handlePaste}
+                            onKeyDown={handleKeyDown}
+                            onChange={handleChange} />    
+                        <Stack direction="row" spacing={1}>
+                            <Box sx={{ width: '100%', margin: '0 auto' }}
+                                className="address-list">
+                                {
+                                    addressList.map((address: any) => {
+                                        return (
+                                            <Chip
+                                            key={address}
+                                            label={address}
+                                            onDelete={() => handleDelete(address)}
+                                            deleteIcon={<DeleteIcon />}
+                                            />
+                                        )
+                                    })
+                                }
+                            </Box>
+                        </Stack>
+                        <div className='yellow-bar'></div>
+                        <Editor
+                            editorState={editorState}
+                            onEditorStateChange={handleEditorChange}
+                            toolbarClassName="toolbar"
+                            wrapperClassName="wrapper"
+                            editorClassName="editor"
+                            placeholder='Write your message here'
+                        />
+                        <div className="editor-overlay"></div>
 
-                    { messageSessionSentCounter === 0 ?
-                        <Box sx={{ display: "flex", 
-                            alignItems: "end", 
-                            justifyContent: "flex-end", 
-                            flexDirection: "column", 
-                            mr: 1 }}>
-                            {textToEncrypt != '' && senderAddress != '' ?
-                                <Box>
-                                    <Typography>
-                                        <div className='estimated-reward'>
-                                            <small>
-                                                est. rewards: {estimatedReward} DBX
-                                            </small>   
-                                        </div>
-                                    </Typography>
-                                </Box> : 
-                                null
-                            }
-                            <LoadingButton className="send-btn" 
-                                loading={loading} endIcon={ loading ? null : <SendIcon className="SEND" />}
-                                loadingPosition="end"
-                                sx={{ marginLeft: 2, marginTop: 1 }}
-                                disabled={textToEncrypt == '' || addressList == []}
-                                onClick={() => 
-                                    encryptText(textToEncrypt, addressList)
-                                } >
-                                { loading ? 'Sending...' : 'Send'}
-                            </LoadingButton>
-                        </Box>
-                    :
-                        <Box sx={{ display: "flex", 
-                            alignItems: "end", 
-                            justifyContent: "flex-end",
-                            flexDirection: "column",
-                            mr: 1 }}>
-                            {textToEncrypt != '' && senderAddress != '' ?
-                                <Box>
-                                    <Typography>
-                                        <small>
-                                            est. rewards: {estimatedReward} DBX
-                                        </small>
-                                    </Typography>
-                                </Box> : 
-                                null
-                            }
-                            <LoadingButton className="send-btn" 
-                                loading={loading} variant="contained" 
-                                endIcon={ <SendIcon /> }
-                                sx={{ marginLeft: 2, marginTop: 1 }}
-                                onClick={() => encryptText(textToEncrypt, senderAddress)}>
-                                Send another message
-                            </LoadingButton>
-                        </Box>
-                    }
-                </Box>
-            </div>
+                        { messageSessionSentCounter === 0 ?
+                            <Box sx={{ display: "flex", 
+                                alignItems: "end", 
+                                justifyContent: "flex-end", 
+                                flexDirection: "column", 
+                                mr: 1 }}>
+                                {textToEncrypt !== '' && senderAddress !== '' ?
+                                    <Box>
+                                        <Typography>
+                                            <div className='estimated-reward'>
+                                                <small>
+                                                    est. rewards: {estimatedReward} DBX
+                                                </small>   
+                                            </div>
+                                        </Typography>
+                                    </Box> : 
+                                    null
+                                }
+
+                                <LoadingButton className="send-btn" 
+                                    loading={loading} endIcon={ loading ? null : <img 
+                                        src={airplaneBlack} className="send-papper-airplane" alt="send-button">
+                                    </img>}
+                                    loadingPosition="end"
+                                    sx={{ marginLeft: 2, marginTop: 1 }}
+                                    disabled={textToEncrypt === '' || addressList === []}
+                                    onClick={() => 
+                                        encryptText(textToEncrypt, addressList)
+                                    } >
+                                </LoadingButton>
+                            </Box>
+                            :
+                            <Box sx={{ display: "flex", 
+                                alignItems: "end", 
+                                justifyContent: "flex-end",
+                                flexDirection: "column",
+                                mr: 1 }}>
+                                {textToEncrypt !== '' && senderAddress !== '' ?
+                                    <Box>
+                                        <Typography>
+                                            <div className='estimated-reward'>
+                                                <small>
+                                                    est. rewards: {estimatedReward} DBX
+                                                </small>
+                                            </div>
+                                        </Typography>
+                                    </Box> : 
+                                    null
+                                }
+
+                                <LoadingButton className="send-btn" 
+                                    loading={loading} variant="contained" 
+                                    endIcon={ <SendIcon /> }
+                                    sx={{ marginLeft: 2, marginTop: 1 }}
+                                    onClick={() => encryptText(textToEncrypt, senderAddress)}>
+                                    Send another message
+                                </LoadingButton>
+                            </Box>
+                        }
+                    </Box>
+                </div>
         </>
     )
 }
