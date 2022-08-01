@@ -18,7 +18,7 @@ import { EditorState, convertToRaw } from 'draft-js';
 import draftToHtml from 'draftjs-to-html';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { Editor } from 'react-draft-wysiwyg';
-import { PropaneSharp } from '@mui/icons-material';
+import airplaneBlack from '../../photos/icons/airplane-black.svg';
 
 const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61";
 const ethUtil = require('ethereumjs-util')
@@ -233,9 +233,7 @@ export function Encrypt(): any {
         <>
             <SnackbarNotification state={notificationState} 
                 setNotificationState={setNotificationState} />
-            {/* <div className='big-box-shadow'> */}
                 <div className="form-container container">
-
                     <Box component="form"
                         noValidate
                         autoComplete="off">
@@ -279,7 +277,7 @@ export function Encrypt(): any {
                                 justifyContent: "flex-end", 
                                 flexDirection: "column", 
                                 mr: 1 }}>
-                                {textToEncrypt != '' && senderAddress != '' ?
+                                {textToEncrypt !== '' && senderAddress !== '' ?
                                     <Box>
                                         <Typography>
                                             <div className='estimated-reward'>
@@ -292,23 +290,17 @@ export function Encrypt(): any {
                                     null
                                 }
 
-                                <button disabled={textToEncrypt == '' || addressList == []}
-                                        onClick={() => encryptText(textToEncrypt, addressList)}
-                                        className="send-button" type="button"
-                                >
-                                    <img src={require('../../photos/icons/send-1.svg').default} className="send-papper-airplane" alt="send-button"></img>
-                                </button>
-
-                                {/* <LoadingButton className="send-btn" 
-                                    loading={loading} endIcon={ loading ? null : <SendIcon />}
+                                <LoadingButton className="send-btn" 
+                                    loading={loading} endIcon={ loading ? null : <img 
+                                        src={airplaneBlack} className="send-papper-airplane" alt="send-button">
+                                    </img>}
                                     loadingPosition="end"
                                     sx={{ marginLeft: 2, marginTop: 1 }}
-                                    disabled={textToEncrypt == '' || addressList == []}
+                                    disabled={textToEncrypt === '' || addressList === []}
                                     onClick={() => 
                                         encryptText(textToEncrypt, addressList)
                                     } >
-                                    { loading ? 'Sending...' : 'Send'}
-                                </LoadingButton> */}
+                                </LoadingButton>
                             </Box>
                             :
                             <Box sx={{ display: "flex", 
@@ -316,7 +308,7 @@ export function Encrypt(): any {
                                 justifyContent: "flex-end",
                                 flexDirection: "column",
                                 mr: 1 }}>
-                                {textToEncrypt != '' && senderAddress != '' ?
+                                {textToEncrypt !== '' && senderAddress !== '' ?
                                     <Box>
                                         <Typography>
                                             <div className='estimated-reward'>
@@ -340,7 +332,6 @@ export function Encrypt(): any {
                         }
                     </Box>
                 </div>
-            {/* </div> */}
         </>
     )
 }
