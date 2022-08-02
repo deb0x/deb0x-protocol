@@ -6,16 +6,14 @@ import {
     ListItemText, ListItemButton, Typography, Box, CircularProgress, Stack
 } from '@mui/material';
 import Stepper from './Stepper'
-import { border } from '@mui/system';
 import IconButton from "@mui/material/IconButton";
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import Pagination from "@mui/material/Pagination";
 import RefreshIcon from '@mui/icons-material/Refresh';
-import Refresh from '@mui/icons-material/Refresh';
-import Button from "@mui/material/Button";
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import '../../componentsStyling/decrypt.scss';
 import empty from '../../photos/empty.png';
+import formatAccountName from '../Common/AccountName';
 
 const axios = require('axios')
 const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61"
@@ -61,7 +59,9 @@ export function Sent(props: any): any {
         const [recipients, setRecipients] = useState<string[]>([]);
         //const [sender, setSender] = useState(props.messsage.sender)
         const [messageTime,setMessageTime] = useState("Mar 17, 18:36")
+        const [ensName,setEnsName] = useState("");
         const [isDecrypted, setIsDecrypted] = useState(false);
+        const savedContacts = JSON.parse(localStorage.getItem('contacts') || 'null'); 
 
         useEffect(()=> {
             checkENS();
@@ -85,7 +85,7 @@ export function Sent(props: any): any {
                     console.log("not null")
                     recipientsTemp = [...recipientsTemp, name];
                 } else {
-                    recipientsTemp = [...recipientsTemp, `${recipient.substring(0, 5)}...${recipient.substring(recipient.length - 4)}`];
+                    recipientsTemp = [...recipientsTemp, recipient];
                 }
             }
             
@@ -114,6 +114,27 @@ export function Sent(props: any): any {
         }
 
         
+        function checkSenderInLocalStorage(recipients: any) {
+            let user = '';
+
+            recipients.map((recipient: any) => {
+                if (ensName !== "") {
+                    user = ensName;
+                } else {
+                    savedContacts.forEach((contact: any) => {
+                        if (recipient === contact.address) {
+                            user = contact.name;
+                        } else {
+                            user = formatAccountName(
+                                recipient
+                            )
+                        }
+                    })
+                }
+            })
+            return user;
+        }
+    
         return (
             <ListItem sx ={{border:1, marginBottom:1}} disablePadding key={props.index}    secondaryAction={ 
                 <IconButton className={`${(message != props.message.fetchedMessage.data) ? "list-item-btn" : ""}`}  
@@ -150,7 +171,7 @@ export function Sent(props: any): any {
                                                         <Chip
                                                             key={recipient}
                                                             color="primary"
-                                                            label={recipient}
+                                                            label={checkSenderInLocalStorage(recipients)}
                                                             variant="outlined"
                                                         />
                                                     )
@@ -171,17 +192,7 @@ export function Sent(props: any): any {
                                         <p><small>To: </small></p>
                                             <Stack direction="row" spacing={1}>
                                                 {
-                                                    recipients.map((recipient: any) => {
-                                                        console.log(recipients)
-                                                        return (
-                                                            <Chip
-                                                                key={recipient}
-                                                                color="primary"
-                                                                label={recipient}
-                                                                variant="outlined"
-                                                            />
-                                                        )
-                                                    })
+                                                    checkSenderInLocalStorage(recipients)
                                                 }
                                             </Stack>
                                         <p><small>{messageTime}</small></p>
@@ -258,7 +269,6 @@ export function Sent(props: any): any {
                         </List>
                         <Box className="intro-box sent col-md-8">
                             <div className="open-message">
-                                {/* <img src={empty} /> */}
                                 <p>Come on, don't be shy. Open a message</p>
                             </div>
                         </Box>

@@ -10,76 +10,73 @@
             overflow-x: hidden;
             padding-right: 15px;
             li.messages-list-item {
-                height: 126px;
+                height: 100px;
                 margin: 10px 5px;
                 border: none;
                 border-radius: 25px;
                 &:last-child {
-                    margin-bottom: 55px;
+                    margin-bottom: 25px;
+                }
+                &.read {
+                    .message-left {
+                        .message-heading {
+                            color: #19141F;
+                            font-weight: 100;
+                        }
+                        .message-overflow {
+                            color: #19141F;
+                            font-weight: 100;
+                            width: 75%;
+                        }
+                        .new-message-icon {
+                            display: none;
+                        }
+                    }
+                }
+                &.unread {
+                    .message-left {
+                        .message-heading {
+                            color: #285943;
+                            font-weight: 800;
+                        }
+                        .message-container {
+                            position: relative;
+                            .message-overflow {
+                                color: #285943;
+                                font-weight: 800;
+                                width: 75%;
+                            }
+                            .new-message-icon {
+                                position: absolute;
+                                color: #285943;
+                                right: 0;
+                                top: 0;
+                            }
+                        }
+                    }
                 }
                 div.list-item-button {
                     padding-right: 15px;
                     width: 100%;
-                    height: 125px;
                     overflow: hidden;
                     background-color: t('bg');
                     border-radius: 25px;
                     box-shadow: t('box-shadow');
-                    
                     .message-heading {
                         display: flex;
                         justify-content: space-between;
                         align-items: center;
                         text-align: left;
-                        font: normal normal bold 20px/23px Karla;
-                        letter-spacing: 0px;
-                        
-                        color: #285943;
-                        opacity: 0.85;
                         .time-stamp {
-                            top: 321px;
-                            left: 886px;
-                            width: 120px;
-                            height: 23px;
-                            text-align: left;
                             font-size: 10px;
-                            font: italic normal bold 20px/23px Karla;
-                            letter-spacing: 0px;
-                            color: #285943;
-                            opacity: 0.85;
+                            font-style: italic;
+                            white-space: nowrap;
                         }
-                        .date-for-open-message {
-                            top: 289px;
-                            left: 1076px;
-                            width: 80px;
-                            height: 19px;
-                            text-align: left;
-                            font: normal normal normal 16px/19px Karla;
-                            letter-spacing: 0px;
-                            color: #F2E9DC;
-                            opacity: 0.85;
-                        }
-                    }
-                    .message {
-                        font-size: 14px;
-                        top: 359px;
-                        left: 570px;
-                        width: 360px;
-                        height: 51px;
-                        text-align: left;
-                        font: normal normal medium 26px/31px Karla;
-                        letter-spacing: 0px;
-                        opacity: 1;
                     }
                     .message-overflow {
-                        margin-top:5px;
                         overflow: hidden;
                         text-overflow: ellipsis;
-                        text-align: left;
-                        font: normal normal bold 20px/23px Karla;
-                        letter-spacing: 0px;
-                        color: #285943;
-                        opacity: 1;
+                        white-space: nowrap;
                     }
                     .for-date {
                         margin-left: 15px;
@@ -235,6 +232,10 @@
     }
     ul.MuiList-root {
         padding-top: 55px;
+    }
+    .message-left {
+        overflow: hidden;
+        margin-left: 3%;
     }
     
 }

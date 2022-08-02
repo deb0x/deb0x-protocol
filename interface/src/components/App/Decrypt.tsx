@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext, createContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Deb0x from "../../ethereum/deb0x"
 import {
@@ -17,12 +17,15 @@ import axios from 'axios';
 import formatAccountName from "../Common/AccountName";
 import "../../componentsStyling/decrypt.scss"
 import { Add } from '@mui/icons-material';
+import { Announcement } from '@mui/icons-material';
 import ContactsSetter from '../ContactsSetter';
 import lock from '../../photos/lock.svg';
 import airplane from '../../photos/airplane.svg';
 import users from '../../photos/users.svg';
 import hand from '../../photos/hand.svg';
 import avatar from '../../photos/icons/avatars/test-avatar-1.svg';
+import ReadedMessagesContext from '../Contexts/ReadedMessagesContext';
+import ReadedMessagesProvider from '../Contexts/ReadedMessagesProvider';
 
 const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61";
 
@@ -71,11 +74,39 @@ export function Decrypt(props: any): any {
         //const [sender, setSender] = useState(props.messsage.sender)
         const [messageTime, setMessageTime] = useState("Mar 17, 18:36")
         const [isDecrypted, setIsDecrypted] = useState(false);
+        const min = 1;
+        const max = 50;
+        const [randomImage, ] = useState<number>(Math.floor(Math.random() * (max - min + 1)) + min);
         let [show, setShow] = useState(false);
+        const [isReaded, setIsReaded] = useState(false);
+        
+        const useMessages = () => useContext(ReadedMessagesContext)
+        const {readed, setReaded} = useMessages()!;
 
         useEffect(()=>{
             checkENS();
         },[])
+
+        const addMessage = () => {
+            let messageList = JSON.parse(localStorage.getItem('messages') || 'null');
+            if(!messageList.includes(message)) {
+                readed.push(message);
+                setReaded([...readed]);
+            }
+        }
+
+        useEffect(() => {
+            localStorage.setItem('messages', JSON.stringify(readed));
+            checkMessageInLocalStorage();
+        })
+
+        const checkMessageInLocalStorage = () => {
+            let messageList = JSON.parse(localStorage.getItem('messages') || 'null');
+            messageList.map((element: any) => {
+                if (element === message)
+                    setIsReaded(true);
+            })
+        }
 
         useEffect(()=>{
             if(props.index !== props.previousIndex && isDecrypted===true){
@@ -94,12 +125,15 @@ export function Decrypt(props: any): any {
 
         async function decryptMessage() {
             const decryptedMessage = await decrypt(message)
+            
             if(decryptedMessage) {
                 setIsDecrypted(false);
                 setMessage(decryptedMessage);
                 setIsDecrypted(true);
                 props.setPreviousIndex(props.index);
             }
+
+            checkMessageInLocalStorage();
         }
 
         async function hideMessage() {
@@ -127,90 +161,91 @@ export function Decrypt(props: any): any {
             return user;
         }
 
-        function generateRandomNumber() {
-            const min = 1;
-            const max = 50;
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
-
         return (
-            <ListItem
-                disablePadding 
-                key={props.index}    
-                secondaryAction={ 
-                    <IconButton className={`${
-                            (message !== props.message.fetchedMessage.data) ? 
-                            "list-item-btn" : ""}`
-                        }  
-                        onClick={()=>{hideMessage()}}  
-                        edge="end" 
-                        aria-label="comments">
-                        { (message !== props.message.fetchedMessage.data) ? 
-                            <VisibilityOffIcon className='visibility-icon' /> : null
-                        }
-                    </IconButton>  
-                }
-                className="messages-list-item card">
-                <ListItemButton 
-                    className={`list-item-button ${isDecrypted ? "active" : ""}` }
-                    onClick={() => {
-                        if(message === props.message.fetchedMessage.data) {
-                            decryptMessage()
-                        }
-                    }}>
-                    <div>
-                        <img width="58px" height="58px" src={require(`../../photos/icons/avatars/animal-${generateRandomNumber()}.svg`).default} alt="avatar"/>
-                    </div>
-                    <ListItemText primary={
-                        <>
-                            <div className="message-left">
-                                <div className="message-heading">
-                                    <p>From: <strong> 
-                                        {
-                                            checkSenderInLocalStorage(props.message.sender)
-                                        }
-                                    </strong></p>
-                                    <p className="time-stamp">
-                                        {messageTime}
-                                    </p>
-                                </div>
-                                <p className="message message-overflow"
-                                    dangerouslySetInnerHTML={{ __html: message }} />
-                            </div>
-                            {isDecrypted ? 
-                                <div className="message-right-box">
-                                    <div className="message-heading">
-                                        <div className="address">
-                                            <p>From: 
-                                                <strong>
-                                                    {
-                                                        checkSenderInLocalStorage(props.message.sender)
-                                                    }
-                                                </strong>
-                                            </p>
-                                            <>
-                                                <IconButton onClick={() => setShow(true)}>
-                                                    <Add />
-                                                </IconButton>
-                                                <ContactsSetter show={show} props={props.message.sender} onClickOutside={() => setShow(false)}/>
-                                            </>
-                                        </div>
-                                        
-                                    </div>
-                                    <p className="date-for-open-message">
-                                        <small className="for-date">
-                                            {messageTime}
-                                        </small>
-                                    </p>
-                                    <p className="message" 
-                                        dangerouslySetInnerHTML={{ __html: message }} />
-                                </div> : 
-                                <></> 
+            <ReadedMessagesProvider>
+                <ListItem
+                    disablePadding 
+                    key={props.index}    
+                    secondaryAction={ 
+                        <IconButton className={`${
+                                (message !== props.message.fetchedMessage.data) ? 
+                                "list-item-btn" : ""}`
+                            }  
+                            onClick={()=>{hideMessage()}}  
+                            edge="end" 
+                            aria-label="comments">
+                            { (message !== props.message.fetchedMessage.data) ? 
+                                <VisibilityOffIcon className='visibility-icon' /> : null
                             }
-                        </> 
-                    }/>
-                </ListItemButton>
-            </ListItem>
+                        </IconButton>  
+                    }
+                    className={`messages-list-item card ${isReaded ? "read" : "unread"}` }>
+                    <ListItemButton 
+                        className={`list-item-button ${isDecrypted ? "active" : ""}` }
+                        onClick={() => {
+                            if(message === props.message.fetchedMessage.data) {
+                                decryptMessage()
+                            }
+                            addMessage();
+
+                        }}>
+                        <div>
+                            <img width="58px" height="58px" src={require(`../../photos/icons/avatars/animal-${randomImage}.svg`).default} alt="avatar"/>
+                        </div>
+                        <ListItemText primary={
+                            <>
+                                <div className="message-left">
+                                    <div className="message-heading">
+                                        <p>From: 
+                                            {
+                                                checkSenderInLocalStorage(props.message.sender)
+                                            }
+                                        </p>
+                                        <p className="time-stamp">
+                                            {messageTime}
+                                        </p>
+                                    </div>
+                                    <div className="message-container">
+                                        <p className="message message-overflow"
+                                            dangerouslySetInnerHTML={{ __html: message }} />
+                                        <Announcement className="new-message-icon" />
+                                    </div>
+                                </div>
+                                {isDecrypted ? 
+                                    <div className="message-right">
+                                        <div className="message-heading">
+                                            <div className="address">
+                                                <p>From: 
+                                                    <strong>
+                                                        {
+                                                            checkSenderInLocalStorage(props.message.sender)
+                                                        }
+                                                    </strong>
+                                                </p>
+                                                <>
+                                                    <IconButton onClick={() => setShow(true)}>
+                                                        <Add />
+                                                    </IconButton>
+                                                    <ContactsSetter show={show} props={props.message.sender} onClickOutside={() => setShow(false)}/>
+                                                </>
+                                            </div>
+                                            
+                                        </div>
+                                        <p className="date-for-open-message">
+                                            <small className="for-date">
+                                                {messageTime}
+                                            </small>
+                                        </p>
+                                        <p className="message" 
+                                            dangerouslySetInnerHTML={{ __html: message }} />
+                                    </div> : 
+                                    <></> 
+                                }
+                            </> 
+                        }/>
+                    </ListItemButton>
+                </ListItem>
+            </ReadedMessagesProvider>
         )
     }
 
