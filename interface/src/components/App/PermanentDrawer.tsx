@@ -116,46 +116,6 @@ export function PermanentDrawer(props: any): any {
         display === index ? setDisplay(undefined) : setDisplay(index);
     }
 
-    useEffect(() => {    
-        window.ethereum ?
-            window.ethereum.request({method: "eth_requestAccounts"}).then(() => {
-                switchNetwork();               
-            }).catch((err: any) => getErrorMessage(err))
-            : getErrorMessage("Please install MetaMask")
-    }, [])
-
-    async function switchNetwork() {
-        try {
-            await window.ethereum.request({
-              method: 'wallet_switchEthereumChain',
-              params: [{ chainId: "0x4"}],
-            }).then(
-                getErrorMessage("You have switched to the right network")
-            );            
-        } catch (switchError) {
-            getErrorMessage("Cannot switch to the network");
-            try {
-                await window.ethereum.request({
-                  method: 'wallet_addEthereumChain',
-                  params: [
-                      {
-                        chainId: '0x4', 
-                        chainName:'Rinkeby Test Network',
-                        rpcUrls:['https://rinkeby.infura.io/v3/'],                   
-                        blockExplorerUrls:['https://rinkeby.etherscan.io'],  
-                        nativeCurrency: { 
-                          symbol:'ETH',   
-                          decimals: 18
-                        }     
-                      }
-                    ]});
-              } catch (err) {
-                console.log(err);
-            }
-        }
-        
-    }
-
     function getErrorMessage(error: string) {
         errorMessage = error;
         return errorMessage;
@@ -163,13 +123,13 @@ export function PermanentDrawer(props: any): any {
 
     return (
         <>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {/* <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 {!!errorMessage && 
                     <p className='alert alert-danger position-fixed' style={{ marginTop: '4rem', marginBottom: '0' }}>
                         {getErrorMessage(errorMessage)}
                     </p>
                 }
-            </div>
+            </div> */}
             <SnackbarNotification state={notificationState} 
                 setNotificationState={setNotificationState} />
             <Box sx={{ display: 'flex' }}>

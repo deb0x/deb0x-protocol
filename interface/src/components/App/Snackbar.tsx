@@ -14,7 +14,6 @@ export default function SnackbarNotification(props: any) {
   const [state, setState] = useState({ severity: props.state.severity, open: props.state.open, message: props.state.message })
 
   useEffect(() => {
-    console.log(props)
     setState({severity: props.state.severity, open: props.state.open, message: props.state.message})
   }, [props])
 

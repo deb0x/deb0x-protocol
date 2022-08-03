@@ -50,18 +50,18 @@ function getErrorMessage(error: Error) {
     let networkName;
 
     injected.supportedChainIds?.forEach(chainId => networkName = (ethers.providers.getNetwork(chainId)).name)
-  if (error instanceof NoEthereumProviderError) {
-    return 'No Ethereum browser extension detected, install MetaMask on desktop or visit from a dApp browser on mobile.'
-  } else if (error instanceof UnsupportedChainIdError) {
-    return `You're connected to an unsupported network. Switch to ${networkName}`
-  } else if (
-    error instanceof UserRejectedRequestErrorInjected
-  ) {
-    return 'Please authorize this website to access your Ethereum account.'
-  } else {
-    console.error(error)
-    return 'An unknown error occurred. Check the console for more details.'
-  }
+    if (error instanceof NoEthereumProviderError) {
+        return 'No Ethereum browser extension detected, install MetaMask on desktop or visit from a dApp browser on mobile.'
+    } else if (error instanceof UnsupportedChainIdError) {
+        return `You're connected to an unsupported network. Switch to ${networkName}`
+    } else if (
+        error instanceof UserRejectedRequestErrorInjected
+    ) {
+        return 'Please authorize this website to access your Ethereum account.'
+    } else {
+        console.error(error)
+        return 'An unknown error occurred. Check the console for more details.'
+    }
 }
 
 function getLibrary(provider: any): ethers.providers.Web3Provider {
@@ -80,54 +80,101 @@ export default function () {
 }
 
 function App() {
-  const context = useWeb3React<ethers.providers.Web3Provider>()
-  const { connector, library, chainId, account, active, error, activate } = context
+    const context = useWeb3React<ethers.providers.Web3Provider>()
+    const { connector, library, chainId, account, active, error, activate } = context
 
-  // handle logic to recognize the connector currently being activated
-  const [activatingConnector, setActivatingConnector] = useState<any>()
-  const [selectedOption, setSelectedOption] = useState('Deb0x')
-  useEffect(() => {
-    if (activatingConnector && activatingConnector === connector) {
-      setActivatingConnector(undefined)
-    }
-  }, [activatingConnector, connector])
-
-  // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
-  const triedEager = useEagerConnect()
-
-  // handle logic to connect in reaction to certain events on the injected ethereum provider, if it exists
-  useInactiveListener(!triedEager || !!activatingConnector)
-
-  function handleChange(newValue: any) {
-    setSelectedOption(newValue)
-  }
-
-  useEffect(() => {
-    localStorage.removeItem('input')
-  }, [])
-
+    // handle logic to recognize the connector currently being activated
+    const [activatingConnector, setActivatingConnector] = useState<any>()
+    const [selectedOption, setSelectedOption] = useState('Deb0x');
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [networkName, setNetworkName] = useState<any>();
+    let errorMsg;
+
+    useEffect(() => {
+        injected.supportedChainIds?.forEach(chainId => 
+            setNetworkName((ethers.providers.getNetwork(chainId).name)));
+        if (activatingConnector && activatingConnector === connector) {
+            setActivatingConnector(undefined)
+        }
+    }, [activatingConnector, connector])
+
+    // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
+    const triedEager = useEagerConnect()
+
+    // handle logic to connect in reaction to certain events on the injected ethereum provider, if it exists
+    useInactiveListener(!triedEager || !!activatingConnector)
+
+    function handleChange(newValue: any) {
+        setSelectedOption(newValue)
+    }
+
+    useEffect(() => {
+        localStorage.removeItem('input')
+    }, [])
+
     function handleClick (event: React.MouseEvent<HTMLElement>) {
         setAnchorEl(anchorEl ? null : event.currentTarget);
     };
 
-  const [username, setUsername] = useState('Default username');
-  return (
+    useEffect(() => {    
+        window.ethereum ?
+            window.ethereum.request({method: "eth_requestAccounts"}).then(() => {
+                switchNetwork();               
+            }).catch((err: any) => displayErrorMsg(err))
+            : displayErrorMsg("Please install MetaMask")
+        }, [])
+
+    async function switchNetwork() {
+        try {
+            await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: "0x4"}],
+            }).then(
+                displayErrorMsg("You have switched to the right network")
+            );            
+        } catch (switchError) {
+            try {
+                await window.ethereum.request({
+                method: 'wallet_addEthereumChain',
+                params: [
+                    {
+                        chainId: '0x4', 
+                        chainName:'Rinkeby Test Network',
+                        rpcUrls:['https://rinkeby.infura.io/v3/'],                   
+                        blockExplorerUrls:['https://rinkeby.etherscan.io'],  
+                        nativeCurrency: { 
+                        symbol:'ETH',   
+                        decimals: 18
+                        }     
+                    }
+                    ]});
+            } catch (err) {
+                displayErrorMsg("Cannot switch to the network");
+            }
+        }
+        
+    }
+
+    function displayErrorMsg(error: string) {
+        errorMsg = error;
+        return errorMsg;
+    }  
+    return (
+
+    <>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        {!!errorMsg &&
+            <p className='alert alert-danger position-fixed' style={{ marginTop: '4rem', marginBottom: '0' }}>
+                {displayErrorMsg(errorMsg)}
+            </p>
+        }
+    </div>
     <ThemeProvider>
         {
             account ? 
             <ContactsProvider>
                 <div className="app-container">
                 <PermanentDrawer onChange={handleChange}/>
-                
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    {!!error && 
-                        <p className='alert alert-danger position-fixed' style={{ marginTop: '4rem', marginBottom: '0' }}>
-                            {getErrorMessage(error)}
-                        </p>
-                    }
-                </div>
-                
                 {
                 account ? 
                 !!(library && account) && (
@@ -186,7 +233,11 @@ function App() {
                                                     <Spinner color={'black'} /> :
                                                     !connected ? 
                                                         "Connect Wallet" :
-                                                        ""
+                                                        <span>
+                                                            {account === undefined ? 
+                                                                `Unsupported Network. Switch to ${networkName}` : 
+                                                                ''}
+                                                        </span>
                                                 }
                                             </Button>
                                         )
@@ -212,6 +263,7 @@ function App() {
             </>
         }
     </ThemeProvider>
+    </>
   )
 }
 

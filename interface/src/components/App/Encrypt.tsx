@@ -287,7 +287,7 @@ export function Encrypt(): any {
                             }
 
                             <LoadingButton className="send-btn" 
-                                loading={loading} endIcon={ loading ? null : <SendIcon />}
+                                loading={loading} endIcon={ loading ? null : <SendIcon className="SEND" />}
                                 loadingPosition="end"
                                 sx={{ marginLeft: 2, marginTop: 1 }}
                                 disabled={textToEncrypt == '' || addressList == []}
