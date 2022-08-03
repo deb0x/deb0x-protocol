@@ -18,8 +18,6 @@ import { injected } from '../../connectors';
 import { Spinner } from './Spinner'
 import { useEagerConnect } from '../../hooks';
 import IconButton from "@mui/material/IconButton";
-import logoDark from "../../photos/logo-dark.svg";
-import logoLight from "../../photos/logo-light.svg";
 import GitHubIcon from '@mui/icons-material/GitHub';
 import Deb0xERC20 from "../../ethereum/deb0xerc20"
 import { ethers } from "ethers";
@@ -30,6 +28,8 @@ import ScreenSize from '../Common/ScreenSize';
 import ContactsContext from '../Contexts/ContactsContext';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import SnackbarNotification from './Snackbar';
+import { Add } from '@mui/icons-material';
+import ContactsSetter from '../ContactsSetter';
 
 const deb0xERC20Address = "0xEde2f177d6Ae8330860B6b37B2F3D767cd2630fe"
 enum ConnectorNames { Injected = 'Injected' };
@@ -64,6 +64,7 @@ export function PermanentDrawer(props: any): any {
     const [notificationState, setNotificationState] = useState({});
     const [networkName, setNetworkName] = useState<any>();
     let errorMessage;
+    let [show, setShow] = useState(false);
 
     if(library){
         checkENS();
@@ -243,7 +244,6 @@ export function PermanentDrawer(props: any): any {
                             { account && 
                                 <div className="contacts">
                                     <List>
-                                        <p>Contacts</p>
                                         {
                                             contacts.map((contact: any, index: any) => (
                                                     <>
@@ -251,7 +251,7 @@ export function PermanentDrawer(props: any): any {
                                                         onClick={() => displayAddress(index)}>
                                                         <ListItemText className="text" primary={contact.name} />
                                                     </ListItem>
-                                                    {display == index ? 
+                                                    {display === index ? 
                                                         <ListItem className="row contact-item" key={index}>
                                                             <ListItemText className="text col-8" primary={contact.address} />
                                                             <div className="col-4 buttons">
@@ -264,7 +264,7 @@ export function PermanentDrawer(props: any): any {
                                                                                 severity: "success"
                                                                             })
                                                                         }}>
-                                                                    <ContentCopyIcon fontSize="small"/>
+                                                                    <ContentCopyIcon className="copy-icon" fontSize="small"/>
                                                                 </IconButton>
                                                                 <IconButton size="small"
                                                                     onClick={() => {
@@ -272,7 +272,7 @@ export function PermanentDrawer(props: any): any {
                                                                         localStorage.setItem("input", JSON.stringify(contact.address))
                                                                         handleChange("Compose", 0)
                                                                     }}>
-                                                                    <SendIcon fontSize="small"/>
+                                                                    <SendIcon className="send-icon" fontSize="small"/>
                                                                 </IconButton>
                                                             </div>
                                                         </ListItem>
@@ -281,6 +281,16 @@ export function PermanentDrawer(props: any): any {
                                             ))
                                         }
                                     </List>
+                                    <>
+                                        <IconButton className='add-new-all' onClick={() => setShow(true)}>
+                                            <Add className="add-button"/>
+                                            <p className='add-new mb-0'>Add new</p>
+                                        </IconButton>
+                                        {show ? 
+                                            <ContactsSetter show={show} onClickOutside={() => setShow(false)}/> : 
+                                            <></>
+                                        }    
+                                    </>
                                 </div>
                             }
                             <div className="content">
