@@ -38,6 +38,12 @@ const connectorsByName: { [connectorName in ConnectorNames]: any } = {
     [ConnectorNames.Injected]: injected
 }
 
+declare global {
+    interface Window {
+        ethereum: any;
+    }
+}
+
 export function PermanentDrawer(props: any): any {
     const context = useWeb3React()
     const { connector, library, chainId, account, activate, deactivate, active, error } = context
@@ -56,6 +62,8 @@ export function PermanentDrawer(props: any): any {
     const useContacts = () => useContext(ContactsContext);
     const { contacts, setContacts } = useContacts()!;
     const [notificationState, setNotificationState] = useState({});
+    const [networkName, setNetworkName] = useState<any>();
+    let errorMessage;
 
     if(library){
         checkENS();
@@ -63,6 +71,8 @@ export function PermanentDrawer(props: any): any {
     }
 
     useEffect(() => {
+        injected.supportedChainIds?.forEach(chainId => 
+            setNetworkName((ethers.providers.getNetwork(chainId).name)));
         if (activatingConnector && activatingConnector === connector) {
             setActivatingConnector(undefined)
         }
@@ -103,15 +113,23 @@ export function PermanentDrawer(props: any): any {
     const [display, setDisplay] = useState();
 
     function displayAddress(index: any) {
-        setNotificationState({});
         display === index ? setDisplay(undefined) : setDisplay(index);
     }
 
-    const event = new CustomEvent('localdatachanged');
-    document.dispatchEvent(event);
+    function getErrorMessage(error: string) {
+        errorMessage = error;
+        return errorMessage;
+    }
 
     return (
         <>
+            {/* <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                {!!errorMessage && 
+                    <p className='alert alert-danger position-fixed' style={{ marginTop: '4rem', marginBottom: '0' }}>
+                        {getErrorMessage(errorMessage)}
+                    </p>
+                }
+            </div> */}
             <SnackbarNotification state={notificationState} 
                 setNotificationState={setNotificationState} />
             <Box sx={{ display: 'flex' }}>
@@ -161,7 +179,7 @@ export function PermanentDrawer(props: any): any {
                                         "Connect Wallet" :
                                         <span>
                                             {account === undefined ? 
-                                                'Unsupported Network' : 
+                                                `Unsupported Network. Switch to ${networkName}` : 
                                                 account ? 
                                                     ensName === "" ? 
                                                         `${formatAccountName(account)}` :
@@ -173,7 +191,7 @@ export function PermanentDrawer(props: any): any {
                             </Button>
                         )
                     }) ()}
-
+                            
                         <ThemeSetter />
                     </Box>
                 </AppBar>
@@ -198,69 +216,76 @@ export function PermanentDrawer(props: any): any {
                     <div className="image-container">
                         <div className="img"></div>
                     </div>
-                    <List className="menu-list">
-                        {menuItems.map((text, index) => (
-                            <>
-                                
-                                <ListItem button key={text} 
-                                    selected={selectedIndex === index} 
-                                    onClick={() => handleChange(text, index)}
-                                    className={`list-item ${index === 0 ? "send-item" : ""}` }>
-                                    <ListItemIcon className="icon" >
-                                        {index === 0 && <img src={add} />}
-                                        {index === 1 && <InboxIcon />}
-                                        {index === 2 && <img src={trophy} />}
-                                        {index === 3 && <SendIcon />}
-                                    </ListItemIcon>
-                                    <ListItemText className="text" primary={text} />
-                                </ListItem>
-                            </>
-                        ))}
-                    </List>
+                    { account  && 
+                        <List className="menu-list">
+                            {menuItems.map((text, index) => (
+                                <>
+                                    <ListItem button key={text} 
+                                        selected={selectedIndex === index} 
+                                        onClick={() => handleChange(text, index)}
+                                        className={`list-item ${index === 0 ? "send-item" : ""}` }>
+                                        
+                                        <ListItemIcon className="icon" >
+                                            {index === 0 && <img src={add} />}
+                                            {index === 1 && <InboxIcon />} 
+                                            {index === 2 && <img src={trophy} />}
+                                            {index === 3 && <SendIcon className="sent-icon-color"/>}
+                                        </ListItemIcon>
+                                        <ListItemText className="text" primary={text} />
+                                    </ListItem>
+                                </>
+                            ))}
+                        </List>
+                    }
                     
                     <div className="side-menu--bottom">
                         <>
-                            <div className="contacts">
-                                <List>
-                                    {
-                                        contacts.map((contact: any, index: any) => (
-                                                <>
-                                                <ListItem button key={contact.name}
-                                                    className="row">
-                                                    <ListItemText className="text col-8" primary={contact.name}
-                                                        onClick={() => displayAddress(index)} />
-                                                    <div className="col-4 buttons">
-                                                        <IconButton size="small"
-                                                            onClick={() => {
-                                                                    navigator.clipboard.writeText(contact.address);
-                                                                    setNotificationState({
-                                                                        message: "Address added to clipboard.",
-                                                                        open: true,
-                                                                        severity: "success"
-                                                                    })
-                                                                }}>
-                                                            <ContentCopyIcon fontSize="small" className="copy-icon"/>
-                                                        </IconButton>
-                                                        <IconButton size="small"
-                                                            onClick={() => {
-                                                                setNotificationState({})
-                                                                localStorage.setItem("input", JSON.stringify(contact.address))
-                                                                handleChange("Compose", 0)
-                                                            }}>
-                                                            <SendIcon fontSize="small" className="send-icon"/>
-                                                        </IconButton>
-                                                    </div>
-
+                            { account && 
+                                <div className="contacts">
+                                    <List>
+                                        <p>Contacts</p>
+                                        {
+                                            contacts.map((contact: any, index: any) => (
+                                                    <>
+                                                    <ListItem button key={contact.name}
+                                                        onClick={() => displayAddress(index)}>
+                                                        <ListItemText className="text" primary={contact.name} />
+                                                    </ListItem>
                                                     {display == index ? 
                                                         <ListItem className="row contact-item" key={index}>
                                                             <ListItemText className="text col-8" primary={contact.address} />
+                                                            <div className="col-4 buttons">
+                                                                <IconButton size="small"
+                                                                    onClick={() => {
+                                                                            navigator.clipboard.writeText(contact.address);
+                                                                            setNotificationState({
+                                                                                message: "Address added to clipboard.",
+                                                                                open: true,
+                                                                                severity: "success"
+                                                                            })
+                                                                        }}>
+                                                                    <ContentCopyIcon fontSize="small"/>
+                                                                </IconButton>
+                                                                <IconButton size="small"
+                                                                    onClick={() => {
+                                                                        setNotificationState({})
+                                                                        localStorage.setItem("input", JSON.stringify(contact.address))
+                                                                        handleChange("Compose", 0)
+                                                                    }}>
+                                                                    <SendIcon fontSize="small"/>
+                                                                </IconButton>
+                                                            </div>
                                                         </ListItem>
                                                         : <></>}
-                                                </ListItem>
-                                                </>
-                                        ))
-                                    }
-                                </List>
+                                                    </>
+                                            ))
+                                        }
+                                    </List>
+                                </div>
+                            }
+                            <div className="plus-full-circle">
+                                <img src={require(`../../photos/icons/plus-circle-fill.svg`).default} alt="plus-circle-fill"></img>
+                                <div className="add-new">Add new</div>
                             </div>
                             <div className="content">
                                 <a href="https://github.com/deb0x" target="_blank">

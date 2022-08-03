@@ -148,9 +148,22 @@
             background: url(../photos/no-message.svg) no-repeat 98% 98%;
             background-size: 40%;
         }
-    }
-    .message-left {
-        max-height: 48px;
-        overflow: hidden;
+        .corner-image {
+            background: url(../photos/icons/corner.svg) no-repeat 98% 98%;
+            background-size: 40%;
+        }
+        .open-message {
+            margin-top: 280px;
+            margin-left: 630px;
+            top: 687px;
+            left: 1429px;
+            width: 215px;
+            height: 51px;
+            text-align: center;
+            font: normal normal normal 18px/21px Karla;
+            letter-spacing: 0px;
+            color: #809BCE;
+            opacity: 0.8;
+        }
     }
 }

@@ -10,14 +10,50 @@
             overflow-x: hidden;
             padding-right: 15px;
             li.messages-list-item {
+                height: 100px;
                 margin: 10px 5px;
                 border: none;
                 border-radius: 25px;
-                &:first-child {
-                    border-top: 1px solid #ccc;
-                }
                 &:last-child {
-                    margin-bottom: 55px;
+                    margin-bottom: 25px;
+                }
+                &.read {
+                    .message-left {
+                        .message-heading {
+                            color: #19141F;
+                            font-weight: 100;
+                        }
+                        .message-overflow {
+                            color: #19141F;
+                            font-weight: 100;
+                            width: 75%;
+                        }
+                        .new-message-icon {
+                            display: none;
+                        }
+                    }
+                }
+                &.unread {
+                    .message-left {
+                        .message-heading {
+                            color: #285943;
+                            font-weight: 800;
+                        }
+                        .message-container {
+                            position: relative;
+                            .message-overflow {
+                                color: #285943;
+                                font-weight: 800;
+                                width: 75%;
+                            }
+                            .new-message-icon {
+                                position: absolute;
+                                color: #285943;
+                                right: 0;
+                                top: 0;
+                            }
+                        }
+                    }
                 }
                 div.list-item-button {
                     padding-right: 15px;
@@ -30,16 +66,20 @@
                         display: flex;
                         justify-content: space-between;
                         align-items: center;
+                        text-align: left;
                         .time-stamp {
                             font-size: 10px;
+                            font-style: italic;
+                            white-space: nowrap;
                         }
-                    }
-                    .message {
-                        font-size: 14px;
                     }
                     .message-overflow {
                         overflow: hidden;
                         text-overflow: ellipsis;
+                        white-space: nowrap;
+                    }
+                    .for-date {
+                        margin-left: 15px;
                     }
                     p {
                         margin-bottom: 5px;
@@ -83,6 +123,81 @@
             position: absolute;
         }
         
+        .message-right-box {
+            
+            width: 66%;
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 100%;
+            .message-heading {
+                background-color: t('logo-bg');
+                padding: 10px 15px;
+            }
+            .message {
+                padding: 10px 15px;
+                background-color: t('logo-bg');
+            }
+            .address {
+                display: flex;
+                top: 261px;
+                left: 1071px;
+                width: 157px;
+                height: 19px;
+                button {
+                    padding: 5px 5px 0;
+                }
+                p {
+                    margin-bottom: 0 !important;
+                }
+            }
+        }
+
+        .clouds {
+            margin-top: 20px;
+        }
+
+        .cloudOne {
+            top: 319px;
+            left: 576px;
+            width: 131px;
+            height: 94px;
+            margin-bottom: -30px;
+            margin-left: 113px;
+        }
+
+        .cloudTwo {
+            top: 392px;
+            left: 724px;
+            width: 93px;
+            height: 67px;
+            margin-left: 262px;
+            margin-bottom: 3px;
+        }
+
+        .cloudThree {
+            top: 457px;
+            left: 626px;
+            width: 63px;
+            height: 45px;
+            margin-bottom: -20px;
+            margin-left: 163px;
+        }
+
+        .cloudText {
+            top: 556px;
+            left: 529px;
+            width: 354px;
+            height: 71px;
+            margin-top: 70px;
+            margin-left: 50px;
+            text-align: center;
+            font: normal normal normal 20px/23px Karla;
+            letter-spacing: 0px;
+            color: #78C3FB;
+            opacity: 1;
+        }
+
         .row.messages-list .message-right {
             width: 66%;
             position: absolute;
@@ -117,6 +232,10 @@
     }
     ul.MuiList-root {
         padding-top: 55px;
+    }
+    .message-left {
+        overflow: hidden;
+        margin-left: 3%;
     }
     
 }

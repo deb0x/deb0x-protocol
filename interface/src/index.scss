@@ -98,18 +98,18 @@ body * {
                 height: 100%;
                 position: relative;
                 .image--left {
-                    height: 100%;
-                    width: 100%;
-                    height: 520px;
+                    left: 80px;
+                    width: 752px;
+                    height: 652px;
                     position: absolute;
-                    top: 70px;
+                    top: 79px;
                 }
                 .img-content {
                     position: absolute;
                     color: #91C499;
                     font-size: 2rem;
                     font-weight: 800;
-                    top: 100px;
+                    top: 125px;
                     left: 28%;
                     width: 450px;
                     p:first-child {
@@ -135,8 +135,11 @@ body * {
                         border-radius: 33px;
                         box-shadow: none;
                         margin-left: 110px;
-                        margin-top: 20px;
+                        margin-top: 50px;
                         padding: 10px 35px;
+                        width: 235px;
+                        height: 50px;
+                        right: 25px;
                     }
                 }
             }

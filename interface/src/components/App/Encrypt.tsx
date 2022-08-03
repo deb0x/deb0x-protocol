@@ -18,6 +18,7 @@ import { EditorState, convertToRaw } from 'draft-js';
 import draftToHtml from 'draftjs-to-html';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { Editor } from 'react-draft-wysiwyg';
+import { PropaneSharp } from '@mui/icons-material';
 
 const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61";
 const ethUtil = require('ethereumjs-util')
@@ -42,7 +43,6 @@ export function Encrypt(): any {
     const [addressList, setAddressList] = useState<string[]>([])
     const [error, setError] = useState<string | null>(null);
     const [ input, setInput ] = useState(JSON.parse(localStorage.getItem('input') || 'null'));
-    
 
     useEffect(() => {
         if(input !== null && input.match(/^0x[a-fA-F0-9]{40}$/g))
@@ -287,13 +287,14 @@ export function Encrypt(): any {
                             }
 
                             <LoadingButton className="send-btn" 
-                                loading={loading} endIcon={ loading ? null : <SendIcon />}
+                                loading={loading} endIcon={ loading ? null : <SendIcon className="SEND" />}
+                                loadingPosition="end"
                                 sx={{ marginLeft: 2, marginTop: 1 }}
                                 disabled={textToEncrypt == '' || addressList == []}
                                 onClick={() => 
                                     encryptText(textToEncrypt, addressList)
                                 } >
-                                { loading ? null : 'Send'}
+                                { loading ? 'Sending...' : 'Send'}
                             </LoadingButton>
                         </Box>
                         :
@@ -317,7 +318,6 @@ export function Encrypt(): any {
                                 loading={loading} variant="contained" 
                                 endIcon={ <SendIcon /> }
                                 sx={{ marginLeft: 2, marginTop: 1 }}
-                                disabled={textToEncrypt === '' || senderAddress === ''}
                                 onClick={() => encryptText(textToEncrypt, senderAddress)}>
                                 Send another message
                             </LoadingButton>
