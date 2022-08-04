@@ -16,6 +16,9 @@ import Button from "@mui/material/Button";
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import '../../componentsStyling/decrypt.scss';
 import empty from '../../photos/empty.png';
+import cloud1 from '../../photos/icons/clouds/cloud-1.svg';
+import cloud2 from '../../photos/icons/clouds/cloud-2.svg';
+import cloud3 from '../../photos/icons/clouds/cloud-3.svg';
 
 const axios = require('axios')
 const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61"
@@ -225,18 +228,18 @@ export function Sent(props: any): any {
         }
 
         if(!loading) {
-            if (fetchedMessages.length == 0) {
+            if (fetchedMessages.length === 0) {
                 return (
                     <>
                         <div className='clouds'>
                             <div className="cloudOne">
-                                <img src={require(`../../photos/icons/clouds/cloud-2.svg`).default} alt="cloud-1" />
+                                <img src={cloud2} alt="cloud-2" />
                             </div>
                             <div className="cloudTwo">
-                                <img src={require(`../../photos/icons/clouds/cloud-1.svg`).default} alt="cloud-2" />
+                                <img src={cloud1} alt="cloud-1" />
                             </div>
                             <div className="cloudThree">
-                                <img src={require(`../../photos/icons/clouds/cloud-3.svg`).default} alt="cloud-3" />
+                                <img src={cloud3} alt="cloud-3" />
                             </div>
                             <div className="cloudText">
                                 Cloudy with a chance of messages
