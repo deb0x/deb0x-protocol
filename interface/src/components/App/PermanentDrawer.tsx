@@ -294,10 +294,10 @@ export function PermanentDrawer(props: any): any {
                                 </div>
                             }
                             <div className="content">
-                                <a href="https://github.com/deb0x" target="_blank">
+                                <a href="https://github.com/deb0x" target="_blank" className='logo-text-color'>
                                 <GitHubIcon  />
                                 </a>
-                                <a href="https://www.deb0x.org" target="_blank">
+                                <a href="https://www.deb0x.org" target="_blank" className='logo-text-color'>
                                     www.deb0x.org
                                 </a>
                             </div>

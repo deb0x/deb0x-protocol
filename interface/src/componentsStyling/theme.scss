@@ -11,6 +11,8 @@ $text-field-big-box--light: #E6D6D1 0% 0% no-repeat padding-box;
 $text-field-color--dark: #1B1521;
 $text-field-color--light: #a79a97cd;
 $inbox-text-color--dark: #91C499;
+$git-hub-logo--dark: #F2E9DC40;
+$git-hub-logo--light: #C7BAB5;
 
 $themes: (
     classic: (
@@ -22,6 +24,7 @@ $themes: (
         box-bg: $text-field-big-box--light,
         text-field-color: $text-field-color--light,
         inbox-text-color: $text--light,
+        git-hub-logo: $git-hub-logo--light,
     ),
     dark: (
         bg: $bg--dark,
@@ -31,6 +34,7 @@ $themes: (
         box-bg: $text-field-big-box--dark,
         text-field-color: $text-field-color--dark,
         inbox-text-color: $inbox-text-color--dark,
+        git-hub-logo: $git-hub-logo--dark,
     ),
 );
 

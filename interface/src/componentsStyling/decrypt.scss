@@ -67,6 +67,9 @@
                         justify-content: space-between;
                         align-items: center;
                         text-align: left;
+                        letter-spacing: 0px;
+                        color: t('inbox-text-color');
+                        opacity: 0.85;
                         .time-stamp {
                             font-size: 10px;
                             font-style: italic;
@@ -77,6 +80,7 @@
                         overflow: hidden;
                         text-overflow: ellipsis;
                         white-space: nowrap;
+                        color: t('inbox-text-color');
                     }
                     .for-date {
                         margin-left: 15px;
@@ -162,7 +166,6 @@
             margin-top: 70px;
             margin-left: 50px;
             text-align: center;
-            font: normal normal normal 20px/23px Karla;
             letter-spacing: 0px;
             color: #78C3FB;
             opacity: 1;
