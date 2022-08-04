@@ -146,19 +146,10 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
                 .gap {
                     margin-top: 118px;
                 }
-                .plus-full-circle {
-                    top: 887px;
-                    left: 125px;
-                    width: 200px;
-                    height: 16px;
-                    bottom: 0;
-                    margin-top: 180px;
+                .button-position {
+                    margin-top: 2px;
                 }
-                .add-new {
-                    display: inline;
-                    color: #809BCE;
-                    padding-left: 10px;
-                }
+                
                 .MuiDrawer-paperAnchorLeft {
                     min-width: 300px;
                     margin: 75px;
@@ -170,8 +161,7 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
                     background-color: t('bg');
                     position: absolute;
                     .image-container {
-                        height: 148px;
-                        min-height: 148px;
+                        height: 20%;
                         background-color: t('logo-bg');
                         display: flex;
                         justify-content: center;
@@ -231,6 +221,7 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
                         }
                     }
                     ul.menu-list {
+                        height: 33%;
                         box-shadow: 4px 0px 11px #1A152036;
                         padding-top: 0;
                         .list-item {
@@ -260,7 +251,7 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
             }
             .side-menu--bottom {
                 display: flex;
-                height: 100%;
+                height: 47%;
                 align-items: center;
                 justify-content: space-between;
                 flex-direction: column;
@@ -268,8 +259,11 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
                     width: 100%;
                     display: flex;
                     justify-content: center;
-                    border-bottom: 1px solid #ccc;
+                    max-height: 75%;
+                    position: relative;
+                    flex-direction: column;
                     ul {
+                        overflow-y: auto;
                         padding-bottom: 0;
                         padding-top: 0;
                         width: 100%;
@@ -305,13 +299,40 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
                             font-size: 14px;
                         }
                     }
+                    .add-new-all {
+                        display: flex;
+                        padding-left: 16px;
+                        justify-content: flex-start;
+                        border-radius: 0;
+                        svg {
+                            width: 16px;
+                            height: 16px;
+                        }
+                        .add-new {
+                            display: inline;
+                            color: #809BCE;
+                            padding-left: 10px;
+                            font-size: 16px;
+                            font-weight: 100;
+                        }
+                        .add-button {
+                            border-color: #809BCE;
+                            border-radius: 50%;
+                            background-color: #809BCE;
+                            display: flex;
+                            justify-content: flex-end;
+                        }
+                    }
                 }
                 .content {
                     display: flex;
                     padding-bottom: 10px;
                     align-items: center;
                     flex-direction: column;
-                    padding-top: 10px;
+                    padding: 10px 0 10% 0;
+                    .logo-text-color {
+                        color: t(git-hub-logo);
+                    }
                 }
             }
         }
