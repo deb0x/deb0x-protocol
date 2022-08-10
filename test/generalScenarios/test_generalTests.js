@@ -547,7 +547,7 @@ describe("Test DBX tokens distributions", async function() {
         expect(totalFeesClaimedCycle3).to.equal(BigNumber.from("10609715468751757410"))
     });
 
-    it("11 ether gathered as fees should be fully distributed back to users and stake check stake and unstake action", async() => {
+    it("11 ether gathered as fees should be fully distributed back to users and stake, check stake and unstake action", async() => {
         await user1Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
@@ -558,7 +558,7 @@ describe("Test DBX tokens distributions", async function() {
         await hre.ethers.provider.send("evm_mine")
 
         await user3Reward.claimRewards()
-        await dbxERC20.connect(user3).approve(user1Reward.address, await dbxERC20.balanceOf(user3.address))
+        await dbxERC20.connect(user3).approve(userReward.address, await dbxERC20.balanceOf(user3.address))
         await user3Reward.stakeDBX(await dbxERC20.balanceOf(user3.address))
 
         await user1Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
@@ -633,7 +633,6 @@ describe("Test DBX tokens distributions", async function() {
         expect(expectedValueUser3).to.equal(actualBalanceUser3)
 
         await user2Reward.claimRewards()
-        let actualBalanceUser2AfterUnstake22 = await dbxERC20.balanceOf(user2.address);
         await user2Reward.unstake(await user2Reward.getUserWithdrawableStake(user2.address))
         let actualBalanceUser2AfterUnstake = await dbxERC20.balanceOf(user2.address);
         //50 DBX tokens was staed + balance before unstake action
@@ -653,4 +652,164 @@ describe("Test DBX tokens distributions", async function() {
         expect(totalFeesClaimed).to.equal(BigNumber.from("5582902322407938031"))
 
     });
+
+    it("Try claim rewards twice and try claim fees", async() => {
+        await user1Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+
+        await user1Reward.claimRewards()
+        let balanceForAlice = await dbxERC20.balanceOf(user1.address);
+        let expectedValueAlice = BigNumber.from("100000000000000000000");
+        expect(balanceForAlice).to.equal(expectedValueAlice)
+
+        try {
+            await user1Reward.claimRewards()
+        } catch (error) {
+            expect(error.message).to.include("Deb0x: You do not have rewards");
+        }
+
+        try {
+            await user2Reward.claimFees()
+        } catch (error) {
+            expect(error.message).to.include('Deb0x: You do not have accrued fees')
+        }
+    });
+
+    it("Try claim front rewards twice", async() => {
+        await user1Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"],
+            feeReceiver.address, 1000, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"],
+            feeReceiver.address, 1000, { value: ethers.utils.parseEther("1") })
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+
+        await user1Reward.claimFees()
+        await user2Reward.claimFees()
+        await frontend.claimFrontEndRewards();
+
+        let frontBalance = await dbxERC20.balanceOf(feeReceiver.address)
+        let expectedValueFront = BigNumber.from("10000000000000000000");
+        expect(expectedValueFront).to.equal(frontBalance)
+
+        try {
+            await frontend.claimFrontEndRewards();
+        } catch (error) {
+            expect(error.message).to.include("Deb0x: You do not have rewards");
+        }
+    });
+
+    it("Try claim front rewards but we have no accrued fees ", async() => {
+        await user1Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"],
+            feeReceiver.address, 1000, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"],
+            feeReceiver.address, 1000, { value: ethers.utils.parseEther("1") })
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+
+        try {
+            await frontend.claimFrontEndFees();
+        } catch (error) {
+            expect(error.message).to.include("Deb0x: You do not have accrued fees")
+        }
+    });
+
+    it("Try to stake and unstake", async() => {
+        await user1Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+
+        await user3Reward.claimRewards()
+        await dbxERC20.connect(user3).approve(userReward.address, await dbxERC20.balanceOf(user3.address))
+        await user3Reward.stakeDBX(await dbxERC20.balanceOf(user3.address))
+
+        try {
+            await user2Reward.stakeDBX(await userReward.getUserWithdrawableStake(user2.address))
+        } catch (error) {
+            expect(error.message).to.include("Deb0x: your amount is 0");
+        }
+
+        try {
+            await user2Reward.unstake(await userReward.getUserWithdrawableStake(user2.address))
+        } catch (error) {
+            expect(error.message).to.include("Deb0x: your amount is 0");
+        }
+
+        await user1Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await user1Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+
+        await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward.claimRewards()
+        await user3Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+
+        //WithdrawableStake value is in this moment 50 DBX, but we try to unstake 51 DBX
+        try {
+            await user3Reward.unstake(BigNumber.from("51000000000000000000"))
+        } catch (error) {
+            expect(error.message).to.include("'Deb0x: can not unstake more than you've staked'")
+        }
+    });
+
+    it("Multiple stake action and contract balance tests", async() => {
+        let balanceBeforeSendMessages = await userReward.contractBalance();
+        expect(parseInt(ethers.utils.formatEther(balanceBeforeSendMessages))).to.equal(0);
+
+        await user1Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+
+        let balanceAfterSendSixMessages = await userReward.contractBalance();
+        expect(parseInt(ethers.utils.formatEther(balanceAfterSendSixMessages))).to.equal(6);
+
+        await user3Reward.claimRewards()
+        await dbxERC20.connect(user3).approve(userReward.address, await dbxERC20.balanceOf(user3.address))
+        await user3Reward.stakeDBX(await dbxERC20.balanceOf(user3.address))
+
+        await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+        await user3Reward.claimRewards()
+        await dbxERC20.connect(user3).approve(userReward.address, await dbxERC20.balanceOf(user3.address))
+        await user3Reward.stakeDBX(await dbxERC20.balanceOf(user3.address))
+
+        await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+
+        await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+
+        let balanceAfterSendAnotherSixMessages = await userReward.contractBalance();
+        expect(parseInt(ethers.utils.formatEther(balanceAfterSendAnotherSixMessages))).to.equal(12);
+
+        let expectedValue = await user3Reward.getUserWithdrawableStake(user3.address);
+        await user3Reward.unstake(await user3Reward.getUserWithdrawableStake(user3.address))
+        let actualBalanceAfterUnstake = await dbxERC20.balanceOf(user3.address);
+        expect(expectedValue).to.equal(actualBalanceAfterUnstake)
+
+    });
+
 });
