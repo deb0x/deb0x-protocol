@@ -63,7 +63,7 @@ export function Decrypt(props: any): any {
     }
 
     async function fetchMessage(message: any) {
-        return await axios.get(`https://ipfs.io/ipfs/${message}`)
+        return await axios.get(`https://deb0x-test.infura-ipfs.io/ipfs/${message}`)
     }
 
     function Message(props: any) {
