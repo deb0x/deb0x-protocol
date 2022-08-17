@@ -3,93 +3,90 @@
 
 .main-container {
     @include themed() {
-        ul.MuiList-root {
-            padding-top: 0;
-            height: 59vh;
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding-right: 15px;
-            li.messages-list-item {
-                height: 100px;
-                margin: 10px 5px;
-                border: none;
-                border-radius: 25px;
-                &:last-child {
-                    margin-bottom: 25px;
-                }
-                &.read {
-                    .message-left {
-                        .message-heading {
-                            color: t('text');
-                            font-weight: 100;
-                        }
-                        .message-overflow {
-                            color: t('text');
-                            font-weight: 100;
-                            width: 75%;
-                        }
-                        .new-message-icon {
-                            display: none;
-                        }
+        .row.messages-list {
+            height: 100%;
+            ul.MuiList-root {
+                padding-top: 0;
+                height: 65vh;
+                overflow-y: auto;
+                overflow-x: hidden;
+                padding-right: 15px;
+                li.messages-list-item {
+                    height: 100px;
+                    margin: 10px 5px;
+                    border: none;
+                    border-radius: 25px;
+                    &:last-child {
+                        margin-bottom: 25px;
                     }
-                }
-                &.unread {
-                    .message-left {
-                        .message-heading {
-                            color: t('unreaded');
-                            font-weight: 800;
-                        }
-                        .message-container {
-                            position: relative;
+                    &.read {
+                        .message-left {
+                            .message-heading {
+                                color: #19141F;
+                                font-weight: 100;
+                            }
                             .message-overflow {
-                                color: t('unreaded');
-                                font-weight: 800;
+                                color: #19141F;
+                                font-weight: 100;
                                 width: 75%;
                             }
                             .new-message-icon {
-                                position: absolute;
-                                color: t('unreaded');
-                                right: 0;
-                                top: 0;
+                                display: none;
                             }
                         }
                     }
-                }
-                div.list-item-button {
-                    padding-right: 15px;
-                    width: 100%;
-                    overflow: hidden;
-                    background-color: t('bg');
-                    border-radius: 25px;
-                    box-shadow: t('box-shadow');
-                    .message-heading {
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        text-align: left;
-                        letter-spacing: 0px;
-                        color: t('inbox-text-color');
-                        opacity: 0.85;
-                        .time-stamp {
-                            font-size: 10px;
-                            font-style: italic;
-                            white-space: nowrap;
+                    &.unread {
+                        .message-left {
+                            .message-heading {
+                                color: #285943;
+                                font-weight: 800;
+                            }
+                            .message-container {
+                                position: relative;
+                                .message-overflow {
+                                    color: #285943;
+                                    font-weight: 800;
+                                    width: 75%;
+                                }
+                                .new-message-icon {
+                                    position: absolute;
+                                    color: #285943;
+                                    right: 0;
+                                    top: 0;
+                                }
+                            }
                         }
                     }
-                    .message-overflow {
+                    div.list-item-button {
+                        padding-right: 15px;
+                        width: 100%;
                         overflow: hidden;
-                        text-overflow: ellipsis;
+                        background-color: t('bg');
+                        border-radius: 25px;
+                        box-shadow: t('box-shadow');
+                        .message-heading {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            text-align: left;
+                            letter-spacing: 0px;
+                            color: t('inbox-text-color');
+                            opacity: 0.85;
+                        }
+                        .message-overflow {
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                            color: t('inbox-text-color');
+                        }
+                        &.active {
+                            background-color: t('logo-bg');
+                        }
+                    }
+                    .time-stamp {
+                        font-size: 10px;
+                        font-style: italic;
                         white-space: nowrap;
-                        color: t('inbox-text-color');
-                    }
-                    .for-date {
-                        margin-left: 15px;
-                    }
-                    p {
-                        margin-bottom: 5px;
-                    }
-                    &.active {
-                        background-color: t('logo-bg');
                     }
                 }
             }
@@ -125,6 +122,11 @@
         .MuiListItemSecondaryAction-root .MuiButtonBase-root,
         .MuiListItemSecondaryAction-root .MuiButtonBase-root > * {
             position: absolute;
+        }
+
+        .row.messages-list .MuiListItemSecondaryAction-root {
+            top: 15px;
+            right: 25px;
         }
 
         .clouds {
@@ -177,13 +179,14 @@
             top: 0;
             right: 0;
             height: 100%;
+            overflow-y: auto;
+            border-bottom-right-radius: 65px;
+            background-color: t('bg');
             .message-heading {
-                background-color: t('logo-bg');
                 padding: 10px 15px;
             }
             .message {
                 padding: 10px 15px;
-                background-color: t('logo-bg');
             }
             .address {
                 display: flex;
@@ -194,6 +197,41 @@
                     margin-bottom: 0 !important;
                 }
             }
+            .form-container{
+                position: absolute;
+                bottom: 0;
+                min-height: auto;
+                margin-bottom: 0;
+                border-radius: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                form {
+                    .wrapper {
+                        margin-bottom: 10px;
+                        .rdw-editor-toolbar.toolbar {
+                            display: none;
+                        }
+                        .editor {
+                            min-height: 150px;
+                            height: 150px;
+                            overflow-y: auto;
+                            .rdw-left-aligned-block {
+                                display: none;
+                            }
+                            .DraftEditor-root {
+                                height: 85%;
+                            }
+                            span {
+                                background-color: transparent;
+                            }
+                        }
+                    }
+                    .send-btn {
+                        margin-bottom: 0;
+                    }
+                }
+            }
+            
         }
     }
 }

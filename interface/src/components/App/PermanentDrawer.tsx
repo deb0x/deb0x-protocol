@@ -3,7 +3,6 @@ import { useWeb3React } from '@web3-react/core';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
-import AppBar from '@mui/material/AppBar';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -21,7 +20,6 @@ import IconButton from "@mui/material/IconButton";
 import GitHubIcon from '@mui/icons-material/GitHub';
 import Deb0xERC20 from "../../ethereum/deb0xerc20"
 import { ethers } from "ethers";
-import formatAccountName from "../Common/AccountName";
 import "../../componentsStyling/permanentDrawer.scss";
 import ThemeSetter from '../ThemeSetter';
 import ScreenSize from '../Common/ScreenSize';
@@ -133,84 +131,7 @@ export function PermanentDrawer(props: any): any {
             </div> */}
             <SnackbarNotification state={notificationState} 
                 setNotificationState={setNotificationState} />
-            <Box sx={{ display: 'flex' }}>
-                <CssBaseline />
-                <AppBar className="app-bar--top">
-                    <Box className="main-menu--right">
-                    { account  ? 
-                        <>
-                            {/* <Paper component="form">
-                                <InputBase
-                                    placeholder="Search messages"
-                                    inputProps={{ "aria-label": "search" }}
-                                    className="search-input" />
-                                <IconButton type="submit" aria-label="search">
-                                    <SearchIcon />
-                                </IconButton>
-                            </Paper> */}
-                            <Button variant ="contained"
-                                    onClick={() => handleChange("Stake", 2)}>
-                                {userUnstakedAmount} DBX
-                            </Button>
-                        </>
-                        : 
-                        null }
-                    
-                    { (() =>  {
-                        const currentConnector = connectorsByName[ConnectorNames.Injected]
-                        const activating = currentConnector === activatingConnector
-                        const connected = currentConnector === connector
-                        const disabled = !triedEager || !!activatingConnector || connected || !!error
-
-                        return (
-                            <Button variant="contained"
-                                key={ConnectorNames.Injected}
-                                aria-describedby={id}
-                                onClick={!connected ? 
-                                    () => {
-                                        setActivatingConnector(currentConnector)
-                                        activate(currentConnector)
-                                    } : 
-                                    handleClick
-                                }>
-                                
-                                { activating ? 
-                                    <Spinner color={'black'} /> :
-                                    !connected ? 
-                                        "Connect Wallet" :
-                                        <span>
-                                            {account === undefined ? 
-                                                `Unsupported Network. Switch to ${networkName}` : 
-                                                account ? 
-                                                    ensName === "" ? 
-                                                        `${formatAccountName(account)}` :
-                                                        `${ensName.toLowerCase()} 
-                                                        (${formatAccountName(account)})`
-                                                : ''}
-                                        </span>
-                                }
-                            </Button>
-                        )
-                    }) ()}
-                            
-                        <ThemeSetter />
-                    </Box>
-                </AppBar>
-                <Popper className="popper" id={id} open={open} anchorEl={anchorEl}>
-                    <List>
-                        
-                        <ListItem className='logout'>
-                            <Button 
-                                onClick={(event: any) => {
-                                    handleClick(event)
-                                    deactivate()
-                                }}
-                                className="logout-btn">
-                                Logout 
-                            </Button>
-                        </ListItem>
-                    </List>
-                </Popper>
+            <Box className="side-menu-box" sx={{ display: 'flex' }}>
                 <Drawer variant="permanent"
                     anchor={dimensions.width > 768 ? 'left' : 'bottom'}
                     className="side-menu">

@@ -26,6 +26,7 @@ import elephant from './photos/icons/elephant.svg';
 import logoGreen from './photos/icons/logo-green.svg';
 import logoDark from "./photos/logo-dark.svg";
 import { Spinner } from './components/App/Spinner';
+import { AppBarComponent } from './components/App/AppBar';
 
 const client = create({
   host: 'ipfs.infura.io',
@@ -173,35 +174,41 @@ function App() {
         {
             account ? 
             <ContactsProvider>
-                <div className="app-container">
-                <PermanentDrawer onChange={handleChange}/>
-                {
-                account ? 
-                !!(library && account) && (
-                    <Box className="main-container" sx={{marginTop: 12}}>
-                        {selectedOption === "Compose" && <Encrypt />}
-                        {selectedOption === "Deb0x" && <Decrypt account={account}/>}
-                        {selectedOption === "Stake" && <Stake />}
-                        {selectedOption === "Sent" && <Sent />}
-                    </Box>
-                ):
-                    <Box className="home-page-box">
-                        <Typography sx={{textAlign:"center",color:"gray"}} variant="h1">
-                            The End To End Encrypted 
-                            <br></br>
-                            Decentralized Email Protocol 
-                            <br></br> 
-                            Owned By Its Users
-                        </Typography>
-                        <Typography sx={{ mt:10,textAlign:"center"}} variant="h3">
-                            Please connect your wallet
-                        </Typography>
-                    </Box>
-                }
+                <div className="app-container container-fluid">
+                    <div className="row main-row">
+                        <div className="col col-md-3 p-0">
+                            <PermanentDrawer onChange={handleChange}/>
+                        </div>
+                        <div className="col col-md-9">
+                        <AppBarComponent />
+                        {account ? 
+                            !!(library && account) && (
+                                <Box className="main-container" sx={{marginTop: 12}}>
+                                    {selectedOption === "Compose" && <Encrypt />}
+                                    {selectedOption === "Deb0x" && <Decrypt account={account}/>}
+                                    {selectedOption === "Stake" && <Stake />}
+                                    {selectedOption === "Sent" && <Sent />}
+                                </Box>
+                            ):
+                                <Box className="home-page-box">
+                                    <Typography sx={{textAlign:"center",color:"gray"}} variant="h1">
+                                        The End To End Encrypted 
+                                        <br></br>
+                                        Decentralized Email Protocol 
+                                        <br></br> 
+                                        Owned By Its Users
+                                    </Typography>
+                                    <Typography sx={{ mt:10,textAlign:"center"}} variant="h3">
+                                        Please connect your wallet
+                                    </Typography>
+                                </Box>
+                        }
+                        </div>
+                    </div>
                 </div>
             </ContactsProvider> :
             <>
-                <div className="app-container p-0">
+                <div className="app-container p-0 d-none">
                     <div className="initial-page">
                         <div className="row">
                             <div className="col-md-7 img-container mr-4">

@@ -147,21 +147,17 @@ export function Sent(props: any): any {
             }
                 className="messages-list-item"
             >
-                <Tooltip 
-                    title={(message === props.message.fetchedMessage.data) ? 
-                    "Click to decrypt" : `Sender:${props.message.sender}`} 
-                    placement="right">
-                    <ListItemButton className="list-item-button"
-                        onClick={() => {
-                            if(message === props.message.fetchedMessage.data) {
-                                decryptMessage()
-                            }
-                        }}>
-                        <div>
-                        <img width="58px" height="58px" src={require(`../../photos/icons/avatars/animal-${generateRandomNumber()}.svg`).default} alt="avatar"/>
-                        </div>
-                        <ListItemText
-                        primary={
+                <ListItemButton className="list-item-button"
+                    onClick={() => {
+                        if(message === props.message.fetchedMessage.data) {
+                            decryptMessage()
+                        }
+                    }}>
+                    <div>
+                    <img width="58px" height="58px" src={require(`../../photos/icons/avatars/animal-${generateRandomNumber()}.svg`).default} alt="avatar"/>
+                    </div>
+                    <ListItemText
+                    primary={
                         <>
                             <div className="message-left">
                                 <div className="message-heading">
@@ -189,27 +185,26 @@ export function Sent(props: any): any {
                                     dangerouslySetInnerHTML={{ __html: message }}>
                                 </p>
                             </div>
-                            {isDecrypted ? 
-                                <div className="message-right">
-                                    <div className="message-heading">
-                                        <p><small>To: </small></p>
-                                            <Stack direction="row" spacing={1}>
-                                                {
-                                                    checkSenderInLocalStorage(recipients)
-                                                }
-                                            </Stack>
-                                        <p><small>{messageTime}</small></p>
-                                    </div>
-                                    <p className={`message ${message === props.message.fetchedMessage.data ? "message-overflow" : ""}` }
-                                        dangerouslySetInnerHTML={{ __html: message }}>
-                                    </p>
-                                </div> : <></>}
                         </>
-                        
-                        }/>
-                            
-                    </ListItemButton>
-                </Tooltip>
+                    }/>
+                </ListItemButton>
+                {isDecrypted ? 
+                    <div className="message-right">
+                        <div className="message-heading">
+                            <p><small>To: </small></p>
+                                <Stack direction="row" spacing={1}>
+                                    {
+                                        checkSenderInLocalStorage(recipients)
+                                    }
+                                </Stack>
+                            <p><small>{messageTime}</small></p>
+                        </div>
+                        <p className={`message ${message === props.message.fetchedMessage.data ? "message-overflow" : ""}` }
+                            dangerouslySetInnerHTML={{ __html: message }}>
+                        </p>
+                    </div> : 
+                    <></>
+                }
             </ListItem>
             )
     }

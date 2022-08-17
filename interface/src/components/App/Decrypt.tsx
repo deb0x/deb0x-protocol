@@ -26,6 +26,7 @@ import hand from '../../photos/hand.svg';
 import avatar from '../../photos/icons/avatars/test-avatar-1.svg';
 import ReadedMessagesContext from '../Contexts/ReadedMessagesContext';
 import ReadedMessagesProvider from '../Contexts/ReadedMessagesProvider';
+import { Encrypt } from './Encrypt';
 
 const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61";
 
@@ -76,7 +77,7 @@ export function Decrypt(props: any): any {
         const [isDecrypted, setIsDecrypted] = useState(false);
         const min = 1;
         const max = 50;
-        const [randomImage, ] = useState<number>(Math.floor(Math.random() * (max - min + 1)) + min);
+        const [randomImage] = useState<number>(Math.floor(Math.random() * (max - min + 1)) + min);
         let [show, setShow] = useState(false);
         const [isReaded, setIsReaded] = useState(false);
         
@@ -211,39 +212,45 @@ export function Decrypt(props: any): any {
                                         <Announcement className="new-message-icon" />
                                     </div>
                                 </div>
-                                {isDecrypted ? 
-                                    <div className="message-right">
-                                        <div className="message-heading">
-                                            <div className="address">
-                                                <p>From: 
-                                                    <strong>
-                                                        {
-                                                            checkSenderInLocalStorage(props.message.sender)
-                                                        }
-                                                    </strong>
-                                                </p>
-                                                <>
-                                                    <IconButton onClick={() => setShow(true)}>
-                                                        <Add />
-                                                    </IconButton>
-                                                    <ContactsSetter show={show} props={props.message.sender} onClickOutside={() => setShow(false)}/>
-                                                </>
-                                            </div>
-                                            
-                                        </div>
-                                        <p className="date-for-open-message">
-                                            <small className="for-date">
-                                                {messageTime}
-                                            </small>
-                                        </p>
-                                        <p className="message" 
-                                            dangerouslySetInnerHTML={{ __html: message }} />
-                                    </div> : 
-                                    <></> 
-                                }
+                                
                             </> 
                         }/>
                     </ListItemButton>
+                    {isDecrypted ? 
+                                {isDecrypted ? 
+                    {isDecrypted ? 
+                        <div className="message-right">
+                            <div className="message-heading">
+                                <div className="address">
+                                    <p>From: 
+                                        <strong>
+                                            {
+                                                checkSenderInLocalStorage(props.message.sender)
+                                            }
+                                        </strong>
+                                    </p>
+                                    <>
+                                        <IconButton onClick={() => setShow(true)}>
+                                            <Add />
+                                        </IconButton>
+                                        <ContactsSetter show={show} props={props.message.sender} 
+                                            onClickOutside={() => setShow(false)}/>
+                                    </>
+                                </div>
+                                <p className="time-stamp">
+                                    <small>
+                                        {messageTime}
+                                    </small>
+                                </p>
+                            </div>
+                            <p className="message" 
+                                        <p className="message" 
+                            <p className="message" 
+                                dangerouslySetInnerHTML={{ __html: message }} />
+                            <Encrypt props={props.message.sender}/>
+                        </div> : 
+                        <></> 
+                    }
                 </ListItem>
             </ReadedMessagesProvider>
         )
@@ -317,6 +324,12 @@ export function Decrypt(props: any): any {
                 return (
                     <div className="row messages-list">
                         <List className="col-md-4 col-sm-12">
+                            <Box className="pagination" sx={{display:"flex"}}>
+                                <Pagination count={1} />
+                                <IconButton size="large" onClick={()=> setLoading(true) }>
+                                    <RefreshIcon fontSize="large"/>
+                                </IconButton>
+                            </Box>
                             {fetchedMessages.map((message: any, i: any) => {
                                 return (
                                     <Message message={message} index={i} 
@@ -345,17 +358,7 @@ export function Decrypt(props: any): any {
     if (encryptionKeyInitialized === true) {
         return (
             <div className="content-box">
-                <Box>
-                    <Box className="pagination" sx={{display:"flex"}}>
-                        <Pagination count={1} />
-                        <IconButton size="large" onClick={()=> setLoading(true) }>
-                            <RefreshIcon fontSize="large"/>
-                        </IconButton>
-                    </Box>
-                    <Box>
-                        <GetMessages />
-                    </Box>
-                </Box>
+                <GetMessages />
             </div>
         )
     } else if (encryptionKeyInitialized === false) {
