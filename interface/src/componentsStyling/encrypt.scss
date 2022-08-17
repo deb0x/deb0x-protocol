@@ -2,14 +2,9 @@
 
 .main-container {
     @include themed() {
-        .form-container {
-            background: t('box-bg');
-            box-shadow: t('box-shadow');
-            border-radius: 25px 10px 85px 25px;
-            margin-bottom: 35px;
+        .content-box.form-container {
             form {
                 padding-top: 15px;
-                position: relative;
                 .MuiFormControl-root {
                     width: 100%;
                     .MuiOutlinedInput-root {
@@ -76,13 +71,14 @@
                     background-color: t('text-field-color');
                     border-radius: 25px 25px 84px 25px;
                     margin-bottom: 50px;
+                    position: relative;
                     .rdw-editor-toolbar {
                         border-radius: 25px;
-                        background-color: rgba(255, 255, 255, 0.5);
                         border: none;
-                        mix-blend-mode: soft-light;
-                        width: 97%;
-                        margin: 22px auto 0 auto;
+                        width: 80%;
+                        position: absolute;
+                        bottom: -25px;
+                        margin: 0;
                         .rdw-option-wrapper, 
                         .rdw-dropdown-wrapper {
                             border: none;
@@ -91,14 +87,12 @@
                     }
                 }
                 .editor {
-                    min-height: 250px;
+                    min-height: 50vh;
                     padding: 15px;
                 }
                 .send-btn {
                     font-size: 12px;
-                    color:  #F5B700;
                     background-color:  #F5B700;
-                    border: 1px solid  #F5B700;
                     border-radius: 50%;
                     width: 88px;
                     height: 88px;
