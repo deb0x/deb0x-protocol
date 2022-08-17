@@ -1,44 +1,21 @@
-const { ethers } = require("hardhat");
-const { abi } = require("../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
 const fs = require('fs')
-
+const { BigNumber } = require("ethers");
 async function calculateRewardDistribution() {
-    let userReward, user1Reward, user2Reward, frontend;
-    let user1, user2, user3, user4;
-    [user1, user2, user3, user4, messageReceiver, feeReceiver] = await ethers.getSigners();
-
-    const Deb0x = await ethers.getContractFactory("Deb0x");
-    userReward = await Deb0x.deploy();
-    await userReward.deployed();
-
-    user1Reward = userReward.connect(user1)
-    frontend = userReward.connect(feeReceiver)
-
-    await user2.sendTransaction({
-        to: user1.address,
-        value: ethers.utils.parseEther("100.0")
-    })
-    await user3.sendTransaction({
-        to: user1.address,
-        value: ethers.utils.parseEther("100.0")
-    })
-    await user4.sendTransaction({
-        to: user1.address,
-        value: ethers.utils.parseEther("100.0")
-    })
-    let reward = 100;
+    let reward = BigNumber.from("100000000000000000000");
+    let lastReward = 0;
+    let iteration = 0;
     while (reward > 0) {
-        await user1Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-        await hre.ethers.provider.send("evm_mine")
-        let reward = ethers.utils.formatEther(await user1Reward.calculateCycleReward());
-        fs.appendFile('result.txt', reward + '\n', err => {
+        lastReward = (reward.mul(BigNumber.from("10000000000000000000000"))).div(BigNumber.from("10019000000000000000000"));
+        reward = lastReward;
+        console.log(ethers.utils.formatEther(reward))
+        fs.appendFile('result.txt', ethers.utils.formatEther(reward) + '\n', err => {
             if (err) {
                 console.error(err);
             }
         });
+        iteration++;
     }
-
+    console.log("Numar de iteratii ->>> " + iteration)
 }
 
 calculateRewardDistribution()
