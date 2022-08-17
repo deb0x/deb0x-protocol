@@ -217,8 +217,6 @@ export function Decrypt(props: any): any {
                         }/>
                     </ListItemButton>
                     {isDecrypted ? 
-                                {isDecrypted ? 
-                    {isDecrypted ? 
                         <div className="message-right">
                             <div className="message-heading">
                                 <div className="address">
@@ -243,8 +241,6 @@ export function Decrypt(props: any): any {
                                     </small>
                                 </p>
                             </div>
-                            <p className="message" 
-                                        <p className="message" 
                             <p className="message" 
                                 dangerouslySetInnerHTML={{ __html: message }} />
                             <Encrypt props={props.message.sender}/>
