@@ -111,10 +111,6 @@ export function PermanentDrawer(props: any): any {
 
     const [display, setDisplay] = useState();
 
-    function displayAddress(index: any) {
-        display === index ? setDisplay(undefined) : setDisplay(index);
-    }
-
     function getErrorMessage(error: string) {
         errorMessage = error;
         return errorMessage;
@@ -168,14 +164,9 @@ export function PermanentDrawer(props: any): any {
                                         {
                                             contacts.map((contact: any, index: any) => (
                                                     <>
-                                                    <ListItem button key={contact.name}
-                                                        onClick={() => displayAddress(index)}>
-                                                        <ListItemText className="text" primary={contact.name} />
-                                                    </ListItem>
-                                                    {display === index ? 
-                                                        <ListItem className="row contact-item" key={index}>
-                                                            <ListItemText className="text col-8" primary={contact.address} />
-                                                            <div className="col-4 buttons">
+                                                    <ListItem button key={contact.name}>
+                                                        <ListItemText className="text" primary={contact.name}/>
+                                                        <div className="col-4 buttons">
                                                                 <IconButton size="small"
                                                                     onClick={() => {
                                                                             navigator.clipboard.writeText(contact.address);
@@ -196,8 +187,7 @@ export function PermanentDrawer(props: any): any {
                                                                     <SendIcon className="send-icon" fontSize="small"/>
                                                                 </IconButton>
                                                             </div>
-                                                        </ListItem>
-                                                        : <></>}
+                                                    </ListItem>
                                                     </>
                                             ))
                                         }

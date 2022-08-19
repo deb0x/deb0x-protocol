@@ -87,7 +87,7 @@
                     }
                 }
                 .editor {
-                    min-height: 50vh;
+                    height: 40vh;
                     padding: 15px;
                 }
                 .send-btn {
@@ -98,6 +98,7 @@
                     height: 88px;
                     position: absolute;
                     margin-bottom: 35px;
+                    z-index: 9;
                     .MuiLoadingButton-loadingIndicator {
                         color: black;
                         .MuiCircularProgress-root {
