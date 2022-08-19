@@ -176,7 +176,7 @@ function App() {
             <ContactsProvider>
                 <div className="app-container container-fluid">
                     <div className="row main-row">
-                        <div className="col col-md-3 p-0">
+                        <div className="col col-md-3 p-0 side-menu-container">
                             <PermanentDrawer onChange={handleChange}/>
                         </div>
                         <div className="col col-md-9">

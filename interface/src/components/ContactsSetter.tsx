@@ -23,6 +23,12 @@ export default function ContactsSetter(props: any) {
         onClickOutside && onClickOutside();
     }
 
+    function handleChange(event: any) {
+        console.log(event)
+        if(event.target)
+            setAddress(event.target.value)
+    }
+
     useEffect(() => {
         setTheme(localStorage.getItem('globalTheme'));
     });
@@ -59,7 +65,7 @@ export default function ContactsSetter(props: any) {
                             { address ?
                                 <input readOnly key="address" className="form-control inputs"
                                     value={address}/> :
-                                <input key="address" className="form-control inputs" placeholder="Type here" />    
+                                <input key="address" className="form-control inputs" placeholder="Type here" onChange={handleChange} />    
                             }
                         </div>
                         <div className="buttons-container">

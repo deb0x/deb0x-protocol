@@ -35,7 +35,8 @@ body * {
     height: calc( 100%);
     border-radius: 100px;
     box-shadow: 0px 3px 25px #0f0b1382;
-    .main-row {
+    .main-row,
+    .side-menu-container {
         height: 100%;
     }
     @include themed() {
@@ -59,6 +60,10 @@ body * {
         }
         .main-container {
             margin-top: 0;
+            display: flex;
+            align-items: center;
+            height: 85%;
+            min-height: 85%;
             .floating-btn {
                 position: fixed;
                 bottom: 75px;
@@ -73,8 +78,8 @@ body * {
                 padding: 0 15px;
                 box-shadow: t('box-shadow');
                 border-radius: 25px 10px 85px 25px;
-                height: 95%;
                 overflow: hidden;
+                width: 100%;
             }
         }
         .home-page-box {

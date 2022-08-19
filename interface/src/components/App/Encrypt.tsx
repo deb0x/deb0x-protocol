@@ -38,7 +38,7 @@ const client = create({
   },
 })
 
-export function Encrypt(props: any): any {
+export function Encrypt(replyAddress: any): any {
     const { account, library } = useWeb3React()
     const [encryptionKey, setKey] = useState('')
     const [textToEncrypt, setTextToEncrypt] = useState('')
@@ -51,15 +51,17 @@ export function Encrypt(props: any): any {
     const [addressList, setAddressList] = useState<string[]>([])
     const [error, setError] = useState<string | null>(null);
     const [ input, setInput ] = useState(JSON.parse(localStorage.getItem('input') || 'null'));
-    const [address, setAddress] = useState<string>(props.props);
+    const [address, setAddress] = useState<string>(replyAddress.props);
 
     useEffect(() => {
         if(input !== null && input.match(/^0x[a-fA-F0-9]{40}$/g))
             addressList.push(input)
-
+        
         if(address)
             addressList.push(address)
     }, []);
+
+    useEffect(() => console.log("XXX", replyAddress.props))
 
     useEffect(() => {
         if (!encryptionKeyInitialized) {
@@ -139,7 +141,7 @@ export function Encrypt(props: any): any {
         setLoading(true);
         const signer = await library.getSigner(0);
         let cids:any = []
-        let recipients = destinationAddresses.flat()
+        let recipients = replyAddress.props ? [replyAddress.props].flat() : destinationAddresses.flat()
         recipients.push(await signer.getAddress())
         const deb0xContract = Deb0x(signer, deb0xAddress);
         for (let address of recipients) {
@@ -198,7 +200,7 @@ export function Encrypt(props: any): any {
 
         setTextToEncrypt('');
         setSenderAddress("");
-        setAddressList([])
+        setAddressList([]);
         setLoading(false);
 
     }
@@ -312,7 +314,7 @@ export function Encrypt(props: any): any {
                                 sx={{ marginLeft: 2, marginTop: 1 }}
                                 disabled={textToEncrypt == '' || addressList == []}
                                 onClick={() => {
-                                    console.log(addressList)
+                                    console.log(replyAddress.props)
                                     encryptText(textToEncrypt, addressList)
                                 }
                                     

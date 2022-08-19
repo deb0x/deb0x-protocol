@@ -22,11 +22,11 @@
                     &.read {
                         .message-left {
                             .message-heading {
-                                color: #19141F;
+                                color: t('text');
                                 font-weight: 100;
                             }
                             .message-overflow {
-                                color: #19141F;
+                                color: t('text');
                                 font-weight: 100;
                                 width: 75%;
                             }
@@ -38,19 +38,19 @@
                     &.unread {
                         .message-left {
                             .message-heading {
-                                color: #285943;
+                                color: t('unreaded');
                                 font-weight: 800;
                             }
                             .message-container {
                                 position: relative;
                                 .message-overflow {
-                                    color: #285943;
+                                    color: t('unreaded');
                                     font-weight: 800;
                                     width: 75%;
                                 }
                                 .new-message-icon {
                                     position: absolute;
-                                    color: #285943;
+                                    color: t('unreaded');
                                     right: 0;
                                     top: 0;
                                 }
@@ -205,6 +205,9 @@
                 border-radius: 0;
                 left: 50%;
                 transform: translateX(-50%);
+                &.content-box {
+                    margin: 0;
+                }
                 form {
                     .wrapper {
                         margin-bottom: 10px;
