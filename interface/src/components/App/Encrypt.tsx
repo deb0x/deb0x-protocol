@@ -61,8 +61,6 @@ export function Encrypt(replyAddress: any): any {
             addressList.push(address)
     }, []);
 
-    useEffect(() => console.log("XXX", replyAddress.props))
-
     useEffect(() => {
         if (!encryptionKeyInitialized) {
             getPublicEncryptionKey()
