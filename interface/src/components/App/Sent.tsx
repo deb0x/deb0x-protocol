@@ -2,17 +2,16 @@ import { useState, useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Deb0x from "../../ethereum/deb0x"
 import {
-    Tooltip, List, ListItem, Chip,
-    ListItemText, ListItemButton, Typography, Box, CircularProgress, Stack
+    List, ListItem, Chip,
+    ListItemText, ListItemButton, 
+    Box, CircularProgress, Stack
 } from '@mui/material';
 import Stepper from './Stepper'
 import IconButton from "@mui/material/IconButton";
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import Pagination from "@mui/material/Pagination";
 import RefreshIcon from '@mui/icons-material/Refresh';
-import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import '../../componentsStyling/decrypt.scss';
-import empty from '../../photos/empty.png';
 import formatAccountName from '../Common/AccountName';
 import cloud1 from '../../photos/icons/clouds/cloud-1.svg';
 import cloud2 from '../../photos/icons/clouds/cloud-2.svg';
@@ -28,7 +27,6 @@ export function Sent(props: any): any {
     const [messageSent, setmessageSent] = useState(false);
 
     useEffect(() => {
-        console.log("useEffect")
         setLoading(true)
         getPublicEncryptionKey()
     }, [account]);
@@ -77,21 +75,20 @@ export function Sent(props: any): any {
 
         },[props.previousIndex])
 
-        async function checkENS(){
+        async function checkENS() {
             let recipientsTemp:any = []
-            const recipientsFiltered = props.message.recipients.filter((recipient:any) => recipient != account)
+            const recipientsFiltered = props.message.recipients;
 
             for(let recipient of recipientsFiltered) {
                 let name = await library.lookupAddress(recipient);
                 if(name !== null)
                 {   
-                    console.log("not null")
                     recipientsTemp = [...recipientsTemp, name];
                 } else {
                     recipientsTemp = [...recipientsTemp, recipient];
                 }
             }
-            
+
             setRecipients(recipientsTemp)
         }
 
@@ -117,66 +114,68 @@ export function Sent(props: any): any {
         }
 
         
-        function checkSenderInLocalStorage(recipients: any) {
-            let user = '';
+        function checkSenderInLocalStorage(sender: any) {
+            let user: any;
 
-            recipients.map((recipient: any) => {
-                if (ensName !== "") {
-                    user = ensName;
-                } else {
-                    savedContacts.forEach((contact: any) => {
-                        if (recipient === contact.address) {
-                            user = contact.name;
-                        } else {
-                            user = formatAccountName(
-                                recipient
-                            )
-                        }
-                    })
-                }
-            })
-            return user;
+            if (ensName !== "") {
+                user = ensName;
+            } else {
+                savedContacts.map((contact: any) => {
+                    if (sender == contact.address) {
+                        user = true;
+                    }
+                })
+            }
+
+           return user;
+        }
+
+        function handleDecryptMessage() {
+            if(message === props.message.fetchedMessage.data) {
+                decryptMessage()
+            }
         }
     
         return (
-            <ListItem sx ={{border:1, marginBottom:1}} disablePadding key={props.index}    secondaryAction={ 
-                <IconButton className={`${(message != props.message.fetchedMessage.data) ? "list-item-btn" : ""}`}  
-                        onClick={()=>{hideMessage()}}  edge="end" aria-label="comments">
-                    { (message != props.message.fetchedMessage.data) ? <VisibilityOffIcon  />: null}
-                </IconButton>  
-            }
+            <ListItem disablePadding key={props.index}
+                secondaryAction={ 
+                    <IconButton 
+                        className={`${(message != props.message.fetchedMessage.data) ? "list-item-btn" : ""}`}  
+                        onClick={()=> hideMessage() }  edge="end" aria-label="comments">
+                        { (message != props.message.fetchedMessage.data) ? <VisibilityOffIcon  />: null}
+                    </IconButton>  
+                }
                 className="messages-list-item"
             >
                 <ListItemButton className="list-item-button"
-                    onClick={() => {
-                        if(message === props.message.fetchedMessage.data) {
-                            decryptMessage()
-                        }
-                    }}>
+                    onClick={() => handleDecryptMessage()}>
                     <div>
-                    <img width="58px" height="58px" src={require(`../../photos/icons/avatars/animal-${generateRandomNumber()}.svg`).default} alt="avatar"/>
+                        <img width="58px" height="58px" src={require(`../../photos/icons/avatars/animal-${generateRandomNumber()}.svg`).default} alt="avatar"/>
                     </div>
-                    <ListItemText
-                    primary={
+                    <ListItemText primary={
                         <>
                             <div className="message-left">
                                 <div className="message-heading">
                                     <p><small>To: </small></p>
-                                        <Stack direction="row" spacing={1}>
+                                        <div>
                                             {
                                                 recipients.map((recipient: any) => {
-                                                    console.log(recipients)
                                                     return (
-                                                        <Chip
-                                                            key={recipient}
-                                                            color="primary"
-                                                            label={checkSenderInLocalStorage(recipients)}
-                                                            variant="outlined"
-                                                        />
+                                                        <span
+                                                            key={recipient}>
+                                                                {
+                                                                checkSenderInLocalStorage(recipient) ?
+                                                                    savedContacts.filter((contact: any) => recipient == contact.address)
+                                                                        .map((filteredPerson: any) => (
+                                                                            filteredPerson.name
+                                                                        )) :
+                                                                        formatAccountName(recipient)
+                                                                }
+                                                        </span>
                                                     )
                                                 })
                                             }
-                                        </Stack>
+                                        </div>
                                     <p><small>{messageTime}</small></p>
                                 </div>
                                 <p className={`message 
@@ -194,7 +193,7 @@ export function Sent(props: any): any {
                             <p><small>To: </small></p>
                                 <Stack direction="row" spacing={1}>
                                     {
-                                        checkSenderInLocalStorage(recipients)
+                                        checkSenderInLocalStorage(recipients) 
                                     }
                                 </Stack>
                             <p><small>{messageTime}</small></p>
@@ -221,7 +220,6 @@ export function Sent(props: any): any {
             const deb0xContract = Deb0x(library, deb0xAddress)
             
             const sentMessages = await deb0xContract.fetchSentMessages(account)   
-            console.log(sentMessages)
 
             const sentMessagesRetrieved = sentMessages.map(async function (item: any) {
                 return { fetchedMessage: await fetchMessage(item.cid), recipients: item.recipients}

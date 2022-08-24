@@ -143,24 +143,21 @@ export function Decrypt(props: any): any {
         }
 
         function checkSenderInLocalStorage(sender: any) {
-            let user = '';
+            let user: any;
 
             if (ensName !== "") {
                 user = ensName;
             } else {
-                savedContacts.forEach((contact: any) => {
+                savedContacts.map((contact: any) => {
                     if (sender == contact.address) {
-                        user = contact.name;
-                    } else {
-                        user = formatAccountName(
-                            props.message.sender
-                        )
+                        user = true;
                     }
                 })
             }
 
-            return user;
+           return user;
         }
+
 
         return (
             <ReadedMessagesProvider>
@@ -199,7 +196,14 @@ export function Decrypt(props: any): any {
                                     <div className="message-heading">
                                         <p>From: 
                                             {
-                                                checkSenderInLocalStorage(props.message.sender)
+                                                checkSenderInLocalStorage(props.message.sender) ?
+                                                savedContacts.filter((contact: any) => props.message.sender == contact.address)
+                                                    .map((filteredPerson: any) => (
+                                                        filteredPerson.name
+                                                    )) :
+                                                    formatAccountName(
+                                                        props.message.sender
+                                                    )
                                             }
                                         </p>
                                         <p className="time-stamp">
@@ -222,15 +226,26 @@ export function Decrypt(props: any): any {
                                 <div className="address">
                                     <p>From: 
                                         <strong>
-                                            {
-                                                checkSenderInLocalStorage(props.message.sender)
-                                            }
+                                        {
+                                            checkSenderInLocalStorage(props.message.sender) ?
+                                                savedContacts.filter((contact: any) => props.message.sender == contact.address)
+                                                    .map((filteredPerson: any) => (
+                                                        filteredPerson.name
+                                                    )) :
+                                                    formatAccountName(
+                                                        props.message.sender
+                                                    )
+                                        }
                                         </strong>
                                     </p>
                                     <>
-                                        <IconButton onClick={() => setShow(true)}>
-                                            <Add />
-                                        </IconButton>
+                                        {!checkSenderInLocalStorage(props.message.sender) ? 
+                                            <IconButton onClick={() => setShow(true)}>
+                                                <Add />
+                                            </IconButton> :
+                                            <></>
+                                        }
+                                        
                                         <ContactsSetter show={show} props={props.message.sender} 
                                             onClickOutside={() => setShow(false)}/>
                                     </>
