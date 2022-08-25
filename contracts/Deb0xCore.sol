@@ -3,14 +3,20 @@
 pragma solidity ^0.8.11;
 
 contract Deb0xCore {
-    struct sentMessage {
+  
+    struct content {
         string cid;
+        uint256 blockTimestam;
+    }
+
+    struct sentMessage {
         address[] recipients;
+        content contentData;
     }
 
     mapping(address => string) private encryptionKeys;
 
-    mapping(address => mapping(address => string[])) private inbox;
+    mapping(address => mapping(address => content[])) private inbox;
 
     mapping(address => sentMessage[]) private outbox;
 
@@ -25,13 +31,15 @@ contract Deb0xCore {
             if (inbox[recipients[i]][msg.sender].length == 0) {
                 messageSenders[recipients[i]].push(msg.sender);
             }
-            inbox[recipients[i]][msg.sender].push(cids[i]);
+            content memory currentStruct = content({cid:cids[i], blockTimestam: block.timestamp});
+            inbox[recipients[i]][msg.sender].push(currentStruct);
         }
 
+        content memory outboxContent = content({cid: cids[recipients.length -1 ], blockTimestam:block.timestamp});
         outbox[msg.sender].push(
             sentMessage({
                 recipients: recipients,
-                cid: cids[recipients.length - 1]
+                contentData: outboxContent
             })
         );
     }
@@ -43,7 +51,7 @@ contract Deb0xCore {
     function fetchMessages(address to, address from)
         public
         view
-        returns (string[] memory)
+        returns (content[] memory)
     {
         return inbox[to][from];
     }
