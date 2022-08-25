@@ -21,19 +21,19 @@ describe("Test fee claiming for users and concurrently stake/unstake", async fun
     rewardedDean = rewardedAlice.connect(dean)
   });
 
-  it.only("11 ether gathered as fees should be fully distributed back to users", async () => {
-    await rewardedAlice["send(address[],string[],address,uint256)"]([messageReceiver.address],
-      ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
-    await rewardedBob["send(address[],string[],address,uint256)"]([messageReceiver.address],
-      ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
-    await rewardedBob["send(address[],string[],address,uint256)"]([messageReceiver.address],
-      ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
-    await rewardedCarol["send(address[],string[],address,uint256)"]([messageReceiver.address],
-      ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
-    await rewardedCarol["send(address[],string[],address,uint256)"]([messageReceiver.address],
-      ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
-    await rewardedCarol["send(address[],string[],address,uint256)"]([messageReceiver.address],
-      ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+  it("11 ether gathered as fees should be fully distributed back to users", async () => {
+    await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address],
+      ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+    await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address],
+      ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+    await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address],
+      ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+    await rewardedCarol["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address],
+      ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+    await rewardedCarol["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address],
+      ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+    await rewardedCarol["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address],
+      ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 
     await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
     await hre.ethers.provider.send("evm_mine")
@@ -47,23 +47,23 @@ describe("Test fee claiming for users and concurrently stake/unstake", async fun
     await dbxERC20.connect(alice).approve(rewardedAlice.address, await dbxERC20.balanceOf(alice.address))
     await rewardedAlice.stakeDBX(await dbxERC20.balanceOf(alice.address))
 
-    await rewardedAlice["send(address[],string[],address,uint256)"]([messageReceiver.address],
-      ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
-    await rewardedAlice["send(address[],string[],address,uint256)"]([messageReceiver.address],
-      ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
-    await rewardedBob["send(address[],string[],address,uint256)"]([messageReceiver.address],
-      ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+    await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address],
+      ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+    await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address],
+      ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+    await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address],
+      ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 
     await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
     await hre.ethers.provider.send("evm_mine")
 
     
 
-    await rewardedBob["send(address[],string[],address,uint256)"]([messageReceiver.address],
-      ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+    await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address],
+      ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
     await rewardedBob.claimRewards()
-    await rewardedCarol["send(address[],string[],address,uint256)"]([messageReceiver.address],
-      ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
+    await rewardedCarol["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address],
+      ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 
     await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
     await hre.ethers.provider.send("evm_mine")
@@ -78,7 +78,10 @@ describe("Test fee claiming for users and concurrently stake/unstake", async fun
     for(let entry of feesClaimed){
       totalFeesClaimed = totalFeesClaimed.add(entry.args.fees)
     }
-    expect(totalFeesClaimed).to.equal(BigNumber.from("10999999999999999695"))
+    const feesCollected = (await rewardedAlice.cycleAccruedFees(0))
+      .add(await rewardedAlice.cycleAccruedFees(1))
+      .add(await rewardedAlice.cycleAccruedFees(2))
+    expect(totalFeesClaimed).to.equal(feesCollected)
     
   });
 
@@ -87,19 +90,19 @@ describe("Test fee claiming for users and concurrently stake/unstake", async fun
   //   await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
   //   await hre.ethers.provider.send("evm_mine")
 
-  //   await rewardedAlice["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0)
+  //   await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0)
 
   //   await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
   //   await hre.ethers.provider.send("evm_mine")
 
-  //   await rewardedBob["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0)
-  //   await rewardedAlice["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0)
-  //   await rewardedAlice["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0)
+  //   await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0)
+  //   await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0)
+  //   await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0)
 
   //   await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 2])
   //   await hre.ethers.provider.send("evm_mine")
 
-  //   await rewardedCarol["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0)
+  //   await rewardedCarol["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0)
 
   //   await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
   //   await hre.ethers.provider.send("evm_mine")
