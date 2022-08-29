@@ -304,8 +304,9 @@ describe("Test DBX tokens distributions", async function() {
         let expectedValueUser3 = BigNumber.from("30000000000000000000");
         expect(expectedValueUser3).to.equal(rewardToClaimForUser3)
 
-        let rewardToDistributeCycle2 = ethers.utils.formatEther(await userReward.calculateCycleReward());
-        console.log("Reward for cycle 2 " + rewardToDistributeCycle2)
+        // let rewardToDistributeCycle2 = ethers.utils.formatEther(await userReward.calculateCycleReward());
+        // console.log("Reward for cycle 2 " + rewardToDistributeCycle2)
+        // 99.810360315400738596
 
         await user1Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], feeReceiver.address, 1000, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], feeReceiver.address, 1000, { value: ethers.utils.parseEther("1") })
@@ -333,8 +334,9 @@ describe("Test DBX tokens distributions", async function() {
         let expectedValueUser3Cycle2 = BigNumber.from("29943108094620221579").add(BigNumber.from(balanceBeforeClaimRewardUser3Cycle2))
         expect(expectedValueUser3Cycle2).to.equal(rewardToClaimForUser3Cycle2)
 
-        let rewardToDistributeCycle3 = ethers.utils.formatEther(await userReward.calculateCycleReward());
-        console.log("Reward for cycle 3 " + rewardToDistributeCycle3);
+        // let rewardToDistributeCycle3 = ethers.utils.formatEther(await userReward.calculateCycleReward());
+        // console.log("Reward for cycle 3 " + rewardToDistributeCycle3);
+        // 99.621080262901226266
 
         await user1Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], feeReceiver.address, 1000, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], feeReceiver.address, 1000, { value: ethers.utils.parseEther("1") })

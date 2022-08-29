@@ -23,8 +23,8 @@ describe("Test Deb0xCore contract", async function() {
     });
 
     it(`Test send function`, async() => {
-        let addresses = [add1.address, add2.address];
-        let cids = ["ipfs1", "ipfs2"];
+        let addresses = [add1.address, add2.address, deployer.address];
+        let cids = ["ipfs1", "ipfs2", "ipfs3"];
         await deboxCore.send(addresses, cids)
 
         let messagesAdd1 = await deboxCore.fetchMessages(add1.address, deployer.address);
@@ -34,8 +34,8 @@ describe("Test Deb0xCore contract", async function() {
     });
 
     it(`Test send function with multimple messages`, async() => {
-        let addresses = [add1.address, add2.address, add3.address, add4.address, add5.address, add5.address, add5.address, add5.address];
-        let cids = ["ipfs1", "ipfs2", "ipfs4", "ipfs4", "ipfs5", "ipfs5", "ipfs5", "ipfs5"];
+        let addresses = [add1.address, add2.address, add3.address, add4.address, add5.address, add5.address, add5.address, add5.address, deployer.address];
+        let cids = ["ipfs1", "ipfs2", "ipfs3", "ipfs4", "ipfs5", "ipfs55", "ipfs555", "ipfs5555", "ipfs6"];
         await deboxCore.send(addresses, cids)
 
         let messagesAdd1 = await deboxCore.fetchMessages(add1.address, deployer.address);
@@ -48,12 +48,14 @@ describe("Test Deb0xCore contract", async function() {
         expect(messagesAdd4[0]).to.equal(cids[3]);
         let messagesAdd5 = await deboxCore.fetchMessages(add5.address, deployer.address);
         expect(messagesAdd5[0]).to.equal(cids[4]);
-
+        expect(messagesAdd5[1]).to.equal(cids[5]);
+        expect(messagesAdd5[2]).to.equal(cids[6]);
+        expect(messagesAdd5[3]).to.equal(cids[7]);
     });
 
     it(`Test fetchMessageSenders function with multimple messages`, async() => {
-        let addresses = [add1.address, add2.address, add3.address, add3.address];
-        let cids = ["ipfs1", "ipfs2", "ipfs4", "ipfs4"];
+        let addresses = [add1.address, add2.address, add3.address, add3.address, deployer.address];
+        let cids = ["ipfs1", "ipfs2", "ipfs4", "ipfs4", "ipfs5"];
         await deboxCore.send(addresses, cids)
         let addressSenderAdd1 = await deboxCore.fetchMessageSenders(add1.address);
         expect(addressSenderAdd1[0]).to.equal(deployer.address);
@@ -62,8 +64,8 @@ describe("Test Deb0xCore contract", async function() {
         let addressSenderAdd3 = await deboxCore.fetchMessageSenders(add3.address);
         expect(addressSenderAdd3[0]).to.equal(deployer.address);
 
-        let addresses2 = [add1.address, add2.address, add3.address, add3.address];
-        let cids2 = ["ipfs1", "ipfs2", "ipfs4", "ipfs4"];
+        let addresses2 = [add1.address, add2.address, add3.address, add3.address, deployer.address];
+        let cids2 = ["ipfs1", "ipfs2", "ipfs4", "ipfs4", "ipfs5"];
 
         await deboxCore.connect(add1).send(addresses2, cids2)
         let addressSenderAdd1SecoundStage = await deboxCore.fetchMessageSenders(add1.address);
@@ -73,9 +75,8 @@ describe("Test Deb0xCore contract", async function() {
         let addressSenderAdd3SecondStage = await deboxCore.fetchMessageSenders(add3.address);
         expect(addressSenderAdd3SecondStage[1]).to.equal(add1.address);
 
-
-        let addresses3 = [add1.address, add2.address, add3.address, add3.address];
-        let cids3 = ["ipfs1", "ipfs2", "ipfs4", "ipfs4"];
+        let addresses3 = [add1.address, add2.address, add3.address, add3.address, deployer.address];
+        let cids3 = ["ipfs1", "ipfs2", "ipfs4", "ipfs4", "ipfs5"];
 
         await deboxCore.connect(add2).send(addresses3, cids3)
         let addressSenderAdd1ThirdStage = await deboxCore.fetchMessageSenders(add1.address);
@@ -87,11 +88,14 @@ describe("Test Deb0xCore contract", async function() {
     });
 
     it(`Test fetchSentMessages function with multimple messages`, async() => {
-        let addresses = [add1.address, add2.address, add3.address, add3.address];
-        let cids = ["ipfs1", "ipfs2", "ipfs3", "ipfs4"];
+        let addresses = [add1.address, add2.address, add3.address, add3.address, deployer.address];
+        let cids = ["ipfs1", "ipfs2", "ipfs3", "ipfs4", "ipfs5"];
         await deboxCore.send(addresses, cids)
         let messagesSentFromDelpoyer = await deboxCore.fetchSentMessages(deployer.address);
-        console.log(messagesSentFromDelpoyer)
-
+        expect(messagesSentFromDelpoyer[0].recipients[0]).to.equal(add1.address)
+        expect(messagesSentFromDelpoyer[0].recipients[1]).to.equal(add2.address)
+        expect(messagesSentFromDelpoyer[0].recipients[2]).to.equal(add3.address)
+        expect(messagesSentFromDelpoyer[0].recipients[3]).to.equal(add3.address)
+        expect(messagesSentFromDelpoyer[0].recipients[4]).to.equal(deployer.address)
     });
 })
