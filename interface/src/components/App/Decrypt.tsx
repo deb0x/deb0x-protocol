@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext, createContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Deb0x from "../../ethereum/deb0x"
 import {
-    Tooltip, List, ListItem,
-    ListItemText, ListItemButton, Typography, Box, CircularProgress
+    Tooltip, List, ListItem, ListItemText, ListItemButton, Typography, Box, 
+    CircularProgress,
+    Button,
+    Modal
 } from '@mui/material';
 import Stepper from './Stepper'
 import IconButton from "@mui/material/IconButton";
@@ -14,33 +16,40 @@ import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import axios from 'axios';
 import formatAccountName from "../Common/AccountName";
 import "../../componentsStyling/decrypt.scss"
+import { Add } from '@mui/icons-material';
+import { Announcement } from '@mui/icons-material';
+import ContactsSetter from '../ContactsSetter';
+import lock from '../../photos/lock.svg';
+import airplane from '../../photos/airplane.svg';
+import users from '../../photos/users.svg';
+import hand from '../../photos/hand.svg';
+import avatar from '../../photos/icons/avatars/test-avatar-1.svg';
+import ReadedMessagesContext from '../Contexts/ReadedMessagesContext';
+import ReadedMessagesProvider from '../Contexts/ReadedMessagesProvider';
+import { Encrypt } from './Encrypt';
 
-const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61"
+const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61";
 
 export function Decrypt(props: any): any {
     const { account, library } = useWeb3React()
     const [loading, setLoading] = useState(true)
     const [encryptionKeyInitialized, setEncryptionKeyInitialized] = 
-        useState<boolean|undefined>(undefined)
+        useState<boolean|undefined>(undefined);
+    const [decrypted, setDecrypted] = useState<any>();
+    const savedContacts = JSON.parse(localStorage.getItem('contacts') || 'null'); 
 
 
     useEffect(() => {
-        console.log("useEffect")
         setLoading(true)
         getPublicEncryptionKey()
     }, [account]);
 
     const getPublicEncryptionKey = async () => {
         const deb0xContract = Deb0x(library, deb0xAddress)
-        console.log(account)
         const key = await deb0xContract.getKey(account)
-        console.log(key)
         const initialized = (key != '') ? true : false
-        console.log(initialized)
         setEncryptionKeyInitialized(initialized)
     }
-
-    
 
     async function decrypt(encryptedMessage: any) {
         try {
@@ -55,18 +64,58 @@ export function Decrypt(props: any): any {
     }
 
     async function fetchMessage(message: any) {
-        return await axios.get(`https://ipfs.io/ipfs/${message}`)
+        return await axios.get(`https://deb0x-test.infura-ipfs.io/ipfs/${message}`)
     }
 
     function Message(props: any) {
         const encryptMessage = props.message.fetchedMessage.data
-        const [message, setMessage] = useState(props.message.fetchedMessage.data)
+        const [message, setMessage] =
+            useState(props.message.fetchedMessage.data)
         const [ensName,setEnsName] = useState("");
         //const [sender, setSender] = useState(props.messsage.sender)
-        const [messageTime,setMessageTime] = useState("Mar 17, 18:36")
+        const [messageTime, setMessageTime] = useState("Mar 17, 18:36")
+        const [isDecrypted, setIsDecrypted] = useState(false);
+        const min = 1;
+        const max = 50;
+        const [randomImage] = useState<number>(Math.floor(Math.random() * (max - min + 1)) + min);
+        let [show, setShow] = useState(false);
+        const [isReaded, setIsReaded] = useState(false);
+        
+        const useMessages = () => useContext(ReadedMessagesContext)
+        const {readed, setReaded} = useMessages()!;
+
         useEffect(()=>{
             checkENS();
         },[])
+
+        const addMessage = () => {
+            let messageList = JSON.parse(localStorage.getItem('messages') || 'null');
+            if(!messageList.includes(message)) {
+                readed.push(message);
+                setReaded([...readed]);
+            }
+        }
+
+        useEffect(() => {
+            localStorage.setItem('messages', JSON.stringify(readed));
+            checkMessageInLocalStorage();
+        })
+
+        const checkMessageInLocalStorage = () => {
+            let messageList = JSON.parse(localStorage.getItem('messages') || 'null');
+            messageList.map((element: any) => {
+                if (element === message)
+                    setIsReaded(true);
+            })
+        }
+
+        useEffect(()=>{
+            if(props.index !== props.previousIndex && isDecrypted===true){
+                hideMessage();
+            }
+
+        },[props.previousIndex])
+
 
         async function checkENS() {
             let name = await library.lookupAddress(props.message.sender);
@@ -77,139 +126,235 @@ export function Decrypt(props: any): any {
 
         async function decryptMessage() {
             const decryptedMessage = await decrypt(message)
+            
             if(decryptedMessage) {
-                setMessage(decryptedMessage)
+                setIsDecrypted(false);
+                setMessage(decryptedMessage);
+                setIsDecrypted(true);
+                props.setPreviousIndex(props.index);
             }
+
+            checkMessageInLocalStorage();
         }
 
         async function hideMessage() {
-            console.log("sss")
-            setMessage(encryptMessage)
+            setMessage(encryptMessage);
+            setIsDecrypted(false);
+        }
+
+        function checkSenderInLocalStorage(sender: any) {
+            let user: any;
+
+            if (ensName !== "") {
+                user = ensName;
+            } else {
+                savedContacts.map((contact: any) => {
+                    if (sender == contact.address) {
+                        user = true;
+                    }
+                })
+            }
+
+           return user;
         }
 
 
-    
         return (
-            <ListItem sx ={{border:1, marginBottom:1}} disablePadding key={props.index}    secondaryAction={ 
-                <IconButton className={`${(message !== props.message.fetchedMessage.data) ? "list-item-btn" : ""}`}  
-                        onClick={()=>{hideMessage()}}  edge="end" aria-label="comments">
-                    { (message !== props.message.fetchedMessage.data) ? <VisibilityOffIcon  />: null}
-                </IconButton>  
-            }
-                className="messages-list-item"
-            >
-                <Tooltip 
-                    title={(message === props.message.fetchedMessage.data) ? 
-                    "Click to decrypt" : `Sender:${props.message.sender}`} 
-                    placement="right">
-                    <ListItemButton className="list-item-button"
+            <ReadedMessagesProvider>
+                <ListItem
+                    disablePadding 
+                    key={props.index}    
+                    secondaryAction={ 
+                        <IconButton className={`${
+                                (message !== props.message.fetchedMessage.data) ? 
+                                "list-item-btn" : ""}`
+                            }  
+                            onClick={()=>{hideMessage()}}  
+                            edge="end" 
+                            aria-label="comments">
+                            { (message !== props.message.fetchedMessage.data) ? 
+                                <VisibilityOffIcon className='visibility-icon' /> : null
+                            }
+                        </IconButton>  
+                    }
+                    className={`messages-list-item card ${isReaded ? "read" : "unread"}` }>
+                    <ListItemButton 
+                        className={`list-item-button ${isDecrypted ? "active" : ""}` }
                         onClick={() => {
                             if(message === props.message.fetchedMessage.data) {
                                 decryptMessage()
                             }
+                            addMessage();
+
                         }}>
                         <div>
-
+                            <img width="58px" height="58px" src={require(`../../photos/icons/avatars/animal-${randomImage}.svg`).default} alt="avatar"/>
                         </div>
-                        <ListItemText
-                        primary={ 
-                         (ensName === "")  ?
-                    
-                        <>
-                            <div className="message-heading">
-                                <p><strong>{formatAccountName(props.message.sender)}</strong></p>
-                                <p className="time-stamp"><small>{messageTime}</small></p>
-                            </div>
-                            <p className={`message ${message === props.message.fetchedMessage.data ? "message-overflow" : ""}` }>
-                                { message }
-                            </p>
-                        </>
-                         
-                        :
-                        <>
-                            <div className="message-heading">
-                                <p><strong>{ensName}</strong></p>
-                                <p className="time-stamp"><small>{messageTime}</small></p>
-                            </div>
-                            <p className={`message ${message === props.message.fetchedMessage.data ? "message-overflow" : ""}` }>
-                                { message }
-                            </p>
-                        </>
+                        <ListItemText primary={
+                            <>
+                                <div className="message-left">
+                                    <div className="message-heading">
+                                        <p>From: 
+                                            {
+                                                checkSenderInLocalStorage(props.message.sender) ?
+                                                savedContacts.filter((contact: any) => props.message.sender == contact.address)
+                                                    .map((filteredPerson: any) => (
+                                                        filteredPerson.name
+                                                    )) :
+                                                    formatAccountName(
+                                                        props.message.sender
+                                                    )
+                                            }
+                                        </p>
+                                        <p className="time-stamp">
+                                            {messageTime}
+                                        </p>
+                                    </div>
+                                    <div className="message-container">
+                                        <p className="message message-overflow"
+                                            dangerouslySetInnerHTML={{ __html: message }} />
+                                        <Announcement className="new-message-icon" />
+                                    </div>
+                                </div>
+                                
+                            </> 
                         }/>
-                         
                     </ListItemButton>
-                </Tooltip>
-            </ListItem>
-            )
+                    {isDecrypted ? 
+                        <div className="message-right">
+                            <div className="message-heading">
+                                <div className="address">
+                                    <p>From: 
+                                        <strong>
+                                        {
+                                            checkSenderInLocalStorage(props.message.sender) ?
+                                                savedContacts.filter((contact: any) => props.message.sender == contact.address)
+                                                    .map((filteredPerson: any) => (
+                                                        filteredPerson.name
+                                                    )) :
+                                                    formatAccountName(
+                                                        props.message.sender
+                                                    )
+                                        }
+                                        </strong>
+                                    </p>
+                                    <>
+                                        {!checkSenderInLocalStorage(props.message.sender) ? 
+                                            <IconButton onClick={() => setShow(true)}>
+                                                <Add />
+                                            </IconButton> :
+                                            <></>
+                                        }
+                                        
+                                        <ContactsSetter show={show} props={props.message.sender} 
+                                            onClickOutside={() => setShow(false)}/>
+                                    </>
+                                </div>
+                                <p className="time-stamp">
+                                    <small>
+                                        {messageTime}
+                                    </small>
+                                </p>
+                            </div>
+                            <p className="message" 
+                                dangerouslySetInnerHTML={{ __html: message }} />
+                            <Encrypt props={props.message.sender}/>
+                        </div> : 
+                        <></> 
+                    }
+                </ListItem>
+            </ReadedMessagesProvider>
+        )
     }
 
     function GetMessages() {
-
         const [fetchedMessages, setFetchedMessages] = useState<any>([])
+        const [previousIndex, setPreviousIndex] = useState<number>();
 
         useEffect(() => {
             processMessages()
         }, []);
 
+
+
         async function processMessages() {
             const deb0xContract = Deb0x(library, deb0xAddress)
-            
-            const senderAddresses = await deb0xContract.fetchMessageSenders(account)
-
-            const cidsPromises = senderAddresses.map(async function(sender:any){
-                return { cids: await deb0xContract.fetchMessages(account, sender), sender: sender}
-            })
+            const senderAddresses = 
+                await deb0xContract.fetchMessageSenders(account)
+            const cidsPromises = 
+                senderAddresses.map(async function(sender:any) {
+                    return { 
+                        cids: await deb0xContract.fetchMessages(account, sender),
+                        sender: sender
+                    }
+                })
 
             const cids = await Promise.all(cidsPromises)
 
-            console.log(cids)
+            const encryptedMessagesPromisesArray = 
+                cids.map(async function(cidArray: any) {
+                    const encryptedMessagesPromises = 
+                        cidArray.cids.map(async function (cid: any) {
+                            return { 
+                                fetchedMessage: await fetchMessage(cid),
+                                sender: cidArray.sender
+                            }
+                        })
+                    const promise = await Promise.all(encryptedMessagesPromises)
 
-            const encryptedMessagesPromisesArray = cids.map(async function(cidArray: any) {
-                console.log(cidArray)
-                const encryptedMessagesPromises = cidArray.cids.map(async function (cid: any) {
-                    return { fetchedMessage:await fetchMessage(cid), sender: cidArray.sender}
+                    return promise
                 })
-                const promise = await Promise.all(encryptedMessagesPromises)
 
-                return promise
-            })
-
-            const encryptedMessages = await Promise.all(encryptedMessagesPromisesArray)
-            
-            console.log(encryptedMessages)
+            const encryptedMessages = 
+                await Promise.all(encryptedMessagesPromisesArray)
             
             setFetchedMessages(encryptedMessages.flat())
             setLoading(false)
+
         }
 
         if(!loading) {
             if (fetchedMessages.length === 0) {
                 return (
-                    <>
-                        <div className="message-placeholder">
-                            <MailOutlineIcon />
-                            <Typography variant="h5"
-                                gutterBottom
-                                component="div"
-                                sx={{marginLeft: .8, marginTop: 3}}
-                            >
-                                No messages yet.
-                            </Typography>
+                    <div className='clouds'>
+                        <div className="cloudOne">
+                            <img src={require(`../../photos/icons/clouds/cloud-2.svg`).default} alt="cloud-1" />
                         </div>
-                    </>
+                        <div className="cloudTwo">
+                            <img src={require(`../../photos/icons/clouds/cloud-1.svg`).default} alt="cloud-2" />
+                        </div>
+                        <div className="cloudThree">
+                            <img src={require(`../../photos/icons/clouds/cloud-3.svg`).default} alt="cloud-3" />
+                        </div>
+                        <div className="cloudText">
+                            Cloudy with a chance of messages
+                        </div>
+                    </div>
                 )
             } else {
                 return (
-                    <Box sx={{ width: '100%', maxWidth: 1080, margin: '0 auto'}}>
-                        <List>
+                    <div className="row messages-list">
+                        <List className="col-md-4 col-sm-12">
+                            <Box className="pagination" sx={{display:"flex"}}>
+                                <Pagination count={1} />
+                                <IconButton size="large" onClick={()=> setLoading(true) }>
+                                    <RefreshIcon fontSize="large"/>
+                                </IconButton>
+                            </Box>
                             {fetchedMessages.map((message: any, i: any) => {
                                 return (
-                                    
-                                        <Message message={message} index={i} key={i} />
+                                    <Message message={message} index={i} 
+                                        key={i} previousIndex={previousIndex} 
+                                        setPreviousIndex={setPreviousIndex} />
                                 )
                             })}
                         </List>
-                    </Box>
+                        <Box className="corner-image col-md-8">
+                            <div>
+                                
+                            </div>
+                        </Box>
+                    </div>
                 )
             }
         } else {
@@ -219,22 +364,13 @@ export function Decrypt(props: any): any {
                 </div>
             )
         }
-
     }
     
     if (encryptionKeyInitialized === true) {
         return (
-            <Box>
-                <Box className="pagination" sx={{display:"flex"}}>
-                    <Pagination count={1} showFirstButton showLastButton />
-                    <IconButton size="large" onClick={()=> setLoading(true) }>
-                        <RefreshIcon fontSize="large"/>
-                    </IconButton>
-                </Box>
-                <Box>
-                    <GetMessages />
-                </Box>
-            </Box>
+            <div className="content-box">
+                <GetMessages />
+            </div>
         )
     } else if (encryptionKeyInitialized === false) {
         return (

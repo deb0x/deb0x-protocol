@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import ThemeContext, { initialThemeState } from "./ThemeContext";
 
 type Props = {
@@ -24,7 +24,7 @@ const ThemeProvider = ( { children }: Props ) => {
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>
-      <div className={`theme--${theme}`}>{children}</div>
+      <div className={`theme theme--${theme}`}>{children}</div>
     </ThemeContext.Provider>
   );
 };

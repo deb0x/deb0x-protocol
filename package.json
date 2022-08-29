@@ -1,34 +1,38 @@
 {
-  "name": "deb0x-proto-01",
-  "version": "1.0.0",
-  "description": "Decentralized Private Mail Protocol",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/starfish-technologies-srl/deb0x-proto-01.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/starfish-technologies-srl/deb0x-proto-01/issues"
-  },
-  "homepage": "https://github.com/starfish-technologies-srl/deb0x-proto-01#readme",
-  "devDependencies": {
-    "@nomiclabs/hardhat-ethers": "^2.0.3",
-    "@nomiclabs/hardhat-waffle": "^2.0.1",
-    "chai": "^4.3.4",
-    "ethereum-waffle": "^3.4.0",
-    "ethers": "^5.5.2",
-    "hardhat": "^2.8.0",
-    "react-error-overlay": "^6.0.9"
-  },
-  "dependencies": {
-    "@openzeppelin/contracts": "^4.5.0",
-    "dotenv": "^10.0.0",
-    "solidity-coverage": "^0.7.21"
-  }
+    "name": "deb0x-proto-01",
+    "version": "1.0.0",
+    "description": "Decentralized Private Mail Protocol",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/starfish-technologies-srl/deb0x-proto-01.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/starfish-technologies-srl/deb0x-proto-01/issues"
+    },
+    "homepage": "https://github.com/starfish-technologies-srl/deb0x-proto-01#readme",
+    "devDependencies": {
+        "@nomiclabs/hardhat-ethers": "^2.0.3",
+        "@nomiclabs/hardhat-waffle": "^2.0.1",
+        "chai": "^4.3.4",
+        "ethereum-waffle": "^3.4.0",
+        "ethers": "^5.5.2",
+        "hardhat": "^2.8.0",
+        "react-error-overlay": "^6.0.9"
+    },
+    "dependencies": {
+        "@openzeppelin/contracts": "^4.5.0",
+        "dotenv": "^10.0.0",
+        <<
+        << << < HEAD "solidity-coverage": "^0.7.21" ===
+            === =
+            "draftjs-to-html": "^0.9.1" >>>
+            >>> > origin / main
+    }
 }

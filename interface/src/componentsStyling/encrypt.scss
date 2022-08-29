@@ -1,14 +1,30 @@
 @import './theme.scss';
 
-.form-container {
+.main-container {
     @include themed() {
-        form {
-            padding-top: 15px;
-            .MuiFormControl-root {
-                width: 100%;
-                .MuiOutlinedInput-root {
-                    margin: 5px 0;
-                    input {
+        .content-box.form-container {
+            form {
+                padding-top: 15px;
+                .MuiFormControl-root {
+                    width: 100%;
+                    .MuiOutlinedInput-root {
+                        margin: 5px 0;
+                        input {
+                            box-sizing: inherit;
+                            font-size: 12px;
+                            color: t('text');
+                            background-color: t('text-field-color');
+                            border: 1px solid t('text-field-color');
+                            border-radius: 32px;
+                            height: 50px;
+                            left: 489px;
+                            margin-bottom: 40px;
+                        }
+                        fieldset {
+                            display: none;
+                        }
+                    }
+                    .MuiInputBase-multiline {
                         box-sizing: inherit;
                         font-size: 12px;
                         color: t('text');
@@ -16,43 +32,92 @@
                         border: 1px solid t('text');
                         border-radius: 4px;
                     }
-                    fieldset {
-                        display: none;
+                }
+                .address-list {
+                    display: flex;
+                    flex-direction: column;
+                    padding: 5px;
+                    div.MuiButtonBase-root {
+                        margin: 2px 0;
+                        background-color: t('bg');
+                        color: t('text');
+                        border: 1px solid t('text');
+                    }
+                } 
+                .estimated-reward {
+                    top: 933px;
+                    left: 514px;
+                    width: 255px;
+                    height: 23px;
+                    text-align: left;
+                    letter-spacing: 0px;
+                    color: t('bar-color');
+                    opacity: 1;
+                    margin-top: 12px;
+                    margin-left: 35px;
+                }
+                .yellow-bar {
+                    position: absolute;
+                    top: 122px;
+                    width: 90%;
+                    transform: translateX(-5%);
+                    left: 10%;
+                    border: 4px solid #F5B700;
+                    opacity: 0.8;
+                    border-radius: 13px;
+                }
+                .wrapper {
+                    border: 1px solid t('text-field-color');
+                    background-color: t('text-field-color');
+                    border-radius: 25px 25px 84px 25px;
+                    margin-bottom: 50px;
+                    position: relative;
+                    .rdw-editor-toolbar {
+                        border-radius: 25px;
+                        border: none;
+                        width: 80%;
+                        position: absolute;
+                        bottom: -25px;
+                        margin: 0;
+                        .rdw-option-wrapper, 
+                        .rdw-dropdown-wrapper {
+                            border: none;
+                            background-color: transparent;
+                        }
                     }
                 }
-                .MuiInputBase-multiline {
-                    box-sizing: inherit;
+                .editor {
+                    height: 40vh;
+                    padding: 15px;
+                }
+                .send-btn {
                     font-size: 12px;
-                    color: t('text');
-                    background-color: t('bg');
-                    border: 1px solid t('text');
-                    border-radius: 4px;
+                    background-color:  #F5B700;
+                    border-radius: 50%;
+                    width: 88px;
+                    height: 88px;
+                    position: absolute;
+                    margin-bottom: 35px;
+                    z-index: 9;
+                    .MuiLoadingButton-loadingIndicator {
+                        color: black;
+                        .MuiCircularProgress-root {
+                            width: 32px !important;
+                            height: 32px !important;
+                        }
+                    }
+                    
                 }
-            }
-            .address-list {
-                display: flex;
-                flex-direction: column;
-                padding: 5px;
-                div.MuiButtonBase-root {
-                    margin: 2px 0;
-                    background-color: t('bg');
-                    color: t('text');
-                    border: 1px solid t('text');
+                .send-papper-airplane {
+                    margin-right: 17px;
+                    height: 47px;
                 }
-            } 
-            .wrapper {
-                border: 1px solid t('text');
-                border-radius: 4px;
-            }
-            .editor {
-                min-height: 250px;
-            }
-            .send-btn {
-                font-size: 12px;
-                color: t('text');
-                background-color: t('bg');
-                border: 1px solid t('text');
-                border-radius: 4px;
+                .MuiLoadingButton-loadingIndicator {
+                    color: t('text');
+                    position: relative;
+                    left: 0;
+                    transform: none;
+                }
             }
         }
     }
@@ -64,6 +129,9 @@
             form {
                 .address-list {
                     display: inline-block;
+                }
+                .wrapper {
+                    margin-bottom: 0;
                 }
             }
         }

@@ -3,29 +3,97 @@
 .app-container {
     @include themed() {
         .container{
+            min-height: 65vh;
+            background: t('stake-bg');
+            box-shadow: t('box-shadow');
+            border-radius: 25px 10px 85px 25px;
+            margin-bottom: 35px;
             .heading-card {
                 font-size: 24px;
                 border: 0;
                 box-shadow: none;
-            }
-            .card-container {
-                .tab-container {
-                    width: 100%;
-                    .tab-btn {
-                        width: 100%;
+                background: t('stake-bg');
+                color: t('text');
+                margin-bottom: 42px;
+                color: #D64933;
+                padding: 50px;
+                h4 {
+                    .logo {
+                        padding-right: 15px;
                     }
                 }
             }
-            .submit-btn {
-                font-size: 12px;
+            .card-container {
+                background-color: t('card-color');
                 color: t('text');
-                background-color: t('bg');
-                border: 1px solid t('text');
+                border-radius: 25px;
+                margin: 15px;
+                position: relative;
+                overflow: unset;
+                .tab-container {
+                    background: t('logo-bg');
+                    width: 100%;
+                    border-radius: 25px 25px 0px 0px;
+                    .tab-btn {
+                        width: 100%;
+                        border: 0;
+                        color: t('text');
+                        margin: 7px;
+                        &.Mui-selected {
+                            background-color: t('stake-unstake-bg');
+                            border-radius: 26px;
+                            width: 100%;
+                            color: #D64933;
+                        }
+                        &:hover {
+                            border-radius: 26px;
+                        }
+                    }
+                }
+                .button-container {
+                    position: absolute;
+                    bottom: -35px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                }
+            }
+            .submit-btn {
+                font-size: 16px;
+                color: t('approve-stake-text');
+                margin: 0 auto;
+                background-color: t('card-color');
                 border-radius: 4px;
+                box-shadow: none;
+            }
+            .collect-btn {
+                font-size: 16px;
+                color: t('approve-stake-text');
+                margin: 0 auto;
+                background-color: t('bg');
+                border: 2px solid #F5B700;
+                border-radius: 33px;
+                box-shadow: none;
+                padding: 10px 40px;
             }
             .amount-row {
                 align-items: center;
             }
+            .display-element {
+                display: block;
+                margin: 0 auto;
+                padding-bottom: 10px;
+            }
+            .rewards {
+                color: #D64933;
+            }
         }
+    }
+}
+
+@media (max-width: 768px) {
+    .cards-grid {
+        height: 69vh;
+        overflow-y: scroll;
+        overflow-x: hidden;
     }
 }

@@ -63,6 +63,7 @@
   },
   "devDependencies": {
     "@metamask/eth-sig-util": "^4.0.0",
+    "@types/draftjs-to-html": "^0.8.1",
     "@types/react-draft-wysiwyg": "^1.13.4",
     "eth-sig-util": "^2.1.1",
     "react-error-overlay": "6.0.9"

@@ -2,19 +2,20 @@ import { useState, useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Deb0x from "../../ethereum/deb0x"
 import {
-    Tooltip, List, ListItem, Chip,
-    ListItemText, ListItemButton, Typography, Box, CircularProgress, Stack
+    List, ListItem, Chip,
+    ListItemText, ListItemButton, 
+    Box, CircularProgress, Stack
 } from '@mui/material';
 import Stepper from './Stepper'
-import { border } from '@mui/system';
 import IconButton from "@mui/material/IconButton";
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import Pagination from "@mui/material/Pagination";
 import RefreshIcon from '@mui/icons-material/Refresh';
-import Refresh from '@mui/icons-material/Refresh';
-import Button from "@mui/material/Button";
-import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import '../../componentsStyling/decrypt.scss';
+import formatAccountName from '../Common/AccountName';
+import cloud1 from '../../photos/icons/clouds/cloud-1.svg';
+import cloud2 from '../../photos/icons/clouds/cloud-2.svg';
+import cloud3 from '../../photos/icons/clouds/cloud-3.svg';
 
 const axios = require('axios')
 const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61"
@@ -23,25 +24,19 @@ export function Sent(props: any): any {
     const { account, library } = useWeb3React()
     const [loading, setLoading] = useState(true)
     const [encryptionKeyInitialized, setEncryptionKeyInitialized] = useState<boolean|undefined>(undefined)
-
+    const [messageSent, setmessageSent] = useState(false);
 
     useEffect(() => {
-        console.log("useEffect")
         setLoading(true)
         getPublicEncryptionKey()
     }, [account]);
 
     const getPublicEncryptionKey = async () => {
         const deb0xContract = Deb0x(library, deb0xAddress)
-        console.log(account)
         const key = await deb0xContract.getKey(account)
-        console.log(key)
         const initialized = (key != '') ? true : false
-        console.log(initialized)
         setEncryptionKeyInitialized(initialized)
     }
-
-    
 
     async function decrypt(encryptedMessage: any) {
         try {
@@ -56,7 +51,7 @@ export function Sent(props: any): any {
     }
 
     async function fetchMessage(message: any) {
-        return await axios.get(`https://ipfs.io/ipfs/${message}`)
+        return await axios.get(`https://deb0x-test.infura-ipfs.io/ipfs/${message}`)
     }
 
     function Message(props: any) {
@@ -65,102 +60,157 @@ export function Sent(props: any): any {
         const [recipients, setRecipients] = useState<string[]>([]);
         //const [sender, setSender] = useState(props.messsage.sender)
         const [messageTime,setMessageTime] = useState("Mar 17, 18:36")
-        useEffect(()=>{
+        const [ensName,setEnsName] = useState("");
+        const [isDecrypted, setIsDecrypted] = useState(false);
+        const savedContacts = JSON.parse(localStorage.getItem('contacts') || 'null'); 
+
+        useEffect(()=> {
             checkENS();
-            console.log(recipients)
         },[])
 
-        async function checkENS(){
+        useEffect(()=>{
+            if(props.index !== props.previousIndex && isDecrypted===true){
+                hideMessage();
+            }
+
+        },[props.previousIndex])
+
+        async function checkENS() {
             let recipientsTemp:any = []
-            const recipientsFiltered = props.message.recipients.filter((recipient:any) => recipient != account)
+            const recipientsFiltered = props.message.recipients;
 
             for(let recipient of recipientsFiltered) {
                 let name = await library.lookupAddress(recipient);
                 if(name !== null)
                 {   
-                    console.log("not null")
                     recipientsTemp = [...recipientsTemp, name];
                 } else {
-                    recipientsTemp = [...recipientsTemp, `${recipient.substring(0, 5)}...${recipient.substring(recipient.length - 4)}`];
+                    recipientsTemp = [...recipientsTemp, recipient];
                 }
             }
-            
+
             setRecipients(recipientsTemp)
         }
 
         async function decryptMessage() {
             const decryptedMessage = await decrypt(message)
             if(decryptedMessage) {
-                setMessage(decryptedMessage)
+                setIsDecrypted(false);
+                setMessage(decryptedMessage);
+                setIsDecrypted(true);
+                props.setPreviousIndex(props.index);
             }
         }
 
         async function hideMessage(){
-            console.log("sss")
-            setMessage(encryptMessage)
+            setMessage(encryptMessage);
+            setIsDecrypted(false);
         }
 
+        function generateRandomNumber() {
+            const min = 1;
+            const max = 50;
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
 
+        
+        function checkSenderInLocalStorage(sender: any) {
+            let user: any;
+
+            if (ensName !== "") {
+                user = ensName;
+            } else {
+                savedContacts.map((contact: any) => {
+                    if (sender == contact.address) {
+                        user = true;
+                    }
+                })
+            }
+
+           return user;
+        }
+
+        function handleDecryptMessage() {
+            if(message === props.message.fetchedMessage.data) {
+                decryptMessage()
+            }
+        }
     
         return (
-            <ListItem sx ={{border:1, marginBottom:1}} disablePadding key={props.index}    secondaryAction={ 
-                <IconButton className={`${(message != props.message.fetchedMessage.data) ? "list-item-btn" : ""}`}  
-                        onClick={()=>{hideMessage()}}  edge="end" aria-label="comments">
-                    { (message != props.message.fetchedMessage.data) ? <VisibilityOffIcon  />: null}
-                </IconButton>  
-            }
+            <ListItem disablePadding key={props.index}
+                secondaryAction={ 
+                    <IconButton 
+                        className={`${(message != props.message.fetchedMessage.data) ? "list-item-btn" : ""}`}  
+                        onClick={()=> hideMessage() }  edge="end" aria-label="comments">
+                        { (message != props.message.fetchedMessage.data) ? <VisibilityOffIcon  />: null}
+                    </IconButton>  
+                }
                 className="messages-list-item"
             >
-                <Tooltip 
-                    title={(message === props.message.fetchedMessage.data) ? 
-                    "Click to decrypt" : `Sender:${props.message.sender}`} 
-                    placement="right">
-                    <ListItemButton className="list-item-button"
-                        onClick={() => {
-                            if(message === props.message.fetchedMessage.data) {
-                                decryptMessage()
-                            }
-                        }}>
-                        <div>
-
-                        </div>
-                        <ListItemText
-                        primary={
+                <ListItemButton className="list-item-button"
+                    onClick={() => handleDecryptMessage()}>
+                    <div>
+                        <img width="58px" height="58px" src={require(`../../photos/icons/avatars/animal-${generateRandomNumber()}.svg`).default} alt="avatar"/>
+                    </div>
+                    <ListItemText primary={
                         <>
-                            <div className="message-heading">
-                                <p><small>To: </small></p>
-                                    <Stack direction="row" spacing={1}>
-                                        {
-                                            recipients.map((recipient: any) => {
-                                                console.log(recipients)
-                                                return (
-                                                    <Chip
-                                                        key={recipient}
-                                                        color="primary"
-                                                        label={recipient}
-                                                        variant="outlined"
-                                                    />
-                                                )
-                                            })
-                                        }
-                                    </Stack>
-                                <p><small>{messageTime}</small></p>
+                            <div className="message-left">
+                                <div className="message-heading">
+                                    <p><small>To: </small></p>
+                                        <div>
+                                            {
+                                                recipients.map((recipient: any) => {
+                                                    return (
+                                                        <span
+                                                            key={recipient}>
+                                                                {
+                                                                checkSenderInLocalStorage(recipient) ?
+                                                                    savedContacts.filter((contact: any) => recipient == contact.address)
+                                                                        .map((filteredPerson: any) => (
+                                                                            filteredPerson.name
+                                                                        )) :
+                                                                        formatAccountName(recipient)
+                                                                }
+                                                        </span>
+                                                    )
+                                                })
+                                            }
+                                        </div>
+                                    <p><small>{messageTime}</small></p>
+                                </div>
+                                <p className={`message 
+                                        ${message === props.message.fetchedMessage.data ? 
+                                        "message-overflow" : ""}` }
+                                    dangerouslySetInnerHTML={{ __html: message }}>
+                                </p>
                             </div>
-                            <p className={`message ${message === props.message.fetchedMessage.data ? "message-overflow" : ""}` }>
-                                { message }
-                            </p>
                         </>
-                        }/>
-                         
-                    </ListItemButton>
-                </Tooltip>
+                    }/>
+                </ListItemButton>
+                {isDecrypted ? 
+                    <div className="message-right">
+                        <div className="message-heading">
+                            <p><small>To: </small></p>
+                                <Stack direction="row" spacing={1}>
+                                    {
+                                        checkSenderInLocalStorage(recipients) 
+                                    }
+                                </Stack>
+                            <p><small>{messageTime}</small></p>
+                        </div>
+                        <p className={`message ${message === props.message.fetchedMessage.data ? "message-overflow" : ""}` }
+                            dangerouslySetInnerHTML={{ __html: message }}>
+                        </p>
+                    </div> : 
+                    <></>
+                }
             </ListItem>
             )
     }
 
     function GetMessages() {
-
-        const [fetchedMessages, setFetchedMessages] = useState<any>([])
+        const [fetchedMessages, setFetchedMessages] = useState<any>([]);
+        const [previousIndex,setPreviousIndex] = useState<number>();
 
         useEffect(() => {
             processMessages()
@@ -170,49 +220,55 @@ export function Sent(props: any): any {
             const deb0xContract = Deb0x(library, deb0xAddress)
             
             const sentMessages = await deb0xContract.fetchSentMessages(account)   
-            console.log(sentMessages)
 
             const sentMessagesRetrieved = sentMessages.map(async function (item: any) {
-                //console.log(item[0], item[1])
                 return { fetchedMessage: await fetchMessage(item.cid), recipients: item.recipients}
             })
 
             const messages = await Promise.all(sentMessagesRetrieved)
 
-            //console.log(messages)
-            
             setFetchedMessages(messages)
             setLoading(false)
         }
 
         if(!loading) {
-            if (fetchedMessages.length == 0) {
+            if (fetchedMessages.length === 0) {
                 return (
                     <>
-                        <div className="message-placeholder">
-                            <MailOutlineIcon />
-                            <Typography variant="h5"
-                                gutterBottom
-                                component="div"
-                                sx={{marginLeft: .8, marginTop: 3}}
-                            >
-                                No messages yet.
-                            </Typography>
+                        <div className='clouds'>
+                            <div className="cloudOne">
+                                <img src={cloud2} alt="cloud-2" />
+                            </div>
+                            <div className="cloudTwo">
+                                <img src={cloud1} alt="cloud-1" />
+                            </div>
+                            <div className="cloudThree">
+                                <img src={cloud3} alt="cloud-3" />
+                            </div>
+                            <div className="cloudText">
+                                Cloudy with a chance of messages
+                            </div>
                         </div>
                     </>
                 )
             } else {
                 return (
-                    <Box sx={{ width: '100%', maxWidth: 1080, margin: '0 auto'}}>
-                        <List>
+                    <div className="row messages-list">
+                        <List className="col-md-4 col-sm-12">
                             {fetchedMessages.map((message: any, i: any) => {
                                 return (
-                                    
-                                        <Message message={message} index={i} key={i} />
+                                    <Message message={message} index={i} 
+                                        key={i} previousIndex={previousIndex} 
+                                        setPreviousIndex={setPreviousIndex} />
                                 )
                             })}
                         </List>
-                    </Box>
+                        <Box className="intro-box sent col-md-8">
+                            <div className="open-message">
+                                <p>Come on, don't be shy. Open a message</p>
+                            </div>
+                        </Box>
+                    </div>
                 )
             }
         } else {
@@ -227,19 +283,19 @@ export function Sent(props: any): any {
     
     if(encryptionKeyInitialized == true){
         return (
-            // sx={{display:"flex"}}
-            <Box>
-                <Box className="pagination" sx={{display:"flex"}}>
-                    <Pagination count={1} showFirstButton showLastButton />
-                    <IconButton size="large" onClick={()=> setLoading(true) }>
-                        <RefreshIcon fontSize="large"/>
-                    </IconButton>
-                </Box>
+            <div className="content-box">
                 <Box>
-                    <GetMessages />
+                    <Box className="pagination" sx={{display:"flex"}}>
+                        <Pagination count={1} showFirstButton showLastButton />
+                        <IconButton size="large" onClick={()=> setLoading(true) }>
+                            <RefreshIcon fontSize="large"/>
+                        </IconButton>
+                    </Box>
+                    <Box>
+                        <GetMessages />
+                    </Box>
                 </Box>
-            </Box>
-           
+           </div>
         )
     } else if(encryptionKeyInitialized == false){
         return (
