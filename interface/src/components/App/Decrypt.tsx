@@ -222,43 +222,45 @@ export function Decrypt(props: any): any {
                     </ListItemButton>
                     {isDecrypted ? 
                         <div className="message-right">
-                            <div className="message-heading">
-                                <div className="address">
-                                    <p>From: 
-                                        <strong>
-                                        {
-                                            checkSenderInLocalStorage(props.message.sender) ?
-                                                savedContacts.filter((contact: any) => props.message.sender == contact.address)
-                                                    .map((filteredPerson: any) => (
-                                                        filteredPerson.name
-                                                    )) :
-                                                    formatAccountName(
-                                                        props.message.sender
-                                                    )
-                                        }
-                                        </strong>
+                            <div className="message-right--container">
+                                <div className="message-heading">
+                                    <div className="address">
+                                        <p>From: 
+                                            <strong>
+                                            {
+                                                checkSenderInLocalStorage(props.message.sender) ?
+                                                    savedContacts.filter((contact: any) => props.message.sender == contact.address)
+                                                        .map((filteredPerson: any) => (
+                                                            filteredPerson.name
+                                                        )) :
+                                                        formatAccountName(
+                                                            props.message.sender
+                                                        )
+                                            }
+                                            </strong>
+                                        </p>
+                                        <>
+                                            {!checkSenderInLocalStorage(props.message.sender) ? 
+                                                <IconButton onClick={() => setShow(true)}>
+                                                    <Add />
+                                                </IconButton> :
+                                                <></>
+                                            }
+                                            
+                                            <ContactsSetter show={show} props={props.message.sender} 
+                                                onClickOutside={() => setShow(false)}/>
+                                        </>
+                                    </div>
+                                    <p className="time-stamp">
+                                        <small>
+                                            {messageTime}
+                                        </small>
                                     </p>
-                                    <>
-                                        {!checkSenderInLocalStorage(props.message.sender) ? 
-                                            <IconButton onClick={() => setShow(true)}>
-                                                <Add />
-                                            </IconButton> :
-                                            <></>
-                                        }
-                                        
-                                        <ContactsSetter show={show} props={props.message.sender} 
-                                            onClickOutside={() => setShow(false)}/>
-                                    </>
                                 </div>
-                                <p className="time-stamp">
-                                    <small>
-                                        {messageTime}
-                                    </small>
-                                </p>
+                                <p className="message" 
+                                    dangerouslySetInnerHTML={{ __html: message }} />
+                                <Encrypt props={props.message.sender}/>
                             </div>
-                            <p className="message" 
-                                dangerouslySetInnerHTML={{ __html: message }} />
-                            <Encrypt props={props.message.sender}/>
                         </div> : 
                         <></> 
                     }
