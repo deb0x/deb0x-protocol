@@ -81,6 +81,17 @@
                         }
                         &.active {
                             background-color: t('logo-bg');
+                            .message-left {
+                                .message {
+                                    &:first-child p {
+                                        display: none;
+                                    }
+                                }
+                                .message {
+                                    margin: 0;
+                                    height: 40px;
+                                }
+                            }
                         }
                     }
                     .time-stamp {
@@ -182,6 +193,7 @@
             overflow-y: auto;
             border-bottom-right-radius: 65px;
             background-color: t('bg');
+            z-index: 1;
             .message-right--container {
                 position: relative;
                 height: 100%;
