@@ -182,57 +182,62 @@
             overflow-y: auto;
             border-bottom-right-radius: 65px;
             background-color: t('bg');
-            .message-heading {
-                padding: 10px 15px;
-            }
-            .message {
-                padding: 10px 15px;
-            }
-            .address {
-                display: flex;
-                button {
-                    padding: 0 5px;
+            .message-right--container {
+                position: relative;
+                height: 100%;
+                .message-heading {
+                    padding: 10px 15px;
                 }
-                p {
-                    margin-bottom: 0 !important;
+                .message {
+                    padding: 10px 15px;
+                    height: calc(100% - 270px);
+                    overflow: auto;
                 }
-            }
-            .form-container{
-                position: absolute;
-                bottom: 0;
-                min-height: auto;
-                margin-bottom: 0;
-                border-radius: 0;
-                left: 50%;
-                transform: translateX(-50%);
-                &.content-box {
-                    margin: 0;
+                .address {
+                    display: flex;
+                    button {
+                        padding: 0 5px;
+                    }
+                    p {
+                        margin-bottom: 0 !important;
+                    }
                 }
-                form {
-                    .wrapper {
-                        margin-bottom: 10px;
-                        .rdw-editor-toolbar.toolbar {
-                            display: none;
-                        }
-                        .editor {
-                            min-height: 150px;
-                            height: 150px;
-                            overflow-y: auto;
-                            .rdw-left-aligned-block {
+                .form-container{
+                    position: sticky;
+                    bottom: 0;
+                    min-height: auto;
+                    margin-bottom: 0;
+                    border-radius: 0;
+                    &.content-box {
+                        margin: 0;
+                    }
+                    form {
+                        .wrapper {
+                            margin-bottom: 10px;
+                            .rdw-editor-toolbar.toolbar {
                                 display: none;
                             }
-                            .DraftEditor-root {
-                                height: 85%;
-                            }
-                            span {
-                                background-color: transparent;
+                            .editor {
+                                min-height: 150px;
+                                height: 150px;
+                                overflow-y: auto;
+                                .rdw-left-aligned-block {
+                                    display: none;
+                                }
+                                .DraftEditor-root {
+                                    height: 85%;
+                                }
+                                span {
+                                    background-color: transparent;
+                                }
                             }
                         }
-                    }
-                    .send-btn {
-                        margin-bottom: 0;
+                        .send-btn {
+                            margin-bottom: 0;
+                        }
                     }
                 }
+
             }
             
         }
