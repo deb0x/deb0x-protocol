@@ -207,67 +207,65 @@ function App() {
                     </div>
                 </div>
             </ContactsProvider> :
-            <>
-                <div className="app-container p-0 d-none">
-                    <div className="initial-page">
-                        <div className="row">
-                            <div className="col-md-7 img-container mr-4">
-                                <img className="image--left" src={elephant} />
-                                <div className="img-content">
-                                    <p>Hey, you!</p>
-                                    
-                                    <p>To use <img className="content-logo" src={logoGreen} /> you need to have your wallet connected</p>
-                                    <div>
-                                    { (() =>  {
-                                        const currentConnector = connectorsByName[ConnectorNames.Injected]
-                                        const activating = currentConnector === activatingConnector
-                                        const connected = currentConnector === connector
-                                        const disabled = !triedEager || !!activatingConnector || connected || !!error
+            <div className={`app-container p-0 ${account == undefined ? "" : "d-none"}` }>
+                <div className="initial-page">
+                    <div className="row">
+                        <div className="col-md-7 img-container mr-4">
+                            <img className="image--left" src={elephant} />
+                            <div className="img-content">
+                                <p>Hey, you!</p>
+                                
+                                <p>To use <img className="content-logo" src={logoGreen} /> you need to have your wallet connected</p>
+                                <div>
+                                { (() =>  {
+                                    const currentConnector = connectorsByName[ConnectorNames.Injected]
+                                    const activating = currentConnector === activatingConnector
+                                    const connected = currentConnector === connector
+                                    const disabled = !triedEager || !!activatingConnector || connected || !!error
 
-                                        return (
-                                            <Button variant="contained"
-                                                key={ConnectorNames.Injected}
-                                                // aria-describedby={id}
-                                                onClick={!connected ? 
-                                                    () => {
-                                                        setActivatingConnector(currentConnector)
-                                                        activate(currentConnector)
-                                                    } : 
-                                                    handleClick}
-                                                    className="connect-button">
-                                                
-                                                { activating ? 
-                                                    <Spinner color={'black'} /> :
-                                                    !connected ? 
-                                                        "Connect Wallet" :
-                                                        <span>
-                                                            {account === undefined ? 
-                                                                `Unsupported Network. Switch to ${networkName}` : 
-                                                                ''}
-                                                        </span>
-                                                }
-                                            </Button>
-                                        )
-                                    }) ()}
-                                    </div>
+                                    return (
+                                        <Button variant="contained"
+                                            key={ConnectorNames.Injected}
+                                            // aria-describedby={id}
+                                            onClick={!connected ? 
+                                                () => {
+                                                    setActivatingConnector(currentConnector)
+                                                    activate(currentConnector)
+                                                } : 
+                                                handleClick}
+                                                className="connect-button">
+                                            
+                                            { activating ? 
+                                                <Spinner color={'black'} /> :
+                                                !connected ? 
+                                                    "Connect Wallet" :
+                                                    <span>
+                                                        {account === undefined ? 
+                                                            `Unsupported Network. Switch to ${networkName}` : 
+                                                            ''}
+                                                    </span>
+                                            }
+                                        </Button>
+                                    )
+                                }) ()}
                                 </div>
                             </div>
-                            <div className="col-md-5">
-                                <div className="text-container">
-                                    <img className="dark-logo" src={logoGreen} />
-                                    <p>
-                                        The End to End Encrypted Decentralized 
-                                        Email Protocol <br />
-                                        <span className="text-green">
-                                            Owned by its Users
-                                        </span>
-                                    </p>
-                                </div>
+                        </div>
+                        <div className="col-md-5">
+                            <div className="text-container">
+                                <img className="dark-logo" src={logoGreen} />
+                                <p>
+                                    The End to End Encrypted Decentralized 
+                                    Email Protocol <br />
+                                    <span className="text-green">
+                                        Owned by its Users
+                                    </span>
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
-            </>
+            </div>
         }
     </ThemeProvider>
     </>
