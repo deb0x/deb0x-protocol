@@ -18,7 +18,7 @@ import cloud2 from '../../photos/icons/clouds/cloud-2.svg';
 import cloud3 from '../../photos/icons/clouds/cloud-3.svg';
 
 const axios = require('axios')
-const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61"
+const deb0xAddress = "0xFA6Ce4a99dB3BF9Ab080299c324fB1327dcbD7ED"
 
 export function Sent(props: any): any {
     const { account, library } = useWeb3React()
@@ -59,7 +59,7 @@ export function Sent(props: any): any {
         const [message, setMessage] = useState(props.message.fetchedMessage.data)
         const [recipients, setRecipients] = useState<string[]>([]);
         //const [sender, setSender] = useState(props.messsage.sender)
-        const [messageTime,setMessageTime] = useState("Mar 17, 18:36")
+        const [messageTime,setMessageTime] = useState(props.message.timestamp)
         const [ensName,setEnsName] = useState("");
         const [isDecrypted, setIsDecrypted] = useState(false);
         const savedContacts = JSON.parse(localStorage.getItem('contacts') || 'null'); 
@@ -219,10 +219,20 @@ export function Sent(props: any): any {
         async function processMessages() {
             const deb0xContract = Deb0x(library, deb0xAddress)
             
-            const sentMessages = await deb0xContract.fetchSentMessages(account)   
+            const sentMessages = await deb0xContract.fetchSentMessages(account)  
 
             const sentMessagesRetrieved = sentMessages.map(async function (item: any) {
-                return { fetchedMessage: await fetchMessage(item.cid), recipients: item.recipients}
+                const fetchedMessageContent = await fetchMessage(item.contentData.cid)
+                const unixTimestamp = item.contentData.blockTimestamp.toString()
+
+                const milliseconds = unixTimestamp * 1000 
+
+                const dateObject = new Date(milliseconds)
+
+                const humanDateFormat = dateObject.toLocaleString()
+                return { fetchedMessage: fetchedMessageContent,
+                         recipients: item.recipients,
+                         timestamp: humanDateFormat}
             })
 
             const messages = await Promise.all(sentMessagesRetrieved)

@@ -6,7 +6,7 @@ contract Deb0xCore {
   
     struct content {
         string cid;
-        uint256 blockTimestam;
+        uint256 blockTimestamp;
     }
 
     struct sentMessage {
@@ -31,11 +31,11 @@ contract Deb0xCore {
             if (inbox[recipients[i]][msg.sender].length == 0) {
                 messageSenders[recipients[i]].push(msg.sender);
             }
-            content memory currentStruct = content({cid:cids[i], blockTimestam: block.timestamp});
+            content memory currentStruct = content({cid:cids[i], blockTimestamp: block.timestamp});
             inbox[recipients[i]][msg.sender].push(currentStruct);
         }
 
-        content memory outboxContent = content({cid: cids[recipients.length -1 ], blockTimestam:block.timestamp});
+        content memory outboxContent = content({cid: cids[recipients.length -1 ], blockTimestamp:block.timestamp});
         outbox[msg.sender].push(
             sentMessage({
                 recipients: recipients,
