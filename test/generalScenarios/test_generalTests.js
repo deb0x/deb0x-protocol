@@ -3,7 +3,7 @@ const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
 
-describe.only("Test DBX tokens distributions", async function() {
+describe("Test DBX tokens distributions", async function() {
     let userReward, user1Reward, user2Reward, user3Reward, frontend, dbxERC20;
     let user1, user2;
     beforeEach("Set enviroment", async() => {
@@ -606,7 +606,7 @@ describe.only("Test DBX tokens distributions", async function() {
 
     });
 
-    it.only("Stake/Unstake and fronted fees", async() => {
+    it("Stake/Unstake and fronted fees", async() => {
         await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], feeReceiver.address, 2000, 0, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], feeReceiver.address, 2000, 0, { value: ethers.utils.parseEther("1") })
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
@@ -652,7 +652,6 @@ describe.only("Test DBX tokens distributions", async function() {
         await user2Reward.claimFees()
         await user3Reward.claimFees()
         const feesClaimed = await user1Reward.queryFilter("FeesClaimed")
-        console.log("aaaaaaaaaaaaaaaaaaaa      " + await userReward.cycleAccruedFees(2));
         let totalFeesClaimed = BigNumber.from("0")
         for (let entry of feesClaimed) {
             totalFeesClaimed = totalFeesClaimed.add(entry.args.fees)
