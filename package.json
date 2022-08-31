@@ -28,10 +28,6 @@
     },
     "dependencies": {
         "@openzeppelin/contracts": "^4.5.0",
-        "@remix-project/remixd": "^0.6.5",
-        "dotenv": "^10.0.0",
-        "draftjs-to-html": "^0.9.1",
-        "solc": "^0.8.16",
-        "solidity-coverage": "^0.7.21"
+        "dotenv": "^10.0.0"
     }
 }

@@ -1,9 +1,8 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
-const { BigNumber } = require("ethers");
 
-describe("Test contract", async function() {
+describe.skip("Test contract", async function() {
     let rewardedAlice, rewardedBob, rewardedCarol, dbxERC20;
     let alice, bob;
     beforeEach("Set enviroment", async() => {
@@ -25,116 +24,109 @@ describe("Test contract", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 2])
         await hre.ethers.provider.send("evm_mine")
 
-        const claimedRewards = await rewardedAlice.claimRewards()
-        console.log(await dbxERC20.balanceOf(alice.address))
+        try {
+            const claimedRewards = await rewardedAlice.claimRewards()
+        } catch (error) {
+            expect(error.message).to.equal("VM Exception while processing transaction: " +
+                "reverted with reason string 'Deb0x: You do not have rewards'");
+        }
     });
 
     it("Should claim no rewards for sending a message in the current cycle", async() => {
 
-        await rewardedAlice["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0)
+        await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 
 
-
-        const claimedRewards = await rewardedAlice.claimRewards()
-        console.log(await dbxERC20.balanceOf(alice.address))
-    });
-
-
-    it("Should claim share of rewards after sending a message in the previous day", async() => {
-        //console.log(await rewardedAlice.getCurrentCycleReward())
-        await rewardedAlice["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0)
-        await rewardedBob["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0)
-        await rewardedBob["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0)
-
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-        await hre.ethers.provider.send("evm_mine")
-
-        const claimedRewards = await rewardedAlice.claimRewards()
-    });
-
-    it("Should be able to claim previous cycle rewards and not reset current messages counter", async() => {
-        //console.log(await rewardedAlice.getCycleReward(0), await rewardedAlice.getCycleReward(1))
-        await rewardedAlice["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0)
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-        await hre.ethers.provider.send("evm_mine")
-
-        await rewardedAlice["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0)
-
-        await rewardedAlice.claimRewards()
-        console.log(await dbxERC20.balanceOf(alice.address))
-
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-        await hre.ethers.provider.send("evm_mine")
-
-        await rewardedAlice.claimRewards()
-        console.log(await dbxERC20.balanceOf(alice.address))
-    });
-
-    it("Should be able to claim previous 2 cycles rewards", async() => {
-        //console.log(await rewardedAlice.getCurrentCycle())
-        await rewardedAlice["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0)
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-        await hre.ethers.provider.send("evm_mine")
-
-        await rewardedAlice["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0)
-
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-        await hre.ethers.provider.send("evm_mine")
-
-        await rewardedAlice.claimRewards()
-        console.log(await dbxERC20.balanceOf(alice.address))
-    });
-
-    it("Should claim share of rewards after sending a message in the previous day", async() => {
-
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-        await hre.ethers.provider.send("evm_mine")
-
-        await rewardedAlice["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0)
-
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-        await hre.ethers.provider.send("evm_mine")
-
-        await rewardedBob["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0)
-        await rewardedAlice["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0)
-        await rewardedAlice["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0)
-
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 2])
-        await hre.ethers.provider.send("evm_mine")
-
-        await rewardedCarol["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0)
-
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-        await hre.ethers.provider.send("evm_mine")
-
-        for (let i = 0; i < 5; i++) {
-            console.log(await rewardedAlice.rewardPerCycle(i))
-        }
-
-        await rewardedAlice.claimRewards()
-        await rewardedBob.claimRewards()
-        await rewardedCarol.claimRewards()
-        console.log("Alice " + await dbxERC20.balanceOf(alice.address))
-        console.log("Bob " + await dbxERC20.balanceOf(bob.address))
-        console.log("Carol " + await dbxERC20.balanceOf(carol.address))
-    });
-
-    it("Try claim rewards twice", async() => {
-
-        await rewardedAlice["send(address[],string[],address,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, { value: ethers.utils.parseEther("1") })
-
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-        await hre.ethers.provider.send("evm_mine")
-
-        const claimedRewards = await rewardedAlice.claimRewards()
-        let balanceForAlice = await dbxERC20.balanceOf(alice.address);
-        let expectedValueAlice = BigNumber.from("100000000000000000000");
-        expect(balanceForAlice).to.equal(expectedValueAlice)
 
         try {
-            const claimedRewards2 = await rewardedAlice.claimRewards()
+            const claimedRewards = await rewardedAlice.claimRewards()
         } catch (error) {
-            expect(error.message).to.include("Deb0x: You do not have rewards");
+            expect(error.message).to.equal("VM Exception while processing transaction: " +
+                "reverted with reason string 'Deb0x: You do not have rewards'");
         }
+        console.log(await dbxERC20.balanceOf(alice.address))
     });
+
+    const claimedRewards = await rewardedAlice.claimRewards()
+    console.log(await dbxERC20.balanceOf(alice.address))
+});
+
+it("Should claim share of rewards after sending a message in the previous day", async() => {
+    //console.log(await rewardedAlice.getCurrentCycleReward())
+    await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+    await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+    await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
+    await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+    await hre.ethers.provider.send("evm_mine")
+
+    const claimedRewards = await rewardedAlice.claimRewards()
+    console.log(await dbxERC20.balanceOf(alice.address))
+});
+
+it("Should be able to claim previous cycle rewards and not reset current messages counter", async() => {
+    //console.log(await rewardedAlice.getCycleReward(0), await rewardedAlice.getCycleReward(1))
+    await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+    await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+    await hre.ethers.provider.send("evm_mine")
+
+    await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
+    await rewardedAlice.claimRewards()
+    console.log(await dbxERC20.balanceOf(alice.address))
+
+    await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+    await hre.ethers.provider.send("evm_mine")
+
+    await rewardedAlice.claimRewards()
+    console.log(await dbxERC20.balanceOf(alice.address))
+});
+
+it("Should be able to claim previous 2 cycles rewards", async() => {
+    //console.log(await rewardedAlice.getCurrentCycle())
+    await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+    await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+    await hre.ethers.provider.send("evm_mine")
+
+    await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
+    await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+    await hre.ethers.provider.send("evm_mine")
+
+    await rewardedAlice.claimRewards()
+    console.log(await dbxERC20.balanceOf(alice.address))
+});
+
+it("Should claim share of rewards after sending a message in the previous day", async() => {
+
+    await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+    await hre.ethers.provider.send("evm_mine")
+
+    await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
+    await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+    await hre.ethers.provider.send("evm_mine")
+
+    await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+    await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+    await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
+    await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 2])
+    await hre.ethers.provider.send("evm_mine")
+
+    await rewardedCarol["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
+    await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+    await hre.ethers.provider.send("evm_mine")
+
+    for (let i = 0; i < 5; i++) {
+        console.log(await rewardedAlice.rewardPerCycle(i))
+    }
+
+    await rewardedAlice.claimRewards()
+    await rewardedBob.claimRewards()
+    await rewardedCarol.claimRewards()
+    console.log("Alice " + await dbxERC20.balanceOf(alice.address))
+    console.log("Bob " + await dbxERC20.balanceOf(bob.address))
+    console.log("Carol " + await dbxERC20.balanceOf(carol.address))
 });
