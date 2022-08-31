@@ -63,7 +63,10 @@ export function Sent(props: any): any {
         const [ensName,setEnsName] = useState("");
         const [isDecrypted, setIsDecrypted] = useState(false);
         const savedContacts = JSON.parse(localStorage.getItem('contacts') || 'null'); 
-
+        const min = 1;
+        const max = 50;
+        const [randomImage] = useState<number>(Math.floor(Math.random() * (max - min + 1)) + min);
+        
         useEffect(()=> {
             checkENS();
         },[])
@@ -75,9 +78,15 @@ export function Sent(props: any): any {
 
         },[props.previousIndex])
 
+        function onlyUnique(value: any, index: any, self: string | any[]) {
+            return self.indexOf(value) === index;
+        }
+
         async function checkENS() {
             let recipientsTemp:any = []
-            const recipientsFiltered = props.message.recipients;
+            const recipients = props.message.recipients;
+
+            var recipientsFiltered = recipients.filter(onlyUnique);
 
             for(let recipient of recipientsFiltered) {
                 let name = await library.lookupAddress(recipient);
@@ -107,13 +116,6 @@ export function Sent(props: any): any {
             setIsDecrypted(false);
         }
 
-        function generateRandomNumber() {
-            const min = 1;
-            const max = 50;
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
-
-        
         function checkSenderInLocalStorage(sender: any) {
             let user: any;
 
@@ -147,16 +149,17 @@ export function Sent(props: any): any {
                 }
                 className="messages-list-item"
             >
-                <ListItemButton className="list-item-button"
+                <ListItemButton className={`list-item-button ${isDecrypted ? "active" : ""}` }
                     onClick={() => handleDecryptMessage()}>
                     <div>
-                        <img width="58px" height="58px" src={require(`../../photos/icons/avatars/animal-${generateRandomNumber()}.svg`).default} alt="avatar"/>
+                        <img width="58px" height="58px" src={require(`../../photos/icons/avatars/animal-${randomImage}.svg`).default} alt="avatar"/>
                     </div>
                     <ListItemText primary={
                         <>
                             <div className="message-left">
                                 <div className="message-heading">
-                                    <p><small>To: </small></p>
+                                    <div className="d-flex align-items-center">
+                                        <small>To: </small>
                                         <div>
                                             {
                                                 recipients.map((recipient: any) => {
@@ -171,14 +174,23 @@ export function Sent(props: any): any {
                                                                         )) :
                                                                         formatAccountName(recipient)
                                                                 }
+                                                                {
+                                                                    recipients.length > 1 ? <>,</> : <></>
+                                                                }
                                                         </span>
+
                                                     )
                                                 })
                                             }
                                         </div>
-                                    <p><small>{messageTime}</small></p>
+                                    </div>
+                                    <p className="time-stamp">
+                                        <small>
+                                            {messageTime}
+                                        </small>
+                                    </p>
                                 </div>
-                                <p className={`message 
+                                <p className={`message message-overflow
                                         ${message === props.message.fetchedMessage.data ? 
                                         "message-overflow" : ""}` }
                                     dangerouslySetInnerHTML={{ __html: message }}>
@@ -189,18 +201,29 @@ export function Sent(props: any): any {
                 </ListItemButton>
                 {isDecrypted ? 
                     <div className="message-right">
-                        <div className="message-heading">
-                            <p><small>To: </small></p>
-                                <Stack direction="row" spacing={1}>
-                                    {
-                                        checkSenderInLocalStorage(recipients) 
-                                    }
-                                </Stack>
-                            <p><small>{messageTime}</small></p>
+                        <div className="message-right--container">
+                            <div className="message-heading">
+                                <div className="address">
+                                    <p>To:
+                                        <strong>
+                                        <Stack direction="row" spacing={1}>
+                                            {
+                                                checkSenderInLocalStorage(recipients) 
+                                            }
+                                        </Stack>
+                                        </strong>
+                                    </p>
+                                </div>
+                                <p className="time-stamp">
+                                    <small>
+                                        {messageTime}
+                                    </small>
+                                </p>
+                            </div>
+                            <p className={`message ${message === props.message.fetchedMessage.data ? "message-overflow" : ""}` }
+                                dangerouslySetInnerHTML={{ __html: message }}>
+                            </p>
                         </div>
-                        <p className={`message ${message === props.message.fetchedMessage.data ? "message-overflow" : ""}` }
-                            dangerouslySetInnerHTML={{ __html: message }}>
-                        </p>
                     </div> : 
                     <></>
                 }
@@ -265,6 +288,12 @@ export function Sent(props: any): any {
                 return (
                     <div className="row messages-list">
                         <List className="col-md-4 col-sm-12">
+                            <Box className="pagination" sx={{display:"flex"}}>
+                                <Pagination count={1} />
+                                <IconButton size="large" onClick={()=> setLoading(true) }>
+                                    <RefreshIcon fontSize="large"/>
+                                </IconButton>
+                            </Box>
                             {fetchedMessages.map((message: any, i: any) => {
                                 return (
                                     <Message message={message} index={i} 
@@ -294,17 +323,7 @@ export function Sent(props: any): any {
     if(encryptionKeyInitialized == true){
         return (
             <div className="content-box">
-                <Box>
-                    <Box className="pagination" sx={{display:"flex"}}>
-                        <Pagination count={1} showFirstButton showLastButton />
-                        <IconButton size="large" onClick={()=> setLoading(true) }>
-                            <RefreshIcon fontSize="large"/>
-                        </IconButton>
-                    </Box>
-                    <Box>
-                        <GetMessages />
-                    </Box>
-                </Box>
+                <GetMessages />
            </div>
         )
     } else if(encryptionKeyInitialized == false){
