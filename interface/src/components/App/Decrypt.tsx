@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext, createContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Deb0x from "../../ethereum/deb0x"
+import { ethers } from "ethers";
 import {
     Tooltip, List, ListItem, ListItemText, ListItemButton, Typography, Box, 
     CircularProgress,
@@ -28,7 +29,7 @@ import ReadedMessagesContext from '../Contexts/ReadedMessagesContext';
 import ReadedMessagesProvider from '../Contexts/ReadedMessagesProvider';
 import { Encrypt } from './Encrypt';
 
-const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61";
+const deb0xAddress = "0xFA6Ce4a99dB3BF9Ab080299c324fB1327dcbD7ED";
 
 export function Decrypt(props: any): any {
     const { account, library } = useWeb3React()
@@ -73,7 +74,7 @@ export function Decrypt(props: any): any {
             useState(props.message.fetchedMessage.data)
         const [ensName,setEnsName] = useState("");
         //const [sender, setSender] = useState(props.messsage.sender)
-        const [messageTime, setMessageTime] = useState("Mar 17, 18:36")
+        const [messageTime, setMessageTime] = useState(props.message.timestamp)
         const [isDecrypted, setIsDecrypted] = useState(false);
         const min = 1;
         const max = 50;
@@ -297,9 +298,17 @@ export function Decrypt(props: any): any {
                 cids.map(async function(cidArray: any) {
                     const encryptedMessagesPromises = 
                         cidArray.cids.map(async function (cid: any) {
+                            const unixTimestamp = cid.blockTimestamp.toString()
+
+                            const milliseconds = unixTimestamp * 1000 
+
+                            const dateObject = new Date(milliseconds)
+
+                            const humanDateFormat = dateObject.toLocaleString()
                             return { 
-                                fetchedMessage: await fetchMessage(cid),
-                                sender: cidArray.sender
+                                fetchedMessage: await fetchMessage(cid.cid),
+                                sender: cidArray.sender,
+                                timestamp: humanDateFormat
                             }
                         })
                     const promise = await Promise.all(encryptedMessagesPromises)
