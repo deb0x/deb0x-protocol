@@ -36,12 +36,10 @@ export function Stake(props: any): any {
         const [loading, setLoading] = useState(false)
 
         useEffect(() => {
-            console.log("rewards effect")
             rewardsAccrued()
         }, [rewardsUnclaimed]);
 
         useEffect(() => {
-            console.log("fee share effect")
             feeShare()
         }, [feeSharePercentage]);
 
@@ -54,17 +52,12 @@ export function Stake(props: any): any {
         }
 
         async function feeShare() {
-            console.log("aicii")
             const deb0xContract = await Deb0x(library, deb0xAddress)
-            console.log("1")
             
             let balance = parseFloat((ethers.utils.formatEther((await deb0xContract.balanceERC20(account)) )) )
-            console.log(balance + " balance")
             
             let totalSupply = parseFloat((ethers.utils.formatEther((await deb0xContract.totalSupply())) ))
-            console.log(totalSupply + " totalSupply")
             const feeShare = balance * 100 / totalSupply
-            console.log(feeShare + " feeShare")
             setFeeSharePercentage(((Math.round(feeShare * 100) / 100).toFixed(2)).toString() + "%")
         }
 
@@ -159,28 +152,22 @@ export function Stake(props: any): any {
         
         const [theme, setTheme] = useState(localStorage.getItem('globalTheme'));
         useEffect(() => {
-            console.log("stake component effect");
             setTheme(localStorage.getItem('globalTheme'));
-            console.log(theme);
         });
 
         useEffect(() => {
-            console.log("user staked effect")
             setStakedAmount()
         }, [userStakedAmount]);
 
         useEffect(() => {
-            console.log("total staked effect")
             totalAmountStaked()
         }, [totalStaked]);
 
         useEffect(() => {
-            console.log("user unstaked effect")
             setUnstakedAmount()
         }, [userUnstakedAmount]);
 
         useEffect(() => {
-            console.log("approval effect")
             setApproval()
         }, [approved]);
 
@@ -438,7 +425,6 @@ export function Stake(props: any): any {
     function TotalStaked() {
         const [totalStaked, setTotalStaked] = useState("")
         useEffect(() => {
-            console.log("total staked effect")
             totalAmountStaked()
         }, [totalStaked]);
     
