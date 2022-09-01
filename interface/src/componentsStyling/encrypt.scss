@@ -17,8 +17,6 @@
                             border: 1px solid t('text-field-color');
                             border-radius: 32px;
                             height: 50px;
-                            left: 489px;
-                            margin-bottom: 40px;
                         }
                         fieldset {
                             display: none;
@@ -34,9 +32,9 @@
                     }
                 }
                 .address-list {
-                    display: flex;
-                    flex-direction: column;
                     padding: 5px;
+                    max-height: 46px;
+                    overflow: auto;
                     div.MuiButtonBase-root {
                         margin: 2px 0;
                         background-color: t('bg');
@@ -79,10 +77,20 @@
                         position: absolute;
                         bottom: -25px;
                         margin: 0;
+                        z-index: 2;
                         .rdw-option-wrapper, 
                         .rdw-dropdown-wrapper {
                             border: none;
                             background-color: transparent;
+                        }
+                        .rdw-embedded-modal, .rdw-emoji-modal, 
+                        .rdw-option-wrapper, .rdw-link-modal,
+                        .rdw-colorpicker-modal {
+                            top: -235px;
+                        }
+                        .rdw-dropdown-optionwrapper {
+                            top: -200px;
+                            max-height: 170px;
                         }
                     }
                 }
