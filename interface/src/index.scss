@@ -8,8 +8,8 @@ $randomNumber: random(4);
     src: url('../src/fonts/Karla/Karla-Regular.ttf');
 }
 
-body * {
-    font-family: 'Karla'!important;
+#root * {
+    font-family: 'Karla';
 }
 
 #root {

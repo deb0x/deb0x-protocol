@@ -90,12 +90,14 @@ function App() {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [networkName, setNetworkName] = useState<any>();
     let errorMsg;
+    const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
         injected.supportedChainIds?.forEach(chainId => 
             setNetworkName((ethers.providers.getNetwork(chainId).name)));
         if (activatingConnector && activatingConnector === connector) {
             setActivatingConnector(undefined)
+            setIsVisible(true);
         }
     }, [activatingConnector, connector])
 
@@ -110,7 +112,9 @@ function App() {
     }
 
     useEffect(() => {
-        localStorage.removeItem('input')
+        localStorage.removeItem('input');
+        setIsVisible(false);
+        console.log("XXX", isVisible)
     }, [])
 
     function handleClick (event: React.MouseEvent<HTMLElement>) {
@@ -159,7 +163,12 @@ function App() {
     function displayErrorMsg(error: string) {
         errorMsg = error;
         return errorMsg;
-    }  
+    }
+    
+    useEffect(() => {
+        setTimeout(() => {setIsVisible(true)}, 2000)
+    }, [account])
+    
     return (
 
     <>
@@ -207,7 +216,7 @@ function App() {
                     </div>
                 </div>
             </ContactsProvider> :
-            <div className={`app-container p-0 ${account == undefined ? "" : "d-none"}` }>
+            <div className={`app-container p-0 ${isVisible ? "" : "d-none"}` }>
                 <div className="initial-page">
                     <div className="row">
                         <div className="col-md-7 img-container mr-4">
