@@ -24,7 +24,6 @@ export default function ContactsSetter(props: any) {
     }
 
     function handleChange(event: any) {
-        console.log(event)
         if(event.target)
             setAddress(event.target.value)
     }

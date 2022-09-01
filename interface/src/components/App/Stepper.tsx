@@ -32,7 +32,6 @@ export default function HorizontalLinearStepper(props: any) {
             params: [account],
         })
             .then((result: any) => {
-                console.log(result)
                 setEncryptionKey(result);
                 handleNext()
                 setStepFailed(undefined)
