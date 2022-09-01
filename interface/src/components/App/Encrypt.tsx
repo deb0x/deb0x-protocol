@@ -23,8 +23,8 @@ import airplaneBlack from '../../photos/icons/airplane-black.svg';
 const deb0xAddress = "0xFA6Ce4a99dB3BF9Ab080299c324fB1327dcbD7ED";
 const ethUtil = require('ethereumjs-util')
 
-const projectId = "2DQlT722j6BR4li5VlazCIT64qu"
-const projectSecret = "357905940d3462525af41c42957a804c"
+const projectId = process.env.REACT_APP_PROJECT_ID
+const projectSecret = process.env.REACT_APP_PROJECT_SECRET
 const projectIdAndSecret = `${projectId}:${projectSecret}`
 
 const client = create({
