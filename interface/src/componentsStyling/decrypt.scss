@@ -72,6 +72,9 @@
                             letter-spacing: 0px;
                             color: t('inbox-text-color');
                             opacity: 0.85;
+                            .message-overflow {
+                                width: 70px;
+                            }
                         }
                         .message-overflow {
                             overflow: hidden;

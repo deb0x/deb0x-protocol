@@ -84,7 +84,7 @@ export function Sent(props: any): any {
 
         async function checkENS() {
             let recipientsTemp:any = []
-            const recipients = props.message.recipients;
+            const recipients = props.message.recipients.filter((recipient:any) => recipient != account);
 
             var recipientsFiltered = recipients.filter(onlyUnique);
 
@@ -160,8 +160,9 @@ export function Sent(props: any): any {
                                 <div className="message-heading">
                                     <div className="d-flex align-items-center">
                                         <small>To: </small>
-                                        <div>
+                                        <div className="message-overflow">
                                             {
+                                                recipients.length > 0 ?
                                                 recipients.map((recipient: any) => {
                                                     return (
                                                         <span
@@ -180,9 +181,13 @@ export function Sent(props: any): any {
                                                         </span>
 
                                                     )
-                                                })
+                                                }) :
+                                                account
                                             }
                                         </div>
+                                        {
+                                            recipients.length > 1 ? <span>({recipients.length})</span> : <></>
+                                        }
                                     </div>
                                     <p className="time-stamp">
                                         <small>
@@ -206,11 +211,23 @@ export function Sent(props: any): any {
                                 <div className="address">
                                     <p>To:
                                         <strong>
-                                        <Stack direction="row" spacing={1}>
-                                            {
-                                                checkSenderInLocalStorage(recipients) 
-                                            }
-                                        </Stack>
+                                        {
+                                            recipients.map((recipient: any) => {
+                                                return (
+                                                    <span
+                                                        key={recipient}>
+                                                            {
+                                                            checkSenderInLocalStorage(recipient) ?
+                                                                savedContacts.filter((contact: any) => recipient == contact.address)
+                                                                    .map((filteredPerson: any) => (
+                                                                        filteredPerson.name
+                                                                    )) :
+                                                                    recipient
+                                                            }
+                                                    </span>
+                                                )
+                                            }) 
+                                        }
                                         </strong>
                                     </p>
                                 </div>

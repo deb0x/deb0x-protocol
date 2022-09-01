@@ -114,7 +114,6 @@ function App() {
     useEffect(() => {
         localStorage.removeItem('input');
         setIsVisible(false);
-        console.log("XXX", isVisible)
     }, [])
 
     function handleClick (event: React.MouseEvent<HTMLElement>) {
