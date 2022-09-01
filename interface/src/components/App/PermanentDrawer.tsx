@@ -116,6 +116,10 @@ export function PermanentDrawer(props: any): any {
         return errorMessage;
     }
 
+    useEffect(() => {
+        setTimeout(() => {setNotificationState({})}, 2000)
+    }, [notificationState])
+
     return (
         <>
             {/* <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -180,7 +184,7 @@ export function PermanentDrawer(props: any): any {
                                                                 </IconButton>
                                                                 <IconButton size="small"
                                                                     onClick={() => {
-                                                                        setNotificationState({})
+                                                                        // setNotificationState({})
                                                                         localStorage.setItem("input", JSON.stringify(contact.address))
                                                                         handleChange("Compose", 0)
                                                                     }}>
