@@ -18,19 +18,27 @@ import { EditorState, convertToRaw } from 'draft-js';
 import draftToHtml from 'draftjs-to-html';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { Editor } from 'react-draft-wysiwyg';
-import { PropaneSharp } from '@mui/icons-material';
+import airplaneBlack from '../../photos/icons/airplane-black.svg';
 
-const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61";
+const deb0xAddress = "0xFA6Ce4a99dB3BF9Ab080299c324fB1327dcbD7ED";
 const ethUtil = require('ethereumjs-util')
 
+const projectId = "2DQlT722j6BR4li5VlazCIT64qu"
+const projectSecret = "357905940d3462525af41c42957a804c"
+const projectIdAndSecret = `${projectId}:${projectSecret}`
 
 const client = create({
     host: 'ipfs.infura.io',
     port: 5001,
-    protocol: 'https'
+    protocol: 'https',
+  headers: {
+    authorization: `Basic ${Buffer.from(projectIdAndSecret).toString(
+      'base64'
+    )}`,
+  },
 })
 
-export function Encrypt(): any {
+export function Encrypt(replyAddress: any): any {
     const { account, library } = useWeb3React()
     const [encryptionKey, setKey] = useState('')
     const [textToEncrypt, setTextToEncrypt] = useState('')
@@ -43,10 +51,14 @@ export function Encrypt(): any {
     const [addressList, setAddressList] = useState<string[]>([])
     const [error, setError] = useState<string | null>(null);
     const [ input, setInput ] = useState(JSON.parse(localStorage.getItem('input') || 'null'));
+    const [address, setAddress] = useState<string>(replyAddress.props);
 
     useEffect(() => {
         if(input !== null && input.match(/^0x[a-fA-F0-9]{40}$/g))
             addressList.push(input)
+        
+        if(address)
+            addressList.push(address)
     }, []);
 
     useEffect(() => {
@@ -127,7 +139,7 @@ export function Encrypt(): any {
         setLoading(true);
         const signer = await library.getSigner(0);
         let cids:any = []
-        let recipients = destinationAddresses.flat()
+        let recipients = replyAddress.props ? [replyAddress.props].flat() : destinationAddresses.flat()
         recipients.push(await signer.getAddress())
         const deb0xContract = Deb0x(signer, deb0xAddress);
         for (let address of recipients) {
@@ -165,6 +177,7 @@ export function Encrypt(): any {
 
                     let count = messageSessionSentCounter + 1;
                     setMessageSessionSentCounter(count);
+                    setEditorState(EditorState.createEmpty());
                 })
                 .catch((error: any) => {
                     setNotificationState({
@@ -185,7 +198,7 @@ export function Encrypt(): any {
 
         setTextToEncrypt('');
         setSenderAddress("");
-        setAddressList([])
+        setAddressList([]);
         setLoading(false);
 
     }
@@ -233,33 +246,38 @@ export function Encrypt(): any {
         <>
             <SnackbarNotification state={notificationState} 
                 setNotificationState={setNotificationState} />
-            <div className="form-container container">
+            <div className="form-container content-box">
                 <Box component="form"
                     noValidate
                     autoComplete="off">
-                    <TextField id="standard-basic"
-                        placeholder="Type or paste addresses and press `Enter`..."
-                        value={senderAddress}
-                        onPaste={handlePaste}
-                        onKeyDown={handleKeyDown}
-                        onChange={handleChange} />
-                    <Stack direction="row" spacing={1}>
-                        <Box sx={{ width: '100%', margin: '0 auto' }}
-                            className="address-list">
-                            {
-                                addressList.map((address: any) => {
-                                    return (
-                                        <Chip
-                                            key={address}
-                                            label={address}
-                                            onDelete={() => handleDelete(address)}
-                                            deleteIcon={<DeleteIcon />}
-                                        />
-                                    )
-                                })
-                            }
-                        </Box>
-                    </Stack>
+                    {!address && 
+                        <>
+                            <TextField id="standard-basic"
+                                placeholder="Type or paste addresses and press `Enter`..."
+                                value={senderAddress}
+                                onPaste={handlePaste}
+                                onKeyDown={handleKeyDown}
+                                onChange={handleChange} />
+                            <Stack direction="row" spacing={1}>
+                                <Box sx={{ width: '100%', margin: '0 auto' }}
+                                    className="address-list">
+                                    {
+                                        addressList.map((address: any) => {
+                                            return (
+                                                <Chip
+                                                    key={address}
+                                                    label={address}
+                                                    onDelete={() => handleDelete(address)}
+                                                    deleteIcon={<DeleteIcon />}
+                                                />
+                                            )
+                                        })
+                                    }
+                                </Box>
+                            </Stack>
+                        </>
+                    }
+                    
                     <Editor
                         editorState={editorState}
                         onEditorStateChange={handleEditorChange}
@@ -267,8 +285,6 @@ export function Encrypt(): any {
                         wrapperClassName="wrapper"
                         editorClassName="editor"
                     />
-                    <div className="editor-overlay"></div>
-
                     { messageSessionSentCounter === 0 ?
                         <Box sx={{ display: "flex", 
                             alignItems: "end", 
@@ -287,14 +303,20 @@ export function Encrypt(): any {
                             }
 
                             <LoadingButton className="send-btn" 
-                                loading={loading} endIcon={ loading ? null : <SendIcon className="SEND" />}
+                                loading={loading} 
+                                endIcon={ loading ? 
+                                    null : 
+                                    <img src={airplaneBlack} className="send-papper-airplane" alt="send-button"></img>
+                                }
                                 loadingPosition="end"
                                 sx={{ marginLeft: 2, marginTop: 1 }}
                                 disabled={textToEncrypt == '' || addressList == []}
-                                onClick={() => 
+                                onClick={() => {
+                                    console.log(replyAddress.props)
                                     encryptText(textToEncrypt, addressList)
+                                }
+                                    
                                 } >
-                                { loading ? 'Sending...' : 'Send'}
                             </LoadingButton>
                         </Box>
                         :
@@ -316,10 +338,9 @@ export function Encrypt(): any {
 
                             <LoadingButton className="send-btn" 
                                 loading={loading} variant="contained" 
-                                endIcon={ <SendIcon /> }
+                                endIcon={ <img src={airplaneBlack} className="send-papper-airplane" alt="send-button"></img> }
                                 sx={{ marginLeft: 2, marginTop: 1 }}
                                 onClick={() => encryptText(textToEncrypt, senderAddress)}>
-                                Send another message
                             </LoadingButton>
                         </Box>
                     }

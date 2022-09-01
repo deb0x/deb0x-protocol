@@ -8,8 +8,8 @@ $randomNumber: random(4);
     src: url('../src/fonts/Karla/Karla-Regular.ttf');
 }
 
-body * {
-    font-family: 'Karla'!important;
+#root * {
+    font-family: 'Karla';
 }
 
 #root {
@@ -17,7 +17,7 @@ body * {
     overflow: hidden;
     .theme {
         display: inline-block;
-        padding: 75px;
+        padding: 5%;
         width: 100%;
         height: 100vh;
         background-size: cover;
@@ -35,6 +35,10 @@ body * {
     height: calc( 100%);
     border-radius: 100px;
     box-shadow: 0px 3px 25px #0f0b1382;
+    .main-row,
+    .side-menu-container {
+        height: 100%;
+    }
     @include themed() {
         color: t('text');
         background: t('bg');
@@ -55,8 +59,11 @@ body * {
             color: t('pagination')
         }
         .main-container {
-            overflow: hidden;
-            margin-top: 155px;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            height: 85%;
+            min-height: 85%;
             .floating-btn {
                 position: fixed;
                 bottom: 75px;
@@ -70,8 +77,9 @@ body * {
                 margin: 15px 30px 15px 15px;
                 padding: 0 15px;
                 box-shadow: t('box-shadow');
-                height: 65vh;
                 border-radius: 25px 10px 85px 25px;
+                overflow: hidden;
+                width: 100%;
             }
         }
         .home-page-box {
@@ -199,11 +207,111 @@ body * {
     }
 }
 
+
 .modal-box {
-    width: 33%;
-    margin: 20vh 33% 0;
-    button {
-        background: #F5B700;
+    height: 470px;
+    width: 55%;
+    margin: 25vh 24% 0;
+    &.dark {
+        background: #2B2235 0% 0% no-repeat padding-box;
+        border-radius: 100px;
+        box-shadow: 0px 3px 25px #0F0B1380;
+        border: 1px solid #2B2235;
+        .add-contact-text {
+            color: #F2E9DC;
+        }
+        .buttons-container {
+            .cancel-button {
+                color: #F5B700;
+                &:hover {
+                    background-color: #1F1826;
+                }
+            }
+            .add-button {
+                color: #F5B700;
+                &:hover {
+                    background-color: #1F1826;
+                }
+            }
+        }
+        .for-label {
+            color:#F2E9DC
+        }
+        .inputs {
+            color: #F2E9DC;
+            background:#1F1826 0% 0% no-repeat padding-box;
+            border: #1F1826;
+            &:focus {
+                background: #1F1826 0% 0% no-repeat padding-box;
+                border: #1F1826;
+            }
+        }
+    }
+    &.classic {
+        border: 1px solid #FFEEE8;
+        border-radius: 100px;
+        background-color: #FFEEE8;
+        box-shadow: 0px 3px 25px #0F0B1380;
+        .add-contact-text {
+            color: #2B2235;
+        }
+        .cancel-button:hover {
+            background-color: #F5B700;
+        }
+        .for-label {
+            color: #2B2235;
+        }
+        .inputs {
+            background: #E6D6D1 0% 0% no-repeat padding-box;
+            &:focus {
+                background: #E6D6D1 0% 0% no-repeat padding-box;
+            }
+        }
+    }
+    .add-contact-text {
+        text-align: center;
+        margin-top: 50px;
+        font-size: 26px;
+    }
+    .for-field {
+        margin: 25px;
+        position: relative;
+    }
+    .for-label {
+        margin: 0 0 10px 20px;
+    }
+    .buttons-container {
+        display: flex;
+        justify-content: space-between;
+        padding: 0 65px;
+        .cancel-button {
+            transition: 0.5s;
+            border-radius: 33px;
+            text-transform: uppercase;
+            &:hover {
+                transition: 0.5s;
+                border-radius: 33px;
+            }
+        }
+        .add-button {
+            border: 2px solid #F5B700;
+            border-radius: 33px;
+            padding: 10px 20px;
+            transition: 0.5s;
+            text-transform: uppercase;
+            &:hover {
+                background: #F5B700;
+                transition: 0.5s;
+            }
+        }
+    }
+    .inputs:focus {
+        border-radius: 32px;
+        height: 50px;
+    }
+    .inputs {
+        border-radius: 32px;
+        height: 50px;
     }
 }
 
@@ -248,14 +356,6 @@ body * {
                     }
                 }
             }
-        }
-    }
-}
-
-@media (max-height: 920px) {
-    .app-container {
-        .main-container {
-            margin-top: 80px !important;
         }
     }
 }

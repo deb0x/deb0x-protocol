@@ -26,6 +26,7 @@ import elephant from './photos/icons/elephant.svg';
 import logoGreen from './photos/icons/logo-green.svg';
 import logoDark from "./photos/logo-dark.svg";
 import { Spinner } from './components/App/Spinner';
+import { AppBarComponent } from './components/App/AppBar';
 
 const client = create({
   host: 'ipfs.infura.io',
@@ -35,8 +36,8 @@ const client = create({
 
 const ethUtil = require('ethereumjs-util')
 //old address: 0x218c10BAb451BE6A897db102b2f608bC7D3441a0
-// 0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61
-const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61";
+// 0xFA6Ce4a99dB3BF9Ab080299c324fB1327dcbD7ED
+const deb0xAddress = "0xFA6Ce4a99dB3BF9Ab080299c324fB1327dcbD7ED";
 
 
 enum ConnectorNames { Injected = 'Injected', Network = 'Network' };
@@ -89,12 +90,14 @@ function App() {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [networkName, setNetworkName] = useState<any>();
     let errorMsg;
+    const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
         injected.supportedChainIds?.forEach(chainId => 
             setNetworkName((ethers.providers.getNetwork(chainId).name)));
         if (activatingConnector && activatingConnector === connector) {
             setActivatingConnector(undefined)
+            setIsVisible(true);
         }
     }, [activatingConnector, connector])
 
@@ -109,7 +112,8 @@ function App() {
     }
 
     useEffect(() => {
-        localStorage.removeItem('input')
+        localStorage.removeItem('input');
+        setIsVisible(false);
     }, [])
 
     function handleClick (event: React.MouseEvent<HTMLElement>) {
@@ -158,7 +162,12 @@ function App() {
     function displayErrorMsg(error: string) {
         errorMsg = error;
         return errorMsg;
-    }  
+    }
+    
+    useEffect(() => {
+        setTimeout(() => {setIsVisible(true)}, 2000)
+    }, [account])
+    
     return (
 
     <>
@@ -173,94 +182,98 @@ function App() {
         {
             account ? 
             <ContactsProvider>
-                <div className="app-container">
-                <PermanentDrawer onChange={handleChange}/>
-                {
-                account ? 
-                !!(library && account) && (
-                    <Box className="main-container" sx={{marginTop: 12}}>
-                        {selectedOption === "Compose" && <Encrypt />}
-                        {selectedOption === "Deb0x" && <Decrypt account={account}/>}
-                        {selectedOption === "Stake" && <Stake />}
-                        {selectedOption === "Sent" && <Sent />}
-                    </Box>
-                ):
-                    <Box className="home-page-box">
-                        <Typography sx={{textAlign:"center",color:"gray"}} variant="h1">
-                            The End To End Encrypted 
-                            <br></br>
-                            Decentralized Email Protocol 
-                            <br></br> 
-                            Owned By Its Users
-                        </Typography>
-                        <Typography sx={{ mt:10,textAlign:"center"}} variant="h3">
-                            Please connect your wallet
-                        </Typography>
-                    </Box>
-                }
+                <div className="app-container container-fluid">
+                    <div className="row main-row">
+                        <div className="col col-md-3 p-0 side-menu-container">
+                            <PermanentDrawer onChange={handleChange}/>
+                        </div>
+                        <div className="col col-md-9">
+                        <AppBarComponent />
+                        {account ? 
+                            !!(library && account) && (
+                                <Box className="main-container" sx={{marginTop: 12}}>
+                                    {selectedOption === "Compose" && <Encrypt />}
+                                    {selectedOption === "Deb0x" && <Decrypt account={account}/>}
+                                    {selectedOption === "Stake" && <Stake />}
+                                    {selectedOption === "Sent" && <Sent />}
+                                </Box>
+                            ):
+                                <Box className="home-page-box">
+                                    <Typography sx={{textAlign:"center",color:"gray"}} variant="h1">
+                                        The End To End Encrypted 
+                                        <br></br>
+                                        Decentralized Email Protocol 
+                                        <br></br> 
+                                        Owned By Its Users
+                                    </Typography>
+                                    <Typography sx={{ mt:10,textAlign:"center"}} variant="h3">
+                                        Please connect your wallet
+                                    </Typography>
+                                </Box>
+                        }
+                        </div>
+                    </div>
                 </div>
             </ContactsProvider> :
-            <>
-                <div className="app-container p-0">
-                    <div className="initial-page">
-                        <div className="row">
-                            <div className="col-md-7 img-container mr-4">
-                                <img className="image--left" src={elephant} />
-                                <div className="img-content">
-                                    <p>Hey, you!</p>
-                                    
-                                    <p>To use <img className="content-logo" src={logoGreen} /> you need to have your wallet connected</p>
-                                    <div>
-                                    { (() =>  {
-                                        const currentConnector = connectorsByName[ConnectorNames.Injected]
-                                        const activating = currentConnector === activatingConnector
-                                        const connected = currentConnector === connector
-                                        const disabled = !triedEager || !!activatingConnector || connected || !!error
+            <div className={`app-container p-0 ${isVisible ? "" : "d-none"}` }>
+                <div className="initial-page">
+                    <div className="row">
+                        <div className="col-md-7 img-container mr-4">
+                            <img className="image--left" src={elephant} />
+                            <div className="img-content">
+                                <p>Hey, you!</p>
+                                
+                                <p>To use <img className="content-logo" src={logoGreen} /> you need to have your wallet connected</p>
+                                <div>
+                                { (() =>  {
+                                    const currentConnector = connectorsByName[ConnectorNames.Injected]
+                                    const activating = currentConnector === activatingConnector
+                                    const connected = currentConnector === connector
+                                    const disabled = !triedEager || !!activatingConnector || connected || !!error
 
-                                        return (
-                                            <Button variant="contained"
-                                                key={ConnectorNames.Injected}
-                                                // aria-describedby={id}
-                                                onClick={!connected ? 
-                                                    () => {
-                                                        setActivatingConnector(currentConnector)
-                                                        activate(currentConnector)
-                                                    } : 
-                                                    handleClick}
-                                                    className="connect-button">
-                                                
-                                                { activating ? 
-                                                    <Spinner color={'black'} /> :
-                                                    !connected ? 
-                                                        "Connect Wallet" :
-                                                        <span>
-                                                            {account === undefined ? 
-                                                                `Unsupported Network. Switch to ${networkName}` : 
-                                                                ''}
-                                                        </span>
-                                                }
-                                            </Button>
-                                        )
-                                    }) ()}
-                                    </div>
+                                    return (
+                                        <Button variant="contained"
+                                            key={ConnectorNames.Injected}
+                                            // aria-describedby={id}
+                                            onClick={!connected ? 
+                                                () => {
+                                                    setActivatingConnector(currentConnector)
+                                                    activate(currentConnector)
+                                                } : 
+                                                handleClick}
+                                                className="connect-button">
+                                            
+                                            { activating ? 
+                                                <Spinner color={'black'} /> :
+                                                !connected ? 
+                                                    "Connect Wallet" :
+                                                    <span>
+                                                        {account === undefined ? 
+                                                            `Unsupported Network. Switch to ${networkName}` : 
+                                                            ''}
+                                                    </span>
+                                            }
+                                        </Button>
+                                    )
+                                }) ()}
                                 </div>
                             </div>
-                            <div className="col-md-5">
-                                <div className="text-container">
-                                    <img className="dark-logo" src={logoGreen} />
-                                    <p>
-                                        The End to End Encrypted Decentralized 
-                                        Email Protocol <br />
-                                        <span className="text-green">
-                                            Owned by its Users
-                                        </span>
-                                    </p>
-                                </div>
+                        </div>
+                        <div className="col-md-5">
+                            <div className="text-container">
+                                <img className="dark-logo" src={logoGreen} />
+                                <p>
+                                    The End to End Encrypted Decentralized 
+                                    Email Protocol <br />
+                                    <span className="text-green">
+                                        Owned by its Users
+                                    </span>
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
-            </>
+            </div>
         }
     </ThemeProvider>
     </>

@@ -7,7 +7,7 @@ import ThemeContext from "./Contexts/ThemeContext";
 export default function ThemeSetter() {
     const useTheme = () => useContext(ThemeContext);
     const { theme, setTheme } = useTheme()!;
-    const [checked, setChecked] = useState<boolean>()
+    const [checked, setChecked] = useState<boolean>(theme === "classic" ? true : false);
 
     useEffect(() => {
         if(theme === "classic") {

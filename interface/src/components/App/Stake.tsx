@@ -14,19 +14,22 @@ import SnackbarNotification from './Snackbar';
 import { ethers } from "ethers";
 import "../../componentsStyling/stake.scss";
 import token from "../../photos/icons/token.svg"
+import coinBagLight from "../../photos/icons/coin-bag-solid--light.svg";
+import coinBagDark from "../../photos/icons/coin-bag-solid--dark.svg";
+import walletLight from "../../photos/icons/wallet--light.svg";
+import walletDark from "../../photos/icons/wallet--dark.svg";
+import trophyRewards from "../../photos/icons/trophyRewards.svg";
 
-const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61"
+const deb0xAddress = "0xFA6Ce4a99dB3BF9Ab080299c324fB1327dcbD7ED"
 const deb0xERC20Address = "0xEde2f177d6Ae8330860B6b37B2F3D767cd2630fe"
 
 export function Stake(props: any): any {
+
     const { account, library } = useWeb3React()
     const [notificationState, setNotificationState] = useState({})
 
-    useEffect(() => {
-        console.log("stake component effect")
-    });
-    
     function RewardsPanel() {
+        
 
         const [rewardsUnclaimed, setRewardsUnclaimed] = useState("")
         const [feeSharePercentage, setFeeSharePercentage] = useState("")
@@ -102,28 +105,35 @@ export function Stake(props: any): any {
         }
 
         return (
+            <>
             <Card variant="outlined" className="card-container">
-                <CardContent>
-                    <Typography variant="h4" component="div">
-                        REWARDS
-                    </Typography>
-                    <Typography>
-                        Your unclaimed rewards:
-                    </Typography>
-                    <Typography variant="h6">
-                        <strong>{rewardsUnclaimed}</strong>
-                    </Typography>
-                    <Typography>
-                        Your share from fees:
-                    </Typography>
-                    <Typography variant="h6">
-                        <strong>{feeSharePercentage}</strong>
-                    </Typography>
+                <CardContent className="row">
+                    <div className="col-12 col-md-6 mb-2">
+                        <Typography variant="h4" component="div" className="rewards mb-3">
+                            REWARDS
+                        </Typography>
+                        <Typography >
+                            Your unclaimed rewards:
+                        </Typography>
+                        <Typography variant="h6" className="mb-3">
+                            <strong>{rewardsUnclaimed}</strong>
+                        </Typography>
+                        <Typography>
+                            Your share from fees:
+                        </Typography>
+                        <Typography variant="h6" className="mb-3">
+                            <strong>{feeSharePercentage}</strong>
+                        </Typography>
+                    </div>
+                    <div className='col-12 col-md-6 d-flex justify-content-end align-items-start'>
+                        <img src={trophyRewards} alt="trophyRewards" className="p-3"/>
+                    </div>
                 </CardContent>
-                <CardActions>
-                    <LoadingButton className="submit-btn" loading={loading} variant="contained" onClick={claimRewards}>Collect</LoadingButton>
+                <CardActions className='button-container'>
+                    <LoadingButton className="collect-btn" loading={loading} variant="contained" onClick={claimRewards}>Collect</LoadingButton>
                 </CardActions>
             </Card>
+            </>
         )
     }
 
@@ -139,15 +149,20 @@ export function Stake(props: any): any {
         const [amountToStake, setAmountToStake] = useState("")
         const [loading, setLoading] = useState(false)
         const [approved, setApproved] = useState<Boolean | null>(false)
-
+        
         const handleChange = (
             event: React.MouseEvent<HTMLElement>,
             newAlignment: string,
         ) => {
             setAlignment(newAlignment);
         };
-
-       
+        
+        const [theme, setTheme] = useState(localStorage.getItem('globalTheme'));
+        useEffect(() => {
+            console.log("stake component effect");
+            setTheme(localStorage.getItem('globalTheme'));
+            console.log(theme);
+        });
 
         useEffect(() => {
             console.log("user staked effect")
@@ -329,20 +344,26 @@ export function Stake(props: any): any {
                 alignment === "stake" ?
                 
                 <>
-                <CardContent>
-                    <Typography>
-                        Your staked amount:
-                    </Typography>
-                    <Typography variant="h6">
-                        <strong>{userStakedAmount} DBX</strong>
-                    </Typography>
-                    <Divider className="divider-pink" />
-                    <Typography>
-                        Your tokens in wallet:
-                    </Typography>
-                    <Typography variant="h6">
-                        <strong>{userUnstakedAmount} DBX</strong>
-                    </Typography>
+                <CardContent className="row pb-0">
+                    <div className="col-6 p-1">
+                        <img className="display-element" src={theme === "classic" ? coinBagDark : coinBagLight} alt="coinbag" />
+                        <Typography className="d-flex justify-content-center p-1">
+                            Your staked amount:
+                        </Typography>
+                        <Typography variant="h6" className="d-flex justify-content-center p-1">
+                            <strong>{userStakedAmount} DBX</strong>
+                        </Typography>
+                    </div>
+                    <div className="col-6 p-1">
+                        <img className="display-element" src={theme === "classic" ? walletDark : walletLight} alt="coinbag" />
+                        <Typography className="d-flex justify-content-center p-1">
+                            Your tokens in wallet:
+                        </Typography>
+                        <Typography variant="h6" className="d-flex justify-content-center p-1">
+                            <strong>{userUnstakedAmount} DBX</strong>
+                        </Typography>
+                    </div>
+                    <Divider className="divider-pink " />
                     {approved && <Grid className="amount-row" container spacing={2}>
                         <Grid item>
                             <TextField id="outlined-basic"
@@ -362,7 +383,7 @@ export function Stake(props: any): any {
                     </Grid>}
                 </CardContent>
                 <CardActions>
-                    {approved && <LoadingButton disabled={!amountToStake} className="submit-btn" loading={loading} variant="contained" onClick={stake}>Stake</LoadingButton>}
+                    {approved && <LoadingButton disabled={!amountToStake} className="submit-btn " loading={loading} variant="contained" onClick={stake}>Stake</LoadingButton>}
                     {!approved && <LoadingButton className="submit-btn" loading={loading} variant="contained" onClick={approveStaking}>Approve Staking</LoadingButton>}
                 </CardActions>
                 </>
@@ -451,8 +472,9 @@ export function Stake(props: any): any {
             <Box className="container">
                 <div className="cards-grid">
                     <div className='row'>
-                        <Grid item className="col col-md-6">
-                            <TotalStaked/>
+                        <Grid item className="col col-md-6 ">
+                            <TotalStaked/>                        
+                            <RewardsPanel />
                         </Grid>
                         <Grid item className="col col-md-6">
                             <StakeUnstake/>

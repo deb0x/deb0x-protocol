@@ -3,7 +3,6 @@ import { useWeb3React } from '@web3-react/core';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
-import AppBar from '@mui/material/AppBar';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -18,18 +17,17 @@ import { injected } from '../../connectors';
 import { Spinner } from './Spinner'
 import { useEagerConnect } from '../../hooks';
 import IconButton from "@mui/material/IconButton";
-import logoDark from "../../photos/logo-dark.svg";
-import logoLight from "../../photos/logo-light.svg";
 import GitHubIcon from '@mui/icons-material/GitHub';
 import Deb0xERC20 from "../../ethereum/deb0xerc20"
 import { ethers } from "ethers";
-import formatAccountName from "../Common/AccountName";
 import "../../componentsStyling/permanentDrawer.scss";
 import ThemeSetter from '../ThemeSetter';
 import ScreenSize from '../Common/ScreenSize';
 import ContactsContext from '../Contexts/ContactsContext';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import SnackbarNotification from './Snackbar';
+import { Add } from '@mui/icons-material';
+import ContactsSetter from '../ContactsSetter';
 
 const deb0xERC20Address = "0xEde2f177d6Ae8330860B6b37B2F3D767cd2630fe"
 enum ConnectorNames { Injected = 'Injected' };
@@ -64,6 +62,7 @@ export function PermanentDrawer(props: any): any {
     const [notificationState, setNotificationState] = useState({});
     const [networkName, setNetworkName] = useState<any>();
     let errorMessage;
+    let [show, setShow] = useState(false);
 
     if(library){
         checkENS();
@@ -112,14 +111,14 @@ export function PermanentDrawer(props: any): any {
 
     const [display, setDisplay] = useState();
 
-    function displayAddress(index: any) {
-        display === index ? setDisplay(undefined) : setDisplay(index);
-    }
-
     function getErrorMessage(error: string) {
         errorMessage = error;
         return errorMessage;
     }
+
+    useEffect(() => {
+        setTimeout(() => {setNotificationState({})}, 2000)
+    }, [notificationState])
 
     return (
         <>
@@ -132,84 +131,7 @@ export function PermanentDrawer(props: any): any {
             </div> */}
             <SnackbarNotification state={notificationState} 
                 setNotificationState={setNotificationState} />
-            <Box sx={{ display: 'flex' }}>
-                <CssBaseline />
-                <AppBar className="app-bar--top">
-                    <Box className="main-menu--right">
-                    { account  ? 
-                        <>
-                            {/* <Paper component="form">
-                                <InputBase
-                                    placeholder="Search messages"
-                                    inputProps={{ "aria-label": "search" }}
-                                    className="search-input" />
-                                <IconButton type="submit" aria-label="search">
-                                    <SearchIcon />
-                                </IconButton>
-                            </Paper> */}
-                            <Button variant ="contained"
-                                    onClick={() => handleChange("Stake", 2)}>
-                                {userUnstakedAmount} DBX
-                            </Button>
-                        </>
-                        : 
-                        null }
-                    
-                    { (() =>  {
-                        const currentConnector = connectorsByName[ConnectorNames.Injected]
-                        const activating = currentConnector === activatingConnector
-                        const connected = currentConnector === connector
-                        const disabled = !triedEager || !!activatingConnector || connected || !!error
-
-                        return (
-                            <Button variant="contained"
-                                key={ConnectorNames.Injected}
-                                aria-describedby={id}
-                                onClick={!connected ? 
-                                    () => {
-                                        setActivatingConnector(currentConnector)
-                                        activate(currentConnector)
-                                    } : 
-                                    handleClick
-                                }>
-                                
-                                { activating ? 
-                                    <Spinner color={'black'} /> :
-                                    !connected ? 
-                                        "Connect Wallet" :
-                                        <span>
-                                            {account === undefined ? 
-                                                `Unsupported Network. Switch to ${networkName}` : 
-                                                account ? 
-                                                    ensName === "" ? 
-                                                        `${formatAccountName(account)}` :
-                                                        `${ensName.toLowerCase()} 
-                                                        (${formatAccountName(account)})`
-                                                : ''}
-                                        </span>
-                                }
-                            </Button>
-                        )
-                    }) ()}
-                            
-                        <ThemeSetter />
-                    </Box>
-                </AppBar>
-                <Popper className="popper" id={id} open={open} anchorEl={anchorEl}>
-                    <List>
-                        
-                        <ListItem className='logout'>
-                            <Button 
-                                onClick={(event: any) => {
-                                    handleClick(event)
-                                    deactivate()
-                                }}
-                                className="logout-btn">
-                                Logout 
-                            </Button>
-                        </ListItem>
-                    </List>
-                </Popper>
+            <Box className="side-menu-box" sx={{ display: 'flex' }}>
                 <Drawer variant="permanent"
                     anchor={dimensions.width > 768 ? 'left' : 'bottom'}
                     className="side-menu">
@@ -243,18 +165,12 @@ export function PermanentDrawer(props: any): any {
                             { account && 
                                 <div className="contacts">
                                     <List>
-                                        <p>Contacts</p>
                                         {
                                             contacts.map((contact: any, index: any) => (
                                                     <>
-                                                    <ListItem button key={contact.name}
-                                                        onClick={() => displayAddress(index)}>
-                                                        <ListItemText className="text" primary={contact.name} />
-                                                    </ListItem>
-                                                    {display == index ? 
-                                                        <ListItem className="row contact-item" key={index}>
-                                                            <ListItemText className="text col-8" primary={contact.address} />
-                                                            <div className="col-4 buttons">
+                                                    <ListItem button key={contact.name}>
+                                                        <ListItemText className="text" primary={contact.name}/>
+                                                        <div className="col-4 buttons">
                                                                 <IconButton size="small"
                                                                     onClick={() => {
                                                                             navigator.clipboard.writeText(contact.address);
@@ -264,34 +180,39 @@ export function PermanentDrawer(props: any): any {
                                                                                 severity: "success"
                                                                             })
                                                                         }}>
-                                                                    <ContentCopyIcon fontSize="small"/>
+                                                                    <ContentCopyIcon className="copy-icon" fontSize="small"/>
                                                                 </IconButton>
                                                                 <IconButton size="small"
                                                                     onClick={() => {
-                                                                        setNotificationState({})
+                                                                        // setNotificationState({})
                                                                         localStorage.setItem("input", JSON.stringify(contact.address))
                                                                         handleChange("Compose", 0)
                                                                     }}>
-                                                                    <SendIcon fontSize="small"/>
+                                                                    <SendIcon className="send-icon" fontSize="small"/>
                                                                 </IconButton>
                                                             </div>
-                                                        </ListItem>
-                                                        : <></>}
+                                                    </ListItem>
                                                     </>
                                             ))
                                         }
                                     </List>
+                                    <>
+                                        <IconButton className='add-new-all' onClick={() => setShow(true)}>
+                                            <Add className="add-button"/>
+                                            <p className='add-new mb-0'>Add new</p>
+                                        </IconButton>
+                                        {show ? 
+                                            <ContactsSetter show={show} onClickOutside={() => setShow(false)}/> : 
+                                            <></>
+                                        }    
+                                    </>
                                 </div>
                             }
-                            <div className="plus-full-circle">
-                                <img src={require(`../../photos/icons/plus-circle-fill.svg`).default} alt="plus-circle-fill"></img>
-                                <div className="add-new">Add new</div>
-                            </div>
                             <div className="content">
-                                <a href="https://github.com/deb0x" target="_blank">
+                                <a href="https://github.com/deb0x" target="_blank" className='logo-text-color'>
                                 <GitHubIcon  />
                                 </a>
-                                <a href="https://www.deb0x.org" target="_blank">
+                                <a href="https://www.deb0x.org" target="_blank" className='logo-text-color'>
                                     www.deb0x.org
                                 </a>
                             </div>

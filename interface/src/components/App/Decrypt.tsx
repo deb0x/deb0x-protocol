@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext, createContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Deb0x from "../../ethereum/deb0x"
+import { ethers } from "ethers";
 import {
     Tooltip, List, ListItem, ListItemText, ListItemButton, Typography, Box, 
     CircularProgress,
@@ -26,8 +27,9 @@ import hand from '../../photos/hand.svg';
 import avatar from '../../photos/icons/avatars/test-avatar-1.svg';
 import ReadedMessagesContext from '../Contexts/ReadedMessagesContext';
 import ReadedMessagesProvider from '../Contexts/ReadedMessagesProvider';
+import { Encrypt } from './Encrypt';
 
-const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61";
+const deb0xAddress = "0xFA6Ce4a99dB3BF9Ab080299c324fB1327dcbD7ED";
 
 export function Decrypt(props: any): any {
     const { account, library } = useWeb3React()
@@ -63,7 +65,7 @@ export function Decrypt(props: any): any {
     }
 
     async function fetchMessage(message: any) {
-        return await axios.get(`https://ipfs.io/ipfs/${message}`)
+        return await axios.get(`https://deb0x-test.infura-ipfs.io/ipfs/${message}`)
     }
 
     function Message(props: any) {
@@ -72,11 +74,11 @@ export function Decrypt(props: any): any {
             useState(props.message.fetchedMessage.data)
         const [ensName,setEnsName] = useState("");
         //const [sender, setSender] = useState(props.messsage.sender)
-        const [messageTime, setMessageTime] = useState("Mar 17, 18:36")
+        const [messageTime, setMessageTime] = useState(props.message.timestamp)
         const [isDecrypted, setIsDecrypted] = useState(false);
         const min = 1;
         const max = 50;
-        const [randomImage, ] = useState<number>(Math.floor(Math.random() * (max - min + 1)) + min);
+        const [randomImage] = useState<number>(Math.floor(Math.random() * (max - min + 1)) + min);
         let [show, setShow] = useState(false);
         const [isReaded, setIsReaded] = useState(false);
         
@@ -142,24 +144,21 @@ export function Decrypt(props: any): any {
         }
 
         function checkSenderInLocalStorage(sender: any) {
-            let user = '';
+            let user: any;
 
             if (ensName !== "") {
                 user = ensName;
             } else {
-                savedContacts.forEach((contact: any) => {
+                savedContacts.map((contact: any) => {
                     if (sender == contact.address) {
-                        user = contact.name;
-                    } else {
-                        user = formatAccountName(
-                            props.message.sender
-                        )
+                        user = true;
                     }
                 })
             }
 
-            return user;
+           return user;
         }
+
 
         return (
             <ReadedMessagesProvider>
@@ -198,7 +197,14 @@ export function Decrypt(props: any): any {
                                     <div className="message-heading">
                                         <p>From: 
                                             {
-                                                checkSenderInLocalStorage(props.message.sender)
+                                                checkSenderInLocalStorage(props.message.sender) ?
+                                                savedContacts.filter((contact: any) => props.message.sender == contact.address)
+                                                    .map((filteredPerson: any) => (
+                                                        filteredPerson.name
+                                                    )) :
+                                                    formatAccountName(
+                                                        props.message.sender
+                                                    )
                                             }
                                         </p>
                                         <p className="time-stamp">
@@ -211,39 +217,54 @@ export function Decrypt(props: any): any {
                                         <Announcement className="new-message-icon" />
                                     </div>
                                 </div>
-                                {isDecrypted ? 
-                                    <div className="message-right">
-                                        <div className="message-heading">
-                                            <div className="address">
-                                                <p>From: 
-                                                    <strong>
-                                                        {
-                                                            checkSenderInLocalStorage(props.message.sender)
-                                                        }
-                                                    </strong>
-                                                </p>
-                                                <>
-                                                    <IconButton onClick={() => setShow(true)}>
-                                                        <Add />
-                                                    </IconButton>
-                                                    <ContactsSetter show={show} props={props.message.sender} onClickOutside={() => setShow(false)}/>
-                                                </>
-                                            </div>
-                                            
-                                        </div>
-                                        <p className="date-for-open-message">
-                                            <small className="for-date">
-                                                {messageTime}
-                                            </small>
-                                        </p>
-                                        <p className="message" 
-                                            dangerouslySetInnerHTML={{ __html: message }} />
-                                    </div> : 
-                                    <></> 
-                                }
+                                
                             </> 
                         }/>
                     </ListItemButton>
+                    {isDecrypted ? 
+                        <div className="message-right">
+                            <div className="message-right--container">
+                                <div className="message-heading">
+                                    <div className="address">
+                                        <p>From: 
+                                            <strong>
+                                            {
+                                                checkSenderInLocalStorage(props.message.sender) ?
+                                                    savedContacts.filter((contact: any) => props.message.sender == contact.address)
+                                                        .map((filteredPerson: any) => (
+                                                            filteredPerson.name
+                                                        )) :
+                                                        formatAccountName(
+                                                            props.message.sender
+                                                        )
+                                            }
+                                            </strong>
+                                        </p>
+                                        <>
+                                            {!checkSenderInLocalStorage(props.message.sender) ? 
+                                                <IconButton onClick={() => setShow(true)}>
+                                                    <Add />
+                                                </IconButton> :
+                                                <></>
+                                            }
+                                            
+                                            <ContactsSetter show={show} props={props.message.sender} 
+                                                onClickOutside={() => setShow(false)}/>
+                                        </>
+                                    </div>
+                                    <p className="time-stamp">
+                                        <small>
+                                            {messageTime}
+                                        </small>
+                                    </p>
+                                </div>
+                                <p className="message" 
+                                    dangerouslySetInnerHTML={{ __html: message }} />
+                                <Encrypt props={props.message.sender}/>
+                            </div>
+                        </div> : 
+                        <></> 
+                    }
                 </ListItem>
             </ReadedMessagesProvider>
         )
@@ -277,9 +298,17 @@ export function Decrypt(props: any): any {
                 cids.map(async function(cidArray: any) {
                     const encryptedMessagesPromises = 
                         cidArray.cids.map(async function (cid: any) {
+                            const unixTimestamp = cid.blockTimestamp.toString()
+
+                            const milliseconds = unixTimestamp * 1000 
+
+                            const dateObject = new Date(milliseconds)
+
+                            const humanDateFormat = dateObject.toLocaleString()
                             return { 
-                                fetchedMessage: await fetchMessage(cid),
-                                sender: cidArray.sender
+                                fetchedMessage: await fetchMessage(cid.cid),
+                                sender: cidArray.sender,
+                                timestamp: humanDateFormat
                             }
                         })
                     const promise = await Promise.all(encryptedMessagesPromises)
@@ -317,6 +346,12 @@ export function Decrypt(props: any): any {
                 return (
                     <div className="row messages-list">
                         <List className="col-md-4 col-sm-12">
+                            <Box className="pagination" sx={{display:"flex"}}>
+                                <Pagination count={1} />
+                                <IconButton size="large" onClick={()=> setLoading(true) }>
+                                    <RefreshIcon fontSize="large"/>
+                                </IconButton>
+                            </Box>
                             {fetchedMessages.map((message: any, i: any) => {
                                 return (
                                     <Message message={message} index={i} 
@@ -345,17 +380,7 @@ export function Decrypt(props: any): any {
     if (encryptionKeyInitialized === true) {
         return (
             <div className="content-box">
-                <Box>
-                    <Box className="pagination" sx={{display:"flex"}}>
-                        <Pagination count={1} />
-                        <IconButton size="large" onClick={()=> setLoading(true) }>
-                            <RefreshIcon fontSize="large"/>
-                        </IconButton>
-                    </Box>
-                    <Box>
-                        <GetMessages />
-                    </Box>
-                </Box>
+                <GetMessages />
             </div>
         )
     } else if (encryptionKeyInitialized === false) {
