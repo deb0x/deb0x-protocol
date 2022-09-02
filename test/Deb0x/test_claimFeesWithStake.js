@@ -3,7 +3,7 @@ const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
 
-describe("Test fee claiming for users and concurrently stake/unstake", async function () {
+describe("Test fee claiming for users and concurrently stake", async function () {
   let rewardedAlice, rewardedBob, rewardedCarol, rewardedDean, dbxERC20;
   let alice, bob;
   beforeEach("Set enviroment", async () => {
@@ -21,7 +21,7 @@ describe("Test fee claiming for users and concurrently stake/unstake", async fun
     rewardedDean = rewardedAlice.connect(dean)
   });
 
-  it("11 ether gathered as fees should be fully distributed back to users", async () => {
+  it("Ether gathered as fees should be fully distributed back to users", async () => {
     await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address],
       ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
     await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address],
@@ -78,9 +78,54 @@ describe("Test fee claiming for users and concurrently stake/unstake", async fun
     for(let entry of feesClaimed){
       totalFeesClaimed = totalFeesClaimed.add(entry.args.fees)
     }
-    expect(totalFeesClaimed).to.equal(BigNumber.from("10999999999999999695"))
+    const feesCollected = (await rewardedAlice.cycleAccruedFees(0))
+      .add(await rewardedAlice.cycleAccruedFees(1))
+      .add(await rewardedAlice.cycleAccruedFees(2))
+    expect(totalFeesClaimed).to.equal(feesCollected)
     
   });
+
+  it.only("Stake more than once in two consecutive cycles", async () => {
+    await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address],
+      ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+    await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address],
+      ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+    await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address],
+      ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+    await rewardedCarol["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address],
+      ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+    await rewardedCarol["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address],
+      ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+    await rewardedCarol["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address],
+      ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
+    await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+    await hre.ethers.provider.send("evm_mine")
+
+    await rewardedCarol.claimRewards()
+    const carolDBXBalance = await dbxERC20.balanceOf(carol.address)
+    await dbxERC20.connect(carol).transfer(bob.address, carolDBXBalance)
+    const oneFifth = (await dbxERC20.balanceOf(bob.address)).div(BigNumber.from("5"))
+    await dbxERC20.connect(bob).approve(rewardedAlice.address, await dbxERC20.balanceOf(bob.address))
+    await rewardedBob.stakeDBX(oneFifth)
+    await rewardedBob.stakeDBX(oneFifth)
+
+    expect(await rewardedBob.userFirstStake(bob.address)).to.equal(1)
+    expect(await rewardedBob.userSecondStake(bob.address)).to.equal(0)
+    expect(await rewardedBob.userStakeCycle(bob.address, 2)).to.equal(oneFifth.add(oneFifth))
+
+    await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+    await hre.ethers.provider.send("evm_mine")
+
+    await rewardedBob.stakeDBX(oneFifth)
+    await rewardedBob.stakeDBX(oneFifth)
+    await rewardedBob.stakeDBX(oneFifth)
+
+    expect(await rewardedBob.userFirstStake(bob.address)).to.equal(1)
+    expect(await rewardedBob.userSecondStake(bob.address)).to.equal(2)
+    expect(await rewardedBob.userStakeCycle(bob.address, 3)).to.equal(oneFifth.mul(BigNumber.from("3")))
+
+  })
 
   // it("Should claim share of rewards after sending a message in the previous day", async () => {
 
@@ -115,4 +160,4 @@ describe("Test fee claiming for users and concurrently stake/unstake", async fun
   //   console.log("Bob " + await dbxERC20.balanceOf(bob.address))
   //   console.log("Carol " + await dbxERC20.balanceOf(carol.address))
   // });
-});
+}); 
