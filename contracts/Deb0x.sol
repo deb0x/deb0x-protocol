@@ -20,6 +20,7 @@ contract Deb0x is Deb0xCore {
     uint256 currentCycleReward;
     uint256 lastCycleReward;
     uint256 pendingStake;
+    uint256 public currentStartedCycle; 
 
     mapping(address => uint256) userCycleFeePercent;
     mapping(address => uint256) frontendCycleFeePercent;
@@ -48,7 +49,7 @@ contract Deb0x is Deb0xCore {
     constructor() {
         dbx = new DBX();
         i_initialTimestamp = block.timestamp;
-        i_periodDuration = 1 days;
+        i_periodDuration = 3 minutes;
         currentCycleReward = 100 * 1e18;
         summedCycleStakes[0] = 100 * 1e18;
         rewardPerCycle[0] = 100 * 1e18;
@@ -71,6 +72,7 @@ contract Deb0x is Deb0xCore {
             uint256 calculatedCycleReward = calculateCycleReward();
             currentCycleReward = calculatedCycleReward;
             rewardPerCycle[currentCycle] = calculatedCycleReward;
+            currentStartedCycle = currentCycle;
         }
         _;
     }
@@ -294,5 +296,53 @@ contract Deb0x is Deb0xCore {
             }
         }
         return userWithdrawableStake[staker] + unlockedStake;
+    }
+
+    function getUnclaimedRewards(address user) public view returns(uint256) {
+        uint256 currentCycle = getCurrentCycle();
+        uint256 currentRewards = addressRewards[user];
+
+        if(cycleTotalMessages[lastActiveCycle[user]] != 0 && lastActiveCycle[user] != currentCycle) {
+                uint256 lastCycleUserReward = userCycleMessages[user] * rewardPerCycle[lastActiveCycle[user]] / cycleTotalMessages[lastActiveCycle[user]];
+                currentRewards += lastCycleUserReward;
+
+                if(userCycleFeePercent[user] != 0) {
+                uint256 rewardPerMsg = lastCycleUserReward / userCycleMessages[user];
+                uint256 rewardsOwed = rewardPerMsg * userCycleFeePercent[user] / 10000;
+                currentRewards -= rewardsOwed;
+                }
+            }
+        return currentRewards;
+    }
+
+    function getUnclaimedFees(address user) public view returns(uint256){
+        uint256 currentCycle = getCurrentCycle();
+        uint256 currentAccruedFees = addressAccruedFees[user];
+        uint256 currentCycleFeesPerStakeSummed;
+        if(summedCycleStakes[currentCycle] == 0) {
+            uint256 feePerStake = cycleAccruedFees[currentCycle - 1] * 1e18 / summedCycleStakes[currentCycle - 1];
+            currentCycleFeesPerStakeSummed = cycleFeesPerStakeSummed[currentCycle - 1] + feePerStake;
+        } else {
+            currentCycleFeesPerStakeSummed = cycleFeesPerStakeSummed[currentCycle];
+        }
+
+        uint256 currentRewards = getUnclaimedRewards(user);
+        if(currentCycle > lastFeeUpdateCycle[user]){
+            currentAccruedFees += ((currentRewards
+                * (currentCycleFeesPerStakeSummed - cycleFeesPerStakeSummed[lastFeeUpdateCycle[user]]))) / 1e18;
+        }
+
+        if(userFirstStake[user] != 0 && currentCycle - userFirstStake[user] > 1) {
+            currentAccruedFees += 
+                ((userStakeCycle[user][userFirstStake[user] + 1] 
+                * (currentCycleFeesPerStakeSummed - cycleFeesPerStakeSummed[userFirstStake[user] + 1]))) / 1e18;
+
+            if(userSecondStake[user] != 0 && currentCycle - userSecondStake[user] > 1) {
+                currentAccruedFees += 
+                    ((userStakeCycle[user][userSecondStake[user] + 1] 
+                    * (currentCycleFeesPerStakeSummed - cycleFeesPerStakeSummed[userSecondStake[user] + 1]))) / 1e18;                    
+            }
+        }
+        return currentAccruedFees;
     }
 }
