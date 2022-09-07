@@ -93,17 +93,21 @@ export function Encrypt(replyAddress: any): any {
         evt.preventDefault()
 
         var paste = evt.clipboardData.getData("text")
-        var addresses = paste.match(/^0x[a-fA-F0-9]{40}$/g)
 
-        if (addresses) {
-            var toBeAdded = addresses.filter((address: any) => !isInList(address))
+        // if (addresses) {
+        //     var toBeAdded = addresses.filter((address: any) => !isInList(address))
 
-            setAddressList([...addressList, ...toBeAdded])
+        //     setAddressList([...addressList, ...toBeAdded])
+        // }
+
+        if(isValid(paste)) {
+            setAddressList([...addressList, paste])
         }
     }
 
     function isValid(address: any) {
         let error = null;
+        const deb0xContract = Deb0x(library, deb0xAddress)
 
         if (isInList(address)) {
             error = `${address} has already been added.`;
@@ -113,6 +117,7 @@ export function Encrypt(replyAddress: any): any {
             error = `${address} is not a valid ethereum address.`;
         }
 
+        
         if (error) {
             setNotificationState({
                 message: error, open: true,
@@ -131,6 +136,7 @@ export function Encrypt(replyAddress: any): any {
     }
 
     function isAddress(address: any) {
+        console.log(ethers.utils.isAddress(address))
         return ethers.utils.isAddress(address);
     }
 
