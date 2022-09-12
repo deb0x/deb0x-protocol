@@ -15,7 +15,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import '../../componentsStyling/appBar.scss';
 
-const deb0xERC20Address = "0x7B09B632991dAfDEc86880117f4393b0B98fdBF7"
+const deb0xERC20Address = "0x342C42c0b11e3DceB0C38424EeEB6E22B4eae9f3"
 enum ConnectorNames { Injected = 'Injected' };
 
 const connectorsByName: { [connectorName in ConnectorNames]: any } = {

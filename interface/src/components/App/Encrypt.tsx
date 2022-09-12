@@ -21,7 +21,7 @@ import { Editor } from 'react-draft-wysiwyg';
 import airplaneBlack from '../../photos/icons/airplane-black.svg';
 
 const { BigNumber } = require("ethers");
-const deb0xAddress = "0xCF619B87E8D152bA76ad8bDb1D3956091cd27d3F";
+const deb0xAddress = "0x82D197ED51f4290F8F152D297e1ae13947FeBA61";
 const ethUtil = require('ethereumjs-util')
 
 const projectId = process.env.REACT_APP_PROJECT_ID

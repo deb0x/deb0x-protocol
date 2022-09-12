@@ -20,8 +20,8 @@ import walletLight from "../../photos/icons/wallet--light.svg";
 import walletDark from "../../photos/icons/wallet--dark.svg";
 import trophyRewards from "../../photos/icons/trophyRewards.svg";
 
-const deb0xAddress = "0xCF619B87E8D152bA76ad8bDb1D3956091cd27d3F"
-const deb0xERC20Address = "0x7B09B632991dAfDEc86880117f4393b0B98fdBF7"
+const deb0xAddress = "0x82D197ED51f4290F8F152D297e1ae13947FeBA61"
+const deb0xERC20Address = "0x342C42c0b11e3DceB0C38424EeEB6E22B4eae9f3"
 
 export function Stake(props: any): any {
 

@@ -73,16 +73,15 @@ contract Deb0x is Deb0xCore {
             currentCycleReward = calculatedCycleReward;
             rewardPerCycle[currentCycle] = calculatedCycleReward;
             currentStartedCycle = currentCycle;
+            summedCycleStakes[currentCycle] += summedCycleStakes[currentCycle - 1] + pendingStake + calculatedCycleReward;
+            pendingStake = 0;
         }
         _;
     }
 
     modifier updateCycleFeesPerStakeSummed() {
         uint256 currentCycle = getCurrentCycle();
-        if(summedCycleStakes[currentCycle] == 0) {
-            uint256 calculatedCycleReward = calculateCycleReward();
-            summedCycleStakes[currentCycle] += summedCycleStakes[currentCycle - 1] + pendingStake + calculatedCycleReward;
-            pendingStake = 0;
+        if(cycleFeesPerStakeSummed[currentCycle] == 0 && currentCycle != 0) {
             uint256 feePerStake = cycleAccruedFees[currentCycle - 1] * 1e18 / summedCycleStakes[currentCycle - 1];
             cycleFeesPerStakeSummed[currentCycle] = cycleFeesPerStakeSummed[currentCycle - 1] + feePerStake;
         }
