@@ -27,6 +27,9 @@ import logoGreen from './photos/icons/logo-green.svg';
 import logoDark from "./photos/logo-dark.svg";
 import { Spinner } from './components/App/Spinner';
 import { AppBarComponent } from './components/App/AppBar';
+import IconButton from "@mui/material/IconButton";
+import { Add } from '@mui/icons-material';
+import HowTo from './components/HowTo'
 
 const client = create({
   host: 'ipfs.infura.io',
@@ -91,6 +94,7 @@ function App() {
     const [networkName, setNetworkName] = useState<any>();
     let errorMsg;
     const [isVisible, setIsVisible] = useState(false);
+    let [show, setShow] = useState(false);
 
     useEffect(() => {
         injected.supportedChainIds?.forEach(chainId => 
@@ -221,15 +225,21 @@ function App() {
                         <div className="col-md-7 img-container mr-4">
                             <img className="image--left" src={elephant} />
                             <div className="img-content">
-                                <p>Hey, you!</p>
+                                <p>Let's get you started</p>
                                 
-                                <p>To use <img className="content-logo" src={logoGreen} /> you need to have your wallet connected</p>
+                                <p>Connect your wallet & start using <img className="content-logo" src={logoGreen} /></p>
+                                <p>Here's how to do this in <IconButton className='info show-popup' onClick={() => setShow(true)}>3 easy steps</IconButton></p>
+                                {show ? 
+                                    <HowTo show={show} onClickOutside={() => setShow(false)}/> : 
+                                        <></>
+                                }
                                 <div>
                                 { (() =>  {
                                     const currentConnector = connectorsByName[ConnectorNames.Injected]
                                     const activating = currentConnector === activatingConnector
                                     const connected = currentConnector === connector
                                     const disabled = !triedEager || !!activatingConnector || connected || !!error
+                                    console.log(window.ethereum);
 
                                     return (
                                         <Button variant="contained"
@@ -248,9 +258,9 @@ function App() {
                                                 !connected ? 
                                                     "Connect Wallet" :
                                                     <span>
-                                                        {account === undefined ? 
-                                                            `Unsupported Network. Switch to ${networkName}` : 
-                                                            ''}
+                                                        {typeof window.ethereum === 'undefined' ? 
+                                                            `Check your prerequisites` : 
+                                                            account === undefined ? `Unsupported Network. Switch to ${networkName}` : ''}
                                                     </span>
                                             }
                                         </Button>
@@ -259,7 +269,7 @@ function App() {
                                 </div>
                             </div>
                         </div>
-                        <div className="col-md-5">
+                        <div className="col-md-5 text-center">
                             <div className="text-container">
                                 <img className="dark-logo" src={logoGreen} />
                                 <p>
