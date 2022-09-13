@@ -20,7 +20,7 @@ import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { Editor } from 'react-draft-wysiwyg';
 import airplaneBlack from '../../photos/icons/airplane-black.svg';
 
-const deb0xAddress = "0xFA6Ce4a99dB3BF9Ab080299c324fB1327dcbD7ED";
+const deb0xAddress = "0xDcEec319947F5A9a2ED2eEd7BF2be221AB0CB65c";
 const ethUtil = require('ethereumjs-util')
 
 const projectId = process.env.REACT_APP_PROJECT_ID
@@ -67,13 +67,13 @@ export function Encrypt(replyAddress: any): any {
         }
     }, []);
 
-    function handleKeyDown(evt: any) {
+    async function handleKeyDown(evt: any) {
         if (["Enter", "Tab", ","].includes(evt.key)) {
             evt.preventDefault();
 
             var value = senderAddress.trim();
 
-            if (value && isValid(value)) {
+            if (value && await isValid(value)) {
                 setAddressList([...addressList, senderAddress])
                 setSenderAddress("")
             }
@@ -89,25 +89,18 @@ export function Encrypt(replyAddress: any): any {
         setAddressList(addressList.filter(i => i !== item))
     }
 
-    function handlePaste(evt: any) {
+    async function handlePaste(evt: any) {
         evt.preventDefault()
 
         var paste = evt.clipboardData.getData("text")
 
-        // if (addresses) {
-        //     var toBeAdded = addresses.filter((address: any) => !isInList(address))
-
-        //     setAddressList([...addressList, ...toBeAdded])
-        // }
-
-        if(isValid(paste)) {
+        if(await isValid(paste)) {
             setAddressList([...addressList, paste])
         }
     }
 
-    function isValid(address: any) {
+    async function isValid(address: any) {
         let error = null;
-        const deb0xContract = Deb0x(library, deb0xAddress)
 
         if (isInList(address)) {
             error = `${address} has already been added.`;
@@ -115,8 +108,9 @@ export function Encrypt(replyAddress: any): any {
 
         if (!isAddress(address)) {
             error = `${address} is not a valid ethereum address.`;
+        } else if (await isInitialized(address) == "") {
+            error = `${address} has not initialized deb0x.`;
         }
-
         
         if (error) {
             setNotificationState({
@@ -131,13 +125,17 @@ export function Encrypt(replyAddress: any): any {
         return true;
     }
 
+    async function isInitialized(address: any) {
+        const deb0xContract = Deb0x(library, deb0xAddress)
+        return await deb0xContract.encryptionKeys(address);
+    }
+
     function isInList(address: any) {
         return addressList.includes(address);
     }
 
     function isAddress(address: any) {
-        console.log(ethers.utils.isAddress(address))
-        return ethers.utils.isAddress(address);
+        return ethers.utils.isAddress(address)
     }
 
     async function encryptText(messageToEncrypt: any, destinationAddresses: any)
