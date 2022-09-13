@@ -99,17 +99,11 @@ export function Governance(props: any): any {
 
             const cids = await Promise.all(cidsPromises)
 
-            console.log(cids)
-
             const encryptedMessagesPromisesArray = cids.map(async function(cidArray: any) {
-                console.log(cidArray)
-               
 
             })
 
             const encryptedMessages = await Promise.all(encryptedMessagesPromisesArray)
-            
-            console.log(encryptedMessages)
             
             setFetchedMessages(encryptedMessages.flat())
             setLoading(false)

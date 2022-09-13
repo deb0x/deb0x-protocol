@@ -20,8 +20,8 @@ import walletLight from "../../photos/icons/wallet--light.svg";
 import walletDark from "../../photos/icons/wallet--dark.svg";
 import trophyRewards from "../../photos/icons/trophyRewards.svg";
 
-const deb0xAddress = "0x82D197ED51f4290F8F152D297e1ae13947FeBA61"
-const deb0xERC20Address = "0x342C42c0b11e3DceB0C38424EeEB6E22B4eae9f3"
+const deb0xAddress = "0xFA6Ce4a99dB3BF9Ab080299c324fB1327dcbD7ED"
+const deb0xERC20Address = "0xA84444759a12ff20998a6c711463606Fed16ceD3"
 
 export function Stake(props: any): any {
 
@@ -116,12 +116,10 @@ export function Stake(props: any): any {
         const [loading, setLoading] = useState(false)
 
         useEffect(() => {
-            console.log("rewards effect")
             rewardsAccrued()
         }, [rewardsUnclaimed]);
 
         useEffect(() => {
-            console.log("fee share effect")
             feeShare()
         }, [feeSharePercentage]);
 
@@ -134,17 +132,12 @@ export function Stake(props: any): any {
         }
 
         async function feeShare() {
-            console.log("aicii")
             const deb0xContract = await Deb0x(library, deb0xAddress)
-            console.log("1")
             
-            let balance = parseFloat((ethers.utils.formatEther((await deb0xContract.getUnclaimedRewards(account)) )) )
-            console.log(balance + " balance")
-            const currentCycle = await deb0xContract.currentStartedCycle()
-            let totalSupply = parseFloat((ethers.utils.formatEther((await deb0xContract.summedCycleStakes(currentCycle))) ))
-            console.log(totalSupply + " totalSupply")
+            let balance = parseFloat((ethers.utils.formatEther((await deb0xContract.balanceERC20(account)) )) )
+            
+            let totalSupply = parseFloat((ethers.utils.formatEther((await deb0xContract.totalSupply())) ))
             const feeShare = balance * 100 / totalSupply
-            console.log(feeShare + " feeShare")
             setFeeSharePercentage(((Math.round(feeShare * 100) / 100).toFixed(2)).toString() + "%")
         }
 
@@ -239,28 +232,22 @@ export function Stake(props: any): any {
         
         const [theme, setTheme] = useState(localStorage.getItem('globalTheme'));
         useEffect(() => {
-            console.log("stake component effect");
             setTheme(localStorage.getItem('globalTheme'));
-            console.log(theme);
         });
 
         useEffect(() => {
-            console.log("user staked effect")
             setStakedAmount()
         }, [userStakedAmount]);
 
         useEffect(() => {
-            console.log("total staked effect")
             totalAmountStaked()
         }, [totalStaked]);
 
         useEffect(() => {
-            console.log("user unstaked effect")
             setUnstakedAmount()
         }, [userUnstakedAmount]);
 
         useEffect(() => {
-            console.log("approval effect")
             setApproval()
         }, [approved]);
 
@@ -520,7 +507,6 @@ export function Stake(props: any): any {
     function TotalStaked() {
         const [totalStaked, setTotalStaked] = useState("")
         useEffect(() => {
-            console.log("total staked effect")
             totalAmountStaked()
         }, [totalStaked]);
     

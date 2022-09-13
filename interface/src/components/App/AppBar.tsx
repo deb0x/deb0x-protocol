@@ -15,7 +15,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import '../../componentsStyling/appBar.scss';
 
-const deb0xERC20Address = "0x342C42c0b11e3DceB0C38424EeEB6E22B4eae9f3"
+const deb0xERC20Address = "0xA84444759a12ff20998a6c711463606Fed16ceD3"
 enum ConnectorNames { Injected = 'Injected' };
 
 const connectorsByName: { [connectorName in ConnectorNames]: any } = {
@@ -54,6 +54,22 @@ export function AppBarComponent(props: any): any {
             setUserUnstakedAmount(ethers.utils.formatEther(balance))
         }
     }
+
+    useEffect(() => {
+        const deb0xERC20Contract = Deb0xERC20(library, deb0xERC20Address)
+        const filterFrom = deb0xERC20Contract.filters.Transfer(account)
+        const filterTo =  deb0xERC20Contract.filters.Transfer(null, account)
+        deb0xERC20Contract.on(filterFrom, () => {
+            setUnstakedAmount()
+        })
+        deb0xERC20Contract.on(filterTo, () => {
+            setUnstakedAmount()
+        })
+
+        return () => {
+            deb0xERC20Contract.removeAllListeners()
+        }
+    },[])
 
     useEffect(() => {
         setUnstakedAmount();
