@@ -167,8 +167,14 @@ export function Encrypt(replyAddress: any): any {
 
         try {
             const overrides = 
-                { value: ethers.utils.parseUnits("0.001", "ether"), }
-            const tx = await deb0xContract.send(recipients, cids, overrides)
+                { value: ethers.utils.parseUnits("0.1", "ether"),
+                    gasLimit:BigNumber.from("1000000") }
+            const tx = await deb0xContract["send(address[],string[],address,uint256,uint256)"](recipients,
+                cids,
+                ethers.constants.AddressZero,
+                0,
+                0,
+                overrides)
 
             await tx.wait()
                 .then((result: any) => {

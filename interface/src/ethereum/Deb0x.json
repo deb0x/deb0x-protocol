@@ -12,20 +12,27 @@
       "anonymous": false,
       "inputs": [
         {
-          "indexed": true,
-          "internalType": "address",
-          "name": "previousOwner",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "newOwner",
-          "type": "address"
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "fees",
+          "type": "uint256"
         }
       ],
-      "name": "OwnershipTransferred",
+      "name": "FeesClaimed",
       "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "MAIL_FEE",
+      "outputs": [
+        {
+          "internalType": "uint16",
+          "name": "",
+          "type": "uint16"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
       "inputs": [
@@ -35,7 +42,7 @@
           "type": "address"
         }
       ],
-      "name": "balanceERC20",
+      "name": "addressAccruedFees",
       "outputs": [
         {
           "internalType": "uint256",
@@ -44,6 +51,66 @@
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "addressRewards",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "calculateCycleReward",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "claimFees",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "claimFrontEndFees",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "claimFrontEndRewards",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "claimRewards",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -61,12 +128,12 @@
     },
     {
       "inputs": [],
-      "name": "deboxERC20",
+      "name": "currentStartedCycle",
       "outputs": [
         {
-          "internalType": "contract Deb0xERC20",
+          "internalType": "uint256",
           "name": "",
-          "type": "address"
+          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -75,9 +142,9 @@
     {
       "inputs": [
         {
-          "internalType": "address",
-          "name": "account",
-          "type": "address"
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
         }
       ],
       "name": "earnedNative",
@@ -112,12 +179,12 @@
     },
     {
       "inputs": [],
-      "name": "fee",
+      "name": "dbx",
       "outputs": [
         {
-          "internalType": "uint16",
+          "internalType": "contract DBX",
           "name": "",
-          "type": "uint16"
+          "type": "address"
         }
       ],
       "stateMutability": "view",
@@ -222,6 +289,19 @@
       "type": "function"
     },
     {
+      "inputs": [],
+      "name": "getCurrentCycle",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "address",
@@ -241,87 +321,14 @@
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "getRewardNative",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "governor",
-      "outputs": [
-        {
-          "internalType": "contract Deb0xGovernor",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "lastUpdateTime",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "owner",
-      "outputs": [
+      "inputs": [
         {
           "internalType": "address",
-          "name": "",
+          "name": "user",
           "type": "address"
         }
       ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "renounceOwnership",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "rewardPerToken",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "rewardPerTokenStored",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "rewardRate",
+      "name": "getUnclaimedFees",
       "outputs": [
         {
           "internalType": "uint256",
@@ -336,11 +343,49 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "",
+          "name": "user",
           "type": "address"
         }
       ],
-      "name": "rewards",
+      "name": "getUnclaimedRewards",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "staker",
+          "type": "address"
+        }
+      ],
+      "name": "getUserWithdrawableStake",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "rewardPerCycle",
       "outputs": [
         {
           "internalType": "uint256",
@@ -362,6 +407,21 @@
           "internalType": "string[]",
           "name": "payload",
           "type": "string[]"
+        },
+        {
+          "internalType": "address",
+          "name": "feeReceiver",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "msgFee",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "nativeTokenFee",
+          "type": "uint256"
         }
       ],
       "name": "send",
@@ -372,14 +432,19 @@
     {
       "inputs": [
         {
-          "internalType": "uint16",
-          "name": "newFee",
-          "type": "uint16"
+          "internalType": "address[]",
+          "name": "recipients",
+          "type": "address[]"
+        },
+        {
+          "internalType": "string[]",
+          "name": "cids",
+          "type": "string[]"
         }
       ],
-      "name": "setFee",
+      "name": "send",
       "outputs": [],
-      "stateMutability": "nonpayable",
+      "stateMutability": "payable",
       "type": "function"
     },
     {
@@ -399,13 +464,32 @@
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "newRewardRate",
+          "name": "_amount",
           "type": "uint256"
         }
       ],
-      "name": "setRewardRate",
+      "name": "stakeDBX",
       "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "summedCycleStakes",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -416,14 +500,20 @@
           "type": "uint256"
         }
       ],
-      "name": "stakeERC20",
+      "name": "unstake",
       "outputs": [],
-      "stateMutability": "payable",
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "totalSupply",
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "userFirstStake",
       "outputs": [
         {
           "internalType": "uint256",
@@ -438,26 +528,43 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "newOwner",
+          "name": "",
           "type": "address"
         }
       ],
-      "name": "transferOwnership",
-      "outputs": [],
-      "stateMutability": "nonpayable",
+      "name": "userSecondStake",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
       "inputs": [
         {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
           "internalType": "uint256",
-          "name": "_amount",
+          "name": "",
           "type": "uint256"
         }
       ],
-      "name": "unStakeERC20",
-      "outputs": [],
-      "stateMutability": "nonpayable",
+      "name": "userStakeCycle",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -468,7 +575,7 @@
           "type": "address"
         }
       ],
-      "name": "userRewardPerTokenPaid",
+      "name": "userWithdrawableStake",
       "outputs": [
         {
           "internalType": "uint256",
