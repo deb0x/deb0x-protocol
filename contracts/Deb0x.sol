@@ -77,10 +77,8 @@ contract Deb0x is Deb0xCore {
             lastStartedCycle = currentStartedCycle;
         }
         if(currentCycle > lastStartedCycle && cycleFeesPerStakeSummed[lastStartedCycle + 1] == 0) {
-            console.log("lastStartedCycle: ", lastStartedCycle);
             uint256 feePerStake = cycleAccruedFees[lastStartedCycle] * dividend / summedCycleStakes[lastStartedCycle];
             cycleFeesPerStakeSummed[lastStartedCycle + 1] = cycleFeesPerStakeSummed[lastStartedCycle] + feePerStake;
-            console.log("cycleFeesPerStakeSummed[currentCycle]: ", cycleFeesPerStakeSummed[currentCycle]);
         }
         _;
     }
@@ -134,32 +132,31 @@ contract Deb0x is Deb0xCore {
         }
         
         if(currentCycle > lastStartedCycle && lastFeeUpdateCycle[account] != lastStartedCycle + 1){
+            console.log(cycleFeesPerStakeSummed[lastStartedCycle + 1], cycleFeesPerStakeSummed[lastFeeUpdateCycle[account]]);
             addressAccruedFees[account] = addressAccruedFees[account] + ((addressRewards[account] 
                 * (cycleFeesPerStakeSummed[lastStartedCycle + 1] - cycleFeesPerStakeSummed[lastFeeUpdateCycle[account]]))) / dividend;
             lastFeeUpdateCycle[account] = lastStartedCycle + 1;
         }
-
-        if(userFirstStake[account] != 0 && currentCycle - userFirstStake[account] > 1) {
-            uint256 unlockedFirstStake = userStakeCycle[account][userFirstStake[account] + 1];
+        
+        if(userFirstStake[account] != 0 && currentCycle - userFirstStake[account] > 0) {
+            uint256 unlockedFirstStake = userStakeCycle[account][userFirstStake[account]];
             addressRewards[account] += unlockedFirstStake;
             userWithdrawableStake[account] += unlockedFirstStake;
-            console.log("stake unlocked fees: ", userStakeCycle[account][userFirstStake[account] + 1] 
-                * (cycleFeesPerStakeSummed[currentCycle] - cycleFeesPerStakeSummed[userFirstStake[account] + 1]) / dividend);
             addressAccruedFees[account] = addressAccruedFees[account] + 
-                ((userStakeCycle[account][userFirstStake[account] + 1] 
-                * (cycleFeesPerStakeSummed[currentCycle] - cycleFeesPerStakeSummed[userFirstStake[account] + 1]))) / dividend;
-            userStakeCycle[account][userFirstStake[account] + 1] = 0;
+                ((userStakeCycle[account][userFirstStake[account]] 
+                * (cycleFeesPerStakeSummed[currentCycle] - cycleFeesPerStakeSummed[userFirstStake[account]]))) / dividend;
+            userStakeCycle[account][userFirstStake[account]] = 0;
             userFirstStake[account] = 0;
 
             if(userSecondStake[account] != 0) {
                 if(currentCycle - userSecondStake[account] > 1) {
-                        uint256 unlockedSecondStake = userStakeCycle[account][userSecondStake[account] + 1];
+                        uint256 unlockedSecondStake = userStakeCycle[account][userSecondStake[account]];
                         addressRewards[account] += unlockedSecondStake;
                         userWithdrawableStake[account] += unlockedSecondStake;
                         addressAccruedFees[account] = addressAccruedFees[account] + 
-                            ((userStakeCycle[account][userSecondStake[account] + 1] 
+                            ((userStakeCycle[account][userSecondStake[account]] 
                             * (cycleFeesPerStakeSummed[currentCycle] - cycleFeesPerStakeSummed[userSecondStake[account] + 1]))) / dividend;
-                        userStakeCycle[account][userSecondStake[account] + 1] = 0;
+                        userStakeCycle[account][userSecondStake[account]] = 0;
                         userSecondStake[account] = 0;
                         } else {
                             userFirstStake[account] = userSecondStake[account];
@@ -220,7 +217,6 @@ contract Deb0x is Deb0xCore {
         uint256 reward = addressRewards[msg.sender] - userWithdrawableStake[msg.sender];
         require(reward > 0, "Deb0x: You do not have rewards");
         addressRewards[msg.sender] -= reward;
-        console.log("summedCycleStakes[currentCycle]: ", summedCycleStakes[currentCycle], " reward: ", reward);
         if(lastStartedCycle == currentStartedCycle){
             pendingStakeWithdrawal += reward;
         } else {
@@ -266,14 +262,19 @@ contract Deb0x is Deb0xCore {
     {
         require(_amount != 0, "Deb0x: your amount is 0");
         pendingStake += _amount;
+        uint256 cycleToSet = currentCycle + 1;
+
+        if(lastStartedCycle == currentStartedCycle) {
+            cycleToSet = currentCycle;
+        }
 
         if(userFirstStake[msg.sender] == 0) {
-            userFirstStake[msg.sender] = currentCycle;
+            userFirstStake[msg.sender] = cycleToSet;
             
         } else if(userSecondStake[msg.sender] == 0) {
-            userSecondStake[msg.sender] = currentCycle;
+            userSecondStake[msg.sender] = cycleToSet;
         }
-        userStakeCycle[msg.sender][currentCycle + 1] += _amount;
+        userStakeCycle[msg.sender][cycleToSet] += _amount;
 
         dbx.transferFrom(msg.sender, address(this), _amount);
     }
@@ -299,7 +300,6 @@ contract Deb0x is Deb0xCore {
     }
 
     function sendViaCall(address payable _to, uint256 _amount) private {
-        console.log(address(this).balance, _amount);
         (bool sent, ) = _to.call{value: _amount}("");
         require(sent, "Deb0x: failed to send amount");
     }
@@ -319,11 +319,11 @@ contract Deb0x is Deb0xCore {
     function getUserWithdrawableStake(address staker) public view returns(uint256) {
         uint256 calculatedCycle = getCurrentCycle();
         uint256 unlockedStake = 0;
-        if(userFirstStake[staker] != 0 && calculatedCycle - userFirstStake[staker] > 1) {
-            unlockedStake += userStakeCycle[staker][userFirstStake[staker] + 1];
+        if(userFirstStake[staker] != 0 && calculatedCycle - userFirstStake[staker] > 0) {
+            unlockedStake += userStakeCycle[staker][userFirstStake[staker]];
 
-            if(userSecondStake[staker] != 0 && calculatedCycle - userSecondStake[staker] > 1) {
-                unlockedStake += userStakeCycle[staker][userSecondStake[staker] + 1];
+            if(userSecondStake[staker] != 0 && calculatedCycle - userSecondStake[staker] > 0) {
+                unlockedStake += userStakeCycle[staker][userSecondStake[staker]];
             }
         }
         return userWithdrawableStake[staker] + unlockedStake;
