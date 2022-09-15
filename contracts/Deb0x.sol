@@ -18,6 +18,7 @@ contract Deb0x is Deb0xCore {
     uint256 pendingStake;
     uint256 currentCycle;
     uint256 lastStartedCycle;
+    uint256 previousStartedCycle;
     uint256 currentStartedCycle;
     uint256 pendingCycleRewardsStake;
     uint256 pendingStakeWithdrawal;
@@ -74,11 +75,14 @@ contract Deb0x is Deb0xCore {
 
     modifier updateCycleFeesPerStakeSummed() {
         if(currentCycle != currentStartedCycle) {
+            previousStartedCycle = lastStartedCycle + 1;
             lastStartedCycle = currentStartedCycle;
         }
         if(currentCycle > lastStartedCycle && cycleFeesPerStakeSummed[lastStartedCycle + 1] == 0) {
+            // console.log(lastStartedCycle);
             uint256 feePerStake = cycleAccruedFees[lastStartedCycle] * dividend / summedCycleStakes[lastStartedCycle];
-            cycleFeesPerStakeSummed[lastStartedCycle + 1] = cycleFeesPerStakeSummed[lastStartedCycle] + feePerStake;
+            // console.log(cycleFeesPerStakeSummed[previousStartedCycle], feePerStake);
+            cycleFeesPerStakeSummed[lastStartedCycle + 1] = cycleFeesPerStakeSummed[previousStartedCycle] + feePerStake;
         }
         _;
     }
@@ -132,7 +136,8 @@ contract Deb0x is Deb0xCore {
         }
         
         if(currentCycle > lastStartedCycle && lastFeeUpdateCycle[account] != lastStartedCycle + 1){
-            console.log(cycleFeesPerStakeSummed[lastStartedCycle + 1], cycleFeesPerStakeSummed[lastFeeUpdateCycle[account]]);
+            // console.log(lastStartedCycle + 1, lastFeeUpdateCycle[account]);
+            // console.log(cycleFeesPerStakeSummed[lastStartedCycle + 1], cycleFeesPerStakeSummed[lastFeeUpdateCycle[account]]);
             addressAccruedFees[account] = addressAccruedFees[account] + ((addressRewards[account] 
                 * (cycleFeesPerStakeSummed[lastStartedCycle + 1] - cycleFeesPerStakeSummed[lastFeeUpdateCycle[account]]))) / dividend;
             lastFeeUpdateCycle[account] = lastStartedCycle + 1;
@@ -179,8 +184,8 @@ contract Deb0x is Deb0xCore {
         }
         if(currentCycle > frontEndLastFeeUpdate[frontend]) {
             frontEndAccruedFees[frontend] += (frontendRewards[frontend] 
-                * (cycleFeesPerStakeSummed[currentCycle] - cycleFeesPerStakeSummed[frontEndLastFeeUpdate[frontend]])) / 1e18;
-            frontEndLastFeeUpdate[frontend] = currentCycle;
+                * (cycleFeesPerStakeSummed[lastStartedCycle + 1] - cycleFeesPerStakeSummed[frontEndLastFeeUpdate[frontend]])) / 1e18;
+            frontEndLastFeeUpdate[frontend] = lastStartedCycle + 1;
         }
     }
 
@@ -233,7 +238,11 @@ contract Deb0x is Deb0xCore {
         uint256 reward = frontendRewards[msg.sender];
         require(reward > 0, "Deb0x: You do not have rewards");
         frontendRewards[msg.sender] = 0;
-        summedCycleStakes[currentCycle] = summedCycleStakes[currentCycle] - reward;
+        if(lastStartedCycle == currentStartedCycle){
+            pendingStakeWithdrawal += reward;
+        } else {
+            summedCycleStakes[currentCycle] = summedCycleStakes[currentCycle] - reward;
+        }
         dbx.mintReward(msg.sender, reward);
     }
     

@@ -2,7 +2,7 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
 
-describe.skip("Test rewards claiming for frontends", async function () {
+describe("Test rewards claiming for frontends", async function () {
   let rewardedAlice, rewardedBob, rewardedCarol, rewardedFeeReceiver, rewardedFeeReceiver2, rewardedFeeReceiver3, dbxERC20;
   let alice, bob;
   beforeEach("Set enviroment", async () => {

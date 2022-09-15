@@ -21,7 +21,7 @@ describe("Test contract", async function () {
     rewardedDean = rewardedAlice.connect(dean)
   });
 
-  it.only("11 ether gathered as fees should be fully distributed back to users", async () => {
+  it("11 ether gathered as fees should be fully distributed back to users", async () => {
     await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address],
       ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
     await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address],
