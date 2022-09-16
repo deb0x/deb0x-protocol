@@ -29,7 +29,7 @@ import SnackbarNotification from './Snackbar';
 import { Add } from '@mui/icons-material';
 import ContactsSetter from '../ContactsSetter';
 
-const deb0xERC20Address = "0xA84444759a12ff20998a6c711463606Fed16ceD3"
+const deb0xERC20Address = "0xEde2f177d6Ae8330860B6b37B2F3D767cd2630fe"
 enum ConnectorNames { Injected = 'Injected' };
 
 const connectorsByName: { [connectorName in ConnectorNames]: any } = {
@@ -52,7 +52,7 @@ export function PermanentDrawer(props: any): any {
     const [ensName, setEnsName] = useState<any>("");
     // const [balance, setBalance] = useState<any>("8.13");
     const [userUnstakedAmount,setUserUnstakedAmount] = useState<any>(0);
-    const menuItems = ['Compose', 'Deb0x', 'Rewards', 'Sent'];
+    const menuItems = ['Compose', 'Deb0x', 'Stake', 'Sent'];
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popper' : undefined;
