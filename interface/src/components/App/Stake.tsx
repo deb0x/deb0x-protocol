@@ -28,86 +28,6 @@ export function Stake(props: any): any {
     const { account, library } = useWeb3React()
     const [notificationState, setNotificationState] = useState({})
 
-    function FeesPanel() {
-        const [feesUnclaimed, setFeesUnclaimed] = useState("")
-        const [loading, setLoading] = useState(false)
-
-        useEffect(() => {
-            console.log("rewards effect")
-            feesAccrued()
-            console.log("fees unclaimed:", feesUnclaimed)
-        }, [feesUnclaimed]);
-
-        async function feesAccrued() {
-            const deb0xContract = await Deb0x(library, deb0xAddress)
-
-            const unclaimedRewards = await deb0xContract.getUnclaimedFees(account);
-
-            setFeesUnclaimed(ethers.utils.formatEther(unclaimedRewards))
-        }
-
-        async function claimFees() {
-            setLoading(true)
-
-            const signer = await library.getSigner(0)
-
-            const deb0xContract = Deb0x(signer, deb0xAddress)
-
-            try {
-                const tx = await deb0xContract.claimFees()
-
-                tx.wait()
-                    .then((result: any) => {
-                        setNotificationState({
-                            message: "You succesfully claimed your fees.", open: true,
-                            severity: "success"
-                        })
-                        //setLoading(false)
-
-                    })
-                    .catch((error: any) => {
-                        setNotificationState({
-                            message: "Fees couldn't be claimed!", open: true,
-                            severity: "error"
-                        })
-                        setLoading(false)
-                    })
-            } catch (error: any) {
-                setNotificationState({
-                    message: "You rejected the transaction. Your fees haven't been claimed.", open: true,
-                    severity: "info"
-                })
-            }
-
-        }
-
-        return (
-            <>
-            <Card variant="outlined" className="card-container">
-                <CardContent className="row">
-                    <div className="col-12 col-md-6 mb-2">
-                        <Typography variant="h4" component="div" className="rewards mb-3">
-                            FEES
-                        </Typography>
-                        <Typography >
-                            Your unclaimed fees:
-                        </Typography>
-                        <Typography variant="h6" className="mb-3">
-                            <strong>{feesUnclaimed}</strong>
-                        </Typography>
-                    </div>
-                    <div className='col-12 col-md-6 d-flex justify-content-end align-items-start'>
-                        <img src={trophyRewards} alt="trophyRewards" className="p-3"/>
-                    </div>
-                </CardContent>
-                <CardActions className='button-container'>
-                    <LoadingButton className="collect-btn" disabled={feesUnclaimed=="0.0"} loading={loading} variant="contained" onClick={claimFees}>Collect</LoadingButton>
-                </CardActions>
-            </Card>
-            </>
-        )
-    }
-
     function RewardsPanel() {
         
 
@@ -126,7 +46,7 @@ export function Stake(props: any): any {
         async function rewardsAccrued() {
             const deb0xContract = await Deb0x(library, deb0xAddress)
 
-            const unclaimedRewards = await deb0xContract.getUnclaimedRewards(account);
+            const unclaimedRewards = await deb0xContract.earnedNative(account);
 
             setRewardsUnclaimed(ethers.utils.formatEther(unclaimedRewards))
         }
@@ -149,7 +69,7 @@ export function Stake(props: any): any {
             const deb0xContract = Deb0x(signer, deb0xAddress)
 
             try {
-                const tx = await deb0xContract.claimRewards()
+                const tx = await deb0xContract.getRewardNative()
 
                 tx.wait()
                     .then((result: any) => {
@@ -255,7 +175,7 @@ export function Stake(props: any): any {
 
             const deb0xContract = await Deb0x(library, deb0xAddress)
 
-            const balance = await deb0xContract.getUserWithdrawableStake(account)
+            const balance = await deb0xContract.balanceERC20(account)
 
             setUserStakedAmount(ethers.utils.formatEther(balance))
         }
@@ -280,9 +200,7 @@ export function Stake(props: any): any {
 
             const deb0xContract = await Deb0x(library, deb0xAddress)
 
-            const currentCycle = await deb0xContract.currentStartedCycle()
-
-            const totalSupply = await deb0xContract.summedCycleStakes(currentCycle)
+            const totalSupply = await deb0xContract.totalSupply()
 
             setTotalStaked(ethers.utils.formatEther(totalSupply))
         }
@@ -330,7 +248,7 @@ export function Stake(props: any): any {
             const deb0xContract = Deb0x(signer, deb0xAddress)
 
             try {
-                const tx = await deb0xContract.unstake(ethers.utils.parseEther(amountToUnstake.toString()))
+                const tx = await deb0xContract.unStakeERC20(ethers.utils.parseEther(amountToUnstake.toString()))
 
                 tx.wait()
                     .then((result: any) => {
@@ -367,7 +285,7 @@ export function Stake(props: any): any {
             const deb0xContract = Deb0x(signer, deb0xAddress)
 
             try {
-                const tx = await deb0xContract.stakeDBX(ethers.utils.parseEther(amountToStake.toString()))
+                const tx = await deb0xContract.stakeERC20(ethers.utils.parseEther(amountToStake.toString()))
 
                 tx.wait()
                     .then((result: any) => {
@@ -513,12 +431,10 @@ export function Stake(props: any): any {
         async function totalAmountStaked() {
     
             const deb0xContract = await Deb0x(library, deb0xAddress)
-
-            const currentCycle= await deb0xContract.currentStartedCycle()
-
-            const currentStake = await deb0xContract.summedCycleStakes(currentCycle)
     
-            setTotalStaked(ethers.utils.formatEther(currentStake))
+            const totalSupply = await deb0xContract.totalSupply()
+    
+            setTotalStaked(ethers.utils.formatEther(totalSupply))
         }
 
         return (
@@ -548,7 +464,7 @@ export function Stake(props: any): any {
                         </Grid>
                         <Grid item className="col col-md-6">
                             <StakeUnstake/>
-                            <FeesPanel />
+                            <RewardsPanel />
                         </Grid>
                     </div>
                 </div>
