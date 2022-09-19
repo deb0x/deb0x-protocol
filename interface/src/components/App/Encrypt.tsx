@@ -21,7 +21,7 @@ import { Editor } from 'react-draft-wysiwyg';
 import airplaneBlack from '../../photos/icons/airplane-black.svg';
 
 const { BigNumber } = require("ethers");
-const deb0xAddress = "0x503AC13AF485580AE2E0Be71B917ab1A6D7949a0";
+const deb0xAddress = "0xb6057a156D1D5BAB08DAb590dC052B66051394e2";
 const ethUtil = require('ethereumjs-util')
 
 const projectId = process.env.REACT_APP_PROJECT_ID
@@ -144,7 +144,6 @@ export function Encrypt(replyAddress: any): any {
         recipients.push(await signer.getAddress())
         const deb0xContract = Deb0x(signer, deb0xAddress);
         for (let address of recipients) {
-            console.log(recipients, address)
             const destinationAddressEncryptionKey = await deb0xContract.getKey(address);
             const encryptedMessage = ethUtil.bufferToHex(
                 Buffer.from(
@@ -192,10 +191,8 @@ export function Encrypt(replyAddress: any): any {
                         open: true,
                         severity: "error"
                     })
-                    console.log(error)
                 })
         } catch (error: any) {
-            console.log(error)
             setNotificationState({
                 message: "You rejected the transaction. Message was not sent.",
                 open: true,
@@ -232,8 +229,6 @@ export function Encrypt(replyAddress: any): any {
     const getPublicEncryptionKey = async () => {
         const deb0xContract = Deb0x(library, deb0xAddress)
         const key = await deb0xContract.getKey(account)
-        console.log(key)
-        console.log(encryptionKey)
         setEncryptionKeyInitialized(key)
     }
     const [editorState, setEditorState] = useState(() =>
@@ -319,7 +314,6 @@ export function Encrypt(replyAddress: any): any {
                                 sx={{ marginLeft: 2, marginTop: 1 }}
                                 disabled={textToEncrypt == '' || addressList == []}
                                 onClick={() => {
-                                    console.log(replyAddress.props)
                                     encryptText(textToEncrypt, addressList)
                                 }
                                     

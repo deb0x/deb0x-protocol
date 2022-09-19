@@ -20,8 +20,8 @@ import walletLight from "../../photos/icons/wallet--light.svg";
 import walletDark from "../../photos/icons/wallet--dark.svg";
 import trophyRewards from "../../photos/icons/trophyRewards.svg";
 
-const deb0xAddress = "0x503AC13AF485580AE2E0Be71B917ab1A6D7949a0"
-const deb0xERC20Address = "0x54D542E5b4797902232911CF79f049CcB99a1022"
+const deb0xAddress = "0xb6057a156D1D5BAB08DAb590dC052B66051394e2"
+const deb0xERC20Address = "0x98583dd5310725eBDFd1123CA1FDE765Ef6eAFb8"
 
 export function Stake(props: any): any {
 
@@ -33,9 +33,7 @@ export function Stake(props: any): any {
         const [loading, setLoading] = useState(false)
 
         useEffect(() => {
-            console.log("rewards effect")
             feesAccrued()
-            console.log("fees unclaimed:", feesUnclaimed)
         }, [feesUnclaimed]);
 
         async function feesAccrued() {
