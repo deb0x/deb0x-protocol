@@ -23,12 +23,19 @@ export default function ThemeSetter() {
     };
 
   return (
-    <Switch
+    <>
+        <Switch
         className="theme-switcher"
         checked={checked}
         onChange={handleChange}
         value="checked"
-    />
+        />
+        <img className="theme-icon-dark" src={require('../photos/icons/theme-switch-dark.svg').default}/>
+        <img className="theme-icon-light" src={require('../photos/icons/theme-switch-light.svg').default}/>
+    </>
+
+
+    
   );
 }
 

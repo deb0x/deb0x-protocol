@@ -65,6 +65,15 @@
                 border-radius: 4px;
                 box-shadow: none;
             }
+            .max-btn {
+                padding: 5px 25px;
+                background-color: #8dbf96;
+                font-size: 16px;
+                border-radius: 25px;
+            }
+            .max-field {
+                border-radius: 25px;
+            }
             .collect-btn {
                 font-size: 16px;
                 color: t('approve-stake-text');
@@ -91,6 +100,9 @@
 }
 
 @media (max-width: 768px) {
+    .container {
+        border-radius: 25px;
+    }
     .cards-grid {
         height: 69vh;
         overflow-y: scroll;

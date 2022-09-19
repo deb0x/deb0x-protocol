@@ -4,7 +4,7 @@
     padding-top: 25px;
     @include themed() {
         .MuiStepLabel-label {
-            font-size: 12px;
+            font-size: 18px;
             color: t('text')
         }
         svg.Mui-active, svg.Mui-completed {
@@ -17,13 +17,21 @@
 }
 
 .button-box {
+    &.left {
+        float: left;
+    }
+    &.right {
+        float: right;
+    }
     @include themed() {
         .init-btn {
-            font-size: 12px;
+            font-size: 16px;
             color: t('text');
             background-color: t('bg');
-            border: 1px solid t('text');
-            border-radius: 4px;
+            border: 2px solid #F5B700;
+            border-radius: 33px;
+            box-shadow: none;
+            padding: 10px 40px;
         }
     }
 }

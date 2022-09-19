@@ -248,7 +248,7 @@ export function Encrypt(replyAddress: any): any {
                     {!address && 
                         <>
                             <TextField id="standard-basic"
-                                placeholder="Type or paste addresses and press `Enter`..."
+                                placeholder="Ethereum address (e.g.0x31dc...) or ENS domain name (e.g test.deb0x.eth)"
                                 value={senderAddress}
                                 onPaste={handlePaste}
                                 onKeyDown={handleKeyDown}

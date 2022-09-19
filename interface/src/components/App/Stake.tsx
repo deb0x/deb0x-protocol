@@ -378,25 +378,33 @@ export function Stake(props: any): any {
 
                 <>
                 <CardContent>
-                    
-                    <Typography>
-                        Your staked amount:
-                    </Typography>
-                    <Typography variant="h6">
-                        <strong>{userStakedAmount} DBX</strong>
-                    </Typography>
-                    <Typography>
-                        Your tokens in wallet:
-                    </Typography>
-                    <Typography variant="h6">
-                        <strong>{userUnstakedAmount} DBX</strong>
-                    </Typography>
+                    <div className="row">
+                        <div className="col-6 p-1">
+                            <img className="display-element" src={theme === "classic" ? coinBagDark : coinBagLight} alt="coinbag" />
+                            <Typography className="d-flex justify-content-center p-1">
+                                Your staked amount:
+                            </Typography>
+                            <Typography variant="h6" className="d-flex justify-content-center p-1">
+                                <strong>{userStakedAmount} DBX</strong>
+                            </Typography>
+                        </div>
+                        <div className="col-6 p-1">
+                            <img className="display-element" src={theme === "classic" ? walletDark : walletLight} alt="coinbag" />
+                            <Typography className="d-flex justify-content-center p-1">
+                                Your tokens in wallet:
+                            </Typography>
+                            <Typography variant="h6" className="d-flex justify-content-center p-1">
+                                <strong>{userUnstakedAmount} DBX</strong>
+                            </Typography>
+                        </div>
+                    </div>
                   
 
                     <Grid className="amount-row" container spacing={2}>
                         <Grid item>
                             <TextField value={amountToUnstake}
                                 id="outlined-basic"
+                                className="max-field"
                                 label="Amount to unstake"
                                 variant="outlined"
                                 onChange={e => setAmountToUnstake(e.target.value)}

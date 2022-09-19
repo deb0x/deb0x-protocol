@@ -324,20 +324,31 @@ $randomNumber: random(4);
 
 @media (max-width: 768px) {
     #root {
+        height: 100vh;
         .theme {
-            padding: 55px 10px;
+            height: auto;
+            min-height: 100vh;
+            padding: 25px 10px;
             .app-container {
                 height: 98%;
+                border-radius: 25px;
                 header {
                     background-color: transparent;
                     margin: 60px 55px 30px;
                 }
+                .side-menu-container {
+                    flex: auto;
+                    height: auto;
+                }
                 .main-container {
-                    margin-top: 75px;
+                    height: 80vh;
+                    margin-top: 0;
                     .content-box {
-                        height: 70vh;
+                        height: auto;
                         border-radius: 25px;
                         margin: 15px;
+                        border-radius: 25px;
+
                     }
                     ul.MuiList-root {
                         height: 63vh;

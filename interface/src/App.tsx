@@ -184,10 +184,10 @@ function App() {
             <ContactsProvider>
                 <div className="app-container container-fluid">
                     <div className="row main-row">
-                        <div className="col col-md-3 p-0 side-menu-container">
+                        <div className="col col-md-3 col-sm-12 p-0 side-menu-container">
                             <PermanentDrawer onChange={handleChange}/>
                         </div>
-                        <div className="col col-md-9">
+                        <div className="col col-md-9 col-sm-12">
                         <AppBarComponent />
                         {account ? 
                             !!(library && account) && (

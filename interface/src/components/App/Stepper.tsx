@@ -105,8 +105,10 @@ export default function HorizontalLinearStepper(props: any) {
                     })}
                 </Stepper>
                 {<Fragment>
-                    <Box className="button-box" sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-                        <LoadingButton className="init-btn" loading={loading} sx={{ marginLeft: 5 }} variant="contained" onClick={
+                    <Box
+                        className={activeStep === steps.length - 1 ? 'right button-box' : 'left button-box'}
+                        sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+                        <LoadingButton className='init-btn' loading={loading} sx={{ marginLeft: 5 }} variant="contained" onClick={
                             (activeStep === 0) ? getEncryptionKey : initializeDeb0x
                         }>
                             {activeStep === steps.length - 1 ? 'Initialize' : 'Provide'}

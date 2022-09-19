@@ -272,6 +272,7 @@ export function Decrypt(props: any): any {
 
     function GetMessages() {
         const [fetchedMessages, setFetchedMessages] = useState<any>([])
+        const [sortedMessages, setSortedMessages] = useState<any>([])
         const [previousIndex, setPreviousIndex] = useState<number>();
 
         useEffect(() => {
@@ -316,16 +317,17 @@ export function Decrypt(props: any): any {
                     return promise
                 })
 
-            const encryptedMessages = 
-                await Promise.all(encryptedMessagesPromisesArray)
-            
+            const encryptedMessages = await Promise.all(encryptedMessagesPromisesArray)
+            const sortedEncryptedMessages = encryptedMessages?.flat().reverse()
+            console.log(sortedMessages)
             setFetchedMessages(encryptedMessages.flat())
+            setSortedMessages(sortedEncryptedMessages)
             setLoading(false)
 
         }
 
         if(!loading) {
-            if (fetchedMessages.length === 0) {
+            if (sortedMessages.length === 0) {
                 return (
                     <div className='clouds'>
                         <div className="cloudOne">
@@ -352,7 +354,7 @@ export function Decrypt(props: any): any {
                                     <RefreshIcon fontSize="large"/>
                                 </IconButton>
                             </Box>
-                            {fetchedMessages.map((message: any, i: any) => {
+                            {sortedMessages.map((message: any, i: any) => {
                                 return (
                                     <Message message={message} index={i} 
                                         key={i} previousIndex={previousIndex} 
