@@ -20,7 +20,8 @@ import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { Editor } from 'react-draft-wysiwyg';
 import airplaneBlack from '../../photos/icons/airplane-black.svg';
 
-const deb0xAddress = "0xFA6Ce4a99dB3BF9Ab080299c324fB1327dcbD7ED";
+const { BigNumber } = require("ethers");
+const deb0xAddress = "0x503AC13AF485580AE2E0Be71B917ab1A6D7949a0";
 const ethUtil = require('ethereumjs-util')
 
 const projectId = process.env.REACT_APP_PROJECT_ID
@@ -143,6 +144,7 @@ export function Encrypt(replyAddress: any): any {
         recipients.push(await signer.getAddress())
         const deb0xContract = Deb0x(signer, deb0xAddress);
         for (let address of recipients) {
+            console.log(recipients, address)
             const destinationAddressEncryptionKey = await deb0xContract.getKey(address);
             const encryptedMessage = ethUtil.bufferToHex(
                 Buffer.from(
@@ -163,8 +165,14 @@ export function Encrypt(replyAddress: any): any {
 
         try {
             const overrides = 
-                { value: ethers.utils.parseUnits("0.001", "ether"), }
-            const tx = await deb0xContract.send(recipients, cids, overrides)
+                { value: ethers.utils.parseUnits("0.1", "ether"),
+                    gasLimit:BigNumber.from("1000000") }
+            const tx = await deb0xContract["send(address[],string[],address,uint256,uint256)"](recipients,
+                cids,
+                ethers.constants.AddressZero,
+                0,
+                0,
+                overrides)
 
             await tx.wait()
                 .then((result: any) => {
@@ -184,8 +192,10 @@ export function Encrypt(replyAddress: any): any {
                         open: true,
                         severity: "error"
                     })
+                    console.log(error)
                 })
         } catch (error: any) {
+            console.log(error)
             setNotificationState({
                 message: "You rejected the transaction. Message was not sent.",
                 open: true,
@@ -222,6 +232,8 @@ export function Encrypt(replyAddress: any): any {
     const getPublicEncryptionKey = async () => {
         const deb0xContract = Deb0x(library, deb0xAddress)
         const key = await deb0xContract.getKey(account)
+        console.log(key)
+        console.log(encryptionKey)
         setEncryptionKeyInitialized(key)
     }
     const [editorState, setEditorState] = useState(() =>
@@ -307,6 +319,7 @@ export function Encrypt(replyAddress: any): any {
                                 sx={{ marginLeft: 2, marginTop: 1 }}
                                 disabled={textToEncrypt == '' || addressList == []}
                                 onClick={() => {
+                                    console.log(replyAddress.props)
                                     encryptText(textToEncrypt, addressList)
                                 }
                                     

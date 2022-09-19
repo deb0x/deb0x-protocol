@@ -20,13 +20,93 @@ import walletLight from "../../photos/icons/wallet--light.svg";
 import walletDark from "../../photos/icons/wallet--dark.svg";
 import trophyRewards from "../../photos/icons/trophyRewards.svg";
 
-const deb0xAddress = "0xFA6Ce4a99dB3BF9Ab080299c324fB1327dcbD7ED"
-const deb0xERC20Address = "0xEde2f177d6Ae8330860B6b37B2F3D767cd2630fe"
+const deb0xAddress = "0x503AC13AF485580AE2E0Be71B917ab1A6D7949a0"
+const deb0xERC20Address = "0x54D542E5b4797902232911CF79f049CcB99a1022"
 
 export function Stake(props: any): any {
 
     const { account, library } = useWeb3React()
     const [notificationState, setNotificationState] = useState({})
+
+    function FeesPanel() {
+        const [feesUnclaimed, setFeesUnclaimed] = useState("")
+        const [loading, setLoading] = useState(false)
+
+        useEffect(() => {
+            console.log("rewards effect")
+            feesAccrued()
+            console.log("fees unclaimed:", feesUnclaimed)
+        }, [feesUnclaimed]);
+
+        async function feesAccrued() {
+            const deb0xContract = await Deb0x(library, deb0xAddress)
+
+            const unclaimedRewards = await deb0xContract.getUnclaimedFees(account);
+
+            setFeesUnclaimed(ethers.utils.formatEther(unclaimedRewards))
+        }
+
+        async function claimFees() {
+            setLoading(true)
+
+            const signer = await library.getSigner(0)
+
+            const deb0xContract = Deb0x(signer, deb0xAddress)
+
+            try {
+                const tx = await deb0xContract.claimFees()
+
+                tx.wait()
+                    .then((result: any) => {
+                        setNotificationState({
+                            message: "You succesfully claimed your fees.", open: true,
+                            severity: "success"
+                        })
+                        //setLoading(false)
+
+                    })
+                    .catch((error: any) => {
+                        setNotificationState({
+                            message: "Fees couldn't be claimed!", open: true,
+                            severity: "error"
+                        })
+                        setLoading(false)
+                    })
+            } catch (error: any) {
+                setNotificationState({
+                    message: "You rejected the transaction. Your fees haven't been claimed.", open: true,
+                    severity: "info"
+                })
+            }
+
+        }
+
+        return (
+            <>
+            <Card variant="outlined" className="card-container">
+                <CardContent className="row">
+                    <div className="col-12 col-md-6 mb-2">
+                        <Typography variant="h4" component="div" className="rewards mb-3">
+                            FEES
+                        </Typography>
+                        <Typography >
+                            Your unclaimed fees:
+                        </Typography>
+                        <Typography variant="h6" className="mb-3">
+                            <strong>{feesUnclaimed}</strong>
+                        </Typography>
+                    </div>
+                    <div className='col-12 col-md-6 d-flex justify-content-end align-items-start'>
+                        <img src={trophyRewards} alt="trophyRewards" className="p-3"/>
+                    </div>
+                </CardContent>
+                <CardActions className='button-container'>
+                    <LoadingButton className="collect-btn" disabled={feesUnclaimed=="0.0"} loading={loading} variant="contained" onClick={claimFees}>Collect</LoadingButton>
+                </CardActions>
+            </Card>
+            </>
+        )
+    }
 
     function RewardsPanel() {
         
@@ -46,17 +126,24 @@ export function Stake(props: any): any {
         async function rewardsAccrued() {
             const deb0xContract = await Deb0x(library, deb0xAddress)
 
-            const unclaimedRewards = await deb0xContract.earnedNative(account);
+            const unclaimedRewards = await deb0xContract.getUnclaimedRewards(account);
 
             setRewardsUnclaimed(ethers.utils.formatEther(unclaimedRewards))
         }
 
         async function feeShare() {
             const deb0xContract = await Deb0x(library, deb0xAddress)
+
+            const unclaimedRewards = await deb0xContract.getUnclaimedRewards(account);
+
+            const userWithdrawableStake = await deb0xContract.getUserWithdrawableStake(account)
             
-            let balance = parseFloat((ethers.utils.formatEther((await deb0xContract.balanceERC20(account)) )) )
+            let balance = parseFloat((ethers.utils.formatEther(unclaimedRewards.add(userWithdrawableStake))))
             
-            let totalSupply = parseFloat((ethers.utils.formatEther((await deb0xContract.totalSupply())) ))
+            const currentCycle = await deb0xContract.currentStartedCycle()
+
+            const totalSupply = await deb0xContract.summedCycleStakes(currentCycle)
+
             const feeShare = balance * 100 / totalSupply
             setFeeSharePercentage(((Math.round(feeShare * 100) / 100).toFixed(2)).toString() + "%")
         }
@@ -69,7 +156,7 @@ export function Stake(props: any): any {
             const deb0xContract = Deb0x(signer, deb0xAddress)
 
             try {
-                const tx = await deb0xContract.getRewardNative()
+                const tx = await deb0xContract.claimRewards()
 
                 tx.wait()
                     .then((result: any) => {
@@ -175,7 +262,7 @@ export function Stake(props: any): any {
 
             const deb0xContract = await Deb0x(library, deb0xAddress)
 
-            const balance = await deb0xContract.balanceERC20(account)
+            const balance = await deb0xContract.getUserWithdrawableStake(account)
 
             setUserStakedAmount(ethers.utils.formatEther(balance))
         }
@@ -200,7 +287,9 @@ export function Stake(props: any): any {
 
             const deb0xContract = await Deb0x(library, deb0xAddress)
 
-            const totalSupply = await deb0xContract.totalSupply()
+            const currentCycle = await deb0xContract.currentStartedCycle()
+
+            const totalSupply = await deb0xContract.summedCycleStakes(currentCycle)
 
             setTotalStaked(ethers.utils.formatEther(totalSupply))
         }
@@ -248,7 +337,7 @@ export function Stake(props: any): any {
             const deb0xContract = Deb0x(signer, deb0xAddress)
 
             try {
-                const tx = await deb0xContract.unStakeERC20(ethers.utils.parseEther(amountToUnstake.toString()))
+                const tx = await deb0xContract.unstake(ethers.utils.parseEther(amountToUnstake.toString()))
 
                 tx.wait()
                     .then((result: any) => {
@@ -285,7 +374,7 @@ export function Stake(props: any): any {
             const deb0xContract = Deb0x(signer, deb0xAddress)
 
             try {
-                const tx = await deb0xContract.stakeERC20(ethers.utils.parseEther(amountToStake.toString()))
+                const tx = await deb0xContract.stakeDBX(ethers.utils.parseEther(amountToStake.toString()))
 
                 tx.wait()
                     .then((result: any) => {
@@ -431,10 +520,12 @@ export function Stake(props: any): any {
         async function totalAmountStaked() {
     
             const deb0xContract = await Deb0x(library, deb0xAddress)
+
+            const currentCycle= await deb0xContract.currentStartedCycle()
+
+            const currentStake = await deb0xContract.summedCycleStakes(currentCycle)
     
-            const totalSupply = await deb0xContract.totalSupply()
-    
-            setTotalStaked(ethers.utils.formatEther(totalSupply))
+            setTotalStaked(ethers.utils.formatEther(currentStake))
         }
 
         return (
@@ -464,7 +555,7 @@ export function Stake(props: any): any {
                         </Grid>
                         <Grid item className="col col-md-6">
                             <StakeUnstake/>
-                            <RewardsPanel />
+                            <FeesPanel />
                         </Grid>
                     </div>
                 </div>
