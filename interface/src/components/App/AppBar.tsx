@@ -148,9 +148,6 @@ export function AppBarComponent(props: any): any {
                 </Box>
             </div>
             <Popper className="popper" id={id} open={open} anchorEl={anchorEl}>
-                <List>
-                    
-                    <ListItem className='logout'>
                         <Button 
                             onClick={(event: any) => {
                                 handleClick(event)
@@ -159,8 +156,6 @@ export function AppBarComponent(props: any): any {
                             className="logout-btn">
                             Logout 
                         </Button>
-                    </ListItem>
-                </List>
             </Popper>
         </>
     );

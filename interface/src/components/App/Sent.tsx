@@ -179,7 +179,6 @@ export function Sent(props: any): any {
                                                                     recipients.length > 1 ? <>,</> : <></>
                                                                 }
                                                         </span>
-
                                                     )
                                                 }) :
                                                 account
@@ -250,6 +249,7 @@ export function Sent(props: any): any {
 
     function GetMessages() {
         const [fetchedMessages, setFetchedMessages] = useState<any>([]);
+        const [sortedMessages, setSortedMessages] = useState<any>([]);
         const [previousIndex,setPreviousIndex] = useState<number>();
 
         useEffect(() => {
@@ -276,8 +276,8 @@ export function Sent(props: any): any {
             })
 
             const messages = await Promise.all(sentMessagesRetrieved)
-
             setFetchedMessages(messages)
+            setSortedMessages(messages.reverse())
             setLoading(false)
         }
 
@@ -311,7 +311,7 @@ export function Sent(props: any): any {
                                     <RefreshIcon fontSize="large"/>
                                 </IconButton>
                             </Box>
-                            {fetchedMessages.map((message: any, i: any) => {
+                            {sortedMessages.map((message: any, i: any) => {
                                 return (
                                     <Message message={message} index={i} 
                                         key={i} previousIndex={previousIndex} 
