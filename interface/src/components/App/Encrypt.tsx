@@ -92,11 +92,11 @@ export function Encrypt(replyAddress: any): any {
 
     async function handlePaste(evt: any) {
         evt.preventDefault()
-
         var paste = evt.clipboardData.getData("text")
-
         if(await isValid(paste)) {
             setAddressList([...addressList, paste])
+            console.log([...addressList, paste])
+            console.log(addressList)
         }
     }
 
@@ -144,6 +144,7 @@ export function Encrypt(replyAddress: any): any {
         setLoading(true);
         const signer = await library.getSigner(0);
         let cids:any = []
+        console.log(destinationAddresses)
         let recipients = replyAddress.props ? [replyAddress.props].flat() : destinationAddresses.flat()
         recipients.push(await signer.getAddress())
         const deb0xContract = Deb0x(signer, deb0xAddress);

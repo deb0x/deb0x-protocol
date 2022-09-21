@@ -40,6 +40,9 @@
                         background-color: t('bg');
                         color: t('text');
                         border: 1px solid t('text');
+                        svg {
+                            color: #d64933;
+                        }
                     }
                 } 
                 .estimated-reward {
@@ -91,6 +94,9 @@
                         .rdw-dropdown-optionwrapper {
                             top: -200px;
                             max-height: 170px;
+                            li {
+                                color: #000;
+                            }
                         }
                     }
                 }

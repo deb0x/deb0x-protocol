@@ -160,7 +160,7 @@ export function Sent(props: any): any {
                                 <div className="message-heading">
                                     <div className="d-flex align-items-center">
                                         <small>To: </small>
-                                        <div className="message-overflow">
+                                        <div className="">
                                             {
                                                 recipients.length > 0 ?
                                                 recipients.map((recipient: any) => {
@@ -181,7 +181,7 @@ export function Sent(props: any): any {
                                                         </span>
                                                     )
                                                 }) :
-                                                account
+                                                formatAccountName(account ?? "")
                                             }
                                         </div>
                                         {

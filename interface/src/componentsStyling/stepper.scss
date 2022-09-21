@@ -7,7 +7,13 @@
             font-size: 18px;
             color: t('text')
         }
-        svg.Mui-active, svg.Mui-completed {
+        svg.Mui-active {
+            color: #809bce;
+            text {
+                color: #2b2235;
+            }
+        }
+        svg.Mui-completed {
             color: t('text');
             text {
                 color: t('text');

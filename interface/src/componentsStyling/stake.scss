@@ -14,9 +14,8 @@
                 box-shadow: none;
                 background: t('stake-bg');
                 color: t('text');
-                margin-bottom: 42px;
                 color: #D64933;
-                padding: 50px;
+                padding: 25px 50px;
                 h4 {
                     .logo {
                         padding-right: 15px;
@@ -73,6 +72,13 @@
             }
             .max-field {
                 border-radius: 25px;
+                label {
+                    color: t('text');
+                }
+                fieldset {
+                    border-color: t('text');
+                    border-radius: 50px;
+                }
             }
             .collect-btn {
                 font-size: 16px;
