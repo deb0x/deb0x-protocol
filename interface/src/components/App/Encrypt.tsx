@@ -68,13 +68,13 @@ export function Encrypt(replyAddress: any): any {
         }
     }, []);
 
-    function handleKeyDown(evt: any) {
+    async function handleKeyDown(evt: any) {
         if (["Enter", "Tab", ","].includes(evt.key)) {
             evt.preventDefault();
 
             var value = senderAddress.trim();
 
-            if (value && isValid(value)) {
+            if (value && await isValid(value)) {
                 setAddressList([...addressList, senderAddress])
                 setSenderAddress("")
             }
@@ -90,20 +90,17 @@ export function Encrypt(replyAddress: any): any {
         setAddressList(addressList.filter(i => i !== item))
     }
 
-    function handlePaste(evt: any) {
+    async function handlePaste(evt: any) {
         evt.preventDefault()
 
         var paste = evt.clipboardData.getData("text")
-        var addresses = paste.match(/^0x[a-fA-F0-9]{40}$/g)
 
-        if (addresses) {
-            var toBeAdded = addresses.filter((address: any) => !isInList(address))
-
-            setAddressList([...addressList, ...toBeAdded])
+        if(await isValid(paste)) {
+            setAddressList([...addressList, paste])
         }
     }
 
-    function isValid(address: any) {
+    async function isValid(address: any) {
         let error = null;
 
         if (isInList(address)) {
@@ -112,6 +109,8 @@ export function Encrypt(replyAddress: any): any {
 
         if (!isAddress(address)) {
             error = `${address} is not a valid ethereum address.`;
+        } else if (await isInitialized(address) == "") {
+            error = `${address} has not initialized deb0x.`;
         }
 
         if (error) {
@@ -125,6 +124,11 @@ export function Encrypt(replyAddress: any): any {
         }
 
         return true;
+    }
+
+    async function isInitialized(address: any) {
+        const deb0xContract = Deb0x(library, deb0xAddress)
+        return await deb0xContract.encryptionKeys(address);
     }
 
     function isInList(address: any) {
