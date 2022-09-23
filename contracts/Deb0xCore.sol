@@ -8,6 +8,7 @@ contract Deb0xCore {
         address[] recipients;
     }
 
+    //RV: rename to publicKeys
     mapping(address => string) private encryptionKeys;
 
     mapping(address => mapping(address => string[])) private inbox;
@@ -21,6 +22,7 @@ contract Deb0xCore {
     }
 
     function send(address[] memory recipients, string[] memory cids) public payable virtual {
+        //RV: limit number of recipients?
         for (uint256 i = 0; i < recipients.length - 1; i++) {
             if (inbox[recipients[i]][msg.sender].length == 0) {
                 messageSenders[recipients[i]].push(msg.sender);
