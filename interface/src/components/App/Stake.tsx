@@ -531,7 +531,10 @@ export function Stake(props: any): any {
 
             const currentStake = await deb0xContract.summedCycleStakes(currentCycle)
     
-            setTotalStaked(ethers.utils.formatEther(currentStake))
+            // setTotalStaked(ethers.utils.formatEther(currentStake))
+
+            setTotalStaked(parseFloat(ethers.utils.formatEther(currentStake)).toFixed(2))
+
         }
 
         return (

@@ -185,6 +185,8 @@ $randomNumber: random(4);
         }
 
         @media (max-width: 768px) {
+            display: none !important;
+
             .row {
                 overflow-y: scroll;
                 padding: 0;
@@ -221,6 +223,26 @@ $randomNumber: random(4);
                     left: 0;
                 }
             }
+        }
+    }
+
+    .mobile-message {
+        display: none;
+        font-size: 27px;
+        line-height: 27px;
+        color: #809bce;
+        font-weight: 800;
+        padding: 100px 50px;
+        .dark-logo {
+            width: 50%;
+            margin-bottom: 25px;
+        }
+        .elephant-img {
+            margin-top: 25px;
+            width: 100%;
+        }
+        @media (max-width: 768px) {
+            display: block;
         }
     }
 }

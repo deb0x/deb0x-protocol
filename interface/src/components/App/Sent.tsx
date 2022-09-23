@@ -176,7 +176,7 @@ export function Sent(props: any): any {
                                                                         formatAccountName(recipient)
                                                                 }
                                                                 {
-                                                                    recipients.length > 1 ? <>,</> : <></>
+                                                                    recipients.length > 1 ? <>, </> : <></>
                                                                 }
                                                         </span>
                                                     )
@@ -223,6 +223,9 @@ export function Sent(props: any): any {
                                                                     )) :
                                                                     recipient
                                                             }
+                                                                                                                        {
+                                                                    recipients.length > 1 ? <> | </> : <></>
+                                                                }
                                                     </span>
                                                 )
                                             }) 
