@@ -283,6 +283,11 @@ function App() {
                         </div>
                     </div>
                 </div>
+                <div className="mobile-message">
+                    <img className="dark-logo" src={logoGreen} />
+                    <p>In order to use the app please log in from Desktop</p>
+                    <img className="elephant-img" src={elephant} />
+                </div>
             </div>
         }
     </ThemeProvider>

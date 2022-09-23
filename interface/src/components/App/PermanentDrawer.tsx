@@ -9,6 +9,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import SendIcon from '@mui/icons-material/Send';
+import DeleteIcon from '@mui/icons-material/Delete';
 import add from '../../photos/icons/ios-compose.svg';
 import trophy from '../../photos/icons/trophy.svg';
 import Button from '@mui/material/Button'
@@ -109,6 +110,11 @@ export function PermanentDrawer(props: any): any {
             localStorage.removeItem('input')
     }
 
+    function deleteContact(index: any) {
+        const contactsList = contacts.filter((_, i) => i !== index);
+        setContacts(contactsList);
+    }
+
     const [display, setDisplay] = useState();
 
     function getErrorMessage(error: string) {
@@ -189,6 +195,12 @@ export function PermanentDrawer(props: any): any {
                                                                         handleChange("Compose", 0)
                                                                     }}>
                                                                     <SendIcon className="send-icon" fontSize="small"/>
+                                                                </IconButton>
+                                                                <IconButton size="small"
+                                                                    onClick={() => {
+                                                                        deleteContact(index)
+                                                                    }}>
+                                                                    <DeleteIcon className="delete-icon" fontSize="small"/>
                                                                 </IconButton>
                                                             </div>
                                                     </ListItem>
