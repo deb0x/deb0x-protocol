@@ -20,7 +20,8 @@ import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { Editor } from 'react-draft-wysiwyg';
 import airplaneBlack from '../../photos/icons/airplane-black.svg';
 
-const deb0xAddress = "0xFA6Ce4a99dB3BF9Ab080299c324fB1327dcbD7ED";
+const { BigNumber } = require("ethers");
+const deb0xAddress = "0xb6057a156D1D5BAB08DAb590dC052B66051394e2";
 const ethUtil = require('ethereumjs-util')
 
 const projectId = process.env.REACT_APP_PROJECT_ID
@@ -67,13 +68,13 @@ export function Encrypt(replyAddress: any): any {
         }
     }, []);
 
-    function handleKeyDown(evt: any) {
+    async function handleKeyDown(evt: any) {
         if (["Enter", "Tab", ","].includes(evt.key)) {
             evt.preventDefault();
 
             var value = senderAddress.trim();
 
-            if (value && isValid(value)) {
+            if (value && await isValid(value)) {
                 setAddressList([...addressList, senderAddress])
                 setSenderAddress("")
             }
@@ -89,20 +90,17 @@ export function Encrypt(replyAddress: any): any {
         setAddressList(addressList.filter(i => i !== item))
     }
 
-    function handlePaste(evt: any) {
+    async function handlePaste(evt: any) {
         evt.preventDefault()
 
         var paste = evt.clipboardData.getData("text")
-        var addresses = paste.match(/^0x[a-fA-F0-9]{40}$/g)
 
-        if (addresses) {
-            var toBeAdded = addresses.filter((address: any) => !isInList(address))
-
-            setAddressList([...addressList, ...toBeAdded])
+        if(await isValid(paste)) {
+            setAddressList([...addressList, paste])
         }
     }
 
-    function isValid(address: any) {
+    async function isValid(address: any) {
         let error = null;
 
         if (isInList(address)) {
@@ -111,6 +109,8 @@ export function Encrypt(replyAddress: any): any {
 
         if (!isAddress(address)) {
             error = `${address} is not a valid ethereum address.`;
+        } else if (await isInitialized(address) == "") {
+            error = `${address} has not initialized deb0x.`;
         }
 
         if (error) {
@@ -124,6 +124,11 @@ export function Encrypt(replyAddress: any): any {
         }
 
         return true;
+    }
+
+    async function isInitialized(address: any) {
+        const deb0xContract = Deb0x(library, deb0xAddress)
+        return await deb0xContract.encryptionKeys(address);
     }
 
     function isInList(address: any) {
@@ -143,7 +148,6 @@ export function Encrypt(replyAddress: any): any {
         recipients.push(await signer.getAddress())
         const deb0xContract = Deb0x(signer, deb0xAddress);
         for (let address of recipients) {
-            console.log(recipients, address)
             const destinationAddressEncryptionKey = await deb0xContract.getKey(address);
             const encryptedMessage = ethUtil.bufferToHex(
                 Buffer.from(
@@ -164,8 +168,14 @@ export function Encrypt(replyAddress: any): any {
 
         try {
             const overrides = 
-                { value: ethers.utils.parseUnits("0.001", "ether"), }
-            const tx = await deb0xContract.send(recipients, cids, overrides)
+                { value: ethers.utils.parseUnits("0.1", "ether"),
+                    gasLimit:BigNumber.from("1000000") }
+            const tx = await deb0xContract["send(address[],string[],address,uint256,uint256)"](recipients,
+                cids,
+                ethers.constants.AddressZero,
+                0,
+                0,
+                overrides)
 
             await tx.wait()
                 .then((result: any) => {
@@ -185,10 +195,8 @@ export function Encrypt(replyAddress: any): any {
                         open: true,
                         severity: "error"
                     })
-                    console.log(error)
                 })
         } catch (error: any) {
-            console.log(error)
             setNotificationState({
                 message: "You rejected the transaction. Message was not sent.",
                 open: true,
@@ -225,8 +233,6 @@ export function Encrypt(replyAddress: any): any {
     const getPublicEncryptionKey = async () => {
         const deb0xContract = Deb0x(library, deb0xAddress)
         const key = await deb0xContract.getKey(account)
-        console.log(key)
-        console.log(encryptionKey)
         setEncryptionKeyInitialized(key)
     }
     const [editorState, setEditorState] = useState(() =>
@@ -253,7 +259,7 @@ export function Encrypt(replyAddress: any): any {
                     {!address && 
                         <>
                             <TextField id="standard-basic"
-                                placeholder="Type or paste addresses and press `Enter`..."
+                                placeholder="Ethereum address (e.g.0x31dc...) or ENS domain name (e.g test.deb0x.eth)"
                                 value={senderAddress}
                                 onPaste={handlePaste}
                                 onKeyDown={handleKeyDown}
@@ -312,7 +318,6 @@ export function Encrypt(replyAddress: any): any {
                                 sx={{ marginLeft: 2, marginTop: 1 }}
                                 disabled={textToEncrypt == '' || addressList == []}
                                 onClick={() => {
-                                    console.log(replyAddress.props)
                                     encryptText(textToEncrypt, addressList)
                                 }
                                     

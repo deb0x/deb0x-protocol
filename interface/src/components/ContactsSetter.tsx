@@ -1,6 +1,8 @@
 import { Add, SettingsPhoneTwoTone } from "@mui/icons-material";
 import { Box, IconButton, Modal } from "@mui/material";
 import { useContext, useEffect, useRef, useState } from "react";
+import SnackbarNotification from '../components/App/Snackbar';
+
 
 import ContactsContext from "./Contexts/ContactsContext";
 
@@ -12,11 +14,23 @@ export default function ContactsSetter(props: any) {
     const ref = useRef<any>(null);
     const { onClickOutside } = props;
     const [theme, setTheme] = useState(localStorage.getItem('globalTheme'));
+    const [notificationState, setNotificationState] = useState({})
+    var found: any;
 
     const addContact = () => {
-        contacts.push({name: name, address: address})
-        setContacts([...contacts])
-        onClickOutside && onClickOutside();
+        found = contacts.some(e => e.address == address)
+        console.log(found)
+        if (!found) {
+            contacts.push({name: name, address: address});
+            setContacts([...contacts])
+            onClickOutside && onClickOutside();
+        } else {
+            console.log("contact already exists")
+            setNotificationState({
+                message: "This address is already saved", open: true,
+                severity: "error"
+            })
+        }
     }
 
     function handleOnCancel() {
@@ -24,7 +38,6 @@ export default function ContactsSetter(props: any) {
     }
 
     function handleChange(event: any) {
-        console.log(event)
         if(event.target)
             setAddress(event.target.value)
     }
@@ -51,6 +64,8 @@ export default function ContactsSetter(props: any) {
 
     return (
         <>
+            <SnackbarNotification state={notificationState} 
+                setNotificationState={setNotificationState} />
             <Modal open={props.show}>
                 <Box ref={ref} className={`modal-box ${theme === "classic" ? "classic" : "dark"}` }>
                     <form>

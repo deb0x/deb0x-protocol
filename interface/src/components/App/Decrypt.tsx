@@ -29,7 +29,7 @@ import ReadedMessagesContext from '../Contexts/ReadedMessagesContext';
 import ReadedMessagesProvider from '../Contexts/ReadedMessagesProvider';
 import { Encrypt } from './Encrypt';
 
-const deb0xAddress = "0xFA6Ce4a99dB3BF9Ab080299c324fB1327dcbD7ED";
+const deb0xAddress = "0xb6057a156D1D5BAB08DAb590dC052B66051394e2";
 
 export function Decrypt(props: any): any {
     const { account, library } = useWeb3React()
@@ -272,6 +272,7 @@ export function Decrypt(props: any): any {
 
     function GetMessages() {
         const [fetchedMessages, setFetchedMessages] = useState<any>([])
+        const [sortedMessages, setSortedMessages] = useState<any>([])
         const [previousIndex, setPreviousIndex] = useState<number>();
 
         useEffect(() => {
@@ -316,16 +317,17 @@ export function Decrypt(props: any): any {
                     return promise
                 })
 
-            const encryptedMessages = 
-                await Promise.all(encryptedMessagesPromisesArray)
-            
+            const encryptedMessages = await Promise.all(encryptedMessagesPromisesArray)
+            const sortedEncryptedMessages = encryptedMessages?.flat().reverse()
+            console.log(sortedMessages)
             setFetchedMessages(encryptedMessages.flat())
+            setSortedMessages(sortedEncryptedMessages)
             setLoading(false)
 
         }
 
         if(!loading) {
-            if (fetchedMessages.length === 0) {
+            if (sortedMessages.length === 0) {
                 return (
                     <div className='clouds'>
                         <div className="cloudOne">
@@ -352,7 +354,7 @@ export function Decrypt(props: any): any {
                                     <RefreshIcon fontSize="large"/>
                                 </IconButton>
                             </Box>
-                            {fetchedMessages.map((message: any, i: any) => {
+                            {sortedMessages.map((message: any, i: any) => {
                                 return (
                                     <Message message={message} index={i} 
                                         key={i} previousIndex={previousIndex} 

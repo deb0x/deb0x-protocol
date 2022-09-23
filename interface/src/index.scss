@@ -119,13 +119,14 @@ $randomNumber: random(4);
                     font-weight: 800;
                     top: 125px;
                     left: 28%;
-                    width: 450px;
+                    width: 550px;
                     p:first-child {
                         text-align: center;
                         font-size: 27px;
                         margin-bottom: 5px;
                     }
-                    p:nth-child(2) {
+                    p:nth-child(2),
+                    p:nth-child(3) {
                         display: inline;
                         margin-bottom: 0;
                         vertical-align: sub;
@@ -144,7 +145,7 @@ $randomNumber: random(4);
                         box-shadow: none;
                         margin-left: 110px;
                         margin-top: 50px;
-                        padding: 10px 35px;
+                        padding: 10px 25px;
                         width: 235px;
                         height: 50px;
                         right: 25px;
@@ -173,6 +174,16 @@ $randomNumber: random(4);
             }
         }
 
+        .show-popup {
+            font-size: 27px;
+            margin-top: -5px;
+            font-weight: bold;
+            padding: 0;
+            color: #78C3FB;
+            text-decoration: underline;
+            background: transparent;
+        }
+
         @media (max-width: 768px) {
             .row {
                 overflow-y: scroll;
@@ -195,6 +206,7 @@ $randomNumber: random(4);
 
             .image--left {
                 height: 100px !important;
+                display: none;
             }
 
             .img-content {
@@ -202,6 +214,12 @@ $randomNumber: random(4);
                 left: 0 !important;
                 padding: 20px;
                 text-align: center;
+
+                button {
+                    width: 100% !important;
+                    margin: 50px auto 0 !important;
+                    left: 0;
+                }
             }
         }
     }
@@ -315,6 +333,65 @@ $randomNumber: random(4);
     }
 }
 
+.how-to-use-list {
+    padding: 30px 5%;
+    height: 100%;
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+        flex-direction: row;
+        display: flex;
+
+        li {
+            display: flex;
+            flex-direction: column;
+            width: 33%;
+            padding: 0 1%;
+
+            p {
+                color: #280E44;
+                font-size: 24px;
+                font-weight: bold;
+            }
+
+            span {
+                color: #CE4760;
+            }
+
+            img {
+                max-width: 45px;
+                margin-bottom: 15px;
+            }
+        }
+
+        a {
+            text-decoration : none;
+        }
+    }
+}
+
+.initial-page-popup {
+    .modal-box.classic {
+        width: 90%;
+        margin-left: 5%;
+
+        .how-to-use-list {
+            align-items: center;
+            justify-content: center;
+
+            ul {
+                margin: 50px 0;
+                a {
+                    color: #809BCE;
+                }
+            }
+        }
+    }
+}
 
 @media (min-width: 769px) {
     .app-container {
@@ -324,20 +401,31 @@ $randomNumber: random(4);
 
 @media (max-width: 768px) {
     #root {
+        height: 100vh;
         .theme {
-            padding: 55px 10px;
+            height: auto;
+            min-height: 100vh;
+            padding: 25px 10px;
             .app-container {
                 height: 98%;
+                border-radius: 25px;
                 header {
                     background-color: transparent;
                     margin: 60px 55px 30px;
                 }
+                .side-menu-container {
+                    flex: auto;
+                    height: auto;
+                }
                 .main-container {
-                    margin-top: 75px;
+                    height: 80vh;
+                    margin-top: 0;
                     .content-box {
-                        height: 70vh;
+                        height: auto;
                         border-radius: 25px;
                         margin: 15px;
+                        border-radius: 25px;
+
                     }
                     ul.MuiList-root {
                         height: 63vh;
@@ -355,6 +443,28 @@ $randomNumber: random(4);
                         }
                     }
                 }
+            }
+        }
+    }
+    .initial-page-popup {
+        .modal-box {
+            overflow-y: scroll;
+            padding: 50px 0 !important;
+            .how-to-use-list {
+                align-items: flex-start !important;
+                justify-content: flex-start !important;
+            }
+
+            ul {
+                flex-direction: column;
+
+                li {
+                    width: 100%;
+                    margin-bottom: 30px;
+                }
+            }
+            h4 {
+                padding-bottom: 50px;
             }
         }
     }

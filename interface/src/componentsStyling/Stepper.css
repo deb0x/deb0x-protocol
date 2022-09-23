@@ -14,6 +14,8 @@ button.init-btn:hover {
 .stepper-box {
     margin: 0 auto;
     padding: 50px 0;
+    max-width: 1080px;
+    left: 50%;
 }
 
 .stepper span,

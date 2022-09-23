@@ -14,7 +14,7 @@ contract Deb0xCore {
         content contentData;
     }
 
-    mapping(address => string) private encryptionKeys;
+    mapping(address => string) public encryptionKeys;
 
     mapping(address => mapping(address => content[])) private inbox;
 

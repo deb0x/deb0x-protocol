@@ -20,13 +20,91 @@ import walletLight from "../../photos/icons/wallet--light.svg";
 import walletDark from "../../photos/icons/wallet--dark.svg";
 import trophyRewards from "../../photos/icons/trophyRewards.svg";
 
-const deb0xAddress = "0xFA6Ce4a99dB3BF9Ab080299c324fB1327dcbD7ED"
-const deb0xERC20Address = "0xEde2f177d6Ae8330860B6b37B2F3D767cd2630fe"
+const deb0xAddress = "0xb6057a156D1D5BAB08DAb590dC052B66051394e2"
+const deb0xERC20Address = "0x98583dd5310725eBDFd1123CA1FDE765Ef6eAFb8"
 
 export function Stake(props: any): any {
 
     const { account, library } = useWeb3React()
     const [notificationState, setNotificationState] = useState({})
+
+    function FeesPanel() {
+        const [feesUnclaimed, setFeesUnclaimed] = useState("")
+        const [loading, setLoading] = useState(false)
+
+        useEffect(() => {
+            feesAccrued()
+        }, [feesUnclaimed]);
+
+        async function feesAccrued() {
+            const deb0xContract = await Deb0x(library, deb0xAddress)
+
+            const unclaimedRewards = await deb0xContract.getUnclaimedFees(account);
+
+            setFeesUnclaimed(ethers.utils.formatEther(unclaimedRewards))
+        }
+
+        async function claimFees() {
+            setLoading(true)
+
+            const signer = await library.getSigner(0)
+
+            const deb0xContract = Deb0x(signer, deb0xAddress)
+
+            try {
+                const tx = await deb0xContract.claimFees()
+
+                tx.wait()
+                    .then((result: any) => {
+                        setNotificationState({
+                            message: "You succesfully claimed your fees.", open: true,
+                            severity: "success"
+                        })
+                        //setLoading(false)
+
+                    })
+                    .catch((error: any) => {
+                        setNotificationState({
+                            message: "Fees couldn't be claimed!", open: true,
+                            severity: "error"
+                        })
+                        setLoading(false)
+                    })
+            } catch (error: any) {
+                setNotificationState({
+                    message: "You rejected the transaction. Your fees haven't been claimed.", open: true,
+                    severity: "info"
+                })
+            }
+
+        }
+
+        return (
+            <>
+            <Card variant="outlined" className="card-container">
+                <CardContent className="row">
+                    <div className="col-12 col-md-6 mb-2">
+                        <Typography variant="h4" component="div" className="rewards mb-3">
+                            FEES
+                        </Typography>
+                        <Typography >
+                            Your unclaimed fees:
+                        </Typography>
+                        <Typography variant="h6" className="mb-3">
+                            <strong>{feesUnclaimed}</strong>
+                        </Typography>
+                    </div>
+                    <div className='col-12 col-md-6 d-flex justify-content-end align-items-start'>
+                        <img src={trophyRewards} alt="trophyRewards" className="p-3"/>
+                    </div>
+                </CardContent>
+                <CardActions className='button-container'>
+                    <LoadingButton className="collect-btn" disabled={feesUnclaimed=="0.0"} loading={loading} variant="contained" onClick={claimFees}>Collect</LoadingButton>
+                </CardActions>
+            </Card>
+            </>
+        )
+    }
 
     function RewardsPanel() {
         
@@ -36,35 +114,35 @@ export function Stake(props: any): any {
         const [loading, setLoading] = useState(false)
 
         useEffect(() => {
-            console.log("rewards effect")
             rewardsAccrued()
         }, [rewardsUnclaimed]);
 
         useEffect(() => {
-            console.log("fee share effect")
             feeShare()
         }, [feeSharePercentage]);
 
         async function rewardsAccrued() {
             const deb0xContract = await Deb0x(library, deb0xAddress)
 
-            const unclaimedRewards = await deb0xContract.earnedNative(account);
+            const unclaimedRewards = await deb0xContract.getUnclaimedRewards(account);
 
             setRewardsUnclaimed(ethers.utils.formatEther(unclaimedRewards))
         }
 
         async function feeShare() {
-            console.log("aicii")
             const deb0xContract = await Deb0x(library, deb0xAddress)
-            console.log("1")
+
+            const unclaimedRewards = await deb0xContract.getUnclaimedRewards(account);
+
+            const userWithdrawableStake = await deb0xContract.getUserWithdrawableStake(account)
             
-            let balance = parseFloat((ethers.utils.formatEther((await deb0xContract.balanceERC20(account)) )) )
-            console.log(balance + " balance")
+            let balance = parseFloat((ethers.utils.formatEther(unclaimedRewards.add(userWithdrawableStake))))
             
-            let totalSupply = parseFloat((ethers.utils.formatEther((await deb0xContract.totalSupply())) ))
-            console.log(totalSupply + " totalSupply")
+            const currentCycle = await deb0xContract.currentStartedCycle()
+
+            const totalSupply = await deb0xContract.summedCycleStakes(currentCycle)
+
             const feeShare = balance * 100 / totalSupply
-            console.log(feeShare + " feeShare")
             setFeeSharePercentage(((Math.round(feeShare * 100) / 100).toFixed(2)).toString() + "%")
         }
 
@@ -76,7 +154,7 @@ export function Stake(props: any): any {
             const deb0xContract = Deb0x(signer, deb0xAddress)
 
             try {
-                const tx = await deb0xContract.getRewardNative()
+                const tx = await deb0xContract.claimRewards()
 
                 tx.wait()
                     .then((result: any) => {
@@ -159,28 +237,22 @@ export function Stake(props: any): any {
         
         const [theme, setTheme] = useState(localStorage.getItem('globalTheme'));
         useEffect(() => {
-            console.log("stake component effect");
             setTheme(localStorage.getItem('globalTheme'));
-            console.log(theme);
         });
 
         useEffect(() => {
-            console.log("user staked effect")
             setStakedAmount()
         }, [userStakedAmount]);
 
         useEffect(() => {
-            console.log("total staked effect")
             totalAmountStaked()
         }, [totalStaked]);
 
         useEffect(() => {
-            console.log("user unstaked effect")
             setUnstakedAmount()
         }, [userUnstakedAmount]);
 
         useEffect(() => {
-            console.log("approval effect")
             setApproval()
         }, [approved]);
 
@@ -188,7 +260,7 @@ export function Stake(props: any): any {
 
             const deb0xContract = await Deb0x(library, deb0xAddress)
 
-            const balance = await deb0xContract.balanceERC20(account)
+            const balance = await deb0xContract.getUserWithdrawableStake(account)
 
             setUserStakedAmount(ethers.utils.formatEther(balance))
         }
@@ -213,7 +285,9 @@ export function Stake(props: any): any {
 
             const deb0xContract = await Deb0x(library, deb0xAddress)
 
-            const totalSupply = await deb0xContract.totalSupply()
+            const currentCycle = await deb0xContract.currentStartedCycle()
+
+            const totalSupply = await deb0xContract.summedCycleStakes(currentCycle)
 
             setTotalStaked(ethers.utils.formatEther(totalSupply))
         }
@@ -261,7 +335,7 @@ export function Stake(props: any): any {
             const deb0xContract = Deb0x(signer, deb0xAddress)
 
             try {
-                const tx = await deb0xContract.unStakeERC20(ethers.utils.parseEther(amountToUnstake.toString()))
+                const tx = await deb0xContract.unstake(ethers.utils.parseEther(amountToUnstake.toString()))
 
                 tx.wait()
                     .then((result: any) => {
@@ -298,7 +372,7 @@ export function Stake(props: any): any {
             const deb0xContract = Deb0x(signer, deb0xAddress)
 
             try {
-                const tx = await deb0xContract.stakeERC20(ethers.utils.parseEther(amountToStake.toString()))
+                const tx = await deb0xContract.stakeDBX(ethers.utils.parseEther(amountToStake.toString()))
 
                 tx.wait()
                     .then((result: any) => {
@@ -391,25 +465,33 @@ export function Stake(props: any): any {
 
                 <>
                 <CardContent>
-                    
-                    <Typography>
-                        Your staked amount:
-                    </Typography>
-                    <Typography variant="h6">
-                        <strong>{userStakedAmount} DBX</strong>
-                    </Typography>
-                    <Typography>
-                        Your tokens in wallet:
-                    </Typography>
-                    <Typography variant="h6">
-                        <strong>{userUnstakedAmount} DBX</strong>
-                    </Typography>
+                    <div className="row">
+                        <div className="col-6 p-1">
+                            <img className="display-element" src={theme === "classic" ? coinBagDark : coinBagLight} alt="coinbag" />
+                            <Typography className="d-flex justify-content-center p-1">
+                                Your staked amount:
+                            </Typography>
+                            <Typography variant="h6" className="d-flex justify-content-center p-1">
+                                <strong>{userStakedAmount} DBX</strong>
+                            </Typography>
+                        </div>
+                        <div className="col-6 p-1">
+                            <img className="display-element" src={theme === "classic" ? walletDark : walletLight} alt="coinbag" />
+                            <Typography className="d-flex justify-content-center p-1">
+                                Your tokens in wallet:
+                            </Typography>
+                            <Typography variant="h6" className="d-flex justify-content-center p-1">
+                                <strong>{userUnstakedAmount} DBX</strong>
+                            </Typography>
+                        </div>
+                    </div>
                   
 
                     <Grid className="amount-row" container spacing={2}>
                         <Grid item>
                             <TextField value={amountToUnstake}
                                 id="outlined-basic"
+                                className="max-field"
                                 label="Amount to unstake"
                                 variant="outlined"
                                 onChange={e => setAmountToUnstake(e.target.value)}
@@ -438,17 +520,18 @@ export function Stake(props: any): any {
     function TotalStaked() {
         const [totalStaked, setTotalStaked] = useState("")
         useEffect(() => {
-            console.log("total staked effect")
             totalAmountStaked()
         }, [totalStaked]);
     
         async function totalAmountStaked() {
     
             const deb0xContract = await Deb0x(library, deb0xAddress)
+
+            const currentCycle= await deb0xContract.currentStartedCycle()
+
+            const currentStake = await deb0xContract.summedCycleStakes(currentCycle)
     
-            const totalSupply = await deb0xContract.totalSupply()
-    
-            setTotalStaked(ethers.utils.formatEther(totalSupply))
+            setTotalStaked(ethers.utils.formatEther(currentStake))
         }
 
         return (
@@ -478,7 +561,7 @@ export function Stake(props: any): any {
                         </Grid>
                         <Grid item className="col col-md-6">
                             <StakeUnstake/>
-                            <RewardsPanel />
+                            <FeesPanel />
                         </Grid>
                     </div>
                 </div>

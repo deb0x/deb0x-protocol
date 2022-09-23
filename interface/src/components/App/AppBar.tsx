@@ -15,7 +15,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import '../../componentsStyling/appBar.scss';
 
-const deb0xERC20Address = "0xEde2f177d6Ae8330860B6b37B2F3D767cd2630fe"
+const deb0xERC20Address = "0x98583dd5310725eBDFd1123CA1FDE765Ef6eAFb8"
 enum ConnectorNames { Injected = 'Injected' };
 
 const connectorsByName: { [connectorName in ConnectorNames]: any } = {
@@ -54,6 +54,22 @@ export function AppBarComponent(props: any): any {
             setUserUnstakedAmount(ethers.utils.formatEther(balance))
         }
     }
+
+    useEffect(() => {
+        const deb0xERC20Contract = Deb0xERC20(library, deb0xERC20Address)
+        const filterFrom = deb0xERC20Contract.filters.Transfer(account)
+        const filterTo =  deb0xERC20Contract.filters.Transfer(null, account)
+        deb0xERC20Contract.on(filterFrom, () => {
+            setUnstakedAmount()
+        })
+        deb0xERC20Contract.on(filterTo, () => {
+            setUnstakedAmount()
+        })
+
+        return () => {
+            deb0xERC20Contract.removeAllListeners()
+        }
+    },[])
 
     useEffect(() => {
         setUnstakedAmount();
@@ -132,9 +148,6 @@ export function AppBarComponent(props: any): any {
                 </Box>
             </div>
             <Popper className="popper" id={id} open={open} anchorEl={anchorEl}>
-                <List>
-                    
-                    <ListItem className='logout'>
                         <Button 
                             onClick={(event: any) => {
                                 handleClick(event)
@@ -143,8 +156,6 @@ export function AppBarComponent(props: any): any {
                             className="logout-btn">
                             Logout 
                         </Button>
-                    </ListItem>
-                </List>
             </Popper>
         </>
     );
