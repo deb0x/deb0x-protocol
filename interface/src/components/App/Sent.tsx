@@ -160,7 +160,7 @@ export function Sent(props: any): any {
                                 <div className="message-heading">
                                     <div className="d-flex align-items-center">
                                         <small>To: </small>
-                                        <div className="">
+                                        <div className="message-overflow">
                                             {
                                                 recipients.length > 0 ?
                                                 recipients.map((recipient: any) => {
@@ -176,12 +176,12 @@ export function Sent(props: any): any {
                                                                         formatAccountName(recipient)
                                                                 }
                                                                 {
-                                                                    recipients.length > 1 ? <>,</> : <></>
+                                                                    recipients.length > 1 ? <>, </> : <></>
                                                                 }
                                                         </span>
                                                     )
                                                 }) :
-                                                formatAccountName(account ?? "")
+                                                account
                                             }
                                         </div>
                                         {
@@ -223,6 +223,9 @@ export function Sent(props: any): any {
                                                                     )) :
                                                                     recipient
                                                             }
+                                                                                                                        {
+                                                                    recipients.length > 1 ? <> | </> : <></>
+                                                                }
                                                     </span>
                                                 )
                                             }) 
