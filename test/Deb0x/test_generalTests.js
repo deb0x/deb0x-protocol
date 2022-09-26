@@ -3,7 +3,7 @@ const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
 
-describe.only("Test DBX tokens distributions", async function() {
+describe("Test DBX tokens distributions", async function() {
     let userReward, user1Reward, user2Reward, user3Reward, frontend, dbxERC20;
     let user1, user2;
     beforeEach("Set enviroment", async() => {
@@ -505,10 +505,11 @@ describe.only("Test DBX tokens distributions", async function() {
 
         let feesClaimed = await userReward.queryFilter("FeesClaimed")
         let totalFeesClaimedCycle1 = BigNumber.from("0")
+        const feesCollected1 = await user1Reward.cycleAccruedFees(0)
         for (let entry of feesClaimed) {
             totalFeesClaimedCycle1 = totalFeesClaimedCycle1.add(entry.args.fees)
         }
-        //expect(totalFeesClaimedCycle1).to.equal(BigNumber.from("4000000000000000000"))
+        //expect(totalFeesClaimedCycle1).to.equal(feesCollected1)
 
         await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
             feeReceiver.address, 1000, 0,  { value: ethers.utils.parseEther("1") })
@@ -530,10 +531,12 @@ describe.only("Test DBX tokens distributions", async function() {
 
         let feesClaimed2 = await userReward.queryFilter("FeesClaimed")
         let totalFeesClaimedCycle2 = BigNumber.from("0")
+        const feesCollected2 = (await user1Reward.cycleAccruedFees(0))
+        .add(await user1Reward.cycleAccruedFees(1))
         for (let entry of feesClaimed2) {
             totalFeesClaimedCycle2 = totalFeesClaimedCycle2.add(entry.args.fees)
         }
-        //expect(totalFeesClaimedCycle2).to.equal(BigNumber.from("8999999999999999864"))
+        //expect(totalFeesClaimedCycle2).to.equal(feesCollected2)
 
         await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
             feeReceiver.address, 1000, 0,  { value: ethers.utils.parseEther("1") })
@@ -544,6 +547,7 @@ describe.only("Test DBX tokens distributions", async function() {
 
         await user1Reward.claimFees()
         await user2Reward.claimFees()
+        await user3Reward.claimFees()
         await frontend.claimFrontEndFees();
 
         let feesClaimed3 = await userReward.queryFilter("FeesClaimed")
@@ -659,6 +663,7 @@ describe.only("Test DBX tokens distributions", async function() {
         await user1Reward.claimFees()
         await user2Reward.claimFees()
         await user3Reward.claimFees()
+        await frontend.claimFrontEndFees();
         const feesClaimed = await user1Reward.queryFilter("FeesClaimed")
         let totalFeesClaimed = BigNumber.from("0")
         for (let entry of feesClaimed) {

@@ -10,7 +10,7 @@ contract Deb0x is Deb0xCore {
 
     DBX public dbx;
     uint16 public constant MAIL_FEE = 1000;
-    uint256 public constant dividend = 1e18;
+    uint256 public constant dividend = 1e60;
     uint256 immutable i_initialTimestamp;
     uint256 immutable i_periodDuration;
     uint256 currentCycleReward;
@@ -182,9 +182,9 @@ contract Deb0x is Deb0xCore {
             }
             frontEndLastRewardUpdate[frontend] = currentCycle;
         }
-        if(currentCycle > frontEndLastFeeUpdate[frontend]) {
+        if(currentCycle > lastStartedCycle && frontEndLastFeeUpdate[frontend] != lastStartedCycle + 1) {
             frontEndAccruedFees[frontend] += (frontendRewards[frontend] 
-                * (cycleFeesPerStakeSummed[lastStartedCycle + 1] - cycleFeesPerStakeSummed[frontEndLastFeeUpdate[frontend]])) / 1e18;
+                * (cycleFeesPerStakeSummed[lastStartedCycle + 1] - cycleFeesPerStakeSummed[frontEndLastFeeUpdate[frontend]])) / dividend;
             frontEndLastFeeUpdate[frontend] = lastStartedCycle + 1;
         }
     }
