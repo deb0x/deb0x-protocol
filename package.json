@@ -29,6 +29,7 @@
   "dependencies": {
     "@openzeppelin/contracts": "^4.5.0",
     "dotenv": "^10.0.0",
-    "draftjs-to-html": "^0.9.1"
+    "draftjs-to-html": "^0.9.1",
+    "solidity-coverage": "^0.8.2"
   }
 }
