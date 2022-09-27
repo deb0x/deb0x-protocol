@@ -172,7 +172,7 @@ contract Deb0x is Deb0xCore {
         _;
     }
 
-    function updateFrontEndStats(address frontend, uint256 currentCycle) internal {
+    function updateFrontEndStats(address frontend) internal {
         if(currentCycle > frontEndLastRewardUpdate[frontend]) {
             uint256 lastUpdatedCycle = frontEndLastRewardUpdate[frontend];
             if(frontendCycleFeePercent[frontend] != 0 && cycleTotalMessages[lastUpdatedCycle] != 0) {
@@ -283,7 +283,7 @@ contract Deb0x is Deb0xCore {
                     userFirstStake[msg.sender] = cycleToSet;
             
                 } else if(userSecondStake[msg.sender] == 0) {
-                    userSecondStake[msg.sender] = currentcycleToSetCycle;
+                    userSecondStake[msg.sender] = cycleToSet;
                 }
             }
         userStakeCycle[msg.sender][cycleToSet] += _amount;
@@ -329,7 +329,6 @@ contract Deb0x is Deb0xCore {
     }
 
     function getUserWithdrawableStake(address staker) public view returns(uint256) {
-        uint256 currentCycle = getCurrentCycle();
         uint256 unlockedStake = 0;
         if(userFirstStake[staker] != 0 && currentCycle - userFirstStake[staker] > 1) {
             unlockedStake += userStakeCycle[staker][userFirstStake[staker] + 1];
@@ -342,7 +341,6 @@ contract Deb0x is Deb0xCore {
     }
 
     function getUnclaimedRewards(address user) public view returns(uint256) {
-        uint256 currentCycle = getCurrentCycle();
         uint256 currentRewards = addressRewards[user];
 
         if(cycleTotalMessages[lastActiveCycle[user]] != 0 && lastActiveCycle[user] != currentCycle) {
@@ -359,7 +357,6 @@ contract Deb0x is Deb0xCore {
     }
 
     function getUnclaimedFees(address user) public view returns(uint256){
-        uint256 currentCycle = getCurrentCycle();
         uint256 currentAccruedFees = addressAccruedFees[user];
         uint256 currentCycleFeesPerStakeSummed;
         if(summedCycleStakes[currentCycle] == 0) {
