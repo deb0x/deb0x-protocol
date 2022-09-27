@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import Deb0x from "../../ethereum/deb0x"
 import SnackbarNotification from './Snackbar';
 import '../../componentsStyling/stepper.scss';
-const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61";
+const deb0xAddress = "0xb6057a156D1D5BAB08DAb590dC052B66051394e2";
 const steps = ['Provide public encryption key', 'Initialize Deb0x'];
 
 export default function HorizontalLinearStepper(props: any) {
@@ -105,8 +105,10 @@ export default function HorizontalLinearStepper(props: any) {
                     })}
                 </Stepper>
                 {<Fragment>
-                    <Box className="button-box" sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-                        <LoadingButton className="init-btn" loading={loading} sx={{ marginLeft: 5 }} variant="contained" onClick={
+                    <Box
+                        className={activeStep === steps.length - 1 ? 'right button-box' : 'left button-box'}
+                        sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+                        <LoadingButton className='init-btn' loading={loading} sx={{ marginLeft: 5 }} variant="contained" onClick={
                             (activeStep === 0) ? getEncryptionKey : initializeDeb0x
                         }>
                             {activeStep === steps.length - 1 ? 'Initialize' : 'Provide'}
