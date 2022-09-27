@@ -88,7 +88,8 @@
                         }
                         .rdw-embedded-modal, .rdw-emoji-modal, 
                         .rdw-option-wrapper, .rdw-link-modal,
-                        .rdw-colorpicker-modal {
+                        .rdw-colorpicker-modal,
+                        .rdw-image-modal {
                             top: -235px;
                         }
                         .rdw-dropdown-optionwrapper {
@@ -98,13 +99,16 @@
                                 color: #000;
                             }
                         }
+                        .rdw-link-modal * {
+                            color: #000;
+                        }
                     }
                 }
                 .editor {
                     height: 40vh;
                     padding: 15px;
-                    .public-DraftStyleDefault-block  {
-                        padding-bottom: 125px;
+                    .public-DraftEditor-content > div  {
+                        padding-bottom: 50px;
                     }
                 }
                 .send-btn {

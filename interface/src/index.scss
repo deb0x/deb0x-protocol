@@ -96,6 +96,10 @@ $randomNumber: random(4);
                 font-size: 22px;
             }
         }
+        .message-container,
+        .d-none {
+            display: none;
+        }
     }
     .initial-page {
         height: 100%;
