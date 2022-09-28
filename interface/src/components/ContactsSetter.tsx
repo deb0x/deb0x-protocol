@@ -19,13 +19,11 @@ export default function ContactsSetter(props: any) {
 
     const addContact = () => {
         found = contacts.some(e => e.address == address)
-        console.log(found)
         if (!found) {
             contacts.push({name: name, address: address});
             setContacts([...contacts])
             onClickOutside && onClickOutside();
         } else {
-            console.log("contact already exists")
             setNotificationState({
                 message: "This address is already saved", open: true,
                 severity: "error"

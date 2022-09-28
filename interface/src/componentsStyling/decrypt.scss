@@ -12,7 +12,6 @@
                 overflow-x: hidden;
                 padding-right: 15px;
                 li.messages-list-item {
-                    height: 100px;
                     margin: 10px 5px;
                     border: none;
                     border-radius: 25px;
@@ -66,16 +65,24 @@
                         box-shadow: t('box-shadow');
                         .message-heading {
                             display: flex;
+                            flex-direction: column;
                             justify-content: space-between;
                             align-items: center;
                             text-align: left;
                             letter-spacing: 0px;
                             color: t('inbox-text-color');
                             opacity: 0.85;
-                            .message-overflow {
-                                width: 70px;
+                            padding: 0 10px;
+                            p, .d-flex {
+                                width: 100%;
+                                margin: 0 0 5px;
                             }
                         }
+
+                        .message-heading + .message-overflow {
+                            display: none;
+                        }
+
                         .message-overflow {
                             overflow: hidden;
                             text-overflow: ellipsis;

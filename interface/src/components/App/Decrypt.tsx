@@ -319,7 +319,6 @@ export function Decrypt(props: any): any {
 
             const encryptedMessages = await Promise.all(encryptedMessagesPromisesArray)
             const sortedEncryptedMessages = encryptedMessages?.flat().reverse()
-            console.log(sortedMessages)
             setFetchedMessages(encryptedMessages.flat())
             setSortedMessages(sortedEncryptedMessages)
             setLoading(false)
