@@ -21,7 +21,7 @@ import { Editor } from 'react-draft-wysiwyg';
 import airplaneBlack from '../../photos/icons/airplane-black.svg';
 
 const { BigNumber } = require("ethers");
-const deb0xAddress = "0xb6057a156D1D5BAB08DAb590dC052B66051394e2";
+const deb0xAddress = "0x0b7310b301D613b8CCe71f6A79ad9Da90e472000";
 const ethUtil = require('ethereumjs-util')
 
 const projectId = process.env.REACT_APP_PROJECT_ID
@@ -166,7 +166,7 @@ export function Encrypt(replyAddress: any): any {
 
         try {
             const overrides = 
-                { value: ethers.utils.parseUnits("0.1", "ether"),
+                { value: ethers.utils.parseUnits("0.01", "ether"),
                     gasLimit:BigNumber.from("1000000") }
             const tx = await deb0xContract["send(address[],string[],address,uint256,uint256)"](recipients,
                 cids,
