@@ -270,7 +270,7 @@ export function Stake(props: any): any {
 
             const balance = await deb0xERC20Contract.balanceOf(account)
 
-            setUserUnstakedAmount(ethers.utils.formatEther(balance))
+            setUserUnstakedAmount(parseFloat(ethers.utils.formatEther(balance)).toFixed(2))
         }
 
         async function setApproval() {
@@ -418,7 +418,7 @@ export function Stake(props: any): any {
                 alignment === "stake" ?
                 
                 <>
-                <CardContent className="row pb-0">
+                <CardContent className="row">
                     <div className="col-6 p-1">
                         <img className="display-element" src={theme === "classic" ? coinBagDark : coinBagLight} alt="coinbag" />
                         <Typography className="d-flex justify-content-center p-1">

@@ -92,6 +92,14 @@
             }
             .amount-row {
                 align-items: center;
+                margin: 10px 0;
+                fieldset {
+                    border-color: t('text');
+                    border-radius: 50px;
+                }
+                label {
+                    color: t('text');
+                }
             }
             .display-element {
                 display: block;
