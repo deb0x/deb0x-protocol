@@ -10,7 +10,7 @@ contract Deb0x is Deb0xCore {
 
     DBX public dbx;
     uint16 public constant MAIL_FEE = 1000;
-    uint256 public constant dividend = 1e60;
+    uint256 public constant dividend = 1e18;
     uint256 immutable i_initialTimestamp;
     uint256 immutable i_periodDuration;
     uint256 currentCycleReward;
@@ -19,9 +19,9 @@ contract Deb0x is Deb0xCore {
     uint256 currentCycle;
     uint256 lastStartedCycle;
     uint256 previousStartedCycle;
-    uint256 currentStartedCycle;
+    uint256 public currentStartedCycle;
     uint256 pendingCycleRewardsStake;
-    uint256 pendingStakeWithdrawal;
+    uint256 public pendingStakeWithdrawal;
 
     mapping(address => uint256) userCycleFeePercent;
     mapping(address => uint256) frontendCycleFeePercent;
@@ -160,7 +160,7 @@ contract Deb0x is Deb0xCore {
                         userWithdrawableStake[account] += unlockedSecondStake;
                         addressAccruedFees[account] = addressAccruedFees[account] + 
                             ((userStakeCycle[account][userSecondStake[account]] 
-                            * (cycleFeesPerStakeSummed[currentCycle] - cycleFeesPerStakeSummed[userSecondStake[account] + 1]))) / dividend;
+                            * (cycleFeesPerStakeSummed[currentCycle] - cycleFeesPerStakeSummed[userSecondStake[account]]))) / dividend;
                         userStakeCycle[account][userSecondStake[account]] = 0;
                         userSecondStake[account] = 0;
                         } else {
@@ -329,11 +329,12 @@ contract Deb0x is Deb0xCore {
     }
 
     function getUserWithdrawableStake(address staker) public view returns(uint256) {
+        uint256 calculatedCycle = getCurrentCycle();
         uint256 unlockedStake = 0;
-        if(userFirstStake[staker] != 0 && currentCycle - userFirstStake[staker] > 1) {
+        if(userFirstStake[staker] != 0 && calculatedCycle - userFirstStake[staker] > 1) {
             unlockedStake += userStakeCycle[staker][userFirstStake[staker] + 1];
 
-            if(userSecondStake[staker] != 0 && currentCycle - userSecondStake[staker] > 1) {
+            if(userSecondStake[staker] != 0 && calculatedCycle - userSecondStake[staker] > 1) {
                 unlockedStake += userStakeCycle[staker][userSecondStake[staker] + 1];
             }
         }
@@ -342,8 +343,9 @@ contract Deb0x is Deb0xCore {
 
     function getUnclaimedRewards(address user) public view returns(uint256) {
         uint256 currentRewards = addressRewards[user];
+        uint256 calculatedCycle = getCurrentCycle();
 
-        if(cycleTotalMessages[lastActiveCycle[user]] != 0 && lastActiveCycle[user] != currentCycle) {
+        if(calculatedCycle > lastActiveCycle[user] && userCycleMessages[user] != 0) {
                 uint256 lastCycleUserReward = userCycleMessages[user] * rewardPerCycle[lastActiveCycle[user]] / cycleTotalMessages[lastActiveCycle[user]];
                 currentRewards += lastCycleUserReward;
 
@@ -357,30 +359,39 @@ contract Deb0x is Deb0xCore {
     }
 
     function getUnclaimedFees(address user) public view returns(uint256){
+        uint256 calculatedCycle = getCurrentCycle();
         uint256 currentAccruedFees = addressAccruedFees[user];
         uint256 currentCycleFeesPerStakeSummed;
-        if(summedCycleStakes[currentCycle] == 0) {
-            uint256 feePerStake = cycleAccruedFees[currentCycle - 1] * 1e18 / summedCycleStakes[currentCycle - 1];
-            currentCycleFeesPerStakeSummed = cycleFeesPerStakeSummed[currentCycle - 1] + feePerStake;
+        uint256 previousStartedCycleTemp = previousStartedCycle;
+        uint256 lastStartedCycleTemp = lastStartedCycle;
+
+        if(calculatedCycle != currentStartedCycle) {
+            previousStartedCycleTemp = lastStartedCycle + 1;
+            lastStartedCycleTemp = currentStartedCycle;
+        }
+
+        if(calculatedCycle > lastStartedCycleTemp && cycleFeesPerStakeSummed[lastStartedCycleTemp + 1] == 0) {
+            uint256 feePerStake = cycleAccruedFees[lastStartedCycleTemp] * dividend / summedCycleStakes[lastStartedCycleTemp];
+            currentCycleFeesPerStakeSummed = cycleFeesPerStakeSummed[previousStartedCycle] + feePerStake;
         } else {
-            currentCycleFeesPerStakeSummed = cycleFeesPerStakeSummed[currentCycle];
+            currentCycleFeesPerStakeSummed = cycleFeesPerStakeSummed[previousStartedCycle];
         }
 
         uint256 currentRewards = getUnclaimedRewards(user);
-        if(currentCycle > lastFeeUpdateCycle[user]){
+        if(calculatedCycle > lastStartedCycleTemp && lastFeeUpdateCycle[user] != lastStartedCycleTemp + 1){
             currentAccruedFees += ((currentRewards
-                * (currentCycleFeesPerStakeSummed - cycleFeesPerStakeSummed[lastFeeUpdateCycle[user]]))) / 1e18;
+                * (currentCycleFeesPerStakeSummed - cycleFeesPerStakeSummed[lastFeeUpdateCycle[user]]))) / dividend;
         }
 
-        if(userFirstStake[user] != 0 && currentCycle - userFirstStake[user] > 1) {
+        if(userFirstStake[user] != 0 && calculatedCycle - userFirstStake[user] > 1) {
             currentAccruedFees += 
-                ((userStakeCycle[user][userFirstStake[user] + 1] 
-                * (currentCycleFeesPerStakeSummed - cycleFeesPerStakeSummed[userFirstStake[user] + 1]))) / 1e18;
+                ((userStakeCycle[user][userFirstStake[user]] 
+                * (currentCycleFeesPerStakeSummed - cycleFeesPerStakeSummed[userFirstStake[user]]))) / dividend;
 
-            if(userSecondStake[user] != 0 && currentCycle - userSecondStake[user] > 1) {
+            if(userSecondStake[user] != 0 && calculatedCycle - userSecondStake[user] > 1) {
                 currentAccruedFees += 
-                    ((userStakeCycle[user][userSecondStake[user] + 1] 
-                    * (currentCycleFeesPerStakeSummed - cycleFeesPerStakeSummed[userSecondStake[user] + 1]))) / 1e18;                    
+                    ((userStakeCycle[user][userSecondStake[user]] 
+                    * (currentCycleFeesPerStakeSummed - cycleFeesPerStakeSummed[userSecondStake[user]]))) / dividend;                    
             }
         }
         return currentAccruedFees;
