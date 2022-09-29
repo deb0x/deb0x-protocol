@@ -8,10 +8,6 @@ $randomNumber: random(4);
     src: url('../src/fonts/Karla/Karla-Regular.ttf');
 }
 
-#root * {
-    font-family: 'Karla';
-}
-
 #root {
     height: 100vh;
     overflow: hidden;
@@ -397,6 +393,16 @@ $randomNumber: random(4);
         a {
             text-decoration : none;
         }
+    }
+
+    h3 img {
+        max-height: 30px;
+        vertical-align: baseline;
+    }
+
+    h4 img {
+        max-height: 30px;
+        vertical-align: baseline;
     }
 }
 

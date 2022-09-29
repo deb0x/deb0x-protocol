@@ -23,6 +23,10 @@
                 }
             }
             .card-container {
+                * {
+                    font-family: 'Karla';
+                    color: #fff;
+                }
                 background-color: t('card-color');
                 color: t('text');
                 border-radius: 25px;
