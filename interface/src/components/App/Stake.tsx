@@ -20,8 +20,8 @@ import walletLight from "../../photos/icons/wallet--light.svg";
 import walletDark from "../../photos/icons/wallet--dark.svg";
 import trophyRewards from "../../photos/icons/trophyRewards.svg";
 
-const deb0xAddress = "0xb6057a156D1D5BAB08DAb590dC052B66051394e2"
-const deb0xERC20Address = "0x98583dd5310725eBDFd1123CA1FDE765Ef6eAFb8"
+const deb0xAddress = "0x0b7310b301D613b8CCe71f6A79ad9Da90e472000"
+const deb0xERC20Address = "0x1218c70d931f46a022163a237D56f63a8ED82C50"
 
 export function Stake(props: any): any {
 
@@ -289,7 +289,9 @@ export function Stake(props: any): any {
 
             const totalSupply = await deb0xContract.summedCycleStakes(currentCycle)
 
-            setTotalStaked(ethers.utils.formatEther(totalSupply))
+            const pendingStakeWithdrawal = await deb0xContract.pendingStakeWithdrawal()
+
+            setTotalStaked(ethers.utils.formatEther(totalSupply.sub(pendingStakeWithdrawal)))
         }
 
         async function approveStaking() {
@@ -530,10 +532,12 @@ export function Stake(props: any): any {
             const currentCycle= await deb0xContract.currentStartedCycle()
 
             const currentStake = await deb0xContract.summedCycleStakes(currentCycle)
+
+            const pendingStakeWithdrawal = await deb0xContract.pendingStakeWithdrawal()
     
             // setTotalStaked(ethers.utils.formatEther(currentStake))
 
-            setTotalStaked(parseFloat(ethers.utils.formatEther(currentStake)).toFixed(2))
+            setTotalStaked(parseFloat(ethers.utils.formatEther(currentStake.sub(pendingStakeWithdrawal))).toFixed(2))
 
         }
 
