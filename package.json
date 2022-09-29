@@ -24,6 +24,7 @@
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.7.0",
     "hardhat": "^2.8.0",
+    "solidity-coverage": "^0.8.2",
     "react-error-overlay": "^6.0.9"
   },
   "dependencies": {
