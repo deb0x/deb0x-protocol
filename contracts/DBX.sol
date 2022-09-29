@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 contract DBX is ERC20 {
     address public owner;
 
+    //RV: rename token to something like "Deb0x Reward Token".
     constructor() ERC20("Deb0x", "DBX") {
         owner = msg.sender;
     }
