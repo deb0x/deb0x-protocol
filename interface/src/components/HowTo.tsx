@@ -35,6 +35,7 @@ export default function HowTo(props: any) {
             <Modal open={props.show} className="initial-page-popup">
                 <Box ref={ref} className={`modal-box ${theme === "classic" ? "classic" : "dark"}` }>
                     <div className="how-to-use-list">
+                        <a href="#" onClick={() => handleOnCancel()} className="close-popup">x</a>
                         <h3>Before connecting to <img src={logoDark} />, make sure you:</h3>
                         <ul>
                             <li>
