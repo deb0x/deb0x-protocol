@@ -239,7 +239,6 @@ function App() {
                                     const activating = currentConnector === activatingConnector
                                     const connected = currentConnector === connector
                                     const disabled = !triedEager || !!activatingConnector || connected || !!error
-                                    console.log(window.ethereum);
 
                                     return (
                                         <Button variant="contained"

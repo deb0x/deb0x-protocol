@@ -1,5 +1,6 @@
 require("@nomiclabs/hardhat-waffle");
-require('solidity-coverage')
+require("solidity-coverage");
+
 const { mnemonic } = require('./.secrets.json')
 
 /**
