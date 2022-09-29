@@ -4,12 +4,12 @@ import { NetworkConnector } from '@web3-react/network-connector'
 
 // const POLLING_INTERVAL = 12000
 const RPC_URLS: { [chainId: number]: string } = {
-    4: 'https://rinkeby.infura.io/v3/84842078b09946638c03157f83405213'
+    5: 'https://goerli.infura.io/v3/c4174820658a4db9a6e5d54efec43ede'
 }
 
-export const injected = new InjectedConnector({ supportedChainIds: [4] })
+export const injected = new InjectedConnector({ supportedChainIds: [5] })
 
 export const network = new NetworkConnector({
-    urls: { 4: RPC_URLS[4] },
-    defaultChainId: 4
+    urls: { 5: RPC_URLS[5] },
+    defaultChainId: 5
   })

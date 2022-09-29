@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import Deb0x from "../../ethereum/deb0x"
 import SnackbarNotification from './Snackbar';
 import '../../componentsStyling/stepper.scss';
-const deb0xAddress = "0x0b7310b301D613b8CCe71f6A79ad9Da90e472000";
+const deb0xAddress = "0xF67a6c9eBFF801ECA26Be95a62FC668f950ca254";
 const steps = ['Provide public encryption key', 'Initialize Deb0x'];
 
 export default function HorizontalLinearStepper(props: any) {

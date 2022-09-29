@@ -39,8 +39,8 @@ const client = create({
 
 const ethUtil = require('ethereumjs-util')
 //old address: 0x218c10BAb451BE6A897db102b2f608bC7D3441a0
-// 0x0b7310b301D613b8CCe71f6A79ad9Da90e472000
-const deb0xAddress = "0x0b7310b301D613b8CCe71f6A79ad9Da90e472000";
+// 0xF67a6c9eBFF801ECA26Be95a62FC668f950ca254
+const deb0xAddress = "0xF67a6c9eBFF801ECA26Be95a62FC668f950ca254";
 
 
 enum ConnectorNames { Injected = 'Injected', Network = 'Network' };
@@ -136,7 +136,7 @@ function App() {
         try {
             await window.ethereum.request({
             method: 'wallet_switchEthereumChain',
-            params: [{ chainId: "0x4"}],
+            params: [{ chainId: "0x5"}],
             }).then(
                 displayErrorMsg("You have switched to the right network")
             );            
@@ -146,12 +146,12 @@ function App() {
                 method: 'wallet_addEthereumChain',
                 params: [
                     {
-                        chainId: '0x4', 
-                        chainName:'Rinkeby Test Network',
-                        rpcUrls:['https://rinkeby.infura.io/v3/'],                   
-                        blockExplorerUrls:['https://rinkeby.etherscan.io'],  
+                        chainId: '0x5', 
+                        chainName:'Goerli Test Network',
+                        rpcUrls:['https://goerli.infura.io/v3/'],                   
+                        blockExplorerUrls:['https://goerli.etherscan.io'],  
                         nativeCurrency: { 
-                        symbol:'ETH',   
+                        symbol:'GoerliETH',   
                         decimals: 18
                         }     
                     }
