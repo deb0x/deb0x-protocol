@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 
 const axios = require('axios')
-const deb0xAddress = "0x13dA6EDcdD7F488AF56D0804dFF54Eb17f41Cc61"
+const deb0xAddress = "0xb6057a156D1D5BAB08DAb590dC052B66051394e2"
 
 
 export function Governance(props: any): any {
@@ -99,17 +99,11 @@ export function Governance(props: any): any {
 
             const cids = await Promise.all(cidsPromises)
 
-            console.log(cids)
-
             const encryptedMessagesPromisesArray = cids.map(async function(cidArray: any) {
-                console.log(cidArray)
-               
 
             })
 
             const encryptedMessages = await Promise.all(encryptedMessagesPromisesArray)
-            
-            console.log(encryptedMessages)
             
             setFetchedMessages(encryptedMessages.flat())
             setLoading(false)

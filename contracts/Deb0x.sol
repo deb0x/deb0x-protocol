@@ -172,10 +172,10 @@ contract Deb0x is Deb0xCore {
         _;
     }
 
-    function updateFrontEndStats(address frontend) internal {
+    function updateFrontEndStats(address frontend, uint256 currentCycle) internal {
         if(currentCycle > frontEndLastRewardUpdate[frontend]) {
-            if(frontendCycleFeePercent[frontend] != 0) {
-                uint256 lastUpdatedCycle = frontEndLastRewardUpdate[frontend];
+            uint256 lastUpdatedCycle = frontEndLastRewardUpdate[frontend];
+            if(frontendCycleFeePercent[frontend] != 0 && cycleTotalMessages[lastUpdatedCycle] != 0) {
                 uint256 rewardPerMsg = rewardPerCycle[lastUpdatedCycle] / cycleTotalMessages[lastUpdatedCycle];
                 frontendRewards[frontend] += rewardPerMsg * frontendCycleFeePercent[frontend] / 10000;
                 frontendCycleFeePercent[frontend] = 0;
@@ -277,12 +277,15 @@ contract Deb0x is Deb0xCore {
             cycleToSet = currentCycle;
         }
 
-        if(userFirstStake[msg.sender] == 0) {
-            userFirstStake[msg.sender] = cycleToSet;
+        if(currentCycle != userFirstStake[msg.sender] &&
+            currentCycle != userSecondStake[msg.sender]) {
+                if(userFirstStake[msg.sender] == 0) {
+                    userFirstStake[msg.sender] = cycleToSet;
             
-        } else if(userSecondStake[msg.sender] == 0) {
-            userSecondStake[msg.sender] = cycleToSet;
-        }
+                } else if(userSecondStake[msg.sender] == 0) {
+                    userSecondStake[msg.sender] = currentcycleToSetCycle;
+                }
+            }
         userStakeCycle[msg.sender][cycleToSet] += _amount;
 
         dbx.transferFrom(msg.sender, address(this), _amount);
@@ -326,15 +329,63 @@ contract Deb0x is Deb0xCore {
     }
 
     function getUserWithdrawableStake(address staker) public view returns(uint256) {
-        uint256 calculatedCycle = getCurrentCycle();
+        uint256 currentCycle = getCurrentCycle();
         uint256 unlockedStake = 0;
-        if(userFirstStake[staker] != 0 && calculatedCycle - userFirstStake[staker] > 0) {
-            unlockedStake += userStakeCycle[staker][userFirstStake[staker]];
+        if(userFirstStake[staker] != 0 && currentCycle - userFirstStake[staker] > 1) {
+            unlockedStake += userStakeCycle[staker][userFirstStake[staker] + 1];
 
-            if(userSecondStake[staker] != 0 && calculatedCycle - userSecondStake[staker] > 0) {
-                unlockedStake += userStakeCycle[staker][userSecondStake[staker]];
+            if(userSecondStake[staker] != 0 && currentCycle - userSecondStake[staker] > 1) {
+                unlockedStake += userStakeCycle[staker][userSecondStake[staker] + 1];
             }
         }
         return userWithdrawableStake[staker] + unlockedStake;
+    }
+
+    function getUnclaimedRewards(address user) public view returns(uint256) {
+        uint256 currentCycle = getCurrentCycle();
+        uint256 currentRewards = addressRewards[user];
+
+        if(cycleTotalMessages[lastActiveCycle[user]] != 0 && lastActiveCycle[user] != currentCycle) {
+                uint256 lastCycleUserReward = userCycleMessages[user] * rewardPerCycle[lastActiveCycle[user]] / cycleTotalMessages[lastActiveCycle[user]];
+                currentRewards += lastCycleUserReward;
+
+                if(userCycleFeePercent[user] != 0) {
+                uint256 rewardPerMsg = lastCycleUserReward / userCycleMessages[user];
+                uint256 rewardsOwed = rewardPerMsg * userCycleFeePercent[user] / 10000;
+                currentRewards -= rewardsOwed;
+                }
+            }
+        return currentRewards;
+    }
+
+    function getUnclaimedFees(address user) public view returns(uint256){
+        uint256 currentCycle = getCurrentCycle();
+        uint256 currentAccruedFees = addressAccruedFees[user];
+        uint256 currentCycleFeesPerStakeSummed;
+        if(summedCycleStakes[currentCycle] == 0) {
+            uint256 feePerStake = cycleAccruedFees[currentCycle - 1] * 1e18 / summedCycleStakes[currentCycle - 1];
+            currentCycleFeesPerStakeSummed = cycleFeesPerStakeSummed[currentCycle - 1] + feePerStake;
+        } else {
+            currentCycleFeesPerStakeSummed = cycleFeesPerStakeSummed[currentCycle];
+        }
+
+        uint256 currentRewards = getUnclaimedRewards(user);
+        if(currentCycle > lastFeeUpdateCycle[user]){
+            currentAccruedFees += ((currentRewards
+                * (currentCycleFeesPerStakeSummed - cycleFeesPerStakeSummed[lastFeeUpdateCycle[user]]))) / 1e18;
+        }
+
+        if(userFirstStake[user] != 0 && currentCycle - userFirstStake[user] > 1) {
+            currentAccruedFees += 
+                ((userStakeCycle[user][userFirstStake[user] + 1] 
+                * (currentCycleFeesPerStakeSummed - cycleFeesPerStakeSummed[userFirstStake[user] + 1]))) / 1e18;
+
+            if(userSecondStake[user] != 0 && currentCycle - userSecondStake[user] > 1) {
+                currentAccruedFees += 
+                    ((userStakeCycle[user][userSecondStake[user] + 1] 
+                    * (currentCycleFeesPerStakeSummed - cycleFeesPerStakeSummed[userSecondStake[user] + 1]))) / 1e18;                    
+            }
+        }
+        return currentAccruedFees;
     }
 }

@@ -1,18 +1,61 @@
-$text--light: black;
-$text--dark: white;
-$bg--light: white;
-$bg--dark: black;
+$text--light: #19141F;
+$text--dark: #F2E9DC;
+$bg--light: #FFEEE8;
+$bg--dark: #2B2235;
+$logo-bg--dark: #1F1826;
+$logo-bg--light: #E6D6D1;
+$box-shadow--dark: 0px 3px 25px #0F0B13;
+$box-shadow--light: 4px 0px 11px #1A152054;
+$text-field-big-box--dark:  #271F30 0% 0% no-repeat padding-box;
+$text-field-big-box--light: #E6D6D1 0% 0% no-repeat padding-box;
+$text-field-color--dark: #1B1521;
+$text-field-color--light: #a79a97cd;
+$inbox-text-color--dark: #91C499;
+$git-hub-logo--dark: #F2E9DC40;
+$git-hub-logo--light: #C7BAB5;
+$text-status--light: #285943;
+$text-status--dark: #91C499;
+$stake-unstake-bg--light: #D6C7C3;
+$stake-unstake-bg--dark: #130F17;
+$yellow-text: #F5B700;
+$cards-color-bg--dark: #2E2438;
+$cards-color-bg--light: #F7E7E1;
+$stake-bg--light: #F2E2DC;
+$stake-bg--dark: #271F30;
+
 
 $themes: (
-        gmail: (
-                bg: $bg--light,
-                text: $text--light,
-                pagination: $text--dark
-        ),
-        dark: (
-                bg: $bg--dark,
-                text: $text--dark,
-        ),
+    classic: (
+        bg: $bg--light,
+        text: $text--light,
+        pagination: $text--dark,
+        logo-bg: $logo-bg--light,
+        box-shadow: $box-shadow--light,
+        box-bg: $text-field-big-box--light,
+        text-field-color: $text-field-color--light,
+        inbox-text-color: $text--light,
+        git-hub-logo: $git-hub-logo--light,
+        unreaded: $text-status--light,
+        stake-unstake-bg: $stake-unstake-bg--light,
+        approve-stake-text: $bg--dark,
+        card-color: $cards-color-bg--light,
+        stake-bg: $stake-bg--light,
+    ),
+    dark: (
+        bg: $bg--dark,
+        text: $text--dark,
+        logo-bg: $logo-bg--dark,
+        box-shadow: $box-shadow--dark,
+        box-bg: $text-field-big-box--dark,
+        text-field-color: $text-field-color--dark,
+        inbox-text-color: $inbox-text-color--dark,
+        git-hub-logo: $git-hub-logo--dark,
+        unreaded: $text-status--dark,
+        stake-unstake-bg: $stake-unstake-bg--dark,
+        approve-stake-text: $yellow-text,
+        card-color: $cards-color-bg--dark,
+        stake-bg: $stake-bg--dark,
+    ),
 );
 
 @mixin themed() {
