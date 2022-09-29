@@ -4,6 +4,8 @@ import { useContext, useEffect, useRef, useState } from "react";
 import icon1 from '../photos/icons/icon-1.png';
 import icon2 from '../photos/icons/icon-2.png';
 import icon3 from '../photos/icons/icon-3.png';
+import logoDark from "../photos/logo-dark.svg";
+import iconParty from "../photos/party-popper.png"
 
 export default function HowTo(props: any) {
     const [name, setName] = useState<string>("");
@@ -32,7 +34,27 @@ export default function HowTo(props: any) {
         <>
             <Modal open={props.show} className="initial-page-popup">
                 <Box ref={ref} className={`modal-box ${theme === "classic" ? "classic" : "dark"}` }>
-                   
+                    <div className="how-to-use-list">
+                        <h3>Before connecting to <img src={logoDark} />, make sure you:</h3>
+                        <ul>
+                            <li>
+                                <img src={icon1} />
+                                <h4>Install <span>MetaMask extension</span> from official website</h4>
+                                <a href="https://metamask.io/" target="_blank">https://metamask.io/</a>
+                            </li>
+                            <li>
+                                <img src={icon2} />
+                                <h4>Switch to <span>Rinkeby testnet</span> network</h4>
+                                <a href="https://isitcrypto.com/add-rinkeby-network-to-metamask/" target="_blank">Read more</a>
+                            </li>
+                            <li>
+                                <img src={icon3} />
+                                <h4>Get <span>Rinkeby testnet</span> funds</h4>
+                                <a href="hhttps://rinkebyfaucet.com/" target="_blank">https://rinkebyfaucet.com/</a>
+                            </li>
+                        </ul>
+                        <h4>After all these steps, you should be ready to use demo.deb0x.org <img src={iconParty} /></h4>
+                   </div>
                 </Box>
             </Modal>
         </>

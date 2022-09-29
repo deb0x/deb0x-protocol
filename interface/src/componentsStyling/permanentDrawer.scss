@@ -3,6 +3,11 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
     0px 2px 2px 0px rgb(0 0 0 / 14%), 
     0px 1px 5px 0px rgb(0 0 0 / 12%);
 
+@font-face {
+    font-family: 'Karla';
+    src: url('../../src/fonts/Karla/Karla-Regular.ttf');
+}
+
 .theme--classic {
     .img {
         background-image: url('../photos/logo-dark.svg');
@@ -160,7 +165,7 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
                         }
                         .MuiTypography-root {
                             font-size: 18px;
-    
+                            font-family: 'Karla';    
                         }
                         .list-item.Mui-selected {
                             background-color: #cccccc40;
@@ -294,6 +299,7 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
                             padding-left: 16px;
                             justify-content: flex-start;
                             border-radius: 0;
+                            font-family: 'Karla';
                             svg {
                                 width: 16px;
                                 height: 16px;
