@@ -149,7 +149,7 @@ contract Deb0x is Deb0xCore {
             userWithdrawableStake[account] += unlockedFirstStake;
             addressAccruedFees[account] = addressAccruedFees[account] + 
                 ((userStakeCycle[account][userFirstStake[account]] 
-                * (cycleFeesPerStakeSummed[currentCycle] - cycleFeesPerStakeSummed[userFirstStake[account]]))) / dividend;
+                * (cycleFeesPerStakeSummed[lastStartedCycle+1] - cycleFeesPerStakeSummed[userFirstStake[account]]))) / dividend;
             userStakeCycle[account][userFirstStake[account]] = 0;
             userFirstStake[account] = 0;
 
@@ -160,7 +160,7 @@ contract Deb0x is Deb0xCore {
                         userWithdrawableStake[account] += unlockedSecondStake;
                         addressAccruedFees[account] = addressAccruedFees[account] + 
                             ((userStakeCycle[account][userSecondStake[account]] 
-                            * (cycleFeesPerStakeSummed[currentCycle] - cycleFeesPerStakeSummed[userSecondStake[account]]))) / dividend;
+                            * (cycleFeesPerStakeSummed[lastStartedCycle+1] - cycleFeesPerStakeSummed[userSecondStake[account]]))) / dividend;
                         userStakeCycle[account][userSecondStake[account]] = 0;
                         userSecondStake[account] = 0;
                         } else {
@@ -332,10 +332,10 @@ contract Deb0x is Deb0xCore {
         uint256 calculatedCycle = getCurrentCycle();
         uint256 unlockedStake = 0;
         if(userFirstStake[staker] != 0 && calculatedCycle - userFirstStake[staker] > 1) {
-            unlockedStake += userStakeCycle[staker][userFirstStake[staker] + 1];
+            unlockedStake += userStakeCycle[staker][userFirstStake[staker] ];
 
             if(userSecondStake[staker] != 0 && calculatedCycle - userSecondStake[staker] > 1) {
-                unlockedStake += userStakeCycle[staker][userSecondStake[staker] + 1];
+                unlockedStake += userStakeCycle[staker][userSecondStake[staker] ];
             }
         }
         return userWithdrawableStake[staker] + unlockedStake;
