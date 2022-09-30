@@ -25,13 +25,13 @@ module.exports = {
             timeout: 1800000
         },
         goerli: {
-        url: "https://goerli.infura.io/v3/c4174820658a4db9a6e5d54efec43ede",
-        chainId: 5,
-        accounts: { mnemonic: mnemonic },
-        gas: 1200000000,
-        blockGasLimit: 3000000000,
-        allowUnlimitedContractSize: true,
-        timeout: 1800000
+            url: "https://goerli.infura.io/v3/c4174820658a4db9a6e5d54efec43ede",
+            chainId: 5,
+            accounts: { mnemonic: mnemonic },
+            gas: 1200000000,
+            blockGasLimit: 3000000000,
+            allowUnlimitedContractSize: true,
+            timeout: 1800000
         }
     }
 };
