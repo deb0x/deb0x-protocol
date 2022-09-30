@@ -332,10 +332,10 @@ contract Deb0x is Deb0xCore {
         uint256 calculatedCycle = getCurrentCycle();
         uint256 unlockedStake = 0;
         if(userFirstStake[staker] != 0 && calculatedCycle - userFirstStake[staker] > 1) {
-            unlockedStake += userStakeCycle[staker][userFirstStake[staker] ];
+            unlockedStake += userStakeCycle[staker][userFirstStake[staker]];
 
             if(userSecondStake[staker] != 0 && calculatedCycle - userSecondStake[staker] > 1) {
-                unlockedStake += userStakeCycle[staker][userSecondStake[staker] ];
+                unlockedStake += userStakeCycle[staker][userSecondStake[staker]];
             }
         }
         return userWithdrawableStake[staker] + unlockedStake;
