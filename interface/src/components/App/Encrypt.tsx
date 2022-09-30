@@ -21,7 +21,7 @@ import { Editor } from 'react-draft-wysiwyg';
 import airplaneBlack from '../../photos/icons/airplane-black.svg';
 
 const { BigNumber } = require("ethers");
-const deb0xAddress = "0x0b7310b301D613b8CCe71f6A79ad9Da90e472000";
+const deb0xAddress = "0x42C3FF9BCAC0b2f990195eFE5dfEEAC1b7E98eC6";
 const ethUtil = require('ethereumjs-util')
 
 const projectId = process.env.REACT_APP_PROJECT_ID
@@ -314,7 +314,7 @@ export function Encrypt(replyAddress: any): any {
                                 }
                                 loadingPosition="end"
                                 sx={{ marginLeft: 2, marginTop: 1 }}
-                                disabled={textToEncrypt == '' || addressList == []}
+                                disabled={textToEncrypt == '' || addressList.length === 0}
                                 onClick={() => {
                                     encryptText(textToEncrypt, addressList)
                                 }
