@@ -98,8 +98,11 @@ describe("Test contract functionalities while having cycles with no messages sen
     for(let entry of feesClaimed){
       totalFeesClaimed = totalFeesClaimed.add(entry.args.fees)
     }
-    const feesCollected = await rewardedAlice.cycleAccruedFees(0)
-    expect(totalFeesClaimed).to.equal(feesCollected)
+    const feesCollected = await rewardedAlice.cycleAccruedFees(0);
+
+    const remainder = await hre.ethers.provider.getBalance(rewardedAlice.address);
+    console.log(`remainder: ${remainder}`);          
+    expect(totalFeesClaimed.add(remainder)).to.equal(feesCollected)
   });
 
   it("Should claim ~99.81 tokens despite gaps before and after sending message", async () => {
