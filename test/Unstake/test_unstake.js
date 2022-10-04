@@ -23,7 +23,7 @@ describe("Test unstake functionality", async function() {
         frontend = deb0xContract.connect(feeReceiver)
     })
 
-    it.only("Stake action from a single account and check user address stake amount", async() => {
+    it("Stake action from a single account and check user address stake amount", async() => {
         await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -73,55 +73,5 @@ describe("Test unstake functionality", async function() {
         console.log("Valoare dupa unstake  " + amoutToUnstakeAfterTwoStakeActionInFirstCycle);
 
     });
-
-    // it("Stake action from multiple accounts and check user address stake amount", async() => {
-    //     await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
-    //     await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-    //     await hre.ethers.provider.send("evm_mine")
-
-    //     await user2Reward.claimRewards()
-    //     await dbxERC20.connect(user2).approve(user1Reward.address, await dbxERC20.balanceOf(user2.address))
-    //     await user2Reward.stakeDBX(await dbxERC20.balanceOf(user2.address))
-
-    //     await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
-    //     await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
-    //     await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
-    //     await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-    //     await hre.ethers.provider.send("evm_mine")
-
-    //     let amountStakeInFirtCyclePerAccount = ethers.utils.formatEther(BigNumber.from(await user1Reward.rewardPerCycle(1)).div(BigNumber.from("3")));
-    //     await user1Reward.claimRewards()
-    //     await dbxERC20.connect(user1).approve(user1Reward.address, await dbxERC20.balanceOf(user1.address))
-    //     await user1Reward.stakeDBX(await dbxERC20.balanceOf(user1.address))
-
-    //     await user2Reward.claimRewards()
-    //     await dbxERC20.connect(user2).approve(user1Reward.address, await dbxERC20.balanceOf(user2.address))
-    //     await user2Reward.stakeDBX(await dbxERC20.balanceOf(user2.address))
-
-    //     await user3Reward.claimRewards()
-    //     await dbxERC20.connect(user3).approve(user1Reward.address, await dbxERC20.balanceOf(user3.address))
-    //     await user3Reward.stakeDBX(await dbxERC20.balanceOf(user3.address))
-
-    //     await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-    //     await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-    //     await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-    //     await hre.ethers.provider.send("evm_mine")
-
-    //     let amountStakeInFirstCycle = ethers.utils.formatEther(await user2Reward.getUserWithdrawableStake(user2.address));
-    //     expect(parseInt(amountStakeInFirstCycle)).to.equal(100);
-
-    //     await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-    //     await hre.ethers.provider.send("evm_mine")
-
-    //     let amountStakeInSecoundCycleFirstAccount = ethers.utils.formatEther(await user1Reward.getUserWithdrawableStake(user1.address));
-    //     expect(amountStakeInFirtCyclePerAccount).to.equal(amountStakeInSecoundCycleFirstAccount);
-
-    //     let amountInSecoundCycle = ethers.utils.formatEther(BigNumber.from(await user2Reward.getUserWithdrawableStake(user2.address)).sub(BigNumber.from(await user1Reward.rewardPerCycle(0))));
-    //     expect(amountStakeInFirtCyclePerAccount).to.equal(amountInSecoundCycle);
-
-    //     let amountStakeInSecoundCycleThirdAccount = ethers.utils.formatEther(await user3Reward.getUserWithdrawableStake(user3.address));
-    //     expect(amountStakeInFirtCyclePerAccount).to.equal(amountStakeInSecoundCycleThirdAccount);
-
-    // });
 
 });
