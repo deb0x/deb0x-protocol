@@ -136,7 +136,6 @@ describe("Test stake functionality", async function() {
 
     });
 
-
     it("Multiple stake from multiple accounts ", async() => {
         await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -165,10 +164,7 @@ describe("Test stake functionality", async function() {
 
         await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
         await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-        await hre.ethers.provider.send("evm_mine")
-
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 2])
         await hre.ethers.provider.send("evm_mine")
 
         let amountStakeInFirstCycleFirstAccount = ethers.utils.formatEther(await user1Reward.getUserWithdrawableStake(user1.address));
@@ -178,11 +174,41 @@ describe("Test stake functionality", async function() {
         expect(ethers.utils.formatEther(balanceUser2)).to.equal(amountStakeInFirstCycleSeconddAccount);
         expect(ethers.utils.formatEther(balanceUser3)).to.equal(amountStakeInFirstCycleThirdAccount);
 
+        await user3Reward.claimRewards()
+        let balanceUser3Cycle3 = await dbxERC20.balanceOf(user3.address);
+        await dbxERC20.connect(user3).approve(user1Reward.address, balanceUser3Cycle3)
+        await user3Reward.stakeDBX(balanceUser3Cycle3)
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 2])
+        await hre.ethers.provider.send("evm_mine")
+
+        let amountRewardCycle3Account3 = ethers.utils.formatEther(NumUtils.day(2).div(2));
+        let totalAmountStakeAccount3 = ethers.utils.formatEther(await user3Reward.getUserWithdrawableStake(user3.address));
+        let intermediateValueAccount3 = await user3Reward.getUserWithdrawableStake(user3.address);
+        expect(totalAmountStakeAccount3 - amountRewardCycle3Account3).to.equal(parseInt(amountStakeInFirstCycleThirdAccount));
+
+        await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        let amountStakeInFirstCycleThirdAccount2 = ethers.utils.formatEther(await user3Reward.getUserWithdrawableStake(user3.address));
-        console.log(amountStakeInFirstCycleThirdAccount2)
+        await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 12])
+        await hre.ethers.provider.send("evm_mine")
+
+        await user3Reward.claimRewards()
+        let balanceUser3Cycle20 = await dbxERC20.balanceOf(user3.address);
+        await dbxERC20.connect(user3).approve(user1Reward.address, balanceUser3Cycle20)
+        await user3Reward.stakeDBX(balanceUser3Cycle20)
+
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 2])
+        await hre.ethers.provider.send("evm_mine")
+
+        let amountRewardCycle4Account3 = NumUtils.day(3).div(2);
+        let amountRewardCycle5Account3 = NumUtils.day(4).div(2);
+        let totalAmountStakeAccount3Cycle5 = await user3Reward.getUserWithdrawableStake(user3.address);
+        let expectedValue = BigNumber.from(amountRewardCycle4Account3).add(BigNumber.from(amountRewardCycle5Account3)).add(BigNumber.from(intermediateValueAccount3))
+        expect(expectedValue).to.equal(BigNumber.from(totalAmountStakeAccount3Cycle5))
     });
 
 
