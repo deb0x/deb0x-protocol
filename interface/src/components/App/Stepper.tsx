@@ -1,5 +1,7 @@
 import {useState, Fragment} from 'react';
 import { useWeb3React } from '@web3-react/core';
+import { signMetaTxRequest } from '../../ethereum/signer';
+import { createInstance } from '../../ethereum/forwarder'
 import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -9,7 +11,7 @@ import Typography from '@mui/material/Typography';
 import Deb0x from "../../ethereum/deb0x"
 import SnackbarNotification from './Snackbar';
 import '../../componentsStyling/stepper.scss';
-const deb0xAddress = "0xb6057a156D1D5BAB08DAb590dC052B66051394e2";
+const deb0xAddress = "0x80F98b549B723a089fa5eb159Dcc537FD6656d20";
 const steps = ['Provide public encryption key', 'Initialize Deb0x'];
 
 export default function HorizontalLinearStepper(props: any) {
@@ -23,6 +25,18 @@ export default function HorizontalLinearStepper(props: any) {
     const handleNext = () => {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
     };
+
+    const fetchInitializeDeb0x = async (url:any, request:any) => {
+        let response = await fetch(url, {
+            method: 'POST',
+            body: JSON.stringify(request),
+            headers: { 'Content-Type': 'application/json' },
+          });
+
+        let responseJson = await response.json()
+
+        return responseJson
+    }
 
     async function getEncryptionKey() {
         setLoading(true)
@@ -47,35 +61,51 @@ export default function HorizontalLinearStepper(props: any) {
         
     }
 
+    
+
     async function initializeDeb0x() {
         setLoading(true)
 
+        const url = "https://api.defender.openzeppelin.com/autotasks/5ce17e1f-6559-458b-b239-696042b4f7aa/runs/webhook/d090d479-22fb-450a-b747-40d46161c437/6uYfdFP7doXyqZ4RYximnc";
+
         const signer = await library.getSigner(0)
 
-        const deb0xContract = Deb0x(signer, deb0xAddress)
+        const deb0xContract = Deb0x(library, deb0xAddress)
+
+        const forwarder = createInstance(library)
+        const from = await signer.getAddress();
+        const data = deb0xContract.interface.encodeFunctionData('setKey', [encryptionKey])
+        const to = deb0xContract.address
 
         try {
-            const tx = await deb0xContract.setKey(encryptionKey)
+            const request = await signMetaTxRequest(library, forwarder, { to, from, data });
 
-            tx.wait()
-            .then((result: any) => {
-                setNotificationState({message: "Deb0x was succesfully initialized.", open: true,
-                severity:"success"})
-                setLoading(false)
-                props.onDeboxInitialization(true)
-                
+            await fetch(url, {
+                method: 'POST',
+                body: JSON.stringify(request),
+                headers: { 'Content-Type': 'application/json' },
             })
-            .catch((error: any) => {
-                setNotificationState({message: "Deb0x couldn't be initialized!", open: true,
-                severity:"error"})
-                setLoading(false)
-            })
-        } catch(error: any) {
-            setNotificationState({message: "You rejected the transaction. Deb0x was not initialized.", open: true,
-                severity:"info"})
-                setLoading(false)
-        }
-
+                .then((response) => response.json())
+                .then(async (data) => {
+                    console.log(data)
+                    const {tx: txReceipt} = JSON.parse(data.result)
+                    
+                    if(txReceipt.status == 1){
+                        setNotificationState({message: "Deb0x was succesfully initialized.", open: true,
+                                severity:"success"})
+                                setLoading(false)
+                                props.onDeboxInitialization(true)
+                    } else {
+                        setNotificationState({message: "Deb0x couldn't be initialized!", open: true,
+                            severity:"error"})
+                            setLoading(false)
+                    }
+                })
+            } catch(error: any) {
+                    setNotificationState({message: "You rejected the transaction. Deb0x was not initialized.", open: true,
+                        severity:"info"})
+                        setLoading(false)
+            }
     }
 
     return (

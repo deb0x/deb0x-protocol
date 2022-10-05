@@ -2,7 +2,9 @@
 
 pragma solidity ^0.8.11;
 
-contract Deb0xCore {
+import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
+
+contract Deb0xCore is ERC2771Context {
   
     struct content {
         string cid;
@@ -22,21 +24,24 @@ contract Deb0xCore {
 
     mapping(address => address[]) private messageSenders;
 
+    constructor(address forwarder)
+    ERC2771Context(forwarder) {}
+
     function setKey(string memory encryptionKey) public {
-        encryptionKeys[msg.sender] = encryptionKey;
+        encryptionKeys[_msgSender()] = encryptionKey;
     }
 
     function send(address[] memory recipients, string[] memory cids) public payable virtual {
         for (uint256 i = 0; i < recipients.length - 1; i++) {
-            if (inbox[recipients[i]][msg.sender].length == 0) {
-                messageSenders[recipients[i]].push(msg.sender);
+            if (inbox[recipients[i]][_msgSender()].length == 0) {
+                messageSenders[recipients[i]].push(_msgSender());
             }
             content memory currentStruct = content({cid:cids[i], blockTimestamp: block.timestamp});
-            inbox[recipients[i]][msg.sender].push(currentStruct);
+            inbox[recipients[i]][_msgSender()].push(currentStruct);
         }
 
         content memory outboxContent = content({cid: cids[recipients.length -1 ], blockTimestamp:block.timestamp});
-        outbox[msg.sender].push(
+        outbox[_msgSender()].push(
             sentMessage({
                 recipients: recipients,
                 contentData: outboxContent

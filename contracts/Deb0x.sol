@@ -10,7 +10,7 @@ contract Deb0x is Deb0xCore {
 
     DBX public dbx;
     uint16 public constant MAIL_FEE = 1000;
-    uint256 public constant dividend = 1e60;
+    uint256 public constant dividend = 1e18;
     uint256 immutable i_initialTimestamp;
     uint256 immutable i_periodDuration;
     uint256 currentCycleReward;
@@ -19,9 +19,9 @@ contract Deb0x is Deb0xCore {
     uint256 currentCycle;
     uint256 lastStartedCycle;
     uint256 previousStartedCycle;
-    uint256 currentStartedCycle;
+    uint256 public currentStartedCycle;
     uint256 pendingCycleRewardsStake;
-    uint256 pendingStakeWithdrawal;
+    uint256 public pendingStakeWithdrawal;
 
     mapping(address => uint256) userCycleFeePercent;
     mapping(address => uint256) frontendCycleFeePercent;
@@ -47,7 +47,8 @@ contract Deb0x is Deb0xCore {
 
     event FeesClaimed(uint256 fees);
 
-    constructor() {
+    constructor(address forwarder)
+    Deb0xCore(forwarder) {
         dbx = new DBX();
         i_initialTimestamp = block.timestamp;
         i_periodDuration = 1 days;
@@ -149,7 +150,7 @@ contract Deb0x is Deb0xCore {
             userWithdrawableStake[account] += unlockedFirstStake;
             addressAccruedFees[account] = addressAccruedFees[account] + 
                 ((userStakeCycle[account][userFirstStake[account]] 
-                * (cycleFeesPerStakeSummed[currentCycle] - cycleFeesPerStakeSummed[userFirstStake[account]]))) / dividend;
+                * (cycleFeesPerStakeSummed[lastStartedCycle + 1] - cycleFeesPerStakeSummed[userFirstStake[account]]))) / dividend;
             userStakeCycle[account][userFirstStake[account]] = 0;
             userFirstStake[account] = 0;
 
@@ -160,7 +161,7 @@ contract Deb0x is Deb0xCore {
                         userWithdrawableStake[account] += unlockedSecondStake;
                         addressAccruedFees[account] = addressAccruedFees[account] + 
                             ((userStakeCycle[account][userSecondStake[account]] 
-                            * (cycleFeesPerStakeSummed[currentCycle] - cycleFeesPerStakeSummed[userSecondStake[account] + 1]))) / dividend;
+                            * (cycleFeesPerStakeSummed[lastStartedCycle + 1] - cycleFeesPerStakeSummed[userSecondStake[account]]))) / dividend;
                         userStakeCycle[account][userSecondStake[account]] = 0;
                         userSecondStake[account] = 0;
                         } else {
@@ -172,7 +173,7 @@ contract Deb0x is Deb0xCore {
         _;
     }
 
-    function updateFrontEndStats(address frontend, uint256 currentCycle) internal {
+    function updateFrontEndStats(address frontend) internal {
         if(currentCycle > frontEndLastRewardUpdate[frontend]) {
             uint256 lastUpdatedCycle = frontEndLastRewardUpdate[frontend];
             if(frontendCycleFeePercent[frontend] != 0 && cycleTotalMessages[lastUpdatedCycle] != 0) {
@@ -196,17 +197,17 @@ contract Deb0x is Deb0xCore {
         calculateCycle
         updateCycleFeesPerStakeSummed
         setUpNewCycle
-        notify(msg.sender)
+        notify(_msgSender())
     {
         updateFrontEndStats(feeReceiver);
 
-        userCycleMessages[msg.sender]++;
+        userCycleMessages[_msgSender()]++;
         cycleTotalMessages[currentCycle]++;
-        lastActiveCycle[msg.sender] = currentCycle;
+        lastActiveCycle[_msgSender()] = currentCycle;
 
         if(feeReceiver != address(0)) {
             if(msgFee != 0) {
-                userCycleFeePercent[msg.sender]+= msgFee;
+                userCycleFeePercent[_msgSender()]+= msgFee;
                 frontendCycleFeePercent[feeReceiver]+= msgFee;
             }
             if(nativeTokenFee != 0) {
@@ -218,10 +219,10 @@ contract Deb0x is Deb0xCore {
         //cycleAccruedFees[currentCycle] += msg.value;
     }
 
-    function claimRewards() public calculateCycle updateCycleFeesPerStakeSummed  notify(msg.sender) {
-        uint256 reward = addressRewards[msg.sender] - userWithdrawableStake[msg.sender];
+    function claimRewards() public calculateCycle updateCycleFeesPerStakeSummed  notify(_msgSender()) {
+        uint256 reward = addressRewards[_msgSender()] - userWithdrawableStake[_msgSender()];
         require(reward > 0, "Deb0x: You do not have rewards");
-        addressRewards[msg.sender] -= reward;
+        addressRewards[_msgSender()] -= reward;
         if(lastStartedCycle == currentStartedCycle){
             pendingStakeWithdrawal += reward;
         } else {
@@ -229,37 +230,37 @@ contract Deb0x is Deb0xCore {
         }
         
         
-        dbx.mintReward(msg.sender, reward);
+        dbx.mintReward(_msgSender(), reward);
     }
 
     function claimFrontEndRewards() public calculateCycle updateCycleFeesPerStakeSummed  {
-        updateFrontEndStats(msg.sender);
+        updateFrontEndStats(_msgSender());
 
-        uint256 reward = frontendRewards[msg.sender];
+        uint256 reward = frontendRewards[_msgSender()];
         require(reward > 0, "Deb0x: You do not have rewards");
-        frontendRewards[msg.sender] = 0;
+        frontendRewards[_msgSender()] = 0;
         if(lastStartedCycle == currentStartedCycle){
             pendingStakeWithdrawal += reward;
         } else {
             summedCycleStakes[currentCycle] = summedCycleStakes[currentCycle] - reward;
         }
-        dbx.mintReward(msg.sender, reward);
+        dbx.mintReward(_msgSender(), reward);
     }
     
     function claimFrontEndFees() public calculateCycle updateCycleFeesPerStakeSummed {
-        updateFrontEndStats(msg.sender);
-        uint256 fees = frontEndAccruedFees[msg.sender];
+        updateFrontEndStats(_msgSender());
+        uint256 fees = frontEndAccruedFees[_msgSender()];
         require(fees > 0, "Deb0x: You do not have accrued fees");
-        frontEndAccruedFees[msg.sender] = 0;
-        sendViaCall(payable(msg.sender), fees);
+        frontEndAccruedFees[_msgSender()] = 0;
+        sendViaCall(payable(_msgSender()), fees);
         emit FeesClaimed(fees);
     }
 
-    function claimFees() public calculateCycle updateCycleFeesPerStakeSummed notify(msg.sender){
-        uint256 fees = addressAccruedFees[msg.sender];
+    function claimFees() public calculateCycle updateCycleFeesPerStakeSummed notify(_msgSender()){
+        uint256 fees = addressAccruedFees[_msgSender()];
         require(fees > 0, "Deb0x: You do not have accrued fees");
-        addressAccruedFees[msg.sender] = 0;
-        sendViaCall(payable(msg.sender), fees);
+        addressAccruedFees[_msgSender()] = 0;
+        sendViaCall(payable(_msgSender()), fees);
         emit FeesClaimed(fees);
     }
 
@@ -267,7 +268,7 @@ contract Deb0x is Deb0xCore {
         external
         calculateCycle
         updateCycleFeesPerStakeSummed
-        notify(msg.sender)
+        notify(_msgSender())
     {
         require(_amount != 0, "Deb0x: your amount is 0");
         pendingStake += _amount;
@@ -277,38 +278,38 @@ contract Deb0x is Deb0xCore {
             cycleToSet = currentCycle;
         }
 
-        if(currentCycle != userFirstStake[msg.sender] &&
-            currentCycle != userSecondStake[msg.sender]) {
-                if(userFirstStake[msg.sender] == 0) {
-                    userFirstStake[msg.sender] = cycleToSet;
+        if(currentCycle != userFirstStake[_msgSender()] &&
+            currentCycle != userSecondStake[_msgSender()]) {
+                if(userFirstStake[_msgSender()] == 0) {
+                    userFirstStake[_msgSender()] = cycleToSet;
             
-                } else if(userSecondStake[msg.sender] == 0) {
-                    userSecondStake[msg.sender] = currentcycleToSetCycle;
+                } else if(userSecondStake[_msgSender()] == 0) {
+                    userSecondStake[_msgSender()] = cycleToSet;
                 }
             }
-        userStakeCycle[msg.sender][cycleToSet] += _amount;
+        userStakeCycle[_msgSender()][cycleToSet] += _amount;
 
-        dbx.transferFrom(msg.sender, address(this), _amount);
+        dbx.transferFrom(_msgSender(), address(this), _amount);
     }
 
     function unstake(uint256 _amount) 
         external
         calculateCycle
         updateCycleFeesPerStakeSummed
-        notify(msg.sender)
+        notify(_msgSender())
     {
         require(_amount != 0, "Deb0x: your amount is 0");
-        require(_amount <= userWithdrawableStake[msg.sender], "Deb0x: can not unstake more than you've staked");
+        require(_amount <= userWithdrawableStake[_msgSender()], "Deb0x: can not unstake more than you've staked");
 
         if(lastStartedCycle == currentStartedCycle){
             pendingStakeWithdrawal += _amount;
         } else {
             summedCycleStakes[currentCycle] -= _amount;
         }
-        userWithdrawableStake[msg.sender] -= _amount;
-        addressRewards[msg.sender] -= _amount;
+        userWithdrawableStake[_msgSender()] -= _amount;
+        addressRewards[_msgSender()] -= _amount;
     
-        dbx.transfer(msg.sender, _amount);
+        dbx.transfer(_msgSender(), _amount);
     }
 
     function sendViaCall(address payable _to, uint256 _amount) private {
@@ -329,23 +330,23 @@ contract Deb0x is Deb0xCore {
     }
 
     function getUserWithdrawableStake(address staker) public view returns(uint256) {
-        uint256 currentCycle = getCurrentCycle();
+        uint256 calculatedCycle = getCurrentCycle();
         uint256 unlockedStake = 0;
-        if(userFirstStake[staker] != 0 && currentCycle - userFirstStake[staker] > 1) {
-            unlockedStake += userStakeCycle[staker][userFirstStake[staker] + 1];
+        if(userFirstStake[staker] != 0 && calculatedCycle - userFirstStake[staker] > 1) {
+            unlockedStake += userStakeCycle[staker][userFirstStake[staker] ];
 
-            if(userSecondStake[staker] != 0 && currentCycle - userSecondStake[staker] > 1) {
-                unlockedStake += userStakeCycle[staker][userSecondStake[staker] + 1];
+            if(userSecondStake[staker] != 0 && calculatedCycle - userSecondStake[staker] > 1) {
+                unlockedStake += userStakeCycle[staker][userSecondStake[staker] ];
             }
         }
         return userWithdrawableStake[staker] + unlockedStake;
     }
 
     function getUnclaimedRewards(address user) public view returns(uint256) {
-        uint256 currentCycle = getCurrentCycle();
         uint256 currentRewards = addressRewards[user];
+        uint256 calculatedCycle = getCurrentCycle();
 
-        if(cycleTotalMessages[lastActiveCycle[user]] != 0 && lastActiveCycle[user] != currentCycle) {
+        if(calculatedCycle > lastActiveCycle[user] && userCycleMessages[user] != 0) {
                 uint256 lastCycleUserReward = userCycleMessages[user] * rewardPerCycle[lastActiveCycle[user]] / cycleTotalMessages[lastActiveCycle[user]];
                 currentRewards += lastCycleUserReward;
 
@@ -359,31 +360,39 @@ contract Deb0x is Deb0xCore {
     }
 
     function getUnclaimedFees(address user) public view returns(uint256){
-        uint256 currentCycle = getCurrentCycle();
+        uint256 calculatedCycle = getCurrentCycle();
         uint256 currentAccruedFees = addressAccruedFees[user];
         uint256 currentCycleFeesPerStakeSummed;
-        if(summedCycleStakes[currentCycle] == 0) {
-            uint256 feePerStake = cycleAccruedFees[currentCycle - 1] * 1e18 / summedCycleStakes[currentCycle - 1];
-            currentCycleFeesPerStakeSummed = cycleFeesPerStakeSummed[currentCycle - 1] + feePerStake;
+        uint256 previousStartedCycleTemp = previousStartedCycle;
+        uint256 lastStartedCycleTemp = lastStartedCycle;
+
+        if(calculatedCycle != currentStartedCycle) {
+            previousStartedCycleTemp = lastStartedCycle + 1;
+            lastStartedCycleTemp = currentStartedCycle;
+        }
+
+        if(calculatedCycle > lastStartedCycleTemp && cycleFeesPerStakeSummed[lastStartedCycleTemp + 1] == 0) {
+            uint256 feePerStake = cycleAccruedFees[lastStartedCycleTemp] * dividend / summedCycleStakes[lastStartedCycleTemp];
+            currentCycleFeesPerStakeSummed = cycleFeesPerStakeSummed[previousStartedCycle] + feePerStake;
         } else {
-            currentCycleFeesPerStakeSummed = cycleFeesPerStakeSummed[currentCycle];
+            currentCycleFeesPerStakeSummed = cycleFeesPerStakeSummed[previousStartedCycle];
         }
 
         uint256 currentRewards = getUnclaimedRewards(user);
-        if(currentCycle > lastFeeUpdateCycle[user]){
+        if(calculatedCycle > lastStartedCycleTemp && lastFeeUpdateCycle[user] != lastStartedCycleTemp + 1){
             currentAccruedFees += ((currentRewards
-                * (currentCycleFeesPerStakeSummed - cycleFeesPerStakeSummed[lastFeeUpdateCycle[user]]))) / 1e18;
+                * (currentCycleFeesPerStakeSummed - cycleFeesPerStakeSummed[lastFeeUpdateCycle[user]]))) / dividend;
         }
 
-        if(userFirstStake[user] != 0 && currentCycle - userFirstStake[user] > 1) {
+        if(userFirstStake[user] != 0 && calculatedCycle - userFirstStake[user] > 1) {
             currentAccruedFees += 
-                ((userStakeCycle[user][userFirstStake[user] + 1] 
-                * (currentCycleFeesPerStakeSummed - cycleFeesPerStakeSummed[userFirstStake[user] + 1]))) / 1e18;
+                ((userStakeCycle[user][userFirstStake[user]] 
+                * (currentCycleFeesPerStakeSummed - cycleFeesPerStakeSummed[userFirstStake[user]]))) / dividend;
 
-            if(userSecondStake[user] != 0 && currentCycle - userSecondStake[user] > 1) {
+            if(userSecondStake[user] != 0 && calculatedCycle - userSecondStake[user] > 1) {
                 currentAccruedFees += 
-                    ((userStakeCycle[user][userSecondStake[user] + 1] 
-                    * (currentCycleFeesPerStakeSummed - cycleFeesPerStakeSummed[userSecondStake[user] + 1]))) / 1e18;                    
+                    ((userStakeCycle[user][userSecondStake[user]] 
+                    * (currentCycleFeesPerStakeSummed - cycleFeesPerStakeSummed[userSecondStake[user]]))) / dividend;                    
             }
         }
         return currentAccruedFees;
