@@ -136,7 +136,7 @@ function App() {
         try {
             await window.ethereum.request({
             method: 'wallet_switchEthereumChain',
-            params: [{ chainId: "0x4"}],
+            params: [{ chainId: "0x5"}],
             }).then(
                 displayErrorMsg("You have switched to the right network")
             );            
@@ -146,14 +146,14 @@ function App() {
                 method: 'wallet_addEthereumChain',
                 params: [
                     {
-                        chainId: '0x4', 
-                        chainName:'Rinkeby Test Network',
-                        rpcUrls:['https://rinkeby.infura.io/v3/'],                   
-                        blockExplorerUrls:['https://rinkeby.etherscan.io'],  
+                        chainId: '0x5', 
+                        chainName:'Goerli Test Network',
+                        rpcUrls:['https://goerli.infura.io/v3/'],                   
+                        blockExplorerUrls:['https://goerli.etherscan.io'],  
                         nativeCurrency: { 
-                        symbol:'ETH',   
+                        symbol:'GoerliETH',   
                         decimals: 18
-                        }     
+                        }       
                     }
                     ]});
             } catch (err) {
