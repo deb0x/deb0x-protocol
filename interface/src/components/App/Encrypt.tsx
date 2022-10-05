@@ -21,7 +21,7 @@ import { Editor } from 'react-draft-wysiwyg';
 import airplaneBlack from '../../photos/icons/airplane-black.svg';
 
 const { BigNumber } = require("ethers");
-const deb0xAddress = "0x80F98b549B723a089fa5eb159Dcc537FD6656d20";
+const deb0xAddress = "0x42C3FF9BCAC0b2f990195eFE5dfEEAC1b7E98eC6";
 const ethUtil = require('ethereumjs-util')
 
 const projectId = process.env.REACT_APP_PROJECT_ID
@@ -93,11 +93,8 @@ export function Encrypt(replyAddress: any): any {
     async function handlePaste(evt: any) {
         evt.preventDefault()
         var paste = evt.clipboardData.getData("text")
-        console.log(paste, "1")
         if(await isValid(paste)) {
             setAddressList([...addressList, paste])
-            console.log([...addressList, paste], "2")
-            console.log(addressList, "3")
         }
     }
 
@@ -145,7 +142,6 @@ export function Encrypt(replyAddress: any): any {
         setLoading(true);
         const signer = await library.getSigner(0);
         let cids:any = []
-        console.log(destinationAddresses, "4")
         let recipients = replyAddress.props ? [replyAddress.props].flat() : destinationAddresses.flat()
         recipients.push(await signer.getAddress())
         const deb0xContract = Deb0x(signer, deb0xAddress);
@@ -170,7 +166,7 @@ export function Encrypt(replyAddress: any): any {
 
         try {
             const overrides = 
-                { value: ethers.utils.parseUnits("0.1", "ether"),
+                { value: ethers.utils.parseUnits("0.01", "ether"),
                     gasLimit:BigNumber.from("1000000") }
             const tx = await deb0xContract["send(address[],string[],address,uint256,uint256)"](recipients,
                 cids,
@@ -318,7 +314,7 @@ export function Encrypt(replyAddress: any): any {
                                 }
                                 loadingPosition="end"
                                 sx={{ marginLeft: 2, marginTop: 1 }}
-                                disabled={textToEncrypt == '' || addressList == []}
+                                disabled={textToEncrypt == '' || addressList.length === 0}
                                 onClick={() => {
                                     encryptText(textToEncrypt, addressList)
                                 }

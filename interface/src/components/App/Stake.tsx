@@ -20,8 +20,8 @@ import walletLight from "../../photos/icons/wallet--light.svg";
 import walletDark from "../../photos/icons/wallet--dark.svg";
 import trophyRewards from "../../photos/icons/trophyRewards.svg";
 
-const deb0xAddress = "0x80F98b549B723a089fa5eb159Dcc537FD6656d20"
-const deb0xERC20Address = "0xCBd5BD1F2C2cb4B748d3dF938fe0EaF5f7c90Be3"
+const deb0xAddress = "0x42C3FF9BCAC0b2f990195eFE5dfEEAC1b7E98eC6"
+const deb0xERC20Address = "0x87b581e1dA1D073b204D6DdC61231a0e08cd5927"
 
 export function Stake(props: any): any {
 
@@ -270,7 +270,7 @@ export function Stake(props: any): any {
 
             const balance = await deb0xERC20Contract.balanceOf(account)
 
-            setUserUnstakedAmount(ethers.utils.formatEther(balance))
+            setUserUnstakedAmount(parseFloat(ethers.utils.formatEther(balance)).toFixed(2))
         }
 
         async function setApproval() {
@@ -289,7 +289,9 @@ export function Stake(props: any): any {
 
             const totalSupply = await deb0xContract.summedCycleStakes(currentCycle)
 
-            setTotalStaked(ethers.utils.formatEther(totalSupply))
+            const pendingStakeWithdrawal = await deb0xContract.pendingStakeWithdrawal()
+
+            setTotalStaked(ethers.utils.formatEther(totalSupply.sub(pendingStakeWithdrawal)))
         }
 
         async function approveStaking() {
@@ -418,7 +420,7 @@ export function Stake(props: any): any {
                 alignment === "stake" ?
                 
                 <>
-                <CardContent className="row pb-0">
+                <CardContent className="row">
                     <div className="col-6 p-1">
                         <img className="display-element" src={theme === "classic" ? coinBagDark : coinBagLight} alt="coinbag" />
                         <Typography className="d-flex justify-content-center p-1">
@@ -530,10 +532,12 @@ export function Stake(props: any): any {
             const currentCycle= await deb0xContract.currentStartedCycle()
 
             const currentStake = await deb0xContract.summedCycleStakes(currentCycle)
+
+            const pendingStakeWithdrawal = await deb0xContract.pendingStakeWithdrawal()
     
             // setTotalStaked(ethers.utils.formatEther(currentStake))
 
-            setTotalStaked(parseFloat(ethers.utils.formatEther(currentStake)).toFixed(2))
+            setTotalStaked(parseFloat(ethers.utils.formatEther(currentStake.sub(pendingStakeWithdrawal))).toFixed(2))
 
         }
 

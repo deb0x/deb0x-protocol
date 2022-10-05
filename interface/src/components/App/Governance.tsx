@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 
 const axios = require('axios')
-const deb0xAddress = "0x80F98b549B723a089fa5eb159Dcc537FD6656d20"
+const deb0xAddress = "0x42C3FF9BCAC0b2f990195eFE5dfEEAC1b7E98eC6"
 
 
 export function Governance(props: any): any {

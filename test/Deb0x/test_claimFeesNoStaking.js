@@ -51,8 +51,11 @@ describe("Test fee claiming for users/frontends without concurrently staking/uns
     for(let entry of feesClaimed){
       totalFeesClaimed = totalFeesClaimed.add(entry.args.fees)
     }
-    const feesCollected = await rewardedAlice.cycleAccruedFees(0)
-    expect(totalFeesClaimed).to.equal(feesCollected)
+    const feesCollected = await rewardedAlice.cycleAccruedFees(0);
+
+    const remainder = await hre.ethers.provider.getBalance(rewardedAlice.address);
+    console.log(`remainder: ${remainder}`);
+    expect(totalFeesClaimed.add(remainder)).to.equal(feesCollected)
   });
 
   it(`
@@ -80,8 +83,11 @@ describe("Test fee claiming for users/frontends without concurrently staking/uns
     for(let entry of feesClaimed){
       totalFeesClaimed = totalFeesClaimed.add(entry.args.fees)
     }
-    const feesCollected = await rewardedAlice.cycleAccruedFees(0)
-    expect(totalFeesClaimed).to.equal(feesCollected)
+    const feesCollected = await rewardedAlice.cycleAccruedFees(0);
+
+    const remainder = await hre.ethers.provider.getBalance(rewardedAlice.address);
+    console.log(`remainder: ${remainder}`);
+    expect(totalFeesClaimed.add(remainder)).to.equal(feesCollected)
   });
 
   it(`
@@ -113,8 +119,11 @@ describe("Test fee claiming for users/frontends without concurrently staking/uns
     for(let entry of feesClaimed){
       totalFeesClaimed = totalFeesClaimed.add(entry.args.fees)
     }
-    const feesCollected = (await rewardedAlice.cycleAccruedFees(0)).add(await rewardedAlice.cycleAccruedFees(1))
-    expect(totalFeesClaimed).to.equal(feesCollected)
+    const feesCollected = (await rewardedAlice.cycleAccruedFees(0)).add(await rewardedAlice.cycleAccruedFees(1));
+
+    const remainder = await hre.ethers.provider.getBalance(rewardedAlice.address);
+    console.log(`remainder: ${remainder}`);
+    expect(totalFeesClaimed.add(remainder)).to.equal(feesCollected)
   });
 
   it(`
@@ -165,8 +174,11 @@ describe("Test fee claiming for users/frontends without concurrently staking/uns
     const feesCollected = (await rewardedAlice.cycleAccruedFees(0))
       .add(await rewardedAlice.cycleAccruedFees(1))
       .add(await rewardedAlice.cycleAccruedFees(2))
-      .add(await rewardedAlice.cycleAccruedFees(3))
-    expect(totalFeesClaimed).to.equal(feesCollected)
+      .add(await rewardedAlice.cycleAccruedFees(3));
+    
+    const remainder = await hre.ethers.provider.getBalance(rewardedAlice.address);
+    console.log(`remainder: ${remainder}`);  
+    expect(totalFeesClaimed.add(remainder)).to.equal(feesCollected)
   });
 
   it("11 ether gathered as fees should be fully distributed back to userss", async () => {
@@ -221,8 +233,11 @@ describe("Test fee claiming for users/frontends without concurrently staking/uns
     }
     const feesCollected = (await rewardedAlice.cycleAccruedFees(0))
       .add(await rewardedAlice.cycleAccruedFees(1))
-      .add(await rewardedAlice.cycleAccruedFees(2))
-    expect(totalFeesClaimed).to.equal(feesCollected)
+      .add(await rewardedAlice.cycleAccruedFees(2));
+
+    const remainder = await hre.ethers.provider.getBalance(rewardedAlice.address);
+    console.log(`remainder: ${remainder}`);  
+    expect(totalFeesClaimed.add(remainder)).to.equal(feesCollected)
   });
 
   // it("Should claim share of rewards after sending a message in the previous day", async () => {

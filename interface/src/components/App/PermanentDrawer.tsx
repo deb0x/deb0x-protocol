@@ -30,7 +30,7 @@ import SnackbarNotification from './Snackbar';
 import { Add } from '@mui/icons-material';
 import ContactsSetter from '../ContactsSetter';
 
-const deb0xERC20Address = "0xCBd5BD1F2C2cb4B748d3dF938fe0EaF5f7c90Be3"
+const deb0xERC20Address = "0x87b581e1dA1D073b204D6DdC61231a0e08cd5927"
 enum ConnectorNames { Injected = 'Injected' };
 
 const connectorsByName: { [connectorName in ConnectorNames]: any } = {
