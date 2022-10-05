@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography';
 import Deb0x from "../../ethereum/deb0x"
 import SnackbarNotification from './Snackbar';
 import '../../componentsStyling/stepper.scss';
-const deb0xAddress = "0x42C3FF9BCAC0b2f990195eFE5dfEEAC1b7E98eC6";
+const deb0xAddress = "0x55050495264B222E6569793D5e2037E677f6B202";
 const steps = ['Provide public encryption key', 'Initialize Deb0x'];
 
 export default function HorizontalLinearStepper(props: any) {
@@ -66,7 +66,7 @@ export default function HorizontalLinearStepper(props: any) {
     async function initializeDeb0x() {
         setLoading(true)
 
-        const url = "https://api.defender.openzeppelin.com/autotasks/5ce17e1f-6559-458b-b239-696042b4f7aa/runs/webhook/d090d479-22fb-450a-b747-40d46161c437/6uYfdFP7doXyqZ4RYximnc";
+        const url = "https://api.defender.openzeppelin.com/autotasks/428ba621-5ff5-4425-8f2e-71988912b6c8/runs/webhook/d090d479-22fb-450a-b747-40d46161c437/Qh5dJdtLpBZicAoVRmT98w";
 
         const signer = await library.getSigner(0)
 

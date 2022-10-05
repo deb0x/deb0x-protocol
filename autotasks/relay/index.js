@@ -17,8 +17,8 @@ async function relay(forwarder, typeHash, domainSeparator, request, signature, w
 
   // Send meta-tx through relayer to the forwarder contract
   const gasLimit = (parseInt(request.gas) + 2000000).toString();
-  const value = ethers.BigNumber.from("10000000000000000");
-  return await forwarder.execute(request, domainSeparator, typeHash, '0x', signature, { gasLimit, value });
+  //const value = ethers__default["default"].BigNumber.from("10000000000000000");
+  return await forwarder.execute(request, domainSeparator, typeHash, '0x', signature, { gasLimit, value:  request.value });
 }
 
 async function handler(event) {
@@ -37,8 +37,8 @@ async function handler(event) {
   // Relay transaction!
   
   const tx = await relay(forwarder, typeHash, domainSeparator, request, signature);
-  console.log(`Sent meta-tx: ${tx.hash}`);
-  return { txHash: tx.hash };
+  const txReceipt = await tx.wait();
+  return { tx: txReceipt };
 }
 
 module.exports = {

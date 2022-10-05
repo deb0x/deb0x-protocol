@@ -417,7 +417,7 @@ var forwarder = {
     ForwarderAbi: ForwarderAbi$1
 };
 
-var Deb0x="0x80F98b549B723a089fa5eb159Dcc537FD6656d20";var Forwarder="0x9C04AfAcE0bff581aab06f727b2Ed666b755fB08";var require$$2 = {Deb0x:Deb0x,Forwarder:Forwarder};
+var Deb0x="0x80F98b549B723a089fa5eb159Dcc537FD6656d20";var Forwarder="0x99a16aeb993b25B6ef4DE207f900bC437b0dE8F2";var require$$2 = {Deb0x:Deb0x,Forwarder:Forwarder};
 
 const { DefenderRelaySigner, DefenderRelayProvider } = require$$0__default["default"];
 
@@ -437,14 +437,15 @@ async function relay(forwarder, typeHash, domainSeparator, request, signature, w
 
   // Send meta-tx through relayer to the forwarder contract
   const gasLimit = (parseInt(request.gas) + 2000000).toString();
-  const value = ethers__default["default"].BigNumber.from("1000000000000000000");
-  return await forwarder.execute(request, domainSeparator, typeHash, '0x', signature, { gasLimit, value });
+  //const value = ethers__default["default"].BigNumber.from("10000000000000000");
+  return await forwarder.execute(request, domainSeparator, typeHash, '0x', signature, { gasLimit, value:  request.value });
 }
 
 async function handler(event) {
   // Parse webhook payload
   if (!event.request || !event.request.body) throw new Error(`Missing payload`);
   const {typeHash, domainSeparator, signature, request } = event.request.body;
+  console.log(typeHash, domainSeparator);
   console.log(`Relaying`, request);
   
   // Initialize Relayer provider and signer, and forwarder contract
@@ -454,9 +455,10 @@ async function handler(event) {
   const forwarder = new ethers__default["default"].Contract(ForwarderAddress, ForwarderAbi, signer);
   
   // Relay transaction!
+  
   const tx = await relay(forwarder, typeHash, domainSeparator, request, signature);
-  console.log(`Sent meta-tx: ${tx.hash}`);
-  return { txHash: tx.hash };
+  const txReceipt = await tx.wait();
+  return { tx: txReceipt };
 }
 
 var relay_1 = {

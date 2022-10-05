@@ -46,9 +46,10 @@ async function signTypedData(signer, from, data) {
   return await signer.send(method, [from, argData]);
 }
 
-async function buildRequest(forwarder, input) {
+async function buildRequest(forwarder, input, valueParam) {
+  const value = valueParam ? valueParam : '0';
   const nonce = await forwarder.getNonce(input.from).then(nonce => nonce.toString());
-  return { value: '0', gas: '1000000', nonce, validUntilTime: '0', ...input };
+  return { value, gas: '1000000', nonce, validUntilTime: '0', ...input };
 }
 
 async function buildTypedData(forwarder, request) {
@@ -63,8 +64,8 @@ async function getDomainSeparator(forwarder) {
   return ethereumJsUtil.bufferToHex(ethSigUtil.TypedDataUtils.hashStruct('EIP712Domain', typeData.domain, {EIP712Domain}, 'V4'))
 }
 
-async function signMetaTxRequest(signer, forwarder, input) {
-  const request = await buildRequest(forwarder, input);
+async function signMetaTxRequest(signer, forwarder, input, value) {
+  const request = await buildRequest(forwarder, input, value);
   const toSign = await buildTypedData(forwarder, request);
   const signature = await signTypedData(signer, input.from, toSign);
   const domainSeparator = await getDomainSeparator(forwarder)
