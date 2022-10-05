@@ -54,13 +54,17 @@ export function Encrypt(replyAddress: any): any {
     const [ input, setInput ] = useState(JSON.parse(localStorage.getItem('input') || 'null'));
     const [address, setAddress] = useState<string>(replyAddress.props);
 
-    useEffect(() => {
-        if(input !== null && input.match(/^0x[a-fA-F0-9]{40}$/g))
-            addressList.push(input)
-        
+    useEffect(() => {        
         if(address)
             addressList.push(address)
     }, []);
+
+    useEffect(() => {
+        if(input !== null && input.match(/^0x[a-fA-F0-9]{40}$/g))
+            addressList.push(input);
+    }, [input]);
+
+    useEffect(() => setInput(JSON.parse(localStorage.getItem('input') || 'null')));
 
     useEffect(() => {
         if (!encryptionKeyInitialized) {
