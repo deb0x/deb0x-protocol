@@ -45,13 +45,13 @@ export default function HowTo(props: any) {
                             </li>
                             <li>
                                 <img src={icon2} />
-                                <h4>Switch to <span>Rinkeby testnet</span> network</h4>
-                                <a href="https://isitcrypto.com/add-rinkeby-network-to-metamask/" target="_blank">Read more</a>
+                                <h4>Switch to <span>Goerli testnet</span> network</h4>
+                                <a href="https://blog.cryptostars.is/goerli-g%C3%B6rli-testnet-network-to-metamask-and-receiving-test-ethereum-in-less-than-2-min-de13e6fe5677" target="_blank">Read more</a>
                             </li>
                             <li>
                                 <img src={icon3} />
-                                <h4>Get <span>Rinkeby testnet</span> funds</h4>
-                                <a href="hhttps://rinkebyfaucet.com/" target="_blank">https://rinkebyfaucet.com/</a>
+                                <h4>Get <span>Goerli testnet</span> funds</h4>
+                                <a href="https://goerlifaucet.com/" target="_blank">https://goerlifaucet.com/</a>
                             </li>
                         </ul>
                         <h4>After all these steps, you should be ready to use demo.deb0x.org <img src={iconParty} /></h4>
