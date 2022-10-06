@@ -18,7 +18,7 @@ import cloud2 from '../../photos/icons/clouds/cloud-2.svg';
 import cloud3 from '../../photos/icons/clouds/cloud-3.svg';
 
 const axios = require('axios')
-const deb0xAddress = "0x55050495264B222E6569793D5e2037E677f6B202"
+const deb0xAddress = "0x3a05242eCF607ab09c748A75591d9CDda2CdEd81"
 
 export function Sent(props: any): any {
     const { account, library } = useWeb3React()

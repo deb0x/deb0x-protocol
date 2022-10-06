@@ -23,7 +23,7 @@ import { signMetaTxRequest } from '../../ethereum/signer';
 import { createInstance } from '../../ethereum/forwarder'
 
 const { BigNumber } = require("ethers");
-const deb0xAddress = "0x55050495264B222E6569793D5e2037E677f6B202";
+const deb0xAddress = "0x3a05242eCF607ab09c748A75591d9CDda2CdEd81";
 const ethUtil = require('ethereumjs-util')
 
 const projectId = process.env.REACT_APP_PROJECT_ID
@@ -140,17 +140,16 @@ export function Encrypt(replyAddress: any): any {
     }
 
     async function fetchSendResult(request: any, url: any) {
-        try {
-            await fetch(url, {
-                method: 'POST',
-                body: JSON.stringify(request),
-                headers: { 'Content-Type': 'application/json' },
-            })
-                .then((response) => response.json())
-                .then(async (data) => {
-                    console.log(data)
+        await fetch(url, {
+            method: 'POST',
+            body: JSON.stringify(request),
+            headers: { 'Content-Type': 'application/json' },
+        })
+            .then((response) => response.json())
+            .then(async (data) => {
+                console.log(data)
+                try{
                     const {tx: txReceipt} = JSON.parse(data.result)
-                    
                     if(txReceipt.status == 1){
                         setNotificationState({
                             message: "Message was succesfully sent.",
@@ -168,14 +167,23 @@ export function Encrypt(replyAddress: any): any {
                             severity: "error"
                         })
                     }
-                })
-        } catch(error){
-            setNotificationState({
-                message: "Transaction relayer error. Please try again",
-                open: true,
-                severity: "error"
+                } catch(error) {
+                    if(data.status == "pending") {
+                        setNotificationState({
+                            message: "Your transaction is pending. Your message should arrive shortly",
+                            open: true,
+                            severity: "info"
+                        })
+                    } else if(data.status == "error") {
+                        setNotificationState({
+                            message: "Transaction relayer error. Please try again",
+                            open: true,
+                            severity: "error"
+                        })
+                    }
+                }
+                
             })
-        }
     }
 
     async function encryptText(messageToEncrypt: any, destinationAddresses: any)
@@ -215,7 +223,7 @@ export function Encrypt(replyAddress: any): any {
         const to = deb0xContract.address
 
         try {
-            const request = await signMetaTxRequest(library, forwarder, { to, from, data }, '1000000000000000000');
+            const request = await signMetaTxRequest(library, forwarder, { to, from, data }, '100000000000000000');
 
             await fetchSendResult(request, url)
 
