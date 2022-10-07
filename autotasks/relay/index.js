@@ -3,11 +3,14 @@ const { DefenderRelaySigner, DefenderRelayProvider } = require('defender-relay-c
 
 const { ForwarderAbi } = require('../../src/forwarder');
 const ForwarderAddress = require('../../interface/src/deploy.json').Forwarder;
+const Deb0xAddress = require('../../interface/src/deploy.json').Forwarder;
+const { whitelist } = require('../../interface/src/constants.json')
 
-async function relay(forwarder, typeHash, domainSeparator, request, signature, whitelist) {
+async function relay(forwarder, typeHash, domainSeparator, request, signature) {
   // Decide if we want to relay this request based on a whitelist
-  const accepts = !whitelist || whitelist.includes(request.to);
+  const accepts = request.to === Deb0xAddress;
   if (!accepts) throw new Error(`Rejected request to ${request.to}`);
+  if (!whitelist.includes(request.from)) throw new Error(`Rejected request from ${request.from}`);
 
   console.log("validating")
   // Validate request on the forwarder contract

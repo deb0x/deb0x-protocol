@@ -21,9 +21,10 @@ import { Editor } from 'react-draft-wysiwyg';
 import airplaneBlack from '../../photos/icons/airplane-black.svg';
 import { signMetaTxRequest } from '../../ethereum/signer';
 import { createInstance } from '../../ethereum/forwarder'
+import { whitelist } from '../../constants.json'
 
 const { BigNumber } = require("ethers");
-const deb0xAddress = "0x3a05242eCF607ab09c748A75591d9CDda2CdEd81";
+const deb0xAddress = "0x9BEDEB077d7c3AbC049Aef96d1FFc843fb859610";
 const ethUtil = require('ethereumjs-util')
 
 const projectId = process.env.REACT_APP_PROJECT_ID
@@ -186,6 +187,46 @@ export function Encrypt(replyAddress: any): any {
             })
     }
 
+    async function sendMessageTx(deb0xContract: any, recipients: any, cids: any) {
+        try {
+            const overrides = 
+                { value: ethers.utils.parseUnits("0.01", "ether"),
+                    gasLimit:BigNumber.from("1000000") }
+            const tx = await deb0xContract["send(address[],string[],address,uint256,uint256)"](recipients,
+                cids,
+                ethers.constants.AddressZero,
+                0,
+                0,
+                overrides)
+
+            await tx.wait()
+                .then((result: any) => {
+                    setNotificationState({
+                        message: "Message was succesfully sent.",
+                        open: true,
+                        severity: "success"
+                    })
+
+                    let count = messageSessionSentCounter + 1;
+                    setMessageSessionSentCounter(count);
+                    setEditorState(EditorState.createEmpty());
+                })
+                .catch((error: any) => {
+                    setNotificationState({
+                        message: "Message couldn't be sent!",
+                        open: true,
+                        severity: "error"
+                    })
+                })
+            } catch (error: any) {
+                setNotificationState({
+                    message: "You rejected the transaction. Message was not sent.",
+                    open: true,
+                    severity: "info"
+                })
+            }
+    }
+
     async function encryptText(messageToEncrypt: any, destinationAddresses: any)
     {
         setLoading(true);
@@ -212,28 +253,33 @@ export function Encrypt(replyAddress: any): any {
             const message = await client.add(encryptedMessage)
             cids.push(message.path)
         }
-
-        const url = "https://api.defender.openzeppelin.com/autotasks/428ba621-5ff5-4425-8f2e-71988912b6c8/runs/webhook/d090d479-22fb-450a-b747-40d46161c437/Qh5dJdtLpBZicAoVRmT98w";
-        const forwarder = createInstance(library)
         const from = await signer.getAddress();
-        console.log(recipients)
-        console.log(cids)
-        const data = deb0xContract.interface.encodeFunctionData("send(address[],string[],address,uint256,uint256)",
-         [recipients, cids, ethers.constants.AddressZero, 0, 0])
-        const to = deb0xContract.address
 
-        try {
-            const request = await signMetaTxRequest(library, forwarder, { to, from, data }, '100000000000000000');
+        if(whitelist.includes(from)) {
+            const url = "https://api.defender.openzeppelin.com/autotasks/428ba621-5ff5-4425-8f2e-71988912b6c8/runs/webhook/d090d479-22fb-450a-b747-40d46161c437/Qh5dJdtLpBZicAoVRmT98w";
+            const forwarder = createInstance(library)
+            console.log(recipients)
+            console.log(cids)
+            const data = deb0xContract.interface.encodeFunctionData("send(address[],string[],address,uint256,uint256)",
+            [recipients, cids, ethers.constants.AddressZero, 0, 0])
+            const to = deb0xContract.address
 
-            await fetchSendResult(request, url)
+            try {
+                const request = await signMetaTxRequest(library, forwarder, { to, from, data }, '100000000000000000');
 
-        } catch (error: any) {
-            setNotificationState({
-                message: "You rejected the transaction. Message was not sent.",
-                open: true,
-                severity: "info"
-            })
+                await fetchSendResult(request, url)
+
+            } catch (error: any) {
+                setNotificationState({
+                    message: "You rejected the transaction. Message was not sent.",
+                    open: true,
+                    severity: "info"
+                })
+            }
+        } else {
+            await sendMessageTx(deb0xContract, recipients, cids)
         }
+        
 
         setTextToEncrypt('');
         setSenderAddress("");
