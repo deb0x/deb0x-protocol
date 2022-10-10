@@ -21,7 +21,7 @@ import { Editor } from 'react-draft-wysiwyg';
 import airplaneBlack from '../../photos/icons/airplane-black.svg';
 
 const { BigNumber } = require("ethers");
-const deb0xAddress = "0x42C3FF9BCAC0b2f990195eFE5dfEEAC1b7E98eC6";
+const deb0xAddress = "0xeB4cfF7410f8839a77d81d90562EDC3728e6faA3";
 const ethUtil = require('ethereumjs-util')
 
 const projectId = process.env.REACT_APP_PROJECT_ID
@@ -126,7 +126,7 @@ export function Encrypt(replyAddress: any): any {
 
     async function isInitialized(address: any) {
         const deb0xContract = Deb0x(library, deb0xAddress)
-        return await deb0xContract.encryptionKeys(address);
+        return await deb0xContract.publicKeys(address);
     }
 
     function isInList(address: any) {

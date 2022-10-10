@@ -3,7 +3,7 @@ pragma solidity ^0.8.11;
 
 import "./Deb0xCore.sol";
 import "./DBX.sol";
-import "hardhat/console.sol";
+
 
 contract Deb0x is Deb0xCore {
     //Message setup

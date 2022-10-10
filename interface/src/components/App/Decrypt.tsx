@@ -29,7 +29,7 @@ import ReadedMessagesContext from '../Contexts/ReadedMessagesContext';
 import ReadedMessagesProvider from '../Contexts/ReadedMessagesProvider';
 import { Encrypt } from './Encrypt';
 
-const deb0xAddress = "0x42C3FF9BCAC0b2f990195eFE5dfEEAC1b7E98eC6";
+const deb0xAddress = "0xeB4cfF7410f8839a77d81d90562EDC3728e6faA3";
 
 export function Decrypt(props: any): any {
     const { account, library } = useWeb3React()
@@ -279,10 +279,9 @@ export function Decrypt(props: any): any {
             processMessages()
         }, []);
 
-
-
         async function processMessages() {
             const deb0xContract = Deb0x(library, deb0xAddress)
+
             const senderAddresses = 
                 await deb0xContract.fetchMessageSenders(account)
             const cidsPromises = 
@@ -299,7 +298,7 @@ export function Decrypt(props: any): any {
                 cids.map(async function(cidArray: any) {
                     const encryptedMessagesPromises = 
                         cidArray.cids.map(async function (cid: any) {
-                            const unixTimestamp = cid.blockTimestamp.toString()
+                            const unixTimestamp = cid.timestamp.toString()
 
                             const milliseconds = unixTimestamp * 1000 
 
@@ -307,7 +306,7 @@ export function Decrypt(props: any): any {
 
                             const humanDateFormat = dateObject.toLocaleString()
                             return { 
-                                fetchedMessage: await fetchMessage(cid.cid),
+                                fetchedMessage: await fetchMessage(cid.content),
                                 sender: cidArray.sender,
                                 timestamp: humanDateFormat
                             }

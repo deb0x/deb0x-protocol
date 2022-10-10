@@ -18,7 +18,7 @@ import cloud2 from '../../photos/icons/clouds/cloud-2.svg';
 import cloud3 from '../../photos/icons/clouds/cloud-3.svg';
 
 const axios = require('axios')
-const deb0xAddress = "0x42C3FF9BCAC0b2f990195eFE5dfEEAC1b7E98eC6"
+const deb0xAddress = "0xeB4cfF7410f8839a77d81d90562EDC3728e6faA3"
 
 export function Sent(props: any): any {
     const { account, library } = useWeb3React()
@@ -265,8 +265,8 @@ export function Sent(props: any): any {
             const sentMessages = await deb0xContract.fetchSentMessages(account)  
 
             const sentMessagesRetrieved = sentMessages.map(async function (item: any) {
-                const fetchedMessageContent = await fetchMessage(item.contentData.cid)
-                const unixTimestamp = item.contentData.blockTimestamp.toString()
+                const fetchedMessageContent = await fetchMessage(item.contentData.content)
+                const unixTimestamp = item.contentData.timestamp.toString()
 
                 const milliseconds = unixTimestamp * 1000 
 

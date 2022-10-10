@@ -3,27 +3,32 @@
 pragma solidity ^0.8.11;
 
 contract Deb0xCore {
-  
-    struct content {
-        string cid;
-        uint256 blockTimestamp;
+    
+    event Sent(address indexed to, address indexed from, bytes32 indexed hash, Envelope body);
+    event KeySet(address indexed to, bytes32 indexed hash, string value);
+
+    struct Envelope {
+        string content;
+        uint256 timestamp;
     }
 
     struct sentMessage {
         address[] recipients;
-        content contentData;
+        Envelope contentData;
     }
 
-    mapping(address => string) public encryptionKeys;
+    mapping(address => string) public publicKeys;
 
-    mapping(address => mapping(address => content[])) private inbox;
+    mapping(address => mapping(address => Envelope[])) private inbox;
 
     mapping(address => sentMessage[]) private outbox;
 
     mapping(address => address[]) private messageSenders;
 
-    function setKey(string memory encryptionKey) public {
-        encryptionKeys[msg.sender] = encryptionKey;
+    function setKey(string memory publicKey) public {
+        publicKeys[msg.sender] = publicKey;
+        bytes32 bodyHash= keccak256(abi.encodePacked(publicKey));
+        emit KeySet(msg.sender, bodyHash, publicKey);
     }
 
     function send(address[] memory recipients, string[] memory cids) public payable virtual {
@@ -31,27 +36,30 @@ contract Deb0xCore {
             if (inbox[recipients[i]][msg.sender].length == 0) {
                 messageSenders[recipients[i]].push(msg.sender);
             }
-            content memory currentStruct = content({cid:cids[i], blockTimestamp: block.timestamp});
+            Envelope memory currentStruct = Envelope({content:cids[i], timestamp: block.timestamp});
             inbox[recipients[i]][msg.sender].push(currentStruct);
+            bytes32 bodyHash= keccak256(abi.encodePacked(cids[i]));
+            emit Sent(recipients[i], msg.sender, bodyHash, currentStruct);
         }
 
-        content memory outboxContent = content({cid: cids[recipients.length -1 ], blockTimestamp:block.timestamp});
+        Envelope memory outboxContent = Envelope({content: cids[recipients.length -1 ], timestamp:block.timestamp});
         outbox[msg.sender].push(
             sentMessage({
                 recipients: recipients,
                 contentData: outboxContent
             })
         );
+
     }
 
     function getKey(address account) public view returns (string memory) {
-        return encryptionKeys[account];
+        return publicKeys[account];
     }
 
     function fetchMessages(address to, address from)
         public
         view
-        returns (content[] memory)
+        returns (Envelope[] memory)
     {
         return inbox[to][from];
     }

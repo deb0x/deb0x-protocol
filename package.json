@@ -24,11 +24,12 @@
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.7.0",
     "hardhat": "^2.8.0",
-    "solidity-coverage": "^0.8.2",
-    "react-error-overlay": "^6.0.9"
+    "react-error-overlay": "^6.0.9",
+    "solidity-coverage": "^0.8.2"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.5.0",
+    "@remix-project/remixd": "^0.6.6",
     "dotenv": "^10.0.0",
     "draftjs-to-html": "^0.9.1",
     "solidity-coverage": "^0.8.2"
