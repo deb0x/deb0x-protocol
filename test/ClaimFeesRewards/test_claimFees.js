@@ -147,7 +147,7 @@ describe("Test fee claiming for users/frontends", async function () {
     diff = totalFeesClaimed.sub(feesCollected)
     
     expect(diff).to.not.eq(0)
-    expect(totalFeesClaimed.sub(diff)).to.equal(feesCollected)
+    expect(totalFeesClaimed).to.equal(feesCollected)
   })
 
 
