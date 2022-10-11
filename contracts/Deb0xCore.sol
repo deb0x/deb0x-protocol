@@ -4,8 +4,10 @@ pragma solidity ^0.8.11;
 
 contract Deb0xCore {
     
-    event Sent(address indexed to, address indexed from, bytes32 indexed hash, Envelope body);
+    event Sent(address indexed to, address indexed from, bytes32 indexed hash, Envelope body,uint256 sentId);
     event KeySet(address indexed to, bytes32 indexed hash, string value);
+
+    uint256 sentId;
 
     struct Envelope {
         string content;
@@ -39,7 +41,7 @@ contract Deb0xCore {
             Envelope memory currentStruct = Envelope({content:cids[i], timestamp: block.timestamp});
             inbox[recipients[i]][msg.sender].push(currentStruct);
             bytes32 bodyHash= keccak256(abi.encodePacked(cids[i]));
-            emit Sent(recipients[i], msg.sender, bodyHash, currentStruct);
+            emit Sent(recipients[i], msg.sender, bodyHash, currentStruct,sentId);
         }
 
         Envelope memory outboxContent = Envelope({content: cids[recipients.length -1 ], timestamp:block.timestamp});
@@ -49,7 +51,7 @@ contract Deb0xCore {
                 contentData: outboxContent
             })
         );
-
+        sentId++;
     }
 
     function getKey(address account) public view returns (string memory) {

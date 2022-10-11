@@ -45,7 +45,14 @@ contract Deb0x is Deb0xCore {
     mapping(address => uint256) userFirstStake;
     mapping(address => uint256) userSecondStake;
 
-    event FeesClaimed(uint256 fees);
+    //TO DO: add cycle number to Sent envent!!!
+    event FrontEndFeesClaimed(address indexed userAddress, uint256 fees,uint256 cycle);
+    event FeesClaimed(address indexed userAddress, uint256 fees,uint256 cycle);
+    event Staked(address indexed userAddress,uint256 amount, uint256 cycle);
+    event Unstaked(address indexed userAddress, uint256 amount,uint256 cycle);
+    event FrontEndRewardsClaimed(address indexed userAddress, uint256 anount,uint256 cycle);
+    event RewardsClaimed(address indexed userAddress, uint256 anount,uint256 cycle);
+    event NewCycleStarted(uint256 indexed currentCycle,uint256 calculatedCycleReward,uint256 summedCycleStakes);
 
     constructor() {
         dbx = new DBX();
@@ -105,6 +112,7 @@ contract Deb0x is Deb0xCore {
                 summedCycleStakes[currentStartedCycle] -= pendingStakeWithdrawal;
                 pendingStakeWithdrawal = 0;
             }
+            emit NewCycleStarted(currentCycle,calculatedCycleReward, summedCycleStakes[currentStartedCycle]);
         }
         _;
     }
@@ -203,7 +211,7 @@ contract Deb0x is Deb0xCore {
         userCycleMessages[msg.sender]++;
         cycleTotalMessages[currentCycle]++;
         lastActiveCycle[msg.sender] = currentCycle;
-
+        //TO DO: include feeReciever(frontend) in Sent event
         if(feeReceiver != address(0)) {
             if(msgFee != 0) {
                 userCycleFeePercent[msg.sender]+= msgFee;
@@ -228,7 +236,7 @@ contract Deb0x is Deb0xCore {
             summedCycleStakes[currentCycle] = summedCycleStakes[currentCycle] - reward;
         }
         
-        
+        emit RewardsClaimed(msg.sender,reward,currentCycle);
         dbx.mintReward(msg.sender, reward);
     }
 
@@ -243,6 +251,8 @@ contract Deb0x is Deb0xCore {
         } else {
             summedCycleStakes[currentCycle] = summedCycleStakes[currentCycle] - reward;
         }
+
+        emit FrontEndFeesClaimed(msg.sender,reward,currentCycle);
         dbx.mintReward(msg.sender, reward);
     }
     
@@ -252,7 +262,7 @@ contract Deb0x is Deb0xCore {
         require(fees > 0, "Deb0x: You do not have accrued fees");
         frontEndAccruedFees[msg.sender] = 0;
         sendViaCall(payable(msg.sender), fees);
-        emit FeesClaimed(fees);
+        emit FrontEndFeesClaimed(msg.sender,fees,getCurrentCycle());
     }
 
     function claimFees() public calculateCycle updateCycleFeesPerStakeSummed notify(msg.sender){
@@ -260,7 +270,7 @@ contract Deb0x is Deb0xCore {
         require(fees > 0, "Deb0x: You do not have accrued fees");
         addressAccruedFees[msg.sender] = 0;
         sendViaCall(payable(msg.sender), fees);
-        emit FeesClaimed(fees);
+        emit FeesClaimed(msg.sender,fees,getCurrentCycle());
     }
 
     function stakeDBX(uint256 _amount)
@@ -288,6 +298,7 @@ contract Deb0x is Deb0xCore {
             }
         userStakeCycle[msg.sender][cycleToSet] += _amount;
 
+        //emit Stake( msg.sender,  _amount,  cycleToSet);
         dbx.transferFrom(msg.sender, address(this), _amount);
     }
 
@@ -307,7 +318,8 @@ contract Deb0x is Deb0xCore {
         }
         userWithdrawableStake[msg.sender] -= _amount;
         addressRewards[msg.sender] -= _amount;
-    
+
+    //    emit Unstake( msg.sender,  _amount);
         dbx.transfer(msg.sender, _amount);
     }
 
