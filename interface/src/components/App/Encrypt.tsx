@@ -19,6 +19,7 @@ import draftToHtml from 'draftjs-to-html';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { Editor } from 'react-draft-wysiwyg';
 import airplaneBlack from '../../photos/icons/airplane-black.svg';
+import { getKey } from '../Common/EventLogs.mjs';
 
 const { BigNumber } = require("ethers");
 const deb0xAddress = "0xeB4cfF7410f8839a77d81d90562EDC3728e6faA3";
@@ -146,7 +147,8 @@ export function Encrypt(replyAddress: any): any {
         recipients.push(await signer.getAddress())
         const deb0xContract = Deb0x(signer, deb0xAddress);
         for (let address of recipients) {
-            const destinationAddressEncryptionKey = await deb0xContract.getKey(address);
+            const destinationAddressEncryptionKey = await getKey(address);
+            ;
             const encryptedMessage = ethUtil.bufferToHex(
                 Buffer.from(
                     JSON.stringify(
@@ -230,7 +232,7 @@ export function Encrypt(replyAddress: any): any {
 
     const getPublicEncryptionKey = async () => {
         const deb0xContract = Deb0x(library, deb0xAddress)
-        const key = await deb0xContract.getKey(account)
+        const key = await getKey(account)
         setEncryptionKeyInitialized(key)
     }
     const [editorState, setEditorState] = useState(() =>

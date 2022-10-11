@@ -2,6 +2,7 @@ import { useState, useEffect, useContext, createContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Deb0x from "../../ethereum/deb0x"
 import { ethers } from "ethers";
+import {fetchMessages,fetchMessageSenders} from '../Common/EventLogs.mjs';
 import {
     Tooltip, List, ListItem, ListItemText, ListItemButton, Typography, Box, 
     CircularProgress,
@@ -28,6 +29,7 @@ import avatar from '../../photos/icons/avatars/test-avatar-1.svg';
 import ReadedMessagesContext from '../Contexts/ReadedMessagesContext';
 import ReadedMessagesProvider from '../Contexts/ReadedMessagesProvider';
 import { Encrypt } from './Encrypt';
+import {getKey} from "../Common/EventLogs.mjs";
 
 const deb0xAddress = "0xeB4cfF7410f8839a77d81d90562EDC3728e6faA3";
 
@@ -47,7 +49,8 @@ export function Decrypt(props: any): any {
 
     const getPublicEncryptionKey = async () => {
         const deb0xContract = Deb0x(library, deb0xAddress)
-        const key = await deb0xContract.getKey(account)
+      
+        const key = await getKey(account);
         const initialized = (key != '') ? true : false
         setEncryptionKeyInitialized(initialized)
     }
@@ -281,25 +284,23 @@ export function Decrypt(props: any): any {
 
         async function processMessages() {
             const deb0xContract = Deb0x(library, deb0xAddress)
-
+            
             const senderAddresses = 
-                await deb0xContract.fetchMessageSenders(account)
+                await fetchMessageSenders(account)
             const cidsPromises = 
                 senderAddresses.map(async function(sender:any) {
                     return { 
-                        cids: await deb0xContract.fetchMessages(account, sender),
+                        cids: await fetchMessages(account,sender),
                         sender: sender
                     }
                 })
 
             const cids = await Promise.all(cidsPromises)
-
             const encryptedMessagesPromisesArray = 
                 cids.map(async function(cidArray: any) {
                     const encryptedMessagesPromises = 
                         cidArray.cids.map(async function (cid: any) {
                             const unixTimestamp = cid.timestamp.toString()
-
                             const milliseconds = unixTimestamp * 1000 
 
                             const dateObject = new Date(milliseconds)

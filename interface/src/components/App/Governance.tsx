@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Deb0x from "../../ethereum/deb0x"
+import {fetchMessages,fetchMessageSenders} from '../Common/EventLogs.mjs';
 import {
     List, Card, CardActions, CardContent, Button, Grid, Box,
     Typography, TextField, CircularProgress, Divider
@@ -91,10 +92,10 @@ export function Governance(props: any): any {
         async function processMessages() {
             const deb0xContract = Deb0x(library, deb0xAddress)
             
-            const senderAddresses = await deb0xContract.fetchMessageSenders(account)
+            const senderAddresses =  await fetchMessageSenders(account)
 
             const cidsPromises = senderAddresses.map(async function(sender:any){
-                return { cids: await deb0xContract.fetchMessages(account, sender), sender: sender}
+                return { cids: await fetchMessages(account,sender), sender: sender}
             })
 
             const cids = await Promise.all(cidsPromises)

@@ -16,6 +16,7 @@ import formatAccountName from '../Common/AccountName';
 import cloud1 from '../../photos/icons/clouds/cloud-1.svg';
 import cloud2 from '../../photos/icons/clouds/cloud-2.svg';
 import cloud3 from '../../photos/icons/clouds/cloud-3.svg';
+import {fetchSentMessages, getKey } from '../Common/EventLogs.mjs';
 
 const axios = require('axios')
 const deb0xAddress = "0xeB4cfF7410f8839a77d81d90562EDC3728e6faA3"
@@ -33,7 +34,7 @@ export function Sent(props: any): any {
 
     const getPublicEncryptionKey = async () => {
         const deb0xContract = Deb0x(library, deb0xAddress)
-        const key = await deb0xContract.getKey(account)
+        const key = await getKey(account)
         const initialized = (key != '') ? true : false
         setEncryptionKeyInitialized(initialized)
     }
@@ -261,7 +262,6 @@ export function Sent(props: any): any {
 
         async function processMessages() {
             const deb0xContract = Deb0x(library, deb0xAddress)
-            
             const sentMessages = await deb0xContract.fetchSentMessages(account)  
 
             const sentMessagesRetrieved = sentMessages.map(async function (item: any) {
