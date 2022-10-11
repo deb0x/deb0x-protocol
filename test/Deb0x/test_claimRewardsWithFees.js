@@ -9,7 +9,7 @@ describe("Test contract", async function () {
     [alice, bob, carol, messageReceiver, feeReceiver] = await ethers.getSigners();
 
     const Deb0x = await ethers.getContractFactory("Deb0x");
-    rewardedAlice = await Deb0x.deploy();
+    rewardedAlice = await Deb0x.deploy(ethers.constants.AddressZero);
     await rewardedAlice.deployed();
 
     const dbxAddress = await rewardedAlice.dbx()
