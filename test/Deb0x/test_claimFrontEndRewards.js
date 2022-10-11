@@ -9,7 +9,7 @@ describe("Test rewards claiming for frontends", async function () {
     [alice, bob, carol, messageReceiver, feeReceiver, feeReceiver2, feeReceiver3] = await ethers.getSigners();
 
     const Deb0x = await ethers.getContractFactory("Deb0x");
-    rewardedAlice = await Deb0x.deploy();
+    rewardedAlice = await Deb0x.deploy(ethers.constants.AddressZero);
     await rewardedAlice.deployed();
 
     const dbxAddress = await rewardedAlice.dbx()

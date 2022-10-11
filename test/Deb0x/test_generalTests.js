@@ -10,7 +10,7 @@ describe("Test DBX tokens distributions", async function() {
         [user1, user2, user3, messageReceiver, feeReceiver] = await ethers.getSigners();
 
         const Deb0x = await ethers.getContractFactory("Deb0x");
-        userReward = await Deb0x.deploy();
+        userReward = await Deb0x.deploy(ethers.constants.AddressZero);
         await userReward.deployed();
 
         const dbxAddress = await userReward.dbx()

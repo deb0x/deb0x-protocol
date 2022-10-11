@@ -11,7 +11,7 @@ describe("Test unstake functionality", async function() {
         [user1, user2, user3, messageReceiver, feeReceiver] = await ethers.getSigners();
 
         const Deb0x = await ethers.getContractFactory("Deb0x");
-        deb0xContract = await Deb0x.deploy();
+        deb0xContract = await Deb0x.deploy(ethers.constants.AddressZero);
         await deb0xContract.deployed();
 
         const dbxAddress = await deb0xContract.dbx()
