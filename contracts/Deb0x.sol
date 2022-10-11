@@ -47,7 +47,8 @@ contract Deb0x is Deb0xCore {
 
     event FeesClaimed(uint256 fees);
 
-    constructor() {
+    constructor(address forwarder)
+    Deb0xCore(forwarder) {
         dbx = new DBX();
         i_initialTimestamp = block.timestamp;
         i_periodDuration = 1 days;
@@ -196,17 +197,17 @@ contract Deb0x is Deb0xCore {
         calculateCycle
         updateCycleFeesPerStakeSummed
         setUpNewCycle
-        notify(msg.sender)
+        notify(_msgSender())
     {
         updateFrontEndStats(feeReceiver);
 
-        userCycleMessages[msg.sender]++;
+        userCycleMessages[_msgSender()]++;
         cycleTotalMessages[currentCycle]++;
-        lastActiveCycle[msg.sender] = currentCycle;
+        lastActiveCycle[_msgSender()] = currentCycle;
 
         if(feeReceiver != address(0)) {
             if(msgFee != 0) {
-                userCycleFeePercent[msg.sender]+= msgFee;
+                userCycleFeePercent[_msgSender()]+= msgFee;
                 frontendCycleFeePercent[feeReceiver]+= msgFee;
             }
             if(nativeTokenFee != 0) {
@@ -218,10 +219,10 @@ contract Deb0x is Deb0xCore {
         //cycleAccruedFees[currentCycle] += msg.value;
     }
 
-    function claimRewards() public calculateCycle updateCycleFeesPerStakeSummed  notify(msg.sender) {
-        uint256 reward = addressRewards[msg.sender] - userWithdrawableStake[msg.sender];
+    function claimRewards() public calculateCycle updateCycleFeesPerStakeSummed  notify(_msgSender()) {
+        uint256 reward = addressRewards[_msgSender()] - userWithdrawableStake[_msgSender()];
         require(reward > 0, "Deb0x: You do not have rewards");
-        addressRewards[msg.sender] -= reward;
+        addressRewards[_msgSender()] -= reward;
         if(lastStartedCycle == currentStartedCycle){
             pendingStakeWithdrawal += reward;
         } else {
@@ -229,37 +230,37 @@ contract Deb0x is Deb0xCore {
         }
         
         
-        dbx.mintReward(msg.sender, reward);
+        dbx.mintReward(_msgSender(), reward);
     }
 
     function claimFrontEndRewards() public calculateCycle updateCycleFeesPerStakeSummed  {
-        updateFrontEndStats(msg.sender);
+        updateFrontEndStats(_msgSender());
 
-        uint256 reward = frontendRewards[msg.sender];
+        uint256 reward = frontendRewards[_msgSender()];
         require(reward > 0, "Deb0x: You do not have rewards");
-        frontendRewards[msg.sender] = 0;
+        frontendRewards[_msgSender()] = 0;
         if(lastStartedCycle == currentStartedCycle){
             pendingStakeWithdrawal += reward;
         } else {
             summedCycleStakes[currentCycle] = summedCycleStakes[currentCycle] - reward;
         }
-        dbx.mintReward(msg.sender, reward);
+        dbx.mintReward(_msgSender(), reward);
     }
     
     function claimFrontEndFees() public calculateCycle updateCycleFeesPerStakeSummed {
-        updateFrontEndStats(msg.sender);
-        uint256 fees = frontEndAccruedFees[msg.sender];
+        updateFrontEndStats(_msgSender());
+        uint256 fees = frontEndAccruedFees[_msgSender()];
         require(fees > 0, "Deb0x: You do not have accrued fees");
-        frontEndAccruedFees[msg.sender] = 0;
-        sendViaCall(payable(msg.sender), fees);
+        frontEndAccruedFees[_msgSender()] = 0;
+        sendViaCall(payable(_msgSender()), fees);
         emit FeesClaimed(fees);
     }
 
-    function claimFees() public calculateCycle updateCycleFeesPerStakeSummed notify(msg.sender){
-        uint256 fees = addressAccruedFees[msg.sender];
+    function claimFees() public calculateCycle updateCycleFeesPerStakeSummed notify(_msgSender()){
+        uint256 fees = addressAccruedFees[_msgSender()];
         require(fees > 0, "Deb0x: You do not have accrued fees");
-        addressAccruedFees[msg.sender] = 0;
-        sendViaCall(payable(msg.sender), fees);
+        addressAccruedFees[_msgSender()] = 0;
+        sendViaCall(payable(_msgSender()), fees);
         emit FeesClaimed(fees);
     }
 
@@ -267,7 +268,7 @@ contract Deb0x is Deb0xCore {
         external
         calculateCycle
         updateCycleFeesPerStakeSummed
-        notify(msg.sender)
+        notify(_msgSender())
     {
         require(_amount != 0, "Deb0x: your amount is 0");
         pendingStake += _amount;
@@ -277,38 +278,38 @@ contract Deb0x is Deb0xCore {
             cycleToSet = currentCycle;
         }
 
-        if(currentCycle != userFirstStake[msg.sender] &&
-            currentCycle != userSecondStake[msg.sender]) {
-                if(userFirstStake[msg.sender] == 0) {
-                    userFirstStake[msg.sender] = cycleToSet;
+        if(currentCycle != userFirstStake[_msgSender()] &&
+            currentCycle != userSecondStake[_msgSender()]) {
+                if(userFirstStake[_msgSender()] == 0) {
+                    userFirstStake[_msgSender()] = cycleToSet;
             
-                } else if(userSecondStake[msg.sender] == 0) {
-                    userSecondStake[msg.sender] = cycleToSet;
+                } else if(userSecondStake[_msgSender()] == 0) {
+                    userSecondStake[_msgSender()] = cycleToSet;
                 }
             }
-        userStakeCycle[msg.sender][cycleToSet] += _amount;
+        userStakeCycle[_msgSender()][cycleToSet] += _amount;
 
-        dbx.transferFrom(msg.sender, address(this), _amount);
+        dbx.transferFrom(_msgSender(), address(this), _amount);
     }
 
     function unstake(uint256 _amount) 
         external
         calculateCycle
         updateCycleFeesPerStakeSummed
-        notify(msg.sender)
+        notify(_msgSender())
     {
         require(_amount != 0, "Deb0x: your amount is 0");
-        require(_amount <= userWithdrawableStake[msg.sender], "Deb0x: can not unstake more than you've staked");
+        require(_amount <= userWithdrawableStake[_msgSender()], "Deb0x: can not unstake more than you've staked");
 
         if(lastStartedCycle == currentStartedCycle){
             pendingStakeWithdrawal += _amount;
         } else {
             summedCycleStakes[currentCycle] -= _amount;
         }
-        userWithdrawableStake[msg.sender] -= _amount;
-        addressRewards[msg.sender] -= _amount;
+        userWithdrawableStake[_msgSender()] -= _amount;
+        addressRewards[_msgSender()] -= _amount;
     
-        dbx.transfer(msg.sender, _amount);
+        dbx.transfer(_msgSender(), _amount);
     }
 
     function sendViaCall(address payable _to, uint256 _amount) private {

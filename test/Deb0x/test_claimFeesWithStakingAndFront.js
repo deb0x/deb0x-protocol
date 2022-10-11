@@ -82,8 +82,11 @@ describe("Test fee claiming for both users and frontends and concurrently stake/
     }
     const feesCollected = (await rewardedAlice.cycleAccruedFees(0))
       .add(await rewardedAlice.cycleAccruedFees(1))
-      .add(await rewardedAlice.cycleAccruedFees(2))
-    expect(totalFeesClaimed).to.equal(feesCollected)
+      .add(await rewardedAlice.cycleAccruedFees(2));
+
+    const remainder = await hre.ethers.provider.getBalance(rewardedAlice.address);
+    console.log(`remainder: ${remainder}`);          
+    expect(totalFeesClaimed.add(remainder)).to.equal(feesCollected)
   });
 
   // it("Should claim share of rewards after sending a message in the previous day", async () => {
