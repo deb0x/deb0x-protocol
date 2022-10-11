@@ -184,4 +184,47 @@ describe("Test fee claiming for users/frontends", async function () {
     remainder = await hre.ethers.provider.getBalance(rewardedAlice.address);
     expect(totalFeesClaimed.add(remainder)).to.equal(feesCollected)
   })
+
+  
+  it.only("should test getting rewards with allice sending 3 messages and bob 8 to see if any diff",async()=>{
+    await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+    feeReceiver.address,0,0, { value: ethers.utils.parseEther("4") });
+    await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+    feeReceiver.address,0,0, { value: ethers.utils.parseEther("4") });
+    await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+    feeReceiver.address,0,0, { value: ethers.utils.parseEther("4") });
+
+    
+    await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+    feeReceiver.address,0,0, { value: ethers.utils.parseEther("4") });
+    await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+    feeReceiver.address,0,0, { value: ethers.utils.parseEther("4") });
+    await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+    feeReceiver.address,0,0, { value: ethers.utils.parseEther("4") });
+    await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+    feeReceiver.address,0,0, { value: ethers.utils.parseEther("4") });
+    await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+    feeReceiver.address,0,0, { value: ethers.utils.parseEther("4") });
+    await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+    feeReceiver.address,0,0, { value: ethers.utils.parseEther("4") });
+    await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+    feeReceiver.address,0,0, { value: ethers.utils.parseEther("4") });
+    await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+    feeReceiver.address,0,0, { value: ethers.utils.parseEther("4") });
+    
+    await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 1])
+    await hre.ethers.provider.send("evm_mine")
+
+    await rewardedAlice.claimRewards();
+    await rewardedBob.claimRewards();
+
+    let aliceBal = await dbxERC20.balanceOf(alice.address);
+    let bobBal = await dbxERC20.balanceOf(bob.address);
+
+    // difference of 1 
+    expect(aliceBal.add(bobBal)).to.eq(ethers.utils.parseEther("100").sub(1));
+    
+    
+  })
+
 })
