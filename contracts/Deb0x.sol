@@ -51,7 +51,7 @@ contract Deb0x is Deb0xCore {
     Deb0xCore(forwarder) {
         dbx = new DBX();
         i_initialTimestamp = block.timestamp;
-        i_periodDuration = 3 minutes;
+        i_periodDuration = 1 days;
         currentCycleReward = 100 * 1e18;
         summedCycleStakes[0] = 100 * 1e18;
         rewardPerCycle[0] = 100 * 1e18;

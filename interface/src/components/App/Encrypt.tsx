@@ -24,7 +24,7 @@ import { createInstance } from '../../ethereum/forwarder'
 import { whitelist } from '../../constants.json'
 
 const { BigNumber } = require("ethers");
-const deb0xAddress = "0x9BEDEB077d7c3AbC049Aef96d1FFc843fb859610";
+const deb0xAddress = "0x36f7C2858C80e897D450dB6DC7e9D7dD714a9cAB";
 const ethUtil = require('ethereumjs-util')
 
 const projectId = process.env.REACT_APP_PROJECT_ID
@@ -148,7 +148,6 @@ export function Encrypt(replyAddress: any): any {
         })
             .then((response) => response.json())
             .then(async (data) => {
-                console.log(data)
                 try{
                     const {tx: txReceipt} = JSON.parse(data.result)
                     if(txReceipt.status == 1){
@@ -258,8 +257,6 @@ export function Encrypt(replyAddress: any): any {
         if(whitelist.includes(from)) {
             const url = "https://api.defender.openzeppelin.com/autotasks/428ba621-5ff5-4425-8f2e-71988912b6c8/runs/webhook/d090d479-22fb-450a-b747-40d46161c437/Qh5dJdtLpBZicAoVRmT98w";
             const forwarder = createInstance(library)
-            console.log(recipients)
-            console.log(cids)
             const data = deb0xContract.interface.encodeFunctionData("send(address[],string[],address,uint256,uint256)",
             [recipients, cids, ethers.constants.AddressZero, 0, 0])
             const to = deb0xContract.address

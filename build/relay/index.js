@@ -417,17 +417,22 @@ var forwarder = {
     ForwarderAbi: ForwarderAbi$1
 };
 
-var Deb0x="0x80F98b549B723a089fa5eb159Dcc537FD6656d20";var Forwarder="0x99a16aeb993b25B6ef4DE207f900bC437b0dE8F2";var require$$2 = {Deb0x:Deb0x,Forwarder:Forwarder};
+var Deb0x="0x36f7C2858C80e897D450dB6DC7e9D7dD714a9cAB";var Forwarder="0x99a16aeb993b25B6ef4DE207f900bC437b0dE8F2";var require$$2 = {Deb0x:Deb0x,Forwarder:Forwarder};
+
+var whitelist$1=["0x4d5f107366B891d0416D44833e19d0c5aE5f6e34","0xE15D6bCf56d205f66205BA381B99d24E1f1a9bAE","0x31dcF3b5F43e7017425E25E5A0F006B6f065c349"];var require$$3 = {whitelist:whitelist$1};
 
 const { DefenderRelaySigner, DefenderRelayProvider } = require$$0__default["default"];
 
 const { ForwarderAbi } = forwarder;
 const ForwarderAddress = require$$2.Forwarder;
+const Deb0xAddress = require$$2.Deb0x;
+const { whitelist } = require$$3;
 
-async function relay(forwarder, typeHash, domainSeparator, request, signature, whitelist) {
+async function relay(forwarder, typeHash, domainSeparator, request, signature) {
   // Decide if we want to relay this request based on a whitelist
-  const accepts = !whitelist || whitelist.includes(request.to);
+  const accepts = request.to === Deb0xAddress;
   if (!accepts) throw new Error(`Rejected request to ${request.to}`);
+  if (!whitelist.includes(request.from)) throw new Error(`Rejected request from ${request.from}`);
 
   console.log("validating");
   // Validate request on the forwarder contract

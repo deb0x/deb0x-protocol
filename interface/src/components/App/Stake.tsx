@@ -23,8 +23,8 @@ import { signMetaTxRequest } from '../../ethereum/signer';
 import { createInstance } from '../../ethereum/forwarder'
 import { whitelist } from '../../constants.json'
 
-const deb0xAddress = "0x9BEDEB077d7c3AbC049Aef96d1FFc843fb859610"
-const deb0xERC20Address = "0x902f899dd1519E64112f630D9031c3605D285937"
+const deb0xAddress = "0x36f7C2858C80e897D450dB6DC7e9D7dD714a9cAB"
+const deb0xERC20Address = "0x7aA874A945cAe55c25Db030aD6c4a9231eC7cBf8"
 
 export function Stake(props: any): any {
 
@@ -55,7 +55,6 @@ export function Stake(props: any): any {
             })
                 .then((response) => response.json())
                 .then(async (data) => {
-                    console.log(data)
                     try{
                         const {tx: txReceipt} = JSON.parse(data.result)
                         if(txReceipt.status == 1){
@@ -226,7 +225,6 @@ export function Stake(props: any): any {
             })
                 .then((response) => response.json())
                 .then(async (data) => {
-                    console.log(data)
                     try{
                         const {tx: txReceipt} = JSON.parse(data.result)
                         if(txReceipt.status == 1){
@@ -429,9 +427,7 @@ export function Stake(props: any): any {
 
             const totalSupply = await deb0xContract.summedCycleStakes(currentCycle)
 
-            const pendingStakeWithdrawal = await deb0xContract.pendingStakeWithdrawal()
-
-            setTotalStaked(ethers.utils.formatEther(totalSupply.sub(pendingStakeWithdrawal)))
+            setTotalStaked(ethers.utils.formatEther(totalSupply))
         }
 
         async function approveStaking() {
@@ -477,7 +473,6 @@ export function Stake(props: any): any {
             })
                 .then((response) => response.json())
                 .then(async (data) => {
-                    console.log(data)
                     try{
                         const {tx: txReceipt} = JSON.parse(data.result)
                         if(txReceipt.status == 1){
@@ -584,7 +579,6 @@ export function Stake(props: any): any {
             })
                 .then((response) => response.json())
                 .then(async (data) => {
-                    console.log(data)
                     try{
                         const {tx: txReceipt} = JSON.parse(data.result)
                         if(txReceipt.status == 1){
@@ -813,11 +807,7 @@ export function Stake(props: any): any {
 
             const currentStake = await deb0xContract.summedCycleStakes(currentCycle)
 
-            console.log(currentCycle, ethers.utils.formatEther(currentStake))
-
             const pendingStakeWithdrawal = await deb0xContract.pendingStakeWithdrawal()
-
-            console.log(ethers.utils.formatEther(pendingStakeWithdrawal))
     
             // setTotalStaked(ethers.utils.formatEther(currentStake))
 
