@@ -96,7 +96,7 @@ contract Forwarder is IForwarder, ERC165 {
 
         if ( req.value != 0 && address(this).balance>0 ) {
             // can't fail: req.from signed (off-chain) the request, so it must be an EOA...
-            payable(req.from).transfer(address(this).balance);
+            payable(msg.sender).transfer(address(this).balance);
         }
 
         return (success,ret);
