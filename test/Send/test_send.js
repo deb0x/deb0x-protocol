@@ -11,7 +11,7 @@ describe("Test send functionality", async function() {
         [user1, user2, user3, messageReceiver, feeReceiver] = await ethers.getSigners();
 
         const Deb0x = await ethers.getContractFactory("Deb0x");
-        deb0xContract = await Deb0x.deploy();
+        deb0xContract = await Deb0x.deploy(ethers.constants.AddressZero);
         await deb0xContract.deployed();
 
         const dbxAddress = await deb0xContract.dbx()
@@ -92,7 +92,7 @@ describe("Test send functionality from Deb0xCore contract!", async function() {
         [deployer, add1, add2, add3, add4, add5, add6, add7] = await ethers.getSigners();
 
         const Deb0xCore = await ethers.getContractFactory("Deb0xCore");
-        deboxCore = await Deb0xCore.deploy();
+        deboxCore = await Deb0xCore.deploy(ethers.constants.AddressZero);
         await deboxCore.deployed();
     });
 

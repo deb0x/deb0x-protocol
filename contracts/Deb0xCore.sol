@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
-
 pragma solidity ^0.8.11;
+import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 
-contract Deb0xCore {
+contract Deb0xCore  is ERC2771Context {
     
     event Sent(address indexed to, address indexed from, bytes32 indexed hash, Envelope body,uint256 sentId);
     event KeySet(address indexed to, bytes32 indexed hash, string value);
@@ -13,7 +13,7 @@ contract Deb0xCore {
         string content;
         uint256 timestamp;
     }
-
+    
     struct sentMessage {
         address[] recipients;
         Envelope contentData;
@@ -27,28 +27,31 @@ contract Deb0xCore {
 
     mapping(address => address[]) private messageSenders;
 
-    function setKey(string memory publicKey) public {
-        publicKeys[msg.sender] = publicKey;
-        bytes32 bodyHash= keccak256(abi.encodePacked(publicKey));
-        emit KeySet(msg.sender, bodyHash, publicKey);
-    }
+    constructor(address forwarder)
+    ERC2771Context(forwarder) {}
 
+    function setKey(string memory publicKey) public {
+        publicKeys[_msgSender()] = publicKey;
+        bytes32 bodyHash= keccak256(abi.encodePacked(publicKey));
+        emit KeySet(_msgSender(), bodyHash, publicKey);
+    }
+    
     function send(address[] memory recipients, string[] memory cids) public payable virtual {
         for (uint256 i = 0; i < recipients.length - 1; i++) {
-            if (inbox[recipients[i]][msg.sender].length == 0) {
-                messageSenders[recipients[i]].push(msg.sender);
+            if (inbox[recipients[i]][_msgSender()].length == 0) {
+                messageSenders[recipients[i]].push(_msgSender());
             }
             Envelope memory currentStruct = Envelope({content:cids[i], timestamp: block.timestamp});
-            inbox[recipients[i]][msg.sender].push(currentStruct);
+            inbox[recipients[i]][_msgSender()].push(currentStruct);
             bytes32 bodyHash= keccak256(abi.encodePacked(cids[i]));
-            emit Sent(recipients[i], msg.sender, bodyHash, currentStruct,sentId);
+            emit Sent(recipients[i], _msgSender(), bodyHash, currentStruct,sentId);
         }
         Envelope memory currentStruct = Envelope({content:cids[recipients.length -1], timestamp: block.timestamp});
         bytes32 bodyHash= keccak256(abi.encodePacked(cids[recipients.length -1]));
-        emit Sent(msg.sender, msg.sender, bodyHash, currentStruct,sentId);
+        emit Sent(_msgSender(), _msgSender(), bodyHash, currentStruct,sentId);
         
         Envelope memory outboxContent = Envelope({content: cids[recipients.length -1 ], timestamp:block.timestamp});
-        outbox[msg.sender].push(
+        outbox[_msgSender()].push(
             sentMessage({
                 recipients: recipients,
                 contentData: outboxContent

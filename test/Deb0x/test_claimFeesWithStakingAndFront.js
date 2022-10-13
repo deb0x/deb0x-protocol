@@ -10,7 +10,7 @@ describe("Test fee claiming for both users and frontends and concurrently stake/
         [alice, bob, carol, dean, messageReceiver, feeReceiver] = await ethers.getSigners();
 
         const Deb0x = await ethers.getContractFactory("Deb0x");
-        rewardedAlice = await Deb0x.deploy();
+        rewardedAlice = await Deb0x.deploy(ethers.constants.AddressZero);
         await rewardedAlice.deployed();
 
         const dbxAddress = await rewardedAlice.dbx()

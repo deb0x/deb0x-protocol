@@ -8,7 +8,7 @@ describe("Test Deb0xCore contract", async function() {
         [deployer, add1, add2, add3, add4, add5] = await ethers.getSigners();
 
         const Deb0xCore = await ethers.getContractFactory("Deb0xCore");
-        deboxCore = await Deb0xCore.deploy();
+        deboxCore = await Deb0xCore.deploy(ethers.constants.AddressZero);
         await deboxCore.deployed();
     });
 
