@@ -50,8 +50,8 @@ contract Deb0x is Deb0xCore {
     event FeesClaimed(address indexed userAddress, uint256 fees,uint256 cycle);
     event Staked(address indexed userAddress,uint256 amount, uint256 cycle);
     event Unstaked(address indexed userAddress, uint256 amount,uint256 cycle);
-    event FrontEndRewardsClaimed(address indexed userAddress, uint256 anount,uint256 cycle);
-    event RewardsClaimed(address indexed userAddress, uint256 anount,uint256 cycle);
+    event FrontEndRewardsClaimed(address indexed userAddress, uint256 amount,uint256 cycle);
+    event RewardsClaimed(address indexed userAddress, uint256 amount,uint256 cycle);
     event NewCycleStarted(uint256 indexed currentCycle,uint256 calculatedCycleReward,uint256 summedCycleStakes);
 
     constructor() {
@@ -196,7 +196,6 @@ contract Deb0x is Deb0xCore {
             frontEndLastFeeUpdate[frontend] = lastStartedCycle + 1;
         }
     }
-
     function send(address[] memory to, string[] memory payload, address feeReceiver, uint256 msgFee, uint256 nativeTokenFee)
         public
         payable
@@ -252,7 +251,7 @@ contract Deb0x is Deb0xCore {
             summedCycleStakes[currentCycle] = summedCycleStakes[currentCycle] - reward;
         }
 
-        emit FrontEndFeesClaimed(msg.sender,reward,currentCycle);
+        emit FrontEndRewardsClaimed(msg.sender,reward,currentCycle);
         dbx.mintReward(msg.sender, reward);
     }
     
@@ -298,7 +297,7 @@ contract Deb0x is Deb0xCore {
             }
         userStakeCycle[msg.sender][cycleToSet] += _amount;
 
-        //emit Stake( msg.sender,  _amount,  cycleToSet);
+        emit Staked( msg.sender,  _amount,  cycleToSet);
         dbx.transferFrom(msg.sender, address(this), _amount);
     }
 
@@ -319,7 +318,7 @@ contract Deb0x is Deb0xCore {
         userWithdrawableStake[msg.sender] -= _amount;
         addressRewards[msg.sender] -= _amount;
 
-    //    emit Unstake( msg.sender,  _amount);
+       emit Unstaked( msg.sender,  _amount,currentCycle);
         dbx.transfer(msg.sender, _amount);
     }
 

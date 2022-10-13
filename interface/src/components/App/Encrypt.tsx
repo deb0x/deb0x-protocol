@@ -22,7 +22,7 @@ import airplaneBlack from '../../photos/icons/airplane-black.svg';
 import { getKey } from '../Common/EventLogs.mjs';
 
 const { BigNumber } = require("ethers");
-const deb0xAddress = "0xeB4cfF7410f8839a77d81d90562EDC3728e6faA3";
+const deb0xAddress = "0x0bCEf0323C29FD45eAeE7e667492bbdb0cDF76b0";
 const ethUtil = require('ethereumjs-util')
 
 const projectId = process.env.REACT_APP_PROJECT_ID
@@ -197,6 +197,7 @@ export function Encrypt(replyAddress: any): any {
                     })
                 })
         } catch (error: any) {
+            console.log(error);
             setNotificationState({
                 message: "You rejected the transaction. Message was not sent.",
                 open: true,

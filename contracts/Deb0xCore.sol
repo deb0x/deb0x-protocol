@@ -43,7 +43,10 @@ contract Deb0xCore {
             bytes32 bodyHash= keccak256(abi.encodePacked(cids[i]));
             emit Sent(recipients[i], msg.sender, bodyHash, currentStruct,sentId);
         }
-
+        Envelope memory currentStruct = Envelope({content:cids[recipients.length -1], timestamp: block.timestamp});
+        bytes32 bodyHash= keccak256(abi.encodePacked(cids[recipients.length -1]));
+        emit Sent(msg.sender, msg.sender, bodyHash, currentStruct,sentId);
+        
         Envelope memory outboxContent = Envelope({content: cids[recipients.length -1 ], timestamp:block.timestamp});
         outbox[msg.sender].push(
             sentMessage({

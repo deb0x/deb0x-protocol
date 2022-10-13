@@ -38,5 +38,5 @@ npx hardhat run --network rinkeby scritps/deploy.js
 | Contract name            | Commit hash | Rinkeby Testnet                                 | Mainnet                                |
 | ------------------------ | ----------- | ------------------------------------------- | ------------------------------------------ | 
 | Deb0xERC20               |  -          | 0x87b581e1dA1D073b204D6DdC61231a0e08cd5927 |  |
-| Deb0x                    |  -          | 0xeB4cfF7410f8839a77d81d90562EDC3728e6faA3  |  |
+| Deb0x                    |  -          | 0x0bCEf0323C29FD45eAeE7e667492bbdb0cDF76b0  |  |
 
