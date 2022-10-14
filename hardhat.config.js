@@ -33,5 +33,8 @@ module.exports = {
             allowUnlimitedContractSize: true,
             timeout: 1800000
         }
+    },
+    goerli: {
+        apiKey: ""
     }
 };
