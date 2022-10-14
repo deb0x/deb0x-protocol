@@ -25,7 +25,7 @@ import { createInstance } from '../../ethereum/forwarder'
 import { whitelist } from '../../constants.json'
 
 const { BigNumber } = require("ethers");
-const deb0xAddress = "0x36f7C2858C80e897D450dB6DC7e9D7dD714a9cAB";
+const deb0xAddress = "0x149a1685b61445000783c9014aA48501d1B77333";
 const ethUtil = require('ethereumjs-util')
 
 const projectId = process.env.REACT_APP_PROJECT_ID
@@ -130,7 +130,7 @@ export function Encrypt(replyAddress: any): any {
 
     async function isInitialized(address: any) {
         const deb0xContract = Deb0x(library, deb0xAddress)
-        return await deb0xContract.publicKeys(address);
+        return await deb0xContract.getKey(address);
     }
 
     function isInList(address: any) {
