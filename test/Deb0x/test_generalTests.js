@@ -817,7 +817,7 @@ describe("Test DBX tokens distributions", async function() {
         }
     });
 
-    it.only("Multiple stake action and contract balance tests", async() => {
+    it("Multiple stake action and contract balance tests", async() => {
         let balanceBeforeSendMessages = await userReward.contractBalance();
         expect(parseInt(ethers.utils.formatEther(balanceBeforeSendMessages))).to.equal(0);
 

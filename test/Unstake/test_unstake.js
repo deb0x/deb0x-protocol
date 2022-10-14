@@ -4,7 +4,7 @@ const { ethers } = require("hardhat");
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
 const { NumUtils } = require("../utils/NumUtils.ts");
 
-describe.only("Test unstake functionality", async function() {
+describe("Test unstake functionality", async function() {
     let deb0xContract, user1Reward, user2Reward, user3Reward, frontend, dbxERC20;
     let user1, user2;
     beforeEach("Set enviroment", async() => {
