@@ -1,24 +1,27 @@
 // SPDX-License-Identifier: MIT
-
 pragma solidity ^0.8.11;
-
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 
-contract Deb0xCore is ERC2771Context {
-  
-    struct content {
-        string cid;
-        uint256 blockTimestamp;
-    }
+contract Deb0xCore  is ERC2771Context {
+    
+    event Sent(address indexed to, address indexed from, bytes32 indexed hash, Envelope body,uint256 sentId);
+    event KeySet(address indexed to, bytes32 indexed hash, string value);
 
+    uint256 public sentId = 1;
+
+    struct Envelope {
+        string content;
+        uint256 timestamp;
+    }
+    
     struct sentMessage {
         address[] recipients;
-        content contentData;
+        Envelope contentData;
     }
 
-    mapping(address => string) public encryptionKeys;
+    mapping(address => string) public publicKeys;
 
-    mapping(address => mapping(address => content[])) private inbox;
+    mapping(address => mapping(address => Envelope[])) private inbox;
 
     mapping(address => sentMessage[]) private outbox;
 
@@ -27,36 +30,46 @@ contract Deb0xCore is ERC2771Context {
     constructor(address forwarder)
     ERC2771Context(forwarder) {}
 
-    function setKey(string memory encryptionKey) public {
-        encryptionKeys[_msgSender()] = encryptionKey;
+    function setKey(string memory publicKey) public {
+        publicKeys[_msgSender()] = publicKey;
+        bytes32 bodyHash= keccak256(abi.encodePacked(publicKey));
+        emit KeySet(_msgSender(), bodyHash, publicKey);
     }
-
-    function send(address[] memory recipients, string[] memory cids) public payable virtual {
+    
+    function send(address[] memory recipients, string[] memory cids) public payable virtual returns(uint256) {
         for (uint256 i = 0; i < recipients.length - 1; i++) {
             if (inbox[recipients[i]][_msgSender()].length == 0) {
                 messageSenders[recipients[i]].push(_msgSender());
             }
-            content memory currentStruct = content({cid:cids[i], blockTimestamp: block.timestamp});
+            Envelope memory currentStruct = Envelope({content:cids[i], timestamp: block.timestamp});
             inbox[recipients[i]][_msgSender()].push(currentStruct);
+            bytes32 bodyHash= keccak256(abi.encodePacked(cids[i]));
+            emit Sent(recipients[i], _msgSender(), bodyHash, currentStruct,sentId);
         }
-
-        content memory outboxContent = content({cid: cids[recipients.length -1 ], blockTimestamp:block.timestamp});
+        Envelope memory currentStruct = Envelope({content:cids[recipients.length -1], timestamp: block.timestamp});
+        bytes32 bodyHash= keccak256(abi.encodePacked(cids[recipients.length -1]));
+        emit Sent(_msgSender(), _msgSender(), bodyHash, currentStruct,sentId);
+        
+        Envelope memory outboxContent = Envelope({content: cids[recipients.length -1 ], timestamp:block.timestamp});
         outbox[_msgSender()].push(
             sentMessage({
                 recipients: recipients,
                 contentData: outboxContent
             })
         );
+        uint256 oldSentId = sentId;
+        sentId++;
+        return oldSentId;
     }
 
     function getKey(address account) public view returns (string memory) {
-        return encryptionKeys[account];
+        return publicKeys[account];
     }
 
     function fetchMessages(address to, address from)
         public
         view
-        returns (content[] memory)
+        returns (Envelope[] memory)
     {
         return inbox[to][from];
     }

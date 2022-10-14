@@ -2,6 +2,7 @@ import { useState, useEffect, useContext, createContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Deb0x from "../../ethereum/deb0x"
 import { ethers } from "ethers";
+import {fetchMessages,fetchMessageSenders} from '../Common/EventLogs.mjs';
 import {
     Tooltip, List, ListItem, ListItemText, ListItemButton, Typography, Box, 
     CircularProgress,
@@ -28,8 +29,9 @@ import avatar from '../../photos/icons/avatars/test-avatar-1.svg';
 import ReadedMessagesContext from '../Contexts/ReadedMessagesContext';
 import ReadedMessagesProvider from '../Contexts/ReadedMessagesProvider';
 import { Encrypt } from './Encrypt';
+import {getKey} from "../Common/EventLogs.mjs";
 
-const deb0xAddress = "0x36f7C2858C80e897D450dB6DC7e9D7dD714a9cAB";
+const deb0xAddress = "0xD50DBcC07387cAf45F9CF649E258C0Ee76a9D6D3";
 
 export function Decrypt(props: any): any {
     const { account, library } = useWeb3React()
@@ -47,7 +49,8 @@ export function Decrypt(props: any): any {
 
     const getPublicEncryptionKey = async () => {
         const deb0xContract = Deb0x(library, deb0xAddress)
-        const key = await deb0xContract.getKey(account)
+      
+        const key = await getKey(account);
         const initialized = (key != '') ? true : false
         setEncryptionKeyInitialized(initialized)
     }
@@ -279,35 +282,32 @@ export function Decrypt(props: any): any {
             processMessages()
         }, []);
 
-
-
         async function processMessages() {
             const deb0xContract = Deb0x(library, deb0xAddress)
+            
             const senderAddresses = 
-                await deb0xContract.fetchMessageSenders(account)
+                await fetchMessageSenders(account)
             const cidsPromises = 
                 senderAddresses.map(async function(sender:any) {
                     return { 
-                        cids: await deb0xContract.fetchMessages(account, sender),
+                        cids: await fetchMessages(account,sender),
                         sender: sender
                     }
                 })
 
             const cids = await Promise.all(cidsPromises)
-
             const encryptedMessagesPromisesArray = 
                 cids.map(async function(cidArray: any) {
                     const encryptedMessagesPromises = 
                         cidArray.cids.map(async function (cid: any) {
-                            const unixTimestamp = cid.blockTimestamp.toString()
-
+                            const unixTimestamp = cid.timestamp.toString()
                             const milliseconds = unixTimestamp * 1000 
 
                             const dateObject = new Date(milliseconds)
 
                             const humanDateFormat = dateObject.toLocaleString()
                             return { 
-                                fetchedMessage: await fetchMessage(cid.cid),
+                                fetchedMessage: await fetchMessage(cid.content),
                                 sender: cidArray.sender,
                                 timestamp: humanDateFormat
                             }
