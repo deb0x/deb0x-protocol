@@ -1,12 +1,14 @@
 import axios from 'axios';
 
+const deb0xAddress = "0x149a1685b61445000783c9014aA48501d1B77333";
+
 async function getData(eventName) {
 
     let data = selectEvent(eventName);
 
     const options = {
         method: 'POST',
-        url: 'https://deep-index.moralis.io/api/v2/0x0bCEf0323C29FD45eAeE7e667492bbdb0cDF76b0/events',
+        url: `https://deep-index.moralis.io/api/v2/${deb0xAddress}/events`,
         params: {
             chain: 'goerli',
             topic: data.topic
@@ -308,7 +310,7 @@ export async function fetchMessages(to, from) {
 
 export async function fetchMessageSenders(to) {
     let data = await getData("Sent");
-    let messageSenders = data.filter(data => data.data.to.toLowerCase() === to.toLowerCase()).map(data => data.data.from);
+    let messageSenders = data.filter(data => (data.data.to.toLowerCase() === to.toLowerCase()) && (data.data.to.toLowerCase() != data.data.from.toLowerCase())).map(data => data.data.from);
     return messageSenders;
 }
 
