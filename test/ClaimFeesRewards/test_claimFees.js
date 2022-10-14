@@ -186,7 +186,7 @@ describe("Test fee claiming for users/frontends", async function () {
   })
 
   
-  it.only("should test getting rewards with allice sending 3 messages and bob 8 to see if any diff",async()=>{
+  it("should test getting rewards with allice sending 3 messages and bob 8 to see if any diff",async()=>{
     await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
     feeReceiver.address,0,0, { value: ethers.utils.parseEther("4") });
     await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
