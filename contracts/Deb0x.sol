@@ -6,7 +6,6 @@ import "./DBX.sol";
 
 
 contract Deb0x is Deb0xCore {
-    //Message setup
 
     DBX public dbx;
     uint16 public constant MAIL_FEE = 1000;
@@ -45,14 +44,14 @@ contract Deb0x is Deb0xCore {
     mapping(address => uint256) userFirstStake;
     mapping(address => uint256) userSecondStake;
 
-    //TO DO: add cycle number to Sent envent!!!
-    event FrontEndFeesClaimed(address indexed userAddress, uint256 fees,uint256 cycle);
-    event FeesClaimed(address indexed userAddress, uint256 fees,uint256 cycle);
-    event Staked(address indexed userAddress,uint256 amount, uint256 cycle);
-    event Unstaked(address indexed userAddress, uint256 amount,uint256 cycle);
-    event FrontEndRewardsClaimed(address indexed userAddress, uint256 amount,uint256 cycle);
-    event RewardsClaimed(address indexed userAddress, uint256 amount,uint256 cycle);
-    event NewCycleStarted(uint256 indexed currentCycle,uint256 calculatedCycleReward,uint256 summedCycleStakes);
+    event FrontEndFeesClaimed(uint256 indexed cycle, address indexed userAddress, uint256 fees);
+    event FeesClaimed(uint256 indexed cycle, address indexed userAddress, uint256 fees);
+    event Staked(uint256 indexed cycle, address indexed userAddress,uint256 amount);
+    event Unstaked(uint256 indexed cycle, address indexed userAddress, uint256 amount);
+    event FrontEndRewardsClaimed(uint256 indexed cycle, address indexed userAddress, uint256 amount);
+    event RewardsClaimed(uint256 indexed cycle, address indexed userAddress,uint256 reward);
+    event NewCycleStarted(uint256 indexed cycle, uint256 calculatedCycleReward,uint256 summedCycleStakes);
+    event SendEntryCreated(uint256 indexed cycle, uint256 indexed sentId, address indexed feeReceiver, uint256 msgFee, uint256 nativeTokenFee);
 
     constructor(address forwarder)
     Deb0xCore(forwarder) {
@@ -87,9 +86,7 @@ contract Deb0x is Deb0xCore {
             lastStartedCycle = currentStartedCycle;
         }
         if(currentCycle > lastStartedCycle && cycleFeesPerStakeSummed[lastStartedCycle + 1] == 0) {
-            // console.log(lastStartedCycle);
             uint256 feePerStake = cycleAccruedFees[lastStartedCycle] * dividend / summedCycleStakes[lastStartedCycle];
-            // console.log(cycleFeesPerStakeSummed[previousStartedCycle], feePerStake);
             cycleFeesPerStakeSummed[lastStartedCycle + 1] = cycleFeesPerStakeSummed[previousStartedCycle] + feePerStake;
         }
         _;
@@ -102,7 +99,6 @@ contract Deb0x is Deb0xCore {
             currentCycleReward = calculatedCycleReward;
             rewardPerCycle[currentCycle] = calculatedCycleReward;
             pendingCycleRewardsStake = calculatedCycleReward;
-            //lastStartedCycle = currentStartedCycle;
             currentStartedCycle = currentCycle;
             summedCycleStakes[currentStartedCycle] += summedCycleStakes[lastStartedCycle] + currentCycleReward;
             if(pendingStake != 0) {
@@ -113,22 +109,10 @@ contract Deb0x is Deb0xCore {
                 summedCycleStakes[currentStartedCycle] -= pendingStakeWithdrawal;
                 pendingStakeWithdrawal = 0;
             }
-            emit NewCycleStarted(currentCycle,calculatedCycleReward, summedCycleStakes[currentStartedCycle]);
+            emit NewCycleStarted(currentCycle, calculatedCycleReward, summedCycleStakes[currentStartedCycle]);
         }
         _;
     }
-
-    // modifier updateStakeStats() {
-        
-    //     if(summedCycleStakes[currentStartedCycle] == 0) {
-    //         summedCycleStakes[currentStartedCycle] += summedCycleStakes[lastStartedCycle];
-    //         if(pendingStake != 0) {
-    //             summedCycleStakes[currentStartedCycle] += pendingStake;
-    //             pendingStake = 0;
-    //         }
-    //     }
-    //     _;
-    // }
 
     modifier notify(address account) {
         if(currentCycle > lastActiveCycle[account] && userCycleMessages[account] != 0) {
@@ -145,8 +129,6 @@ contract Deb0x is Deb0xCore {
         }
         
         if(currentCycle > lastStartedCycle && lastFeeUpdateCycle[account] != lastStartedCycle + 1){
-            // console.log(lastStartedCycle + 1, lastFeeUpdateCycle[account]);
-            // console.log(cycleFeesPerStakeSummed[lastStartedCycle + 1], cycleFeesPerStakeSummed[lastFeeUpdateCycle[account]]);
             addressAccruedFees[account] = addressAccruedFees[account] + ((addressRewards[account] 
                 * (cycleFeesPerStakeSummed[lastStartedCycle + 1] - cycleFeesPerStakeSummed[lastFeeUpdateCycle[account]]))) / dividend;
             lastFeeUpdateCycle[account] = lastStartedCycle + 1;
@@ -210,7 +192,6 @@ contract Deb0x is Deb0xCore {
 
         userCycleMessages[_msgSender()]++;
         cycleTotalMessages[currentCycle]++;
-        //TO DO: include feeReciever(frontend) in Sent event
         lastActiveCycle[_msgSender()] = currentCycle;
 
         if(feeReceiver != address(0)) {
@@ -223,8 +204,8 @@ contract Deb0x is Deb0xCore {
             }
         }
 
-        super.send(to, payload);
-        //cycleAccruedFees[currentCycle] += msg.value;
+        uint256 sentId = super.send(to, payload);
+        emit SendEntryCreated(currentCycle, sentId, feeReceiver, msgFee, nativeTokenFee);
     }
 
     function claimRewards() public calculateCycle updateCycleFeesPerStakeSummed  notify(_msgSender()) {
@@ -237,7 +218,7 @@ contract Deb0x is Deb0xCore {
             summedCycleStakes[currentCycle] = summedCycleStakes[currentCycle] - reward;
         }
         
-        emit RewardsClaimed(msg.sender,reward,currentCycle);
+        emit RewardsClaimed(currentCycle, msg.sender, reward);
         dbx.mintReward(_msgSender(), reward);
     }
 
@@ -253,7 +234,7 @@ contract Deb0x is Deb0xCore {
             summedCycleStakes[currentCycle] = summedCycleStakes[currentCycle] - reward;
         }
 
-        emit FrontEndRewardsClaimed(msg.sender,reward,currentCycle);
+        emit FrontEndRewardsClaimed(currentCycle,msg.sender,reward);
         dbx.mintReward(_msgSender(), reward);
     }
     
@@ -264,7 +245,7 @@ contract Deb0x is Deb0xCore {
      
         frontEndAccruedFees[_msgSender()] = 0;
         sendViaCall(payable(_msgSender()), fees);
-        emit FrontEndFeesClaimed(msg.sender,fees,getCurrentCycle());
+        emit FrontEndFeesClaimed(getCurrentCycle(), msg.sender, fees);
     }
 
     function claimFees() public calculateCycle updateCycleFeesPerStakeSummed notify(_msgSender()){
@@ -273,7 +254,7 @@ contract Deb0x is Deb0xCore {
        
         addressAccruedFees[_msgSender()] = 0;
         sendViaCall(payable(_msgSender()), fees);
-        emit FeesClaimed(msg.sender,fees,getCurrentCycle());
+        emit FeesClaimed(getCurrentCycle(), msg.sender, fees);
     }
 
     function stakeDBX(uint256 _amount)
@@ -301,7 +282,7 @@ contract Deb0x is Deb0xCore {
             }
         userStakeCycle[_msgSender()][cycleToSet] += _amount;
 
-        emit Staked( msg.sender,  _amount,  cycleToSet);
+        emit Staked(cycleToSet, msg.sender, _amount);
         dbx.transferFrom(_msgSender(), address(this), _amount);
     }
 
@@ -324,7 +305,7 @@ contract Deb0x is Deb0xCore {
         addressRewards[_msgSender()] -= _amount;
     
         dbx.transfer(_msgSender(), _amount);
-        emit Unstaked( msg.sender,  _amount,currentCycle);
+        emit Unstaked(currentCycle,  msg.sender,  _amount);
     }
 
     function sendViaCall(address payable _to, uint256 _amount) private {

@@ -7,7 +7,7 @@ contract Deb0xCore  is ERC2771Context {
     event Sent(address indexed to, address indexed from, bytes32 indexed hash, Envelope body,uint256 sentId);
     event KeySet(address indexed to, bytes32 indexed hash, string value);
 
-    uint256 sentId;
+    uint256 public sentId = 1;
 
     struct Envelope {
         string content;
@@ -36,7 +36,7 @@ contract Deb0xCore  is ERC2771Context {
         emit KeySet(_msgSender(), bodyHash, publicKey);
     }
     
-    function send(address[] memory recipients, string[] memory cids) public payable virtual {
+    function send(address[] memory recipients, string[] memory cids) public payable virtual returns(uint256) {
         for (uint256 i = 0; i < recipients.length - 1; i++) {
             if (inbox[recipients[i]][_msgSender()].length == 0) {
                 messageSenders[recipients[i]].push(_msgSender());
@@ -57,7 +57,9 @@ contract Deb0xCore  is ERC2771Context {
                 contentData: outboxContent
             })
         );
+        uint256 oldSentId = sentId;
         sentId++;
+        return oldSentId;
     }
 
     function getKey(address account) public view returns (string memory) {

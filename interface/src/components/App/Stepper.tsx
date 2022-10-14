@@ -12,7 +12,7 @@ import Deb0x from "../../ethereum/deb0x"
 import SnackbarNotification from './Snackbar';
 import '../../componentsStyling/stepper.scss';
 import { whitelist } from '../../constants.json'
-const deb0xAddress = "0x149a1685b61445000783c9014aA48501d1B77333";
+const deb0xAddress = "0xD50DBcC07387cAf45F9CF649E258C0Ee76a9D6D3";
 const steps = ['Provide public encryption key', 'Initialize Deb0x'];
 
 export default function HorizontalLinearStepper(props: any) {

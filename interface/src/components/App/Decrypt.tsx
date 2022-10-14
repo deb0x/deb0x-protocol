@@ -31,7 +31,7 @@ import ReadedMessagesProvider from '../Contexts/ReadedMessagesProvider';
 import { Encrypt } from './Encrypt';
 import {getKey} from "../Common/EventLogs.mjs";
 
-const deb0xAddress = "0x149a1685b61445000783c9014aA48501d1B77333";
+const deb0xAddress = "0xD50DBcC07387cAf45F9CF649E258C0Ee76a9D6D3";
 
 export function Decrypt(props: any): any {
     const { account, library } = useWeb3React()
