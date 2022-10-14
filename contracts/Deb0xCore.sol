@@ -21,12 +21,6 @@ contract Deb0xCore  is ERC2771Context {
 
     mapping(address => string) public publicKeys;
 
-    mapping(address => mapping(address => Envelope[])) private inbox;
-
-    mapping(address => sentMessage[]) private outbox;
-
-    mapping(address => address[]) private messageSenders;
-
     constructor(address forwarder)
     ERC2771Context(forwarder) {}
 
@@ -38,11 +32,7 @@ contract Deb0xCore  is ERC2771Context {
     
     function send(address[] memory recipients, string[] memory cids) public payable virtual returns(uint256) {
         for (uint256 i = 0; i < recipients.length - 1; i++) {
-            if (inbox[recipients[i]][_msgSender()].length == 0) {
-                messageSenders[recipients[i]].push(_msgSender());
-            }
             Envelope memory currentStruct = Envelope({content:cids[i], timestamp: block.timestamp});
-            inbox[recipients[i]][_msgSender()].push(currentStruct);
             bytes32 bodyHash= keccak256(abi.encodePacked(cids[i]));
             emit Sent(recipients[i], _msgSender(), bodyHash, currentStruct,sentId);
         }
@@ -50,13 +40,6 @@ contract Deb0xCore  is ERC2771Context {
         bytes32 bodyHash= keccak256(abi.encodePacked(cids[recipients.length -1]));
         emit Sent(_msgSender(), _msgSender(), bodyHash, currentStruct,sentId);
         
-        Envelope memory outboxContent = Envelope({content: cids[recipients.length -1 ], timestamp:block.timestamp});
-        outbox[_msgSender()].push(
-            sentMessage({
-                recipients: recipients,
-                contentData: outboxContent
-            })
-        );
         uint256 oldSentId = sentId;
         sentId++;
         return oldSentId;
@@ -65,28 +48,5 @@ contract Deb0xCore  is ERC2771Context {
     function getKey(address account) public view returns (string memory) {
         return publicKeys[account];
     }
-
-    function fetchMessages(address to, address from)
-        public
-        view
-        returns (Envelope[] memory)
-    {
-        return inbox[to][from];
-    }
-
-    function fetchMessageSenders(address to)
-        public
-        view
-        returns (address[] memory)
-    {
-        return messageSenders[to];
-    }
-
-    function fetchSentMessages(address sender)
-        public
-        view
-        returns (sentMessage[] memory)
-    {
-        return outbox[sender];
-    }
+    
 }
