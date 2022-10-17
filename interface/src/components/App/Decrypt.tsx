@@ -345,12 +345,6 @@ export function Decrypt(props: any): any {
                }
                 }
             })
-            // console.log(encryptedMessages.flat())
-            // console.log(sortedEncryptedMessages);
-            // console.log(transactions);
-            // console.log(sortedEncryptedMessages)
-            // setFetchedMessages(encryptedMessages.flat())
-            // setSortedMessages(sortedEncryptedMessages)
             setFetchedMessages(transactions)
             setSortedMessages(transactions)
             setLoading(false)
