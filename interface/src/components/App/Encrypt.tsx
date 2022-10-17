@@ -25,7 +25,7 @@ import { createInstance } from '../../ethereum/forwarder'
 import { whitelist } from '../../constants.json'
 
 const { BigNumber } = require("ethers");
-const deb0xAddress = "0x5Dcf37b1Fd681d410481052C80F3cCECcc8Ce3E3";
+const deb0xAddress = "0x61D7bd5024F2AcaadD2eb8a898fa22DA7c6Fa5Aa";
 const ethUtil = require('ethereumjs-util')
 
 const projectId = process.env.REACT_APP_PROJECT_ID
