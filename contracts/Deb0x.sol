@@ -205,7 +205,7 @@ contract Deb0x is Deb0xCore {
         }
 
         uint256 sentId = super.send(to, payload);
-        emit SendEntryCreated(currentCycle, sentId, feeReceiver, msgFee, nativeTokenFee);
+      //  emit SendEntryCreated(currentCycle, sentId, feeReceiver, msgFee, nativeTokenFee);
     }
 
     function claimRewards() public calculateCycle updateCycleFeesPerStakeSummed  notify(_msgSender()) {
