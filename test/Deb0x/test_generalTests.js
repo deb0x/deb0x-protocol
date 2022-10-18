@@ -2,6 +2,7 @@ const { expect } = require("chai");
 const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
+const { NumUtils } = require("../utils/NumUtils.ts");
 
 describe("Test DBX tokens distributions", async function() {
     let userReward, user1Reward, user2Reward, user3Reward, frontend, dbxERC20;
@@ -31,12 +32,12 @@ describe("Test DBX tokens distributions", async function() {
 
         await user1Reward.claimRewards();
         let balanceForUser1 = await dbxERC20.balanceOf(user1.address);
-        let expectedValueUser1Cycle1 = BigNumber.from("50000000000000000000");
+        let expectedValueUser1Cycle1 = BigNumber.from("5000000000000000000000");
         expect(expectedValueUser1Cycle1).to.equal(balanceForUser1)
 
         await user2Reward.claimRewards();
         let balanceForUser2 = await dbxERC20.balanceOf(user2.address);
-        let expectedValueUser2Cycle1 = BigNumber.from("50000000000000000000");
+        let expectedValueUser2Cycle1 = BigNumber.from("5000000000000000000000");
         expect(expectedValueUser2Cycle1).to.equal(balanceForUser2)
     });
 
@@ -48,12 +49,12 @@ describe("Test DBX tokens distributions", async function() {
 
         await user1Reward.claimRewards();
         let balanceForUser1Cycle1 = await dbxERC20.balanceOf(user1.address);
-        let expectedValueUser1Cycle1 = BigNumber.from("50000000000000000000");
+        let expectedValueUser1Cycle1 = BigNumber.from("5000000000000000000000");
         expect(expectedValueUser1Cycle1).to.equal(balanceForUser1Cycle1)
 
         await user2Reward.claimRewards();
         let balanceForUser2Cycle1 = await dbxERC20.balanceOf(user2.address);
-        let expectedValueUser2Cycle1 = BigNumber.from("50000000000000000000");
+        let expectedValueUser2Cycle1 = BigNumber.from("5000000000000000000000");
         expect(expectedValueUser2Cycle1).to.equal(balanceForUser2Cycle1)
 
         await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -65,14 +66,15 @@ describe("Test DBX tokens distributions", async function() {
         //let rewardToDistributeCycle2 = ethers.utils.formatEther(await userReward.calculateCycleReward());
         //console.log(rewardToDistributeCycle2)
         //Reward to distribute in cycle 2: 99.810360315400738596
+        let secondCycleReward = NumUtils.day(2).div(2);
         await user1Reward.claimRewards();
         let balanceForUser1Cycle2 = await dbxERC20.balanceOf(user1.address);
-        let expectedValueUser1Cycle2 = BigNumber.from("50000000000000000000").add(BigNumber.from("49905180157700369298"));
+        let expectedValueUser1Cycle2 = BigNumber.from("5000000000000000000000").add(BigNumber.from(secondCycleReward));
         expect(expectedValueUser1Cycle2).to.equal(balanceForUser1Cycle2)
 
         await user2Reward.claimRewards();
         let balanceForUser2Cycle2 = await dbxERC20.balanceOf(user2.address);
-        let expectedValueUser2Cycle2 = BigNumber.from("50000000000000000000").add(BigNumber.from("49905180157700369298"));
+        let expectedValueUser2Cycle2 = BigNumber.from("5000000000000000000000").add(BigNumber.from(secondCycleReward));
         expect(expectedValueUser2Cycle2).to.equal(balanceForUser2Cycle2)
 
         await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -84,10 +86,10 @@ describe("Test DBX tokens distributions", async function() {
         //let rewardToDistributeCycle3 = ethers.utils.formatEther(await userReward.calculateCycleReward());
         //console.log(rewardToDistributeCycle3)
         //Reward to distribute in cycle 3: 99.621080262901226266 
-
+        let thidCycleReward = NumUtils.day(3);
         await user1Reward.claimRewards();
         let balanceForUser1Cycle3 = await dbxERC20.balanceOf(user1.address);
-        let expectedValueCycle3 = BigNumber.from("99621080262901226266").add(BigNumber.from("99905180157700369298"));
+        let expectedValueCycle3 = BigNumber.from(expectedValueUser1Cycle2).add(BigNumber.from(thidCycleReward));
         expect(expectedValueCycle3).to.equal(balanceForUser1Cycle3)
     });
 
@@ -99,7 +101,7 @@ describe("Test DBX tokens distributions", async function() {
 
         await user1Reward.claimRewards();
         let balanceForUser1Cycle1 = await dbxERC20.balanceOf(user1.address);
-        let expectedValueCycle1 = BigNumber.from("100000000000000000000");
+        let expectedValueCycle1 = BigNumber.from("10000000000000000000000");
         expect(expectedValueCycle1).to.equal(balanceForUser1Cycle1)
 
         await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -110,10 +112,11 @@ describe("Test DBX tokens distributions", async function() {
         //let rewardToDistributeCycle2 = ethers.utils.formatEther(await userReward.calculateCycleReward());
         //console.log(rewardToDistributeCycle2)
         //Reward to distribute in cycle 2: 99.810360315400738596 
-
+        let firstCycleReward = NumUtils.day(1);
+        let secondCycleReward = NumUtils.day(2);
         await user1Reward.claimRewards();
         let balanceForUser1Cycle2 = await dbxERC20.balanceOf(user1.address);
-        let expectedValueCycle2 = BigNumber.from("100000000000000000000").add(BigNumber.from("99810360315400738596"));
+        let expectedValueCycle2 = BigNumber.from(firstCycleReward).add(BigNumber.from(secondCycleReward));
         expect(expectedValueCycle2).to.equal(balanceForUser1Cycle2)
 
         await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -132,10 +135,10 @@ describe("Test DBX tokens distributions", async function() {
         //let rewardToDistributeCycle3 = ethers.utils.formatEther(await userReward.calculateCycleReward());
         //console.log(rewardToDistributeCycle3)
         //Reward to distribute in cycle 2: 99.621080262901226266
-
+        let thirdCycleReward = NumUtils.day(3);
         await user1Reward.claimRewards();
         let balanceForUser1Cycle3 = await dbxERC20.balanceOf(user1.address);
-        let expectedValueCycle3 = BigNumber.from("199810360315400738596").add(BigNumber.from("99621080262901226266"));
+        let expectedValueCycle3 = BigNumber.from(expectedValueCycle2).add(BigNumber.from(thirdCycleReward));
         expect(expectedValueCycle3).to.equal(balanceForUser1Cycle3)
     });
 
@@ -260,12 +263,12 @@ describe("Test DBX tokens distributions", async function() {
 
         await user1Reward.claimRewards()
         let rewardToClaimForUser1 = await dbxERC20.balanceOf(user1.address);
-        let expectedValueUser1 = BigNumber.from("41000000000000000000");
+        let expectedValueUser1 = BigNumber.from("4100000000000000000000");
         expect(expectedValueUser1).to.equal(rewardToClaimForUser1)
 
         await user2Reward.claimRewards();
         let rewardToClaimForUser2 = await dbxERC20.balanceOf(user2.address);
-        let expectedValueUser2 = BigNumber.from("45000000000000000000");
+        let expectedValueUser2 = BigNumber.from("4500000000000000000000");
         expect(expectedValueUser2).to.equal(rewardToClaimForUser2)
     });
 
@@ -703,7 +706,7 @@ describe("Test DBX tokens distributions", async function() {
 
         await user1Reward.claimRewards()
         let balanceForAlice = await dbxERC20.balanceOf(user1.address);
-        let expectedValueAlice = BigNumber.from("100000000000000000000");
+        let expectedValueAlice = BigNumber.from("10000000000000000000000");
         expect(balanceForAlice).to.equal(expectedValueAlice)
 
         try {
@@ -732,7 +735,7 @@ describe("Test DBX tokens distributions", async function() {
         await frontend.claimFrontEndRewards();
 
         let frontBalance = await dbxERC20.balanceOf(feeReceiver.address)
-        let expectedValueFront = BigNumber.from("10000000000000000000");
+        let expectedValueFront = BigNumber.from("1000000000000000000000");
         expect(expectedValueFront).to.equal(frontBalance)
 
         try {
@@ -895,5 +898,4 @@ describe("Test DBX tokens distributions", async function() {
         let actualBalanceAfterUnstake = await dbxERC20.balanceOf(user3.address);
         expect(expectedValue).to.equal(actualBalanceAfterUnstake)
     });
-
-});
+})

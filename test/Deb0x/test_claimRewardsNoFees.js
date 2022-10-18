@@ -57,7 +57,7 @@ describe("Test contract", async function() {
         await rewardedAlice.claimRewards();
         const balance = await dbxERC20.balanceOf(alice.address);
 
-        const expected = NumUtils.ether(100).div(3);
+        const expected = NumUtils.ether(10000).div(3);
 
         expect(balance).to.equal(expected);
     });
