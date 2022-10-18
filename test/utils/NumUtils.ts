@@ -1,6 +1,6 @@
 const { BigNumberish, BigNumber, utils } = require("ethers"); 
 
-const DAY1_REWARD_ETHER = 100;
+const DAY1_REWARD_ETHER = 10000;
 
 class NumUtils {
     static ether(value /*: typeof BigNumberish*/) {
@@ -12,7 +12,7 @@ class NumUtils {
     }
 
     static day2() {
-        return this.day1().mul(BigNumber.from('10000')).div(BigNumber.from('10019'));
+        return this.day1().mul(BigNumber.from('10000')).div(BigNumber.from('10020'));
     }
 
     static day(number /*: number*/) {
@@ -22,7 +22,7 @@ class NumUtils {
 
         let amount = this.day1();
         while (number > 1) {
-            amount = amount.mul(BigNumber.from('10000')).div(BigNumber.from('10019'));
+            amount = amount.mul(BigNumber.from('10000')).div(BigNumber.from('10020'));
             number--;
         }
 

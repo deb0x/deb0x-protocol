@@ -18,7 +18,7 @@ import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import axios from 'axios';
 import formatAccountName from "../Common/AccountName";
 import "../../componentsStyling/decrypt.scss"
-import { Add } from '@mui/icons-material';
+import { Add, CompressOutlined, ConstructionOutlined } from '@mui/icons-material';
 import { Announcement } from '@mui/icons-material';
 import ContactsSetter from '../ContactsSetter';
 import lock from '../../photos/lock.svg';
@@ -30,8 +30,9 @@ import ReadedMessagesContext from '../Contexts/ReadedMessagesContext';
 import ReadedMessagesProvider from '../Contexts/ReadedMessagesProvider';
 import { Encrypt } from './Encrypt';
 import {getKey} from "../Common/EventLogs.mjs";
+import { commify } from 'ethers/lib/utils';
 
-const deb0xAddress = "0xD50DBcC07387cAf45F9CF649E258C0Ee76a9D6D3";
+const deb0xAddress = "0x03B4a733d4083Eb92972740372Eb05664c937136";
 
 export function Decrypt(props: any): any {
     const { account, library } = useWeb3React()
@@ -313,14 +314,39 @@ export function Decrypt(props: any): any {
                             }
                         })
                     const promise = await Promise.all(encryptedMessagesPromises)
-
+                       
                     return promise
                 })
 
             const encryptedMessages = await Promise.all(encryptedMessagesPromisesArray)
             const sortedEncryptedMessages = encryptedMessages?.flat().reverse()
-            setFetchedMessages(encryptedMessages.flat())
-            setSortedMessages(sortedEncryptedMessages)
+            let sendersArray:any[] = [];
+            let timestampArray:any[] = [];
+            let transactions:any[] = [];
+            let index = 0;
+            sortedEncryptedMessages.forEach(element =>{
+                if(sendersArray.length ==0 ){
+                    sendersArray[index] = element.sender;
+                    timestampArray[index] = element.timestamp;
+                    transactions.push(element);
+                    index++;
+                } else {
+                    let ok= 1;
+                for(let i=0;i<sendersArray.length;i++){
+                    if(sendersArray[i] == element.sender && timestampArray[i] == element.timestamp){
+                        ok=0;
+                    } 
+                }
+                if(ok==1){
+                    sendersArray[index] = element.sender;
+                    timestampArray[index] = element.timestamp;
+                    transactions.push(element);
+                    index++;
+               }
+                }
+            })
+            setFetchedMessages(transactions)
+            setSortedMessages(transactions)
             setLoading(false)
 
         }

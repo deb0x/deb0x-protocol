@@ -41,7 +41,7 @@ describe("Test send functionality", async function() {
 
         await user2Reward.claimRewards()
         let user2Balance = await dbxERC20.balanceOf(user2.address);
-        expect(user2Balance).to.equal("33333333333333333333");
+        expect(user2Balance).to.equal("3333333333333333333333");
 
         await user3Reward.claimRewards()
         let user3Balance = await dbxERC20.balanceOf(user3.address);
