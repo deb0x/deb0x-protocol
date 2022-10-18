@@ -58,9 +58,9 @@ contract Deb0x is Deb0xCore {
         dbx = new DBX();
         i_initialTimestamp = block.timestamp;
         i_periodDuration = 1 days;
-        currentCycleReward = 100 * 1e18;
-        summedCycleStakes[0] = 100 * 1e18;
-        rewardPerCycle[0] = 100 * 1e18;
+        currentCycleReward = 10000 * 1e18;
+        summedCycleStakes[0] = 10000 * 1e18;
+        rewardPerCycle[0] = 10000 * 1e18;
     }
 
     modifier gasWrapper(uint256 nativeTokenFee) {
@@ -322,7 +322,7 @@ contract Deb0x is Deb0xCore {
     }
 
     function calculateCycleReward() public view returns(uint256){
-        return lastCycleReward * 10000 / 10019;
+        return lastCycleReward * 10000 / 10020;
     }
 
     function getUserWithdrawableStake(address staker) public view returns(uint256) {

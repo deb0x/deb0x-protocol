@@ -32,13 +32,13 @@ describe("Test contract functionalities while having cycles with no messages sen
         await hre.ethers.provider.send("evm_mine")
 
         await rewardedAlice.claimRewards()
-        expect(await dbxERC20.balanceOf(alice.address)).to.equal(ethers.utils.parseEther("75"))
+        expect(await dbxERC20.balanceOf(alice.address)).to.equal(ethers.utils.parseEther("7500"))
 
         await hre.ethers.provider.send("evm_increaseTime", [2 * 60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
         await rewardedBob.claimRewards()
-        expect(await dbxERC20.balanceOf(bob.address)).to.equal(ethers.utils.parseEther("25"))
+        expect(await dbxERC20.balanceOf(bob.address)).to.equal(ethers.utils.parseEther("2500"))
     });
 
     it("Should be able to claim previous cycle rewards and not reset current messages counter", async() => {
@@ -65,8 +65,8 @@ describe("Test contract functionalities while having cycles with no messages sen
 
         await rewardedAlice.claimRewards()
         await rewardedBob.claimRewards()
-        expect(await dbxERC20.balanceOf(bob.address)).to.equal(ethers.utils.parseEther("99.810360315400738596"))
-        expect(await dbxERC20.balanceOf(alice.address)).to.equal(ethers.utils.parseEther("199.621080262901226266"))
+        expect(await dbxERC20.balanceOf(bob.address)).to.equal(ethers.utils.parseEther("9980.039920159680638722"))
+        expect(await dbxERC20.balanceOf(alice.address)).to.equal(ethers.utils.parseEther("19960.119680798084469782"))
     });
 
     it(`
@@ -125,6 +125,6 @@ describe("Test contract functionalities while having cycles with no messages sen
         await hre.ethers.provider.send("evm_mine")
 
         await rewardedAlice.claimRewards()
-        expect(await dbxERC20.balanceOf(alice.address)).to.equal(ethers.utils.parseEther("99.810360315400738596"))
+        expect(await dbxERC20.balanceOf(alice.address)).to.equal(ethers.utils.parseEther("9980.039920159680638722"))
     });
 });

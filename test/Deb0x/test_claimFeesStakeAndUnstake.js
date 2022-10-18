@@ -2,6 +2,7 @@ const { expect } = require("chai");
 const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
+const { NumUtils } = require("../utils/NumUtils.ts");
 
 describe("Test contract", async function() {
     let rewardedAlice, rewardedBob, rewardedCarol, rewardedDean, dbxERC20;
@@ -36,9 +37,9 @@ describe("Test contract", async function() {
         let CarolRewarClaimed = BigNumber.from("0")
         const rewardClaimed = await rewardedCarol.queryFilter("RewardsClaimed")
         for (let entry of rewardClaimed) {
-            CarolRewarClaimed = CarolRewarClaimed.add(entry.args.amount)
+            CarolRewarClaimed = CarolRewarClaimed.add(entry.args.reward)
         }
-        expect("50000000000000000000").to.equal(CarolRewarClaimed)
+        expect(NumUtils.day(1).div(2)).to.equal(CarolRewarClaimed)
 
         const carolDBXBalance = await dbxERC20.balanceOf(carol.address)
         await dbxERC20.connect(carol).transfer(bob.address, carolDBXBalance.div(BigNumber.from("2")))

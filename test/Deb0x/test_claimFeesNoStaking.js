@@ -2,6 +2,7 @@ const { expect } = require("chai");
 const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
+const { NumUtils } = require("../utils/NumUtils.ts");
 
 describe("Test fee claiming for users/frontends without concurrently staking/unstaking", async function() {
     let rewardedAlice, rewardedBob, rewardedCarol, frontend, dbxERC20;
@@ -187,9 +188,9 @@ describe("Test fee claiming for users/frontends without concurrently staking/uns
         let CarolRewarClaimed = BigNumber.from("0")
         const rewardClaimed = await rewardedCarol.queryFilter("RewardsClaimed")
         for (let entry of rewardClaimed) {
-            CarolRewarClaimed = CarolRewarClaimed.add(entry.args.amount)
+            CarolRewarClaimed = CarolRewarClaimed.add(entry.args.reward)
         }
-        expect("50000000000000000000").to.equal(CarolRewarClaimed)
+        expect(NumUtils.day(1).div(2)).to.equal(CarolRewarClaimed)
 
         await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
