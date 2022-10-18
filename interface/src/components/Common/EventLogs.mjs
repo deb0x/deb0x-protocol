@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const deb0xAddress = "0xB693E0698cC7d2Bd4Bb4AC390F34A506E146e5D3";
+const deb0xAddress = "0x03B4a733d4083Eb92972740372Eb05664c937136";
 
 async function getData(eventName) {
 
@@ -299,7 +299,6 @@ function selectEvent(name) {
 
 export async function fetchMessages(to, from) {
     let data = await getData("Sent");
-
     let messages = data.filter(data => data.data.to.toLowerCase() === to.toLowerCase() &&
         data.data.from.toLowerCase() === from.toLowerCase()).
     map(data => data.data.body);
