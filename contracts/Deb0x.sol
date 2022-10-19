@@ -44,6 +44,7 @@ contract Deb0x is Deb0xCore {
     mapping(address => uint256) public userWithdrawableStake;
     mapping(address => uint256) userFirstStake;
     mapping(address => uint256) userSecondStake;
+    mapping(address => bool) stakedDuringGapCycle;
 
     event FeesClaimed(uint256 fees);
 
@@ -144,24 +145,43 @@ contract Deb0x is Deb0xCore {
             lastFeeUpdateCycle[account] = lastStartedCycle + 1;
         }
         
-        if(userFirstStake[account] != 0 && currentCycle - userFirstStake[account] > 0) {
+        if(userFirstStake[account] != 0 &&
+         currentCycle - userFirstStake[account] >= 0 &&
+         stakedDuringGapCycle[account]){
             uint256 unlockedFirstStake = userStakeCycle[account][userFirstStake[account]];
             addressRewards[account] += unlockedFirstStake;
             userWithdrawableStake[account] += unlockedFirstStake;
+            if(lastStartedCycle + 1 > userFirstStake[account]){
             addressAccruedFees[account] = addressAccruedFees[account] + 
                 ((userStakeCycle[account][userFirstStake[account]] 
-                * (cycleFeesPerStakeSummed[lastStartedCycle + 1] - cycleFeesPerStakeSummed[userFirstStake[account]]))) / dividend;
+                * (cycleFeesPerStakeSummed[lastStartedCycle + 1] - cycleFeesPerStakeSummed[userFirstStake[account]]))) / dividend;         
+            }
+            userStakeCycle[account][userFirstStake[account]] = 0;
+            userFirstStake[account] = 0;
+            stakedDuringGapCycle[account] = false;
+
+        } else if(userFirstStake[account] != 0 && currentCycle - userFirstStake[account] > 0) {
+            uint256 unlockedFirstStake = userStakeCycle[account][userFirstStake[account]];
+            addressRewards[account] += unlockedFirstStake;
+            userWithdrawableStake[account] += unlockedFirstStake;
+            if(lastStartedCycle + 1 > userFirstStake[account]){
+            addressAccruedFees[account] = addressAccruedFees[account] + 
+                ((userStakeCycle[account][userFirstStake[account]] 
+                * (cycleFeesPerStakeSummed[lastStartedCycle + 1] - cycleFeesPerStakeSummed[userFirstStake[account]]))) / dividend;         
+            }
             userStakeCycle[account][userFirstStake[account]] = 0;
             userFirstStake[account] = 0;
 
             if(userSecondStake[account] != 0) {
-                if(currentCycle - userSecondStake[account] > 1) {
+                if(currentCycle - userSecondStake[account] > 0) {
                         uint256 unlockedSecondStake = userStakeCycle[account][userSecondStake[account]];
                         addressRewards[account] += unlockedSecondStake;
                         userWithdrawableStake[account] += unlockedSecondStake;
-                        addressAccruedFees[account] = addressAccruedFees[account] + 
+                        if(lastStartedCycle + 1 > userSecondStake[account]){
+                            addressAccruedFees[account] = addressAccruedFees[account] + 
                             ((userStakeCycle[account][userSecondStake[account]] 
                             * (cycleFeesPerStakeSummed[lastStartedCycle + 1] - cycleFeesPerStakeSummed[userSecondStake[account]]))) / dividend;
+                        }
                         userStakeCycle[account][userSecondStake[account]] = 0;
                         userSecondStake[account] = 0;
                         } else {
@@ -276,6 +296,7 @@ contract Deb0x is Deb0xCore {
 
         if(lastStartedCycle == currentStartedCycle) {
             cycleToSet = currentCycle;
+            stakedDuringGapCycle[_msgSender()] = true;
         }
 
         if(currentCycle != userFirstStake[_msgSender()] &&
