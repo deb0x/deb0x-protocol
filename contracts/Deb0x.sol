@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.11;
 
-import "./Deb0xCore.sol";
+// import "./Deb0xCore.sol";
+import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import "./DBX.sol";
 
 
-contract Deb0x is Deb0xCore {
+contract Deb0x is ERC2771Context {
 
     DBX public dbx;
     uint16 public constant MAIL_FEE = 1000;
@@ -21,6 +22,8 @@ contract Deb0x is Deb0xCore {
     uint256 public currentStartedCycle;
     uint256 pendingCycleRewardsStake;
     uint256 public pendingStakeWithdrawal;
+    uint256 public sentId = 1;
+    mapping(address => string) public publicKeys;
 
     mapping(address => uint256) userCycleFeePercent;
     mapping(address => uint256) frontendCycleFeePercent;
@@ -52,9 +55,16 @@ contract Deb0x is Deb0xCore {
     event RewardsClaimed(uint256 indexed cycle, address indexed userAddress,uint256 reward);
     event NewCycleStarted(uint256 indexed cycle, uint256 calculatedCycleReward,uint256 summedCycleStakes);
     event SendEntryCreated(uint256 indexed cycle, uint256 indexed sentId, address indexed feeReceiver, uint256 msgFee, uint256 nativeTokenFee);
+    event Sent(address indexed to, address indexed from, bytes32 indexed hash, Envelope body,uint256 sentId);
+    event KeySet(address indexed to, bytes32 indexed hash, string value);
+
+    struct Envelope {
+        string content;
+        uint256 timestamp;
+    }
 
     constructor(address forwarder)
-    Deb0xCore(forwarder) {
+    ERC2771Context(forwarder) {
         dbx = new DBX();
         i_initialTimestamp = block.timestamp;
         i_periodDuration = 1 days;
@@ -179,6 +189,32 @@ contract Deb0x is Deb0xCore {
             frontEndLastFeeUpdate[frontend] = lastStartedCycle + 1;
         }
     }
+
+    function setKey(string memory publicKey) public {
+        publicKeys[_msgSender()] = publicKey;
+        bytes32 bodyHash= keccak256(abi.encodePacked(publicKey));
+        emit KeySet(_msgSender(), bodyHash, publicKey);
+    }
+
+    function _send(address[] memory recipients, string[] memory cids) private returns(uint256) {
+        for (uint256 i = 0; i < recipients.length - 1; i++) {
+            Envelope memory currentStruct = Envelope({content:cids[i], timestamp: block.timestamp});
+            bytes32 bodyHash= keccak256(abi.encodePacked(cids[i]));
+            emit Sent(recipients[i], _msgSender(), bodyHash, currentStruct,sentId);
+        }
+        Envelope memory currentStruct = Envelope({content:cids[recipients.length -1], timestamp: block.timestamp});
+        bytes32 bodyHash= keccak256(abi.encodePacked(cids[recipients.length -1]));
+        emit Sent(_msgSender(), _msgSender(), bodyHash, currentStruct,sentId);
+        
+        uint256 oldSentId = sentId;
+        sentId++;
+        return oldSentId;
+    }
+
+    function getKey(address account) public view returns (string memory) {
+        return publicKeys[account];
+    }
+
     function send(address[] memory to, string[] memory payload, address feeReceiver, uint256 msgFee, uint256 nativeTokenFee)
         public
         payable
@@ -204,7 +240,7 @@ contract Deb0x is Deb0xCore {
             }
         }
 
-        uint256 sentId = super.send(to, payload);
+        uint256 sentId = _send(to, payload);
         emit SendEntryCreated(currentCycle, sentId, feeReceiver, msgFee, nativeTokenFee);
     }
 

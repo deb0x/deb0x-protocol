@@ -2,7 +2,7 @@ const { expect, assert } = require("chai");
 const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
-const { abiDBXCore } = require("../../artifacts/contracts/Deb0xCore.sol/Deb0xCore.json")
+// const { abiDBXCore } = require("../../artifacts/contracts/Deb0xCore.sol/Deb0xCore.json")
 
 describe("Test fee claiming for users/frontends", async function() {
     let rewardedAlice, rewardedBob, rewardedCarol, frontend, dbxERC20;
