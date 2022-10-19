@@ -63,7 +63,7 @@ describe("Test unstake functionality", async function() {
 
         let valueToUnstake = await user3Reward.getUserWithdrawableStake(user3.address);
         console.log(valueToUnstake)
-        expect(valueToUnstake).to.equal("37500000000000000000")
+        expect(valueToUnstake).to.equal(BigNumber.from("3750000000000000000000"))
         console.log("Valoare la care trebuie facut unstake: " + ethers.utils.formatEther(valueToUnstake))
         await user3Reward.unstake("37000000000000000000")
 
@@ -83,7 +83,6 @@ describe("Test unstake functionality", async function() {
         await user1Reward.claimRewards()
 
         const user1AddressAccruedFees1 = await user1Reward.addressAccruedFees(user1.address)
-s
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
@@ -109,12 +108,19 @@ s
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
         console.log((await hre.ethers.provider.getBalance(deb0xContract.address)).toString())
+        
+        await user1Reward.claimFees()
 
-        await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        const user1AddressAccruedFees4 = await user1Reward.addressAccruedFees(user1.address)
+        feesClaimed = await user1Reward.queryFilter("FeesClaimed")
+        let totalFeesClaimed = BigNumber.from("0")
+        for(let entry of feesClaimed){
+            totalFeesClaimed = totalFeesClaimed.add(entry.args.fees)
+        }
+        const feesCollected = (await user1Reward.cycleAccruedFees(0))
+        .add(await user1Reward.cycleAccruedFees(6))
 
-        expect(user1AddressAccruedFees4).equal(user1AddressAccruedFees3
-            .add(await user1Reward.cycleAccruedFees(6)))
+        const remainder = await hre.ethers.provider.getBalance(user1Reward.address);
+        expect(totalFeesClaimed.add(remainder)).to.equal(feesCollected)
     })
 
     it("Action during gap cycles should convert stake back to rewards and not grant fees for that stake", async() => {
@@ -173,7 +179,7 @@ s
         expect(totalFeesClaimed.add(remainder)).to.equal(feesCollected)
     })
 
-    it.only("Staking before reward cycle start and after should properly unlock in the next cycles", async() => {
+    it("Staking before reward cycle start and after should properly unlock in the next cycles", async() => {
         await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
@@ -215,7 +221,7 @@ s
         expect(totalFeesClaimed.add(remainder)).to.equal(feesCollected)
     })
 
-    it.only("Staking before reward cycle start and after should properly unlock both stakes after two cycles", async() => {
+    it("Staking before reward cycle start and after should properly unlock both stakes after two cycles", async() => {
         await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])

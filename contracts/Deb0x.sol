@@ -292,8 +292,8 @@ contract Deb0x is Deb0xCore {
             stakedDuringGapCycle[_msgSender()] = true;
         }
 
-        if(currentCycle != userFirstStake[_msgSender()] &&
-            currentCycle != userSecondStake[_msgSender()]) {
+        if((cycleToSet != userFirstStake[_msgSender()] &&
+            cycleToSet != userSecondStake[_msgSender()])) {
                 if(userFirstStake[_msgSender()] == 0) {
                     userFirstStake[_msgSender()] = cycleToSet;
             
@@ -349,10 +349,14 @@ contract Deb0x is Deb0xCore {
     function getUserWithdrawableStake(address staker) public view returns(uint256) {
         uint256 calculatedCycle = getCurrentCycle();
         uint256 unlockedStake = 0;
-        if(userFirstStake[staker] != 0 && calculatedCycle - userFirstStake[staker] > 1) {
+        if(userFirstStake[staker] != 0 &&
+         currentCycle - userFirstStake[staker] >= 0 &&
+         stakedDuringGapCycle[staker]){
+            unlockedStake += userStakeCycle[staker][userFirstStake[staker]];
+         } else if(userFirstStake[staker] != 0 && calculatedCycle - userFirstStake[staker] > 0) {
             unlockedStake += userStakeCycle[staker][userFirstStake[staker]];
 
-            if(userSecondStake[staker] != 0 && calculatedCycle - userSecondStake[staker] > 1) {
+            if(userSecondStake[staker] != 0 && calculatedCycle - userSecondStake[staker] > 0) {
                 unlockedStake += userStakeCycle[staker][userSecondStake[staker]];
             }
         }
