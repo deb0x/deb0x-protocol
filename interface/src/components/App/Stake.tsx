@@ -23,8 +23,8 @@ import { signMetaTxRequest } from '../../ethereum/signer';
 import { createInstance } from '../../ethereum/forwarder'
 import { whitelist } from '../../constants.json'
 
-const deb0xAddress = "0x36f7C2858C80e897D450dB6DC7e9D7dD714a9cAB"
-const deb0xERC20Address = "0x7aA874A945cAe55c25Db030aD6c4a9231eC7cBf8"
+const deb0xAddress = "0x03B4a733d4083Eb92972740372Eb05664c937136"
+const deb0xERC20Address = "0x7c8B0C62c2cB8BEd8A60555D14722ACFf4D760e5"
 
 export function Stake(props: any): any {
 

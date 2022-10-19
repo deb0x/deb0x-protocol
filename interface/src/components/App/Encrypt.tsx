@@ -19,12 +19,13 @@ import draftToHtml from 'draftjs-to-html';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { Editor } from 'react-draft-wysiwyg';
 import airplaneBlack from '../../photos/icons/airplane-black.svg';
+import { getKey } from '../Common/EventLogs.mjs';
 import { signMetaTxRequest } from '../../ethereum/signer';
 import { createInstance } from '../../ethereum/forwarder'
 import { whitelist } from '../../constants.json'
 
 const { BigNumber } = require("ethers");
-const deb0xAddress = "0x36f7C2858C80e897D450dB6DC7e9D7dD714a9cAB";
+const deb0xAddress = "0x03B4a733d4083Eb92972740372Eb05664c937136";
 const ethUtil = require('ethereumjs-util')
 
 const projectId = process.env.REACT_APP_PROJECT_ID
@@ -129,7 +130,7 @@ export function Encrypt(replyAddress: any): any {
 
     async function isInitialized(address: any) {
         const deb0xContract = Deb0x(library, deb0xAddress)
-        return await deb0xContract.encryptionKeys(address);
+        return await deb0xContract.getKey(address);
     }
 
     function isInList(address: any) {
@@ -235,7 +236,7 @@ export function Encrypt(replyAddress: any): any {
         recipients.push(await signer.getAddress())
         const deb0xContract = Deb0x(signer, deb0xAddress);
         for (let address of recipients) {
-            const destinationAddressEncryptionKey = await deb0xContract.getKey(address);
+            const destinationAddressEncryptionKey = await getKey(address);
             const encryptedMessage = ethUtil.bufferToHex(
                 Buffer.from(
                     JSON.stringify(
@@ -305,7 +306,7 @@ export function Encrypt(replyAddress: any): any {
 
     const getPublicEncryptionKey = async () => {
         const deb0xContract = Deb0x(library, deb0xAddress)
-        const key = await deb0xContract.getKey(account)
+        const key = await getKey(account)
         setEncryptionKeyInitialized(key)
     }
     const [editorState, setEditorState] = useState(() =>

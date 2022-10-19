@@ -39,8 +39,8 @@ const client = create({
 
 const ethUtil = require('ethereumjs-util')
 //old address: 0x218c10BAb451BE6A897db102b2f608bC7D3441a0
-// 0x36f7C2858C80e897D450dB6DC7e9D7dD714a9cAB
-const deb0xAddress = "0x36f7C2858C80e897D450dB6DC7e9D7dD714a9cAB";
+// 0x03B4a733d4083Eb92972740372Eb05664c937136
+const deb0xAddress = "0x03B4a733d4083Eb92972740372Eb05664c937136";
 
 
 enum ConnectorNames { Injected = 'Injected', Network = 'Network' };

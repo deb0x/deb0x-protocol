@@ -16,9 +16,10 @@ import formatAccountName from '../Common/AccountName';
 import cloud1 from '../../photos/icons/clouds/cloud-1.svg';
 import cloud2 from '../../photos/icons/clouds/cloud-2.svg';
 import cloud3 from '../../photos/icons/clouds/cloud-3.svg';
+import {fetchSentMessages, getKey } from '../Common/EventLogs.mjs';
 
 const axios = require('axios')
-const deb0xAddress = "0x36f7C2858C80e897D450dB6DC7e9D7dD714a9cAB"
+const deb0xAddress = "0x03B4a733d4083Eb92972740372Eb05664c937136"
 
 export function Sent(props: any): any {
     const { account, library } = useWeb3React()
@@ -33,7 +34,7 @@ export function Sent(props: any): any {
 
     const getPublicEncryptionKey = async () => {
         const deb0xContract = Deb0x(library, deb0xAddress)
-        const key = await deb0xContract.getKey(account)
+        const key = await getKey(account)
         const initialized = (key != '') ? true : false
         setEncryptionKeyInitialized(initialized)
     }
@@ -84,8 +85,7 @@ export function Sent(props: any): any {
 
         async function checkENS() {
             let recipientsTemp:any = []
-            const recipients = props.message.recipients.filter((recipient:any) => recipient != account);
-
+            const recipients = props.message.recipients.filter((recipient:any) => recipient.toLowerCase() != account?.toLowerCase());
             var recipientsFiltered = recipients.filter(onlyUnique);
 
             for(let recipient of recipientsFiltered) {
@@ -261,20 +261,19 @@ export function Sent(props: any): any {
 
         async function processMessages() {
             const deb0xContract = Deb0x(library, deb0xAddress)
-            
-            const sentMessages = await deb0xContract.fetchSentMessages(account)  
-
+            const sentMessages = await fetchSentMessages(account)
             const sentMessagesRetrieved = sentMessages.map(async function (item: any) {
-                const fetchedMessageContent = await fetchMessage(item.contentData.cid)
-                const unixTimestamp = item.contentData.blockTimestamp.toString()
+                let intermediateValueForContentData = item[1];
+                let intermediateValueForRecipients = item[0];
+                const fetchedMessageContent = await fetchMessage(intermediateValueForContentData[0].contentData.content)
+                const unixTimestamp = intermediateValueForContentData[0].contentData.timestamp.toString()
 
                 const milliseconds = unixTimestamp * 1000 
 
                 const dateObject = new Date(milliseconds)
-
                 const humanDateFormat = dateObject.toLocaleString()
                 return { fetchedMessage: fetchedMessageContent,
-                         recipients: item.recipients,
+                         recipients: intermediateValueForRecipients[0].recipients,
                          timestamp: humanDateFormat}
             })
 
