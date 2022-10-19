@@ -11,7 +11,7 @@ describe("Test stake functionality", async function() {
         [user1, user2, user3, messageReceiver, feeReceiver] = await ethers.getSigners();
 
         const Deb0x = await ethers.getContractFactory("Deb0x");
-        deb0xContract = await Deb0x.deploy();
+        deb0xContract = await Deb0x.deploy(ethers.constants.AddressZero);
         await deb0xContract.deployed();
 
         const dbxAddress = await deb0xContract.dbx()
@@ -35,8 +35,8 @@ describe("Test stake functionality", async function() {
 
         await user3Reward.claimRewards()
         let user3Balance = await dbxERC20.balanceOf(user3.address);
-        //User3balanceDiv 4 will be 12.5 (50/4)
-        let user3BalanceDiv4 = user3Balance / 4;
+        //User3balanceDiv 4 will be 125 (50/4)
+        let user3BalanceDiv4 = BigNumber.from(user3Balance).div(BigNumber.from("4"))
         let balanceBigNumberFormat = BigNumber.from(user3BalanceDiv4.toString());
         await dbxERC20.connect(user3).approve(deb0xContract.address, user3Balance)
         await user3Reward.stakeDBX(balanceBigNumberFormat)
@@ -66,7 +66,7 @@ describe("Test stake functionality", async function() {
         await hre.ethers.provider.send("evm_mine")
 
         let amoutToUnstakeAfterTwoStakeActionInFirstCycle = ethers.utils.formatEther(await user3Reward.getUserWithdrawableStake(user3.address));
-        expect(parseInt(amoutToUnstakeAfterTwoStakeActionInFirstCycle)).to.equal(25);
+        expect(parseInt(amoutToUnstakeAfterTwoStakeActionInFirstCycle)).to.equal(2500);
 
         await user3Reward.stakeDBX(balanceBigNumberFormat)
         console.log("Balance account after fourth stake but in second cycle: " + ethers.utils.formatEther(await dbxERC20.balanceOf(user3.address)))
@@ -77,12 +77,12 @@ describe("Test stake functionality", async function() {
         await hre.ethers.provider.send("evm_mine")
 
         let amoutToUnstakeAfterAnotherStakeInSecoundCycle = ethers.utils.formatEther(await user3Reward.getUserWithdrawableStake(user3.address));
-        expect(parseFloat(amoutToUnstakeAfterAnotherStakeInSecoundCycle)).to.equal(37.5);
+        expect(parseFloat(amoutToUnstakeAfterAnotherStakeInSecoundCycle)).to.equal(3750);
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
         let amoutToUnstakeAfterAnotherStakeInThirdCyle = ethers.utils.formatEther(await user3Reward.getUserWithdrawableStake(user3.address));
-        expect(parseFloat(amoutToUnstakeAfterAnotherStakeInThirdCyle)).to.equal(50);
+        expect(parseFloat(amoutToUnstakeAfterAnotherStakeInThirdCyle)).to.equal(5000);
 
     });
 
@@ -120,7 +120,7 @@ describe("Test stake functionality", async function() {
         await hre.ethers.provider.send("evm_mine")
 
         let amountStakeInFirstCycle = ethers.utils.formatEther(await user2Reward.getUserWithdrawableStake(user2.address));
-        expect(parseInt(amountStakeInFirstCycle)).to.equal(100);
+        expect(parseInt(amountStakeInFirstCycle)).to.equal(10000);
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")

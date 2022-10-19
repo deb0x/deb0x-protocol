@@ -2,6 +2,7 @@ import { useState, useEffect, useContext, createContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Deb0x from "../../ethereum/deb0x"
 import { ethers } from "ethers";
+import {fetchMessages,fetchMessageSenders} from '../Common/EventLogs.mjs';
 import {
     Tooltip, List, ListItem, ListItemText, ListItemButton, Typography, Box, 
     CircularProgress,
@@ -17,7 +18,7 @@ import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import axios from 'axios';
 import formatAccountName from "../Common/AccountName";
 import "../../componentsStyling/decrypt.scss"
-import { Add } from '@mui/icons-material';
+import { Add, CompressOutlined, ConstructionOutlined } from '@mui/icons-material';
 import { Announcement } from '@mui/icons-material';
 import ContactsSetter from '../ContactsSetter';
 import lock from '../../photos/lock.svg';
@@ -28,8 +29,10 @@ import avatar from '../../photos/icons/avatars/test-avatar-1.svg';
 import ReadedMessagesContext from '../Contexts/ReadedMessagesContext';
 import ReadedMessagesProvider from '../Contexts/ReadedMessagesProvider';
 import { Encrypt } from './Encrypt';
+import {getKey} from "../Common/EventLogs.mjs";
+import { commify } from 'ethers/lib/utils';
 
-const deb0xAddress = "0x42C3FF9BCAC0b2f990195eFE5dfEEAC1b7E98eC6";
+const deb0xAddress = "0x03B4a733d4083Eb92972740372Eb05664c937136";
 
 export function Decrypt(props: any): any {
     const { account, library } = useWeb3React()
@@ -47,7 +50,8 @@ export function Decrypt(props: any): any {
 
     const getPublicEncryptionKey = async () => {
         const deb0xContract = Deb0x(library, deb0xAddress)
-        const key = await deb0xContract.getKey(account)
+      
+        const key = await getKey(account);
         const initialized = (key != '') ? true : false
         setEncryptionKeyInitialized(initialized)
     }
@@ -279,48 +283,70 @@ export function Decrypt(props: any): any {
             processMessages()
         }, []);
 
-
-
         async function processMessages() {
             const deb0xContract = Deb0x(library, deb0xAddress)
+            
             const senderAddresses = 
-                await deb0xContract.fetchMessageSenders(account)
+                await fetchMessageSenders(account)
             const cidsPromises = 
                 senderAddresses.map(async function(sender:any) {
                     return { 
-                        cids: await deb0xContract.fetchMessages(account, sender),
+                        cids: await fetchMessages(account,sender),
                         sender: sender
                     }
                 })
 
             const cids = await Promise.all(cidsPromises)
-
             const encryptedMessagesPromisesArray = 
                 cids.map(async function(cidArray: any) {
                     const encryptedMessagesPromises = 
                         cidArray.cids.map(async function (cid: any) {
-                            const unixTimestamp = cid.blockTimestamp.toString()
-
+                            const unixTimestamp = cid.timestamp.toString()
                             const milliseconds = unixTimestamp * 1000 
 
                             const dateObject = new Date(milliseconds)
 
                             const humanDateFormat = dateObject.toLocaleString()
                             return { 
-                                fetchedMessage: await fetchMessage(cid.cid),
+                                fetchedMessage: await fetchMessage(cid.content),
                                 sender: cidArray.sender,
                                 timestamp: humanDateFormat
                             }
                         })
                     const promise = await Promise.all(encryptedMessagesPromises)
-
+                       
                     return promise
                 })
 
             const encryptedMessages = await Promise.all(encryptedMessagesPromisesArray)
             const sortedEncryptedMessages = encryptedMessages?.flat().reverse()
-            setFetchedMessages(encryptedMessages.flat())
-            setSortedMessages(sortedEncryptedMessages)
+            let sendersArray:any[] = [];
+            let timestampArray:any[] = [];
+            let transactions:any[] = [];
+            let index = 0;
+            sortedEncryptedMessages.forEach(element =>{
+                if(sendersArray.length ==0 ){
+                    sendersArray[index] = element.sender;
+                    timestampArray[index] = element.timestamp;
+                    transactions.push(element);
+                    index++;
+                } else {
+                    let ok= 1;
+                for(let i=0;i<sendersArray.length;i++){
+                    if(sendersArray[i] == element.sender && timestampArray[i] == element.timestamp){
+                        ok=0;
+                    } 
+                }
+                if(ok==1){
+                    sendersArray[index] = element.sender;
+                    timestampArray[index] = element.timestamp;
+                    transactions.push(element);
+                    index++;
+               }
+                }
+            })
+            setFetchedMessages(transactions)
+            setSortedMessages(transactions)
             setLoading(false)
 
         }

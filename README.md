@@ -5,7 +5,7 @@ Decentralized Private Mail App and Protocol
 * npm 6.14+
 * node v14.17+
 * [Metamask.io](https://metamask.io) browser extension
-* Get rinkeby testnet ETH from a faucet (e.g. https://faucet.rinkeby.io/)
+* Get goerli testnet ETH from a faucet (e.g. https://goerlifaucet.com/)
 
 ### Steps to run the frontend
 
@@ -28,15 +28,15 @@ Add `.secrets.json` file in root directory and put your secret phrase as a json 
 }
 ```
 
-Run deploy script (Rinkeby testnet)
+Run deploy script (Goerli testnet)
 ```
-npx hardhat run --network rinkeby scritps/deploy.js
+npx hardhat run --network goerli scritps/deploy.js
 ```
 
 # Deb0x Contract Addresses 
 
-| Contract name            | Commit hash | Rinkeby Testnet                                 | Mainnet                                |
+| Contract name            | Commit hash | Goerli Testnet                                 | Mainnet                                |
 | ------------------------ | ----------- | ------------------------------------------- | ------------------------------------------ | 
-| Deb0xERC20               |  -          | 0x87b581e1dA1D073b204D6DdC61231a0e08cd5927 |  |
-| Deb0x                    |  -          | 0x42C3FF9BCAC0b2f990195eFE5dfEEAC1b7E98eC6  |  |
+| Deb0xERC20               |  -          | 0x7c8B0C62c2cB8BEd8A60555D14722ACFf4D760e5 |  |
+| Deb0x                    |  -          | 0x03B4a733d4083Eb92972740372Eb05664c937136  |  |
 
