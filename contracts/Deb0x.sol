@@ -1,12 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.11;
 
-// import "./Deb0xCore.sol";
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import "./DBX.sol";
 
 
 contract Deb0x is ERC2771Context {
+
+    struct Envelope {
+        string content;
+        uint256 timestamp;
+    }
 
     DBX public dbx;
     uint16 public constant MAIL_FEE = 1000;
@@ -58,21 +62,6 @@ contract Deb0x is ERC2771Context {
     event SendEntryCreated(uint256 indexed cycle, uint256 indexed sentId, address indexed feeReceiver, uint256 msgFee, uint256 nativeTokenFee);
     event Sent(address indexed to, address indexed from, bytes32 indexed hash, Envelope body,uint256 sentId);
     event KeySet(address indexed to, bytes32 indexed hash, string value);
-
-    struct Envelope {
-        string content;
-        uint256 timestamp;
-    }
-
-    constructor(address forwarder)
-    ERC2771Context(forwarder) {
-        dbx = new DBX();
-        i_initialTimestamp = block.timestamp;
-        i_periodDuration = 1 days;
-        currentCycleReward = 10000 * 1e18;
-        summedCycleStakes[0] = 10000 * 1e18;
-        rewardPerCycle[0] = 10000 * 1e18;
-    }
 
     modifier gasWrapper(uint256 nativeTokenFee) {
         uint256 startGas = gasleft();
@@ -192,6 +181,17 @@ contract Deb0x is ERC2771Context {
         }
         _;
     }
+
+    constructor(address forwarder)
+    ERC2771Context(forwarder) {
+        dbx = new DBX();
+        i_initialTimestamp = block.timestamp;
+        i_periodDuration = 1 days;
+        currentCycleReward = 10000 * 1e18;
+        summedCycleStakes[0] = 10000 * 1e18;
+        rewardPerCycle[0] = 10000 * 1e18;
+    }
+
 
     function updateFrontEndStats(address frontend) internal {
         if(currentCycle > frontEndLastRewardUpdate[frontend]) {
