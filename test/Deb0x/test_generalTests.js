@@ -710,13 +710,13 @@ describe("Test DBX tokens distributions", async function() {
         try {
             await user1Reward.claimRewards()
         } catch (error) {
-            expect(error.message).to.include("Deb0x: You do not have rewards");
+            expect(error.message).to.include("Deb0x: account has no rewards");
         }
 
         try {
             await user2Reward.claimFees()
         } catch (error) {
-            expect(error.message).to.include('Deb0x: You do not have accrued fees')
+            expect(error.message).to.include('Deb0x: account has no accrued fees')
         }
     });
 
@@ -738,7 +738,7 @@ describe("Test DBX tokens distributions", async function() {
         try {
             await frontend.claimFrontEndRewards();
         } catch (error) {
-            expect(error.message).to.include("Deb0x: You do not have rewards");
+            expect(error.message).to.include("Deb0x: account has no rewards");
         }
     });
 
@@ -753,7 +753,7 @@ describe("Test DBX tokens distributions", async function() {
         try {
             await frontend.claimFrontEndFees();
         } catch (error) {
-            expect(error.message).to.include("Deb0x: You do not have accrued fees")
+            expect(error.message).to.include("Deb0x: account has no accrued fees")
         }
     });
 
@@ -765,7 +765,7 @@ describe("Test DBX tokens distributions", async function() {
             await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
                 feeReceiver.address, 1000, 0)
         } catch (error) {
-            expect(error.message).to.include("Deb0x: must pay 10% of transaction cost")
+            expect(error.message).to.include("Deb0x: value must be >= 10% of the spent gas")
         }
     });
 
@@ -786,13 +786,13 @@ describe("Test DBX tokens distributions", async function() {
         try {
             await user2Reward.stakeDBX(await userReward.getUserWithdrawableStake(user2.address))
         } catch (error) {
-            expect(error.message).to.include("Deb0x: your amount is 0");
+            expect(error.message).to.include("Deb0x: amount arg is zero");
         }
 
         try {
             await user2Reward.unstake(await userReward.getUserWithdrawableStake(user2.address))
         } catch (error) {
-            expect(error.message).to.include("Deb0x: your amount is 0");
+            expect(error.message).to.include("Deb0x: amount arg is zero");
         }
 
         await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -813,7 +813,7 @@ describe("Test DBX tokens distributions", async function() {
         try {
             await user3Reward.unstake(BigNumber.from("51000000000000000000"))
         } catch (error) {
-            expect(error.message).to.include("'Deb0x: can not unstake more than you've staked'")
+            expect(error.message).to.include("'Deb0x: can not unstake more than withdrawable stake'")
         }
     });
 

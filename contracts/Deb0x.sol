@@ -156,7 +156,7 @@ contract Deb0x is ERC2771Context {
         
         require(
             msg.value - nativeTokenFee >= fee,
-            "Deb0x: must pay 10% of transaction cost"
+            "Deb0x: value must be >= 10% of the spent gas"
         );
         
         sendViaCall(payable(msg.sender), msg.value - fee - nativeTokenFee);
@@ -415,7 +415,7 @@ contract Deb0x is ERC2771Context {
         uint256 reward = addressRewards[_msgSender()] -
             userWithdrawableStake[_msgSender()];
 
-        require(reward > 0, "Deb0x: You do not have rewards");
+        require(reward > 0, "Deb0x: account has no rewards");
 
         addressRewards[_msgSender()] -= reward;
         
@@ -437,7 +437,7 @@ contract Deb0x is ERC2771Context {
         updateFrontEndStats(_msgSender());
 
         uint256 reward = frontendRewards[_msgSender()];
-        require(reward > 0, "Deb0x: You do not have rewards");
+        require(reward > 0, "Deb0x: account has no rewards");
         frontendRewards[_msgSender()] = 0;
 
         if (lastStartedCycle == currentStartedCycle) {
@@ -457,7 +457,7 @@ contract Deb0x is ERC2771Context {
         updateStats(_msgSender())
     {
         uint256 fees = addressAccruedFees[_msgSender()];
-        require(fees > 0, "Deb0x: You do not have accrued fees");
+        require(fees > 0, "Deb0x: account has no accrued fees");
 
         addressAccruedFees[_msgSender()] = 0;
         sendViaCall(payable(_msgSender()), fees);
@@ -471,7 +471,7 @@ contract Deb0x is ERC2771Context {
     {
         updateFrontEndStats(_msgSender());
         uint256 fees = frontEndAccruedFees[_msgSender()];
-        require(fees > 0, "Deb0x: You do not have accrued fees");
+        require(fees > 0, "Deb0x: account has no accrued fees");
 
         frontEndAccruedFees[_msgSender()] = 0;
         sendViaCall(payable(_msgSender()), fees);
@@ -484,7 +484,7 @@ contract Deb0x is ERC2771Context {
         updateCycleFeesPerStakeSummed
         updateStats(_msgSender())
     {
-        require(_amount != 0, "Deb0x: your amount is 0");
+        require(_amount != 0, "Deb0x: amount arg is zero");
         pendingStake += _amount;
         uint256 cycleToSet = currentCycle + 1;
 
@@ -516,11 +516,11 @@ contract Deb0x is ERC2771Context {
         updateCycleFeesPerStakeSummed
         updateStats(_msgSender())
     {
-        require(_amount != 0, "Deb0x: your amount is 0");
+        require(_amount != 0, "Deb0x: amount arg is zero");
 
         require(
             _amount <= userWithdrawableStake[_msgSender()],
-            "Deb0x: can not unstake more than you've staked"
+            "Deb0x: can not unstake more than withdrawable stake"
         );
 
         if (lastStartedCycle == currentStartedCycle) {
