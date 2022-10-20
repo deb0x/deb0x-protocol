@@ -357,10 +357,6 @@ contract Deb0x is ERC2771Context {
         emit KeySet(_msgSender(), bodyHash, publicKey);
     }
 
-    function getKey(address account) external view returns (string memory) {
-        return publicKeys[account];
-    }
-
     function send(
         address[] memory to,
         string[] memory payload,
@@ -536,6 +532,10 @@ contract Deb0x is ERC2771Context {
 
     function contractBalance() external view returns (uint256) {
         return address(this).balance;
+    }
+
+    function getKey(address account) external view returns (string memory) {
+        return publicKeys[account];
     }
 
     function getUserWithdrawableStake(address staker)
