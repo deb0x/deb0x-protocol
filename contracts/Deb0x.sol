@@ -191,18 +191,18 @@ contract Deb0x is ERC2771Context {
         rewardPerCycle[0] = 10000 * 1e18;
     }
 
-    function setKey(string memory publicKey) public {
+    function setKey(string memory publicKey) external {
         publicKeys[_msgSender()] = publicKey;
         bytes32 bodyHash= keccak256(abi.encodePacked(publicKey));
         emit KeySet(_msgSender(), bodyHash, publicKey);
     }
 
-    function getKey(address account) public view returns (string memory) {
+    function getKey(address account) external view returns (string memory) {
         return publicKeys[account];
     }
 
     function send(address[] memory to, string[] memory payload, address feeReceiver, uint256 msgFee, uint256 nativeTokenFee)
-        public
+        external
         payable
         gasWrapper(nativeTokenFee)
         calculateCycle
@@ -230,7 +230,7 @@ contract Deb0x is ERC2771Context {
         emit SendEntryCreated(currentCycle, _sentId, feeReceiver, msgFee, nativeTokenFee);
     }
 
-    function claimRewards() public calculateCycle updateCycleFeesPerStakeSummed  updateStats(_msgSender()) {
+    function claimRewards() external calculateCycle updateCycleFeesPerStakeSummed  updateStats(_msgSender()) {
         uint256 reward = addressRewards[_msgSender()] - userWithdrawableStake[_msgSender()];
         require(reward > 0, "Deb0x: You do not have rewards");
         addressRewards[_msgSender()] -= reward;
@@ -244,7 +244,7 @@ contract Deb0x is ERC2771Context {
         emit RewardsClaimed(currentCycle, _msgSender(), reward);
     }
 
-    function claimFrontEndRewards() public calculateCycle updateCycleFeesPerStakeSummed  {
+    function claimFrontEndRewards() external calculateCycle updateCycleFeesPerStakeSummed  {
         updateFrontEndStats(_msgSender());
 
         uint256 reward = frontendRewards[_msgSender()];
@@ -260,7 +260,7 @@ contract Deb0x is ERC2771Context {
         emit FrontEndRewardsClaimed(currentCycle, _msgSender(), reward);
     }
 
-    function claimFees() public calculateCycle updateCycleFeesPerStakeSummed updateStats(_msgSender()){
+    function claimFees() external calculateCycle updateCycleFeesPerStakeSummed updateStats(_msgSender()){
         uint256 fees = addressAccruedFees[_msgSender()];
         require(fees > 0, "Deb0x: You do not have accrued fees");
        
@@ -269,7 +269,7 @@ contract Deb0x is ERC2771Context {
         emit FeesClaimed(getCurrentCycle(), _msgSender(), fees);
     }
 
-    function claimFrontEndFees() public calculateCycle updateCycleFeesPerStakeSummed {
+    function claimFrontEndFees() external calculateCycle updateCycleFeesPerStakeSummed {
         updateFrontEndStats(_msgSender());
         uint256 fees = frontEndAccruedFees[_msgSender()];
         require(fees > 0, "Deb0x: You do not have accrued fees");
@@ -331,7 +331,7 @@ contract Deb0x is ERC2771Context {
         emit Unstaked(currentCycle, _msgSender(), _amount);
     }
 
-    function contractBalance() public view returns (uint256) {
+    function contractBalance() external view returns (uint256) {
         return address(this).balance;
     }
 
@@ -343,7 +343,7 @@ contract Deb0x is ERC2771Context {
         return lastCycleReward * 10000 / 10020;
     }
 
-    function getUserWithdrawableStake(address staker) public view returns(uint256) {
+    function getUserWithdrawableStake(address staker) external view returns(uint256) {
         uint256 calculatedCycle = getCurrentCycle();
         uint256 unlockedStake = 0;
         if(userFirstStake[staker] != 0 &&
@@ -377,7 +377,7 @@ contract Deb0x is ERC2771Context {
         return currentRewards;
     }
 
-    function getUnclaimedFees(address user) public view returns(uint256){
+    function getUnclaimedFees(address user) external view returns(uint256){
         uint256 calculatedCycle = getCurrentCycle();
         uint256 currentAccruedFees = addressAccruedFees[user];
         uint256 currentCycleFeesPerStakeSummed;
