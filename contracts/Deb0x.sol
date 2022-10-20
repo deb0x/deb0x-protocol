@@ -152,9 +152,7 @@ contract Deb0x is ERC2771Context {
 
         _;
 
-        uint256 fee = ((startGas - gasleft() + 31108) *
-            tx.gasprice *
-            PROTOCOL_FEE) / 10000;
+        uint256 fee = ((startGas - gasleft() + 31108) * tx.gasprice * PROTOCOL_FEE) / 10000;
         
         require(
             msg.value - nativeTokenFee >= fee,
@@ -185,11 +183,10 @@ contract Deb0x is ERC2771Context {
             currentCycle > lastStartedCycle &&
             cycleFeesPerStakeSummed[lastStartedCycle + 1] == 0
         ) {
-            uint256 feePerStake = (cycleAccruedFees[lastStartedCycle] *
-                scalingFactor) / summedCycleStakes[lastStartedCycle];
-            cycleFeesPerStakeSummed[lastStartedCycle + 1] =
-                cycleFeesPerStakeSummed[previousStartedCycle] +
-                feePerStake;
+            uint256 feePerStake = (cycleAccruedFees[lastStartedCycle] * scalingFactor) / 
+            summedCycleStakes[lastStartedCycle];
+
+            cycleFeesPerStakeSummed[lastStartedCycle + 1] = cycleFeesPerStakeSummed[previousStartedCycle] + feePerStake;
         }
 
         _;
@@ -205,9 +202,7 @@ contract Deb0x is ERC2771Context {
 
             currentStartedCycle = currentCycle;
             
-            summedCycleStakes[currentStartedCycle] +=
-                summedCycleStakes[lastStartedCycle] +
-                currentCycleReward;
+            summedCycleStakes[currentStartedCycle] += summedCycleStakes[lastStartedCycle] + currentCycleReward;
             
             if (pendingStake != 0) {
                 summedCycleStakes[currentStartedCycle] += pendingStake;
@@ -215,9 +210,7 @@ contract Deb0x is ERC2771Context {
             }
             
             if (pendingStakeWithdrawal != 0) {
-                summedCycleStakes[
-                    currentStartedCycle
-                ] -= pendingStakeWithdrawal;
+                summedCycleStakes[currentStartedCycle] -= pendingStakeWithdrawal;
                 pendingStakeWithdrawal = 0;
             }
             
@@ -236,18 +229,15 @@ contract Deb0x is ERC2771Context {
             currentCycle > lastActiveCycle[account] &&
             userCycleMessages[account] != 0
         ) {
-            uint256 lastCycleUserReward = (userCycleMessages[account] *
-                rewardPerCycle[lastActiveCycle[account]]) /
-                cycleTotalMessages[lastActiveCycle[account]];
+            uint256 lastCycleUserReward = (userCycleMessages[account] * rewardPerCycle[lastActiveCycle[account]]) / 
+            cycleTotalMessages[lastActiveCycle[account]];
 
             addressRewards[account] += lastCycleUserReward;
 
             if (userCycleFeePercent[account] != 0) {
-                uint256 rewardPerMsg = lastCycleUserReward /
-                    userCycleMessages[account];
+                uint256 rewardPerMsg = lastCycleUserReward / userCycleMessages[account];
 
-                uint256 rewardsOwed = (rewardPerMsg *
-                    userCycleFeePercent[account]) / 10000;
+                uint256 rewardsOwed = (rewardPerMsg * userCycleFeePercent[account]) / 10000;
 
                 addressRewards[account] -= rewardsOwed;
                 userCycleFeePercent[account] = 0;
@@ -263,11 +253,11 @@ contract Deb0x is ERC2771Context {
             addressAccruedFees[account] =
                 addressAccruedFees[account] +
                 (
-                    (addressRewards[account] *
-                        (cycleFeesPerStakeSummed[lastStartedCycle + 1] -
-                            cycleFeesPerStakeSummed[
-                                lastFeeUpdateCycle[account]
-                            ]))
+                    (addressRewards[account] * 
+                        (cycleFeesPerStakeSummed[lastStartedCycle + 1] - 
+                            cycleFeesPerStakeSummed[lastFeeUpdateCycle[account]]
+                        )
+                    )
                 ) /
                 scalingFactor;
 
@@ -279,24 +269,21 @@ contract Deb0x is ERC2771Context {
             currentCycle - userFirstStake[account] >= 0 &&
             stakedDuringGapCycle[account]
         ) {
-            uint256 unlockedFirstStake = userStakeCycle[account][
-                userFirstStake[account]
-            ];
+            uint256 unlockedFirstStake = userStakeCycle[account][userFirstStake[account]];
 
             addressRewards[account] += unlockedFirstStake;
             userWithdrawableStake[account] += unlockedFirstStake;
             
             if (lastStartedCycle + 1 > userFirstStake[account]) {
-                addressAccruedFees[account] =
-                    addressAccruedFees[account] +
-                    (
-                        (userStakeCycle[account][userFirstStake[account]] *
-                            (cycleFeesPerStakeSummed[lastStartedCycle + 1] -
-                                cycleFeesPerStakeSummed[
-                                    userFirstStake[account]
-                                ]))
-                    ) /
-                    scalingFactor;
+                addressAccruedFees[account] = addressAccruedFees[account] + 
+                (
+                    (userStakeCycle[account][userFirstStake[account]] * 
+                        (cycleFeesPerStakeSummed[lastStartedCycle + 1] - 
+                            cycleFeesPerStakeSummed[userFirstStake[account]]
+                        )
+                    )
+                ) /
+                scalingFactor;
             }
 
             userStakeCycle[account][userFirstStake[account]] = 0;
@@ -306,24 +293,21 @@ contract Deb0x is ERC2771Context {
             userFirstStake[account] != 0 &&
             currentCycle - userFirstStake[account] > 0
         ) {
-            uint256 unlockedFirstStake = userStakeCycle[account][
-                userFirstStake[account]
-            ];
+            uint256 unlockedFirstStake = userStakeCycle[account][userFirstStake[account]];
 
             addressRewards[account] += unlockedFirstStake;
             userWithdrawableStake[account] += unlockedFirstStake;
 
             if (lastStartedCycle + 1 > userFirstStake[account]) {
-                addressAccruedFees[account] =
-                    addressAccruedFees[account] +
-                    (
-                        (userStakeCycle[account][userFirstStake[account]] *
-                            (cycleFeesPerStakeSummed[lastStartedCycle + 1] -
-                                cycleFeesPerStakeSummed[
-                                    userFirstStake[account]
-                                ]))
-                    ) /
-                    scalingFactor;
+                addressAccruedFees[account] = addressAccruedFees[account] + 
+                (
+                    (userStakeCycle[account][userFirstStake[account]] * 
+                        (cycleFeesPerStakeSummed[lastStartedCycle + 1] - 
+                            cycleFeesPerStakeSummed[userFirstStake[account]]
+                        )
+                    )
+                ) / 
+                scalingFactor;
             }
 
             userStakeCycle[account][userFirstStake[account]] = 0;
@@ -331,28 +315,21 @@ contract Deb0x is ERC2771Context {
 
             if (userSecondStake[account] != 0) {
                 if (currentCycle - userSecondStake[account] > 0) {
-                    uint256 unlockedSecondStake = userStakeCycle[account][
-                        userSecondStake[account]
-                    ];
+                    uint256 unlockedSecondStake = userStakeCycle[account][userSecondStake[account]];
 
                     addressRewards[account] += unlockedSecondStake;
                     userWithdrawableStake[account] += unlockedSecondStake;
                     
                     if (lastStartedCycle + 1 > userSecondStake[account]) {
-                        addressAccruedFees[account] =
-                            addressAccruedFees[account] +
-                            (
-                                (userStakeCycle[account][
-                                    userSecondStake[account]
-                                ] *
-                                    (cycleFeesPerStakeSummed[
-                                        lastStartedCycle + 1
-                                    ] -
-                                        cycleFeesPerStakeSummed[
-                                            userSecondStake[account]
-                                        ]))
-                            ) /
-                            scalingFactor;
+                        addressAccruedFees[account] = addressAccruedFees[account] + 
+                        (
+                            (userStakeCycle[account][userSecondStake[account]] * 
+                                (cycleFeesPerStakeSummed[lastStartedCycle + 1] - 
+                                    cycleFeesPerStakeSummed[userSecondStake[account]]
+                                )
+                            )
+                        ) / 
+                        scalingFactor;
                     }
 
                     userStakeCycle[account][userSecondStake[account]] = 0;
@@ -445,9 +422,7 @@ contract Deb0x is ERC2771Context {
         if (lastStartedCycle == currentStartedCycle) {
             pendingStakeWithdrawal += reward;
         } else {
-            summedCycleStakes[currentCycle] =
-                summedCycleStakes[currentCycle] -
-                reward;
+            summedCycleStakes[currentCycle] = summedCycleStakes[currentCycle] - reward;
         }
 
         dbx.mintReward(_msgSender(), reward);
@@ -468,9 +443,7 @@ contract Deb0x is ERC2771Context {
         if (lastStartedCycle == currentStartedCycle) {
             pendingStakeWithdrawal += reward;
         } else {
-            summedCycleStakes[currentCycle] =
-                summedCycleStakes[currentCycle] -
-                reward;
+            summedCycleStakes[currentCycle] = summedCycleStakes[currentCycle] - reward;
         }
 
         dbx.mintReward(_msgSender(), reward);
@@ -544,6 +517,7 @@ contract Deb0x is ERC2771Context {
         updateStats(_msgSender())
     {
         require(_amount != 0, "Deb0x: your amount is 0");
+
         require(
             _amount <= userWithdrawableStake[_msgSender()],
             "Deb0x: can not unstake more than you've staked"
@@ -590,9 +564,7 @@ contract Deb0x is ERC2771Context {
                 userSecondStake[staker] != 0 &&
                 calculatedCycle - userSecondStake[staker] > 0
             ) {
-                unlockedStake += userStakeCycle[staker][
-                    userSecondStake[staker]
-                ];
+                unlockedStake += userStakeCycle[staker][userSecondStake[staker]];
             }
         }
 
@@ -615,15 +587,12 @@ contract Deb0x is ERC2771Context {
             calculatedCycle > lastStartedCycleTemp &&
             cycleFeesPerStakeSummed[lastStartedCycleTemp + 1] == 0
         ) {
-            uint256 feePerStake = (cycleAccruedFees[lastStartedCycleTemp] *
-                scalingFactor) / summedCycleStakes[lastStartedCycleTemp];
-            currentCycleFeesPerStakeSummed =
-                cycleFeesPerStakeSummed[previousStartedCycle] +
-                feePerStake;
+            uint256 feePerStake = (cycleAccruedFees[lastStartedCycleTemp] * scalingFactor) / 
+            summedCycleStakes[lastStartedCycleTemp];
+
+            currentCycleFeesPerStakeSummed = cycleFeesPerStakeSummed[previousStartedCycle] + feePerStake;
         } else {
-            currentCycleFeesPerStakeSummed = cycleFeesPerStakeSummed[
-                previousStartedCycle
-            ];
+            currentCycleFeesPerStakeSummed = cycleFeesPerStakeSummed[previousStartedCycle];
         }
 
         uint256 currentRewards = getUnclaimedRewards(user);
@@ -632,38 +601,35 @@ contract Deb0x is ERC2771Context {
             calculatedCycle > lastStartedCycleTemp &&
             lastFeeUpdateCycle[user] != lastStartedCycleTemp + 1
         ) {
-            currentAccruedFees +=
-                (
-                    (currentRewards *
-                        (currentCycleFeesPerStakeSummed -
-                            cycleFeesPerStakeSummed[lastFeeUpdateCycle[user]]))
-                ) /
-                scalingFactor;
+            currentAccruedFees += (
+                (currentRewards * 
+                    (currentCycleFeesPerStakeSummed - cycleFeesPerStakeSummed[lastFeeUpdateCycle[user]])
+                )
+            ) / 
+            scalingFactor;
         }
 
         if (
             userFirstStake[user] != 0 &&
             calculatedCycle - userFirstStake[user] > 1
         ) {
-            currentAccruedFees +=
-                (
-                    (userStakeCycle[user][userFirstStake[user]] *
-                        (currentCycleFeesPerStakeSummed -
-                            cycleFeesPerStakeSummed[userFirstStake[user]]))
-                ) /
-                scalingFactor;
+            currentAccruedFees += (
+                (userStakeCycle[user][userFirstStake[user]] * 
+                    (currentCycleFeesPerStakeSummed - cycleFeesPerStakeSummed[userFirstStake[user]])
+                )
+            ) /
+            scalingFactor;
 
             if (
                 userSecondStake[user] != 0 &&
                 calculatedCycle - userSecondStake[user] > 1
             ) {
-                currentAccruedFees +=
-                    (
-                        (userStakeCycle[user][userSecondStake[user]] *
-                            (currentCycleFeesPerStakeSummed -
-                                cycleFeesPerStakeSummed[userSecondStake[user]]))
-                    ) /
-                    scalingFactor;
+                currentAccruedFees += (
+                    (userStakeCycle[user][userSecondStake[user]] * 
+                        (currentCycleFeesPerStakeSummed - cycleFeesPerStakeSummed[userSecondStake[user]])
+                    )
+                ) /
+                scalingFactor;
             }
         }
 
@@ -686,16 +652,14 @@ contract Deb0x is ERC2771Context {
             calculatedCycle > lastActiveCycle[user] &&
             userCycleMessages[user] != 0
         ) {
-            uint256 lastCycleUserReward = (userCycleMessages[user] *
-                rewardPerCycle[lastActiveCycle[user]]) /
-                cycleTotalMessages[lastActiveCycle[user]];
+            uint256 lastCycleUserReward = (userCycleMessages[user] * rewardPerCycle[lastActiveCycle[user]]) / 
+            cycleTotalMessages[lastActiveCycle[user]];
+            
             currentRewards += lastCycleUserReward;
 
             if (userCycleFeePercent[user] != 0) {
-                uint256 rewardPerMsg = lastCycleUserReward /
-                    userCycleMessages[user];
-                uint256 rewardsOwed = (rewardPerMsg *
-                    userCycleFeePercent[user]) / 10000;
+                uint256 rewardPerMsg = lastCycleUserReward / userCycleMessages[user];
+                uint256 rewardsOwed = (rewardPerMsg * userCycleFeePercent[user]) / 10000;
                 currentRewards -= rewardsOwed;
             }
         }
@@ -711,11 +675,8 @@ contract Deb0x is ERC2771Context {
                 frontendCycleFeePercent[frontend] != 0 &&
                 cycleTotalMessages[lastUpdatedCycle] != 0
             ) {
-                uint256 rewardPerMsg = rewardPerCycle[lastUpdatedCycle] /
-                    cycleTotalMessages[lastUpdatedCycle];
-                frontendRewards[frontend] +=
-                    (rewardPerMsg * frontendCycleFeePercent[frontend]) /
-                    10000;
+                uint256 rewardPerMsg = rewardPerCycle[lastUpdatedCycle] / cycleTotalMessages[lastUpdatedCycle];
+                frontendRewards[frontend] += (rewardPerMsg * frontendCycleFeePercent[frontend]) / 10000;
                 frontendCycleFeePercent[frontend] = 0;
             }
 
@@ -726,13 +687,13 @@ contract Deb0x is ERC2771Context {
             currentCycle > lastStartedCycle &&
             frontEndLastFeeUpdate[frontend] != lastStartedCycle + 1
         ) {
-            frontEndAccruedFees[frontend] +=
-                (frontendRewards[frontend] *
-                    (cycleFeesPerStakeSummed[lastStartedCycle + 1] -
-                        cycleFeesPerStakeSummed[
-                            frontEndLastFeeUpdate[frontend]
-                        ])) /
-                scalingFactor;
+            frontEndAccruedFees[frontend] += (
+                frontendRewards[frontend] * 
+                    (cycleFeesPerStakeSummed[lastStartedCycle + 1] - 
+                        cycleFeesPerStakeSummed[frontEndLastFeeUpdate[frontend]]
+                    )
+            ) /
+            scalingFactor;
 
             frontEndLastFeeUpdate[frontend] = lastStartedCycle + 1;
         }
@@ -767,7 +728,7 @@ contract Deb0x is ERC2771Context {
         bytes32 selfBodyHash = keccak256(
             abi.encodePacked(crefs[recipients.length - 1])
         );
-        
+
         emit Sent(
             _msgSender(),
             _msgSender(),
