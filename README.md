@@ -33,6 +33,11 @@ Run deploy script (Goerli testnet)
 npx hardhat run --network goerli scritps/deploy.js
 ```
 
+### run solhint
+1. `npm install` 
+2. `npx hardhat check`
+
+
 # Deb0x Contract Addresses 
 
 | Contract name            | Commit hash | Goerli Testnet                                 | Mainnet                                |
