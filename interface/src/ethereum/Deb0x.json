@@ -22,7 +22,7 @@
                 {
                     "indexed": true,
                     "internalType": "address",
-                    "name": "userAddress",
+                    "name": "account",
                     "type": "address"
                 },
                 {
@@ -46,7 +46,7 @@
                 {
                     "indexed": true,
                     "internalType": "address",
-                    "name": "userAddress",
+                    "name": "account",
                     "type": "address"
                 },
                 {
@@ -56,7 +56,7 @@
                     "type": "uint256"
                 }
             ],
-            "name": "FrontEndFeesClaimed",
+            "name": "ClientFeesClaimed",
             "type": "event"
         },
         {
@@ -70,7 +70,7 @@
                 {
                     "indexed": true,
                     "internalType": "address",
-                    "name": "userAddress",
+                    "name": "account",
                     "type": "address"
                 },
                 {
@@ -80,7 +80,7 @@
                     "type": "uint256"
                 }
             ],
-            "name": "FrontEndRewardsClaimed",
+            "name": "ClientRewardsClaimed",
             "type": "event"
         },
         {
@@ -142,7 +142,7 @@
                 {
                     "indexed": true,
                     "internalType": "address",
-                    "name": "userAddress",
+                    "name": "account",
                     "type": "address"
                 },
                 {
@@ -249,7 +249,7 @@
                 {
                     "indexed": true,
                     "internalType": "address",
-                    "name": "userAddress",
+                    "name": "account",
                     "type": "address"
                 },
                 {
@@ -273,7 +273,7 @@
                 {
                     "indexed": true,
                     "internalType": "address",
-                    "name": "userAddress",
+                    "name": "account",
                     "type": "address"
                 },
                 {
@@ -303,7 +303,7 @@
                 "name": "",
                 "type": "address"
             }],
-            "name": "addressAccruedFees",
+            "name": "accAccruedFees",
             "outputs": [{
                 "internalType": "uint256",
                 "name": "",
@@ -318,7 +318,7 @@
                 "name": "",
                 "type": "address"
             }],
-            "name": "addressRewards",
+            "name": "accRewards",
             "outputs": [{
                 "internalType": "uint256",
                 "name": "",
@@ -347,14 +347,14 @@
         },
         {
             "inputs": [],
-            "name": "claimFrontEndFees",
+            "name": "claimClientFees",
             "outputs": [],
             "stateMutability": "nonpayable",
             "type": "function"
         },
         {
             "inputs": [],
-            "name": "claimFrontEndRewards",
+            "name": "claimClientRewards",
             "outputs": [],
             "stateMutability": "nonpayable",
             "type": "function"
@@ -517,7 +517,7 @@
                 "name": "staker",
                 "type": "address"
             }],
-            "name": "getUserWithdrawableStake",
+            "name": "getAccWithdrawableStake",
             "outputs": [{
                 "internalType": "uint256",
                 "name": "",
@@ -700,7 +700,7 @@
                 "name": "",
                 "type": "address"
             }],
-            "name": "userWithdrawableStake",
+            "name": "accWithdrawableStake",
             "outputs": [{
                 "internalType": "uint256",
                 "name": "",

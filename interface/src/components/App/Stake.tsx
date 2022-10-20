@@ -205,9 +205,9 @@ export function Stake(props: any): any {
 
             const unclaimedRewards = await deb0xContract.getUnclaimedRewards(account);
 
-            const userWithdrawableStake = await deb0xContract.getUserWithdrawableStake(account)
+            const accWithdrawableStake = await deb0xContract.getAccWithdrawableStake(account)
             
-            let balance = parseFloat((ethers.utils.formatEther(unclaimedRewards.add(userWithdrawableStake))))
+            let balance = parseFloat((ethers.utils.formatEther(unclaimedRewards.add(accWithdrawableStake))))
             
             const currentCycle = await deb0xContract.currentStartedCycle()
 
@@ -398,7 +398,7 @@ export function Stake(props: any): any {
 
             const deb0xContract = await Deb0x(library, deb0xAddress)
 
-            const balance = await deb0xContract.getUserWithdrawableStake(account)
+            const balance = await deb0xContract.getAccWithdrawableStake(account)
 
             setUserStakedAmount(ethers.utils.formatEther(balance))
         }

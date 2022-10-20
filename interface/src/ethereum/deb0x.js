@@ -48,7 +48,7 @@ const abi = [
         "type": "address"
       }
     ],
-    "name": "addressAccruedFees",
+    "name": "accAccruedFees",
     "outputs": [
       {
         "internalType": "uint256",
@@ -67,7 +67,7 @@ const abi = [
         "type": "address"
       }
     ],
-    "name": "addressRewards",
+    "name": "accRewards",
     "outputs": [
       {
         "internalType": "uint256",
@@ -100,14 +100,14 @@ const abi = [
   },
   {
     "inputs": [],
-    "name": "claimFrontEndFees",
+    "name": "claimClientFees",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [],
-    "name": "claimFrontEndRewards",
+    "name": "claimClientRewards",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -423,7 +423,7 @@ const abi = [
         "type": "address"
       }
     ],
-    "name": "getUserWithdrawableStake",
+    "name": "getAccWithdrawableStake",
     "outputs": [
       {
         "internalType": "uint256",
@@ -602,7 +602,7 @@ const abi = [
         "type": "address"
       }
     ],
-    "name": "userWithdrawableStake",
+    "name": "accWithdrawableStake",
     "outputs": [
       {
         "internalType": "uint256",

@@ -105,14 +105,14 @@ function selectEvent(name) {
                 "type": "event"
             }
             break;
-        case 'FrontEndFeesClaimed':
+        case 'ClientFeesClaimed':
             topic = "";
             abi = {
                 "anonymous": false,
                 "inputs": [{
                         "indexed": true,
                         "internalType": "address",
-                        "name": "userAddress",
+                        "name": "account",
                         "type": "address"
                     },
                     {
@@ -128,7 +128,7 @@ function selectEvent(name) {
                         "type": "uint256"
                     }
                 ],
-                "name": "FrontEndFeesClaimed",
+                "name": "ClientFeesClaimed",
                 "type": "event"
             }
             break;
@@ -139,7 +139,7 @@ function selectEvent(name) {
                 "inputs": [{
                         "indexed": true,
                         "internalType": "address",
-                        "name": "userAddress",
+                        "name": "account",
                         "type": "address"
                     },
                     {
@@ -166,7 +166,7 @@ function selectEvent(name) {
                 "inputs": [{
                         "indexed": true,
                         "internalType": "address",
-                        "name": "userAddress",
+                        "name": "account",
                         "type": "address"
                     },
                     {
@@ -193,7 +193,7 @@ function selectEvent(name) {
                 "inputs": [{
                         "indexed": true,
                         "internalType": "address",
-                        "name": "userAddress",
+                        "name": "account",
                         "type": "address"
                     },
                     {
@@ -213,14 +213,14 @@ function selectEvent(name) {
                 "type": "event"
             }
             break;
-        case 'FrontEndRewardsClaimed':
+        case 'ClientRewardsClaimed':
             topic = "";
             abi = {
                 "anonymous": false,
                 "inputs": [{
                         "indexed": true,
                         "internalType": "address",
-                        "name": "userAddress",
+                        "name": "account",
                         "type": "address"
                     },
                     {
@@ -236,7 +236,7 @@ function selectEvent(name) {
                         "type": "uint256"
                     }
                 ],
-                "name": "FrontEndRewardsClaimed",
+                "name": "ClientRewardsClaimed",
                 "type": "event"
             }
             break;
@@ -247,7 +247,7 @@ function selectEvent(name) {
                 "inputs": [{
                         "indexed": true,
                         "internalType": "address",
-                        "name": "userAddress",
+                        "name": "account",
                         "type": "address"
                     },
                     {
