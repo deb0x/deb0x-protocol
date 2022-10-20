@@ -2,7 +2,7 @@
 pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
-import "./DBX.sol";
+import "./Deb0xERC20.sol";
 
 contract Deb0x is ERC2771Context {
 
@@ -11,7 +11,7 @@ contract Deb0x is ERC2771Context {
         uint256 timestamp;
     }
 
-    DBX public dbx;
+    Deb0xERC20 public dbx;
 
     uint16 public constant PROTOCOL_FEE = 1000;
 
@@ -345,7 +345,7 @@ contract Deb0x is ERC2771Context {
     }
 
     constructor(address forwarder) ERC2771Context(forwarder) {
-        dbx = new DBX();
+        dbx = new Deb0xERC20();
         i_initialTimestamp = block.timestamp;
         i_periodDuration = 1 days;
         currentCycleReward = 10000 * 1e18;
