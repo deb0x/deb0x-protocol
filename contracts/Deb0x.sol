@@ -335,14 +335,6 @@ contract Deb0x is ERC2771Context {
         return address(this).balance;
     }
 
-    function getCurrentCycle() public view returns(uint256){
-        return (block.timestamp - i_initialTimestamp) / i_periodDuration ;
-    }
-
-    function calculateCycleReward() public view returns(uint256){
-        return lastCycleReward * 10000 / 10020;
-    }
-
     function getUserWithdrawableStake(address staker) external view returns(uint256) {
         uint256 calculatedCycle = getCurrentCycle();
         uint256 unlockedStake = 0;
@@ -358,23 +350,6 @@ contract Deb0x is ERC2771Context {
             }
         }
         return userWithdrawableStake[staker] + unlockedStake;
-    }
-
-    function getUnclaimedRewards(address user) public view returns(uint256) {
-        uint256 currentRewards = addressRewards[user];
-        uint256 calculatedCycle = getCurrentCycle();
-
-        if(calculatedCycle > lastActiveCycle[user] && userCycleMessages[user] != 0) {
-                uint256 lastCycleUserReward = userCycleMessages[user] * rewardPerCycle[lastActiveCycle[user]] / cycleTotalMessages[lastActiveCycle[user]];
-                currentRewards += lastCycleUserReward;
-
-                if(userCycleFeePercent[user] != 0) {
-                uint256 rewardPerMsg = lastCycleUserReward / userCycleMessages[user];
-                uint256 rewardsOwed = rewardPerMsg * userCycleFeePercent[user] / 10000;
-                currentRewards -= rewardsOwed;
-                }
-            }
-        return currentRewards;
     }
 
     function getUnclaimedFees(address user) external view returns(uint256){
@@ -414,6 +389,31 @@ contract Deb0x is ERC2771Context {
             }
         }
         return currentAccruedFees;
+    }
+
+    function getCurrentCycle() public view returns(uint256){
+        return (block.timestamp - i_initialTimestamp) / i_periodDuration ;
+    }
+
+    function calculateCycleReward() public view returns(uint256){
+        return lastCycleReward * 10000 / 10020;
+    }
+
+    function getUnclaimedRewards(address user) public view returns(uint256) {
+        uint256 currentRewards = addressRewards[user];
+        uint256 calculatedCycle = getCurrentCycle();
+
+        if(calculatedCycle > lastActiveCycle[user] && userCycleMessages[user] != 0) {
+                uint256 lastCycleUserReward = userCycleMessages[user] * rewardPerCycle[lastActiveCycle[user]] / cycleTotalMessages[lastActiveCycle[user]];
+                currentRewards += lastCycleUserReward;
+
+                if(userCycleFeePercent[user] != 0) {
+                uint256 rewardPerMsg = lastCycleUserReward / userCycleMessages[user];
+                uint256 rewardsOwed = rewardPerMsg * userCycleFeePercent[user] / 10000;
+                currentRewards -= rewardsOwed;
+                }
+            }
+        return currentRewards;
     }
 
     function updateFrontEndStats(address frontend) internal {
