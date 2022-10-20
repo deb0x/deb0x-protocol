@@ -192,43 +192,10 @@ contract Deb0x is ERC2771Context {
         rewardPerCycle[0] = 10000 * 1e18;
     }
 
-
-    function updateFrontEndStats(address frontend) internal {
-        if(currentCycle > frontEndLastRewardUpdate[frontend]) {
-            uint256 lastUpdatedCycle = frontEndLastRewardUpdate[frontend];
-            if(frontendCycleFeePercent[frontend] != 0 && cycleTotalMessages[lastUpdatedCycle] != 0) {
-                uint256 rewardPerMsg = rewardPerCycle[lastUpdatedCycle] / cycleTotalMessages[lastUpdatedCycle];
-                frontendRewards[frontend] += rewardPerMsg * frontendCycleFeePercent[frontend] / 10000;
-                frontendCycleFeePercent[frontend] = 0;
-            }
-            frontEndLastRewardUpdate[frontend] = currentCycle;
-        }
-        if(currentCycle > lastStartedCycle && frontEndLastFeeUpdate[frontend] != lastStartedCycle + 1) {
-            frontEndAccruedFees[frontend] += (frontendRewards[frontend] 
-                * (cycleFeesPerStakeSummed[lastStartedCycle + 1] - cycleFeesPerStakeSummed[frontEndLastFeeUpdate[frontend]])) / dividend;
-            frontEndLastFeeUpdate[frontend] = lastStartedCycle + 1;
-        }
-    }
-
     function setKey(string memory publicKey) public {
         publicKeys[_msgSender()] = publicKey;
         bytes32 bodyHash= keccak256(abi.encodePacked(publicKey));
         emit KeySet(_msgSender(), bodyHash, publicKey);
-    }
-
-    function _send(address[] memory recipients, string[] memory cids) private returns(uint256) {
-        for (uint256 i = 0; i < recipients.length - 1; i++) {
-            Envelope memory currentStruct = Envelope({content:cids[i], timestamp: block.timestamp});
-            bytes32 bodyHash= keccak256(abi.encodePacked(cids[i]));
-            emit Sent(recipients[i], _msgSender(), bodyHash, currentStruct,sentId);
-        }
-        Envelope memory currentStruct = Envelope({content:cids[recipients.length -1], timestamp: block.timestamp});
-        bytes32 bodyHash= keccak256(abi.encodePacked(cids[recipients.length -1]));
-        emit Sent(_msgSender(), _msgSender(), bodyHash, currentStruct,sentId);
-        
-        uint256 oldSentId = sentId;
-        sentId++;
-        return oldSentId;
     }
 
     function getKey(address account) public view returns (string memory) {
@@ -293,16 +260,6 @@ contract Deb0x is ERC2771Context {
         dbx.mintReward(_msgSender(), reward);
         emit FrontEndRewardsClaimed(currentCycle, _msgSender(), reward);
     }
-    
-    function claimFrontEndFees() public calculateCycle updateCycleFeesPerStakeSummed {
-        updateFrontEndStats(_msgSender());
-        uint256 fees = frontEndAccruedFees[_msgSender()];
-        require(fees > 0, "Deb0x: You do not have accrued fees");
-     
-        frontEndAccruedFees[_msgSender()] = 0;
-        sendViaCall(payable(_msgSender()), fees);
-        emit FrontEndFeesClaimed(getCurrentCycle(), _msgSender(), fees);
-    }
 
     function claimFees() public calculateCycle updateCycleFeesPerStakeSummed notify(_msgSender()){
         uint256 fees = addressAccruedFees[_msgSender()];
@@ -311,6 +268,16 @@ contract Deb0x is ERC2771Context {
         addressAccruedFees[_msgSender()] = 0;
         sendViaCall(payable(_msgSender()), fees);
         emit FeesClaimed(getCurrentCycle(), _msgSender(), fees);
+    }
+
+    function claimFrontEndFees() public calculateCycle updateCycleFeesPerStakeSummed {
+        updateFrontEndStats(_msgSender());
+        uint256 fees = frontEndAccruedFees[_msgSender()];
+        require(fees > 0, "Deb0x: You do not have accrued fees");
+     
+        frontEndAccruedFees[_msgSender()] = 0;
+        sendViaCall(payable(_msgSender()), fees);
+        emit FrontEndFeesClaimed(getCurrentCycle(), _msgSender(), fees);
     }
 
     function stakeDBX(uint256 _amount)
@@ -363,11 +330,6 @@ contract Deb0x is ERC2771Context {
     
         dbx.transfer(_msgSender(), _amount);
         emit Unstaked(currentCycle, _msgSender(), _amount);
-    }
-
-    function sendViaCall(address payable _to, uint256 _amount) private {
-        (bool sent, ) = _to.call{value: _amount}("");
-        require(sent, "Deb0x: failed to send amount");
     }
 
     function contractBalance() public view returns (uint256) {
@@ -453,5 +415,42 @@ contract Deb0x is ERC2771Context {
             }
         }
         return currentAccruedFees;
+    }
+
+    function updateFrontEndStats(address frontend) internal {
+        if(currentCycle > frontEndLastRewardUpdate[frontend]) {
+            uint256 lastUpdatedCycle = frontEndLastRewardUpdate[frontend];
+            if(frontendCycleFeePercent[frontend] != 0 && cycleTotalMessages[lastUpdatedCycle] != 0) {
+                uint256 rewardPerMsg = rewardPerCycle[lastUpdatedCycle] / cycleTotalMessages[lastUpdatedCycle];
+                frontendRewards[frontend] += rewardPerMsg * frontendCycleFeePercent[frontend] / 10000;
+                frontendCycleFeePercent[frontend] = 0;
+            }
+            frontEndLastRewardUpdate[frontend] = currentCycle;
+        }
+        if(currentCycle > lastStartedCycle && frontEndLastFeeUpdate[frontend] != lastStartedCycle + 1) {
+            frontEndAccruedFees[frontend] += (frontendRewards[frontend] 
+                * (cycleFeesPerStakeSummed[lastStartedCycle + 1] - cycleFeesPerStakeSummed[frontEndLastFeeUpdate[frontend]])) / dividend;
+            frontEndLastFeeUpdate[frontend] = lastStartedCycle + 1;
+        }
+    }
+
+    function _send(address[] memory recipients, string[] memory cids) private returns(uint256) {
+        for (uint256 i = 0; i < recipients.length - 1; i++) {
+            Envelope memory currentStruct = Envelope({content:cids[i], timestamp: block.timestamp});
+            bytes32 bodyHash= keccak256(abi.encodePacked(cids[i]));
+            emit Sent(recipients[i], _msgSender(), bodyHash, currentStruct,sentId);
+        }
+        Envelope memory currentStruct = Envelope({content:cids[recipients.length -1], timestamp: block.timestamp});
+        bytes32 bodyHash= keccak256(abi.encodePacked(cids[recipients.length -1]));
+        emit Sent(_msgSender(), _msgSender(), bodyHash, currentStruct,sentId);
+        
+        uint256 oldSentId = sentId;
+        sentId++;
+        return oldSentId;
+    }
+
+    function sendViaCall(address payable _to, uint256 _amount) private {
+        (bool sent, ) = _to.call{value: _amount}("");
+        require(sent, "Deb0x: failed to send amount");
     }
 }
