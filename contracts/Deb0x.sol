@@ -260,8 +260,8 @@ contract Deb0x is ERC2771Context {
             }
         }
 
-        uint256 sentId = _send(to, payload);
-        emit SendEntryCreated(currentCycle, sentId, feeReceiver, msgFee, nativeTokenFee);
+        uint256 _sentId = _send(to, payload);
+        emit SendEntryCreated(currentCycle, _sentId, feeReceiver, msgFee, nativeTokenFee);
     }
 
     function claimRewards() public calculateCycle updateCycleFeesPerStakeSummed  notify(_msgSender()) {
@@ -274,8 +274,8 @@ contract Deb0x is ERC2771Context {
             summedCycleStakes[currentCycle] = summedCycleStakes[currentCycle] - reward;
         }
         
-        emit RewardsClaimed(currentCycle, msg.sender, reward);
         dbx.mintReward(_msgSender(), reward);
+        emit RewardsClaimed(currentCycle, _msgSender(), reward);
     }
 
     function claimFrontEndRewards() public calculateCycle updateCycleFeesPerStakeSummed  {
@@ -290,8 +290,8 @@ contract Deb0x is ERC2771Context {
             summedCycleStakes[currentCycle] = summedCycleStakes[currentCycle] - reward;
         }
 
-        emit FrontEndRewardsClaimed(currentCycle,msg.sender,reward);
         dbx.mintReward(_msgSender(), reward);
+        emit FrontEndRewardsClaimed(currentCycle, _msgSender(), reward);
     }
     
     function claimFrontEndFees() public calculateCycle updateCycleFeesPerStakeSummed {
@@ -301,7 +301,7 @@ contract Deb0x is ERC2771Context {
      
         frontEndAccruedFees[_msgSender()] = 0;
         sendViaCall(payable(_msgSender()), fees);
-        emit FrontEndFeesClaimed(getCurrentCycle(), msg.sender, fees);
+        emit FrontEndFeesClaimed(getCurrentCycle(), _msgSender(), fees);
     }
 
     function claimFees() public calculateCycle updateCycleFeesPerStakeSummed notify(_msgSender()){
@@ -310,7 +310,7 @@ contract Deb0x is ERC2771Context {
        
         addressAccruedFees[_msgSender()] = 0;
         sendViaCall(payable(_msgSender()), fees);
-        emit FeesClaimed(getCurrentCycle(), msg.sender, fees);
+        emit FeesClaimed(getCurrentCycle(), _msgSender(), fees);
     }
 
     function stakeDBX(uint256 _amount)
@@ -339,8 +339,8 @@ contract Deb0x is ERC2771Context {
             }
         userStakeCycle[_msgSender()][cycleToSet] += _amount;
 
-        emit Staked(cycleToSet, msg.sender, _amount);
         dbx.transferFrom(_msgSender(), address(this), _amount);
+        emit Staked(cycleToSet, _msgSender(), _amount);
     }
 
     function unstake(uint256 _amount) 
@@ -362,7 +362,7 @@ contract Deb0x is ERC2771Context {
         addressRewards[_msgSender()] -= _amount;
     
         dbx.transfer(_msgSender(), _amount);
-        emit Unstaked(currentCycle,  msg.sender,  _amount);
+        emit Unstaked(currentCycle, _msgSender(), _amount);
     }
 
     function sendViaCall(address payable _to, uint256 _amount) private {
