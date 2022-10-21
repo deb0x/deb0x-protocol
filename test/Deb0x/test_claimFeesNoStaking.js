@@ -46,9 +46,9 @@ describe("Test fee claiming for users/frontends without concurrently staking/uns
 
         await rewardedAlice.claimFees()
         await rewardedBob.claimFees()
-        await frontend.claimFrontEndFees();
+        await frontend.claimClientFees();
         const feesClaimed = await rewardedAlice.queryFilter("FeesClaimed")
-        const feesClaimedAsFrontend = await frontend.queryFilter("FrontEndFeesClaimed");
+        const feesClaimedAsFrontend = await frontend.queryFilter("ClientFeesClaimed");
         let totalFeesClaimedFrontend = BigNumber.from("0")
         let totalFeesClaimed = BigNumber.from("0")
         for (let entry of feesClaimed) {

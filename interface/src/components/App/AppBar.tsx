@@ -15,7 +15,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import '../../componentsStyling/appBar.scss';
 
-const deb0xERC20Address = "0x7c8B0C62c2cB8BEd8A60555D14722ACFf4D760e5"
+const deb0xERC20Address = "0x341B0ceaeD9331F3c0a4548a8AB75D5918076654"
 enum ConnectorNames { Injected = 'Injected' };
 
 const connectorsByName: { [connectorName in ConnectorNames]: any } = {
@@ -76,12 +76,14 @@ export function AppBarComponent(props: any): any {
     },[userUnstakedAmount])
 
     async function checkENS(){
- 
-        var name = await library.lookupAddress(account);
-        if(name !== null)
-        {   
-            setEnsName(name);
+        if(chainId !=137){
+            var name = await library.lookupAddress(account);
+            if(name !== null)
+            {   
+                setEnsName(name);
+            }
         }
+       
     }
 
     function handleClick (event: React.MouseEvent<HTMLElement>) {

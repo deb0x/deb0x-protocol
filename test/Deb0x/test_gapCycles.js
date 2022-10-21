@@ -86,7 +86,7 @@ describe("Test contract functionalities while having cycles with no messages sen
 
         await hre.ethers.provider.send("evm_increaseTime", [2 * 60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
-        await frontend.claimFrontEndFees();
+        await frontend.claimClientFees();
 
         await hre.ethers.provider.send("evm_increaseTime", [2 * 60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
@@ -101,7 +101,7 @@ describe("Test contract functionalities while having cycles with no messages sen
         const feesCollected = await rewardedAlice.cycleAccruedFees(0);
 
         let totalFeesClaimedFrontend = BigNumber.from("0")
-        const feesClaimedAsFrontend = await frontend.queryFilter("FrontEndFeesClaimed");
+        const feesClaimedAsFrontend = await frontend.queryFilter("ClientFeesClaimed");
         for (let entry of feesClaimedAsFrontend) {
             totalFeesClaimedFrontend = totalFeesClaimedFrontend.add(entry.args.fees)
         }

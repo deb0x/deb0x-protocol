@@ -427,7 +427,7 @@ describe("Test DBX tokens distributions", async function() {
 
         await user1Reward.claimFees()
         await user2Reward.claimFees()
-        await frontend.claimFrontEndFees();
+        await frontend.claimClientFees();
 
         const feesClaimed = await userReward.queryFilter("FeesClaimed")
         let totalFeesClaimed = BigNumber.from("0")
@@ -437,7 +437,7 @@ describe("Test DBX tokens distributions", async function() {
         const feesCollected = await userReward.cycleAccruedFees(0)
 
         let totalFeesClaimedFrontend = BigNumber.from("0")
-        const feesClaimedAsFrontend = await frontend.queryFilter("FrontEndFeesClaimed");
+        const feesClaimedAsFrontend = await frontend.queryFilter("ClientFeesClaimed");
         for (let entry of feesClaimedAsFrontend) {
             totalFeesClaimedFrontend = totalFeesClaimedFrontend.add(entry.args.fees)
         }
@@ -457,7 +457,7 @@ describe("Test DBX tokens distributions", async function() {
 
         await user1Reward.claimFees()
         await user2Reward.claimFees()
-        await frontend.claimFrontEndFees();
+        await frontend.claimClientFees();
 
         let feesClaimed = await userReward.queryFilter("FeesClaimed")
         let totalFeesClaimedCycle1 = BigNumber.from("0")
@@ -477,7 +477,7 @@ describe("Test DBX tokens distributions", async function() {
         await user1Reward.claimFees()
         await user2Reward.claimFees()
         await user3Reward.claimFees()
-        await frontend.claimFrontEndFees();
+        await frontend.claimClientFees();
 
         let feesClaimed2 = await userReward.queryFilter("FeesClaimed")
         let totalFeesClaimedCycle2 = BigNumber.from("0")
@@ -486,7 +486,7 @@ describe("Test DBX tokens distributions", async function() {
         }
         const feesCollectedBothCycles = (await userReward.cycleAccruedFees(0)).add(await userReward.cycleAccruedFees(1))
         let totalFeesClaimedFrontend = BigNumber.from("0")
-        const feesClaimedAsFrontend = await frontend.queryFilter("FrontEndFeesClaimed");
+        const feesClaimedAsFrontend = await frontend.queryFilter("ClientFeesClaimed");
         for (let entry of feesClaimedAsFrontend) {
             totalFeesClaimedFrontend = totalFeesClaimedFrontend.add(entry.args.fees)
         }
@@ -509,7 +509,7 @@ describe("Test DBX tokens distributions", async function() {
         await user1Reward.claimFees()
         await user2Reward.claimFees()
         await user3Reward.claimFees()
-        await frontend.claimFrontEndFees();
+        await frontend.claimClientFees();
 
         let feesClaimed = await userReward.queryFilter("FeesClaimed")
         let totalFeesClaimedCycle1 = BigNumber.from("0")
@@ -535,7 +535,7 @@ describe("Test DBX tokens distributions", async function() {
         await user1Reward.claimFees()
         await user2Reward.claimFees()
         await user3Reward.claimFees()
-        await frontend.claimFrontEndFees();
+        await frontend.claimClientFees();
 
         let feesClaimed2 = await userReward.queryFilter("FeesClaimed")
         let totalFeesClaimedCycle2 = BigNumber.from("0")
@@ -556,7 +556,7 @@ describe("Test DBX tokens distributions", async function() {
         await user1Reward.claimFees()
         await user2Reward.claimFees()
         await user3Reward.claimFees()
-        await frontend.claimFrontEndFees();
+        await frontend.claimClientFees();
 
         let feesClaimed3 = await userReward.queryFilter("FeesClaimed")
         let totalFeesClaimedCycle3 = BigNumber.from("0")
@@ -564,7 +564,7 @@ describe("Test DBX tokens distributions", async function() {
             totalFeesClaimedCycle3 = totalFeesClaimedCycle3.add(entry.args.fees)
         }
         let totalFeesClaimedFrontend = BigNumber.from("0")
-        const feesClaimedAsFrontend = await frontend.queryFilter("FrontEndFeesClaimed");
+        const feesClaimedAsFrontend = await frontend.queryFilter("ClientFeesClaimed");
         for (let entry of feesClaimedAsFrontend) {
             totalFeesClaimedFrontend = totalFeesClaimedFrontend.add(entry.args.fees)
         }
@@ -611,7 +611,7 @@ describe("Test DBX tokens distributions", async function() {
         let actualBalanceUser3 = await dbxERC20.balanceOf(user3.address);
         expect(expectedValueUser3).to.equal(actualBalanceUser3)
 
-        await user3Reward.unstake(await user3Reward.getUserWithdrawableStake(user3.address))
+        await user3Reward.unstake(await user3Reward.getAccWithdrawableStake(user3.address))
         let expectedValueUser3ForUnstakeValue = amountToStake;
         let actualBalanceUser3AfterUnstake = await dbxERC20.balanceOf(user3.address);
         //5000 DBX tokens was staked + balance before unstake action
@@ -671,7 +671,7 @@ describe("Test DBX tokens distributions", async function() {
         expect(expectedValueUser3).to.equal(actualBalanceUser3)
 
         await user2Reward.claimRewards()
-        await user2Reward.unstake(await user2Reward.getUserWithdrawableStake(user2.address))
+        await user2Reward.unstake(await user2Reward.getAccWithdrawableStake(user2.address))
         let actualBalanceUser2AfterUnstake = await dbxERC20.balanceOf(user2.address);
         let cycle2AndCycle3Value = BigNumber.from(user3RewardInCycle3).add(BigNumber.from(userTotalRewardSecondCycle)).add(BigNumber.from(userTotalRewardFirstCycle))
         expect(cycle2AndCycle3Value).to.equal(actualBalanceUser2AfterUnstake)
@@ -679,7 +679,7 @@ describe("Test DBX tokens distributions", async function() {
         await user1Reward.claimFees()
         await user2Reward.claimFees()
         await user3Reward.claimFees()
-        await frontend.claimFrontEndFees();
+        await frontend.claimClientFees();
         const feesClaimed = await user1Reward.queryFilter("FeesClaimed")
         let totalFeesClaimed = BigNumber.from("0")
         for (let entry of feesClaimed) {
@@ -690,7 +690,7 @@ describe("Test DBX tokens distributions", async function() {
             .add(await user1Reward.cycleAccruedFees(2))
 
         let totalFeesClaimedFrontend = BigNumber.from("0")
-        const feesClaimedAsFrontend = await frontend.queryFilter("FrontEndFeesClaimed");
+        const feesClaimedAsFrontend = await frontend.queryFilter("ClientFeesClaimed");
         for (let entry of feesClaimedAsFrontend) {
             totalFeesClaimedFrontend = totalFeesClaimedFrontend.add(entry.args.fees)
         }
@@ -710,13 +710,13 @@ describe("Test DBX tokens distributions", async function() {
         try {
             await user1Reward.claimRewards()
         } catch (error) {
-            expect(error.message).to.include("Deb0x: You do not have rewards");
+            expect(error.message).to.include("Deb0x: account has no rewards");
         }
 
         try {
             await user2Reward.claimFees()
         } catch (error) {
-            expect(error.message).to.include('Deb0x: You do not have accrued fees')
+            expect(error.message).to.include('Deb0x: account has no accrued fees')
         }
     });
 
@@ -730,15 +730,15 @@ describe("Test DBX tokens distributions", async function() {
 
         await user1Reward.claimFees()
         await user2Reward.claimFees()
-        await frontend.claimFrontEndRewards();
+        await frontend.claimClientRewards();
         let excepetedValue = BigNumber.from("10000000000000000000").mul(BigNumber.from(NumUtils.day(1))).div(BigNumber.from("100000000000000000000"))
         let frontBalance = await dbxERC20.balanceOf(feeReceiver.address)
         expect(excepetedValue).to.equal(frontBalance)
 
         try {
-            await frontend.claimFrontEndRewards();
+            await frontend.claimClientRewards();
         } catch (error) {
-            expect(error.message).to.include("Deb0x: You do not have rewards");
+            expect(error.message).to.include("Deb0x: account has no rewards");
         }
     });
 
@@ -751,9 +751,9 @@ describe("Test DBX tokens distributions", async function() {
         await hre.ethers.provider.send("evm_mine")
 
         try {
-            await frontend.claimFrontEndFees();
+            await frontend.claimClientFees();
         } catch (error) {
-            expect(error.message).to.include("Deb0x: You do not have accrued fees")
+            expect(error.message).to.include("Deb0x: account has no accrued fees")
         }
     });
 
@@ -765,7 +765,7 @@ describe("Test DBX tokens distributions", async function() {
             await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
                 feeReceiver.address, 1000, 0)
         } catch (error) {
-            expect(error.message).to.include("Deb0x: must pay 10% of transaction cost")
+            expect(error.message).to.include("Deb0x: value must be >= 10% of the spent gas")
         }
     });
 
@@ -784,15 +784,15 @@ describe("Test DBX tokens distributions", async function() {
         await user3Reward.stakeDBX(await dbxERC20.balanceOf(user3.address))
 
         try {
-            await user2Reward.stakeDBX(await userReward.getUserWithdrawableStake(user2.address))
+            await user2Reward.stakeDBX(await userReward.getAccWithdrawableStake(user2.address))
         } catch (error) {
-            expect(error.message).to.include("Deb0x: your amount is 0");
+            expect(error.message).to.include("Deb0x: amount arg is zero");
         }
 
         try {
-            await user2Reward.unstake(await userReward.getUserWithdrawableStake(user2.address))
+            await user2Reward.unstake(await userReward.getAccWithdrawableStake(user2.address))
         } catch (error) {
-            expect(error.message).to.include("Deb0x: your amount is 0");
+            expect(error.message).to.include("Deb0x: amount arg is zero");
         }
 
         await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -813,7 +813,7 @@ describe("Test DBX tokens distributions", async function() {
         try {
             await user3Reward.unstake(BigNumber.from("51000000000000000000"))
         } catch (error) {
-            expect(error.message).to.include("'Deb0x: can not unstake more than you've staked'")
+            expect(error.message).to.include("'Deb0x: can not unstake more than withdrawable stake'")
         }
     });
 
@@ -848,13 +848,13 @@ describe("Test DBX tokens distributions", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        await user3Reward.getUserWithdrawableStake(user3.address);
+        await user3Reward.getAccWithdrawableStake(user3.address);
 
         await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        await user3Reward.getUserWithdrawableStake(user3.address);
+        await user3Reward.getAccWithdrawableStake(user3.address);
         await user3Reward.claimRewards()
         await dbxERC20.connect(user3).approve(userReward.address, await dbxERC20.balanceOf(user3.address))
         await user3Reward.stakeDBX(await dbxERC20.balanceOf(user3.address))
@@ -869,7 +869,7 @@ describe("Test DBX tokens distributions", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        await user3Reward.getUserWithdrawableStake(user3.address);
+        await user3Reward.getAccWithdrawableStake(user3.address);
         await user3Reward.claimRewards()
         await dbxERC20.connect(user3).approve(userReward.address, await dbxERC20.balanceOf(user3.address))
         await user3Reward.stakeDBX(await dbxERC20.balanceOf(user3.address))
@@ -890,8 +890,8 @@ describe("Test DBX tokens distributions", async function() {
         await dbxERC20.connect(user3).approve(userReward.address, await dbxERC20.balanceOf(user3.address))
         await user3Reward.stakeDBX(await dbxERC20.balanceOf(user3.address))
 
-        let expectedValue = await user3Reward.getUserWithdrawableStake(user3.address);
-        await user3Reward.unstake(await user3Reward.getUserWithdrawableStake(user3.address))
+        let expectedValue = await user3Reward.getAccWithdrawableStake(user3.address);
+        await user3Reward.unstake(await user3Reward.getAccWithdrawableStake(user3.address))
         let actualBalanceAfterUnstake = await dbxERC20.balanceOf(user3.address);
         expect(expectedValue).to.equal(actualBalanceAfterUnstake)
     });
