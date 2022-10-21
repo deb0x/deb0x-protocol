@@ -6,7 +6,7 @@ const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.jso
 const { NumUtils } = require("../utils/NumUtils.ts");
 
 describe("Test ERC20 require", async function() {
-    let userReward, user1Reward, user2Reward, user3Reward, frontend, dbxERC20;
+    let userReward, user1Reward, user2Reward, user3Reward, frontend, dbxERC20, totalMinted;
     let user1, user2;
     beforeEach("Set enviroment", async() => {
         [user1, user2, user3, messageReceiver, feeReceiver] = await ethers.getSigners();
@@ -30,20 +30,34 @@ describe("Test ERC20 require", async function() {
             await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
             await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
             await hre.ethers.provider.send("evm_mine")
-            console.log("Cyclu" + i)
+            totalMinted = totalMinted + NumUtils.day(i + 1);
+            console.log("Cyclu " + i)
         }
 
-        for (let i = 15000; i <= 22532; i++) {
-            await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-            await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-            await hre.ethers.provider.send("evm_mine")
-            console.log("Cyclu for 2" + i)
-        }
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
         console.log("Total supply of ERC20:");
         console.log(await dbxERC20.totalSupply());
     });
+
+    it.only(`Should test require`, async() => {
+        console.log("T0TAL DIN PRIMUL " + totalMinted);
+        for (let i = 15001; i < 22532; i++) {
+            await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+            await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+            await hre.ethers.provider.send("evm_mine")
+            totalMinted = totalMinted + NumUtils.day(i + 1);
+            console.log("Cyclu din al doilea it  " + i)
+        }
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+
+        console.log("Total supply of ERC20:");
+        console.log("T0TAL " + totalMinted);
+        console.log(await dbxERC20.totalSupply());
+    });
+
+
 
 });
