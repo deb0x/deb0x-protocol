@@ -188,6 +188,7 @@ contract Deb0x is Deb0xCore {
         setUpNewCycle
         notify(_msgSender())
     {
+        require(msgFee < 10001, "Deb0x: Reward fees can not exceed 100%");
         updateFrontEndStats(feeReceiver);
 
         userCycleMessages[_msgSender()]++;
