@@ -8,13 +8,13 @@ describe("Test Deb0xERC20 contract", async function() {
         [deployer] = await ethers.getSigners();
 
         const Deb0xERC20 = await ethers.getContractFactory("Deb0xERC20");
-        erc20 = await Deb0xERC20.deploy(deployer.address);
+        erc20 = await Deb0xERC20.deploy();
         await erc20.deployed();
     });
 
     it(`Test balanceOf function after deploy`, async() => {
         let actualBalanceForDeployer = await erc20.balanceOf(deployer.address)
-        expect(actualBalanceForDeployer).to.equal(ethers.utils.parseEther("1000000"))
+        expect(actualBalanceForDeployer).to.equal(ethers.utils.parseEther("0"))
     });
 
 })

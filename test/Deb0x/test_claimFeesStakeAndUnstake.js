@@ -81,7 +81,7 @@ describe("Test contract", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        let unstakeAmount = await rewardedAlice.getUserWithdrawableStake(alice.address)
+        let unstakeAmount = await rewardedAlice.getAccWithdrawableStake(alice.address)
         await rewardedAlice.unstake(unstakeAmount)
         const unstakedValueAlice = await rewardedAlice.queryFilter("Unstaked");
         let AliceUnstakedValue = BigNumber.from("0")
