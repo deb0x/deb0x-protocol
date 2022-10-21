@@ -26,11 +26,18 @@ describe("Test ERC20 require", async function() {
 
     //Tests without fees
     it.only(`Should test require`, async() => {
-        for (let i = 0; i <= 22532; i++) {
+        for (let i = 0; i <= 15000; i++) {
             await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
             await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
             await hre.ethers.provider.send("evm_mine")
             console.log("Cyclu" + i)
+        }
+
+        for (let i = 15000; i <= 22532; i++) {
+            await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+            await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+            await hre.ethers.provider.send("evm_mine")
+            console.log("Cyclu for 2" + i)
         }
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
