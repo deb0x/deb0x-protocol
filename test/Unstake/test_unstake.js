@@ -54,22 +54,22 @@ describe("Test unstake functionality", async function() {
         await user3Reward.claimRewards();
         await user3Reward.stakeDBX(balanceBigNumberFormat)
         console.log("Balance account after third stake but in second cycle: " + ethers.utils.formatEther(await dbxERC20.balanceOf(user3.address)))
-        console.log("Acc  " + ethers.utils.formatEther(await user3Reward.getUserWithdrawableStake(user3.address)))
+        console.log("Acc  " + ethers.utils.formatEther(await user3Reward.getAccWithdrawableStake(user3.address)))
 
         await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        let valueToUnstake = await user3Reward.getUserWithdrawableStake(user3.address);
+        let valueToUnstake = await user3Reward.getAccWithdrawableStake(user3.address);
         console.log(valueToUnstake)
         expect(valueToUnstake).to.equal(BigNumber.from("3750000000000000000000"))
         console.log("Valoare la care trebuie facut unstake: " + ethers.utils.formatEther(valueToUnstake))
         await user3Reward.unstake("37000000000000000000")
 
-        console.log("Valoare dupa unstake  " + ethers.utils.formatEther(await user3Reward.getUserWithdrawableStake(user3.address)))
+        console.log("Valoare dupa unstake  " + ethers.utils.formatEther(await user3Reward.getAccWithdrawableStake(user3.address)))
 
-        let amoutToUnstakeAfterTwoStakeActionInFirstCycle = ethers.utils.formatEther(await user3Reward.getUserWithdrawableStake(user3.address));
+        let amoutToUnstakeAfterTwoStakeActionInFirstCycle = ethers.utils.formatEther(await user3Reward.getAccWithdrawableStake(user3.address));
         console.log("Valoare dupa unstake  " + amoutToUnstakeAfterTwoStakeActionInFirstCycle);
 
     });
@@ -82,7 +82,7 @@ describe("Test unstake functionality", async function() {
 
         await user1Reward.claimRewards()
 
-        const user1AddressAccruedFees1 = await user1Reward.addressAccruedFees(user1.address)
+        const user1accAccruedFees1 = await user1Reward.accAccruedFees(user1.address)
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
@@ -94,16 +94,16 @@ describe("Test unstake functionality", async function() {
         await hre.ethers.provider.send("evm_mine")
 
         await user1Reward.unstake(user1Balance)
-        const user1AddressAccruedFees2 = await user1Reward.addressAccruedFees(user1.address)
+        const user1accAccruedFees2 = await user1Reward.accAccruedFees(user1.address)
         expect(await dbxERC20.balanceOf(user1.address)).to.equal(user1Balance)
-        expect(user1AddressAccruedFees2).equal(user1AddressAccruedFees1)
+        expect(user1accAccruedFees2).equal(user1accAccruedFees1)
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 2])
         await hre.ethers.provider.send("evm_mine")
 
         await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        const user1AddressAccruedFees3 = await user1Reward.addressAccruedFees(user1.address)
-        expect(user1AddressAccruedFees3).equal(user1AddressAccruedFees2)
+        const user1accAccruedFees3 = await user1Reward.accAccruedFees(user1.address)
+        expect(user1accAccruedFees3).equal(user1accAccruedFees2)
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
@@ -130,7 +130,7 @@ describe("Test unstake functionality", async function() {
         await hre.ethers.provider.send("evm_mine")
 
         await user1Reward.claimRewards()
-        const user1AddressAccruedFees1 = await user1Reward.addressAccruedFees(user1.address)
+        const user1accAccruedFees1 = await user1Reward.accAccruedFees(user1.address)
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
@@ -153,12 +153,12 @@ describe("Test unstake functionality", async function() {
         for(let entry of feesClaimed){
             user1ClaimedFees = user1ClaimedFees.add(entry.args.fees)
         }
-        expect(user1ClaimedFees).to.equal(user1AddressAccruedFees1)
-        // const user1AddressAccruedFees1 = await user1Reward.addressAccruedFees(user1.address)
-        // console.log(user1AddressAccruedFees1.toString())
+        expect(user1ClaimedFees).to.equal(user1accAccruedFees1)
+        // const user1accAccruedFees1 = await user1Reward.accAccruedFees(user1.address)
+        // console.log(user1accAccruedFees1.toString())
         // await user1Reward.unstake(user1Balance.div(BigNumber.from("2")))
-        // const user1AddressAccruedFees2 = await user1Reward.addressAccruedFees(user1.address)
-        // console.log(user1AddressAccruedFees2.toString())
+        // const user1accAccruedFees2 = await user1Reward.accAccruedFees(user1.address)
+        // console.log(user1accAccruedFees2.toString())
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")

@@ -36,7 +36,7 @@ describe("Test rewards claiming for frontends", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        await rewardedFeeReceiver.claimFrontEndRewards()
+        await rewardedFeeReceiver.claimClientRewards()
         console.log(ethers.utils.formatEther(await dbxERC20.balanceOf(feeReceiver.address)))
     });
 
@@ -61,7 +61,7 @@ describe("Test rewards claiming for frontends", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        await rewardedFeeReceiver.claimFrontEndRewards()
+        await rewardedFeeReceiver.claimClientRewards()
         console.log(ethers.utils.formatEther(await dbxERC20.balanceOf(feeReceiver.address)))
     });
 
@@ -81,7 +81,7 @@ describe("Test rewards claiming for frontends", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        await rewardedFeeReceiver.claimFrontEndRewards()
+        await rewardedFeeReceiver.claimClientRewards()
         console.log(ethers.utils.formatEther(await dbxERC20.balanceOf(feeReceiver.address)))
     });
 
@@ -99,8 +99,8 @@ describe("Test rewards claiming for frontends", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        await rewardedFeeReceiver.claimFrontEndRewards()
-        await rewardedFeeReceiver2.claimFrontEndRewards()
+        await rewardedFeeReceiver.claimClientRewards()
+        await rewardedFeeReceiver2.claimClientRewards()
         console.log("FeeReceiver1 acc. fees " + ethers.utils.formatEther(await dbxERC20.balanceOf(feeReceiver.address)))
         console.log("FeeReceiver2 acc. fees " + ethers.utils.formatEther(await dbxERC20.balanceOf(feeReceiver2.address)))
     });
@@ -139,9 +139,9 @@ describe("Test rewards claiming for frontends", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        await rewardedFeeReceiver.claimFrontEndRewards()
-        await rewardedFeeReceiver2.claimFrontEndRewards()
-        await rewardedFeeReceiver3.claimFrontEndRewards()
+        await rewardedFeeReceiver.claimClientRewards()
+        await rewardedFeeReceiver2.claimClientRewards()
+        await rewardedFeeReceiver3.claimClientRewards()
         console.log("FeeReceiver acc. fees " + ethers.utils.formatEther(await dbxERC20.balanceOf(feeReceiver.address)))
         console.log("FeeReceiver2 acc. fees " + ethers.utils.formatEther(await dbxERC20.balanceOf(feeReceiver2.address)))
         console.log("FeeReceiver3 acc. fees " + ethers.utils.formatEther(await dbxERC20.balanceOf(feeReceiver3.address)))

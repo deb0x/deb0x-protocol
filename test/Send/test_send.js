@@ -91,7 +91,7 @@ describe("Test send functionality from Deb0xCore contract!", async function() {
     beforeEach("Set enviroment", async() => {
         [deployer, add1, add2, add3, add4, add5, add6, add7] = await ethers.getSigners();
 
-        const Deb0xCore = await ethers.getContractFactory("Deb0xCore");
+        const Deb0xCore = await ethers.getContractFactory("Deb0x");
         deboxCore = await Deb0xCore.deploy(ethers.constants.AddressZero);
         await deboxCore.deployed();
     });
@@ -99,7 +99,7 @@ describe("Test send functionality from Deb0xCore contract!", async function() {
     it(`Test send function`, async() => {
         let addresses = [add1.address, add2.address, add2.address];
         let cids = ["ipfs1", "ipfs2", "ipfs2"];
-        let transaction = await deboxCore.send(addresses, cids)
+        let transaction = await deboxCore.send(addresses, cids, ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         let receipt = await transaction.wait();
 
         for (let i = 0; i < receipt.events.length - 1; i++) {
@@ -111,9 +111,9 @@ describe("Test send functionality from Deb0xCore contract!", async function() {
     it(`Test send function with multimple messages`, async() => {
         let addresses = [add1.address, add2.address, add3.address, add4.address, add5.address, add5.address, add5.address, add5.address];
         let cids = ["ipfs1", "ipfs2", "ipfs4", "ipfs4", "ipfs5", "ipfs5", "ipfs5", "ipfs5"];
-        await deboxCore.send(addresses, cids)
+        // await deboxCore.send(addresses, cids)
 
-        let transaction = await deboxCore.send(addresses, cids)
+        let transaction = await deboxCore.send(addresses, cids, ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         let receipt = await transaction.wait();
 
         for (let i = 0; i < receipt.events.length - 1; i++) {
@@ -125,7 +125,7 @@ describe("Test send functionality from Deb0xCore contract!", async function() {
     it(`Test fetch messages in case of multimple messages`, async() => {
         let addresses = [add1.address, add2.address, add3.address, add3.address];
         let cids = ["ipfs1", "ipfs2", "ipfs4", "ipfs4"];
-        let transaction = await deboxCore.send(addresses, cids)
+        let transaction = await deboxCore.send(addresses, cids, ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         let receipt = await transaction.wait();
 
         for (let i = 0; i < receipt.events.length - 1; i++) {
@@ -135,7 +135,7 @@ describe("Test send functionality from Deb0xCore contract!", async function() {
         let addresses2 = [add1.address, add2.address, add3.address, add3.address];
         let cids2 = ["ipfs1", "ipfs2", "ipfs4", "ipfs4"];
 
-        let transactionAddress1 = await deboxCore.connect(add1).send(addresses2, cids2)
+        let transactionAddress1 = await deboxCore.connect(add1).send(addresses2, cids2, ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         let receiptAddress1 = await transactionAddress1.wait();
 
         for (let i = 0; i < receiptAddress1.events.length - 1; i++) {
@@ -145,7 +145,7 @@ describe("Test send functionality from Deb0xCore contract!", async function() {
         let addresses3 = [add1.address, add2.address, add3.address, add3.address];
         let cids3 = ["ipfs1", "ipfs2", "ipfs4", "ipfs4"];
 
-        let transactionAddress2 = await deboxCore.connect(add2).send(addresses3, cids3)
+        let transactionAddress2 = await deboxCore.connect(add2).send(addresses3, cids3, ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         let receiptAddress2 = await transactionAddress2.wait();
 
         for (let i = 0; i < receiptAddress2.events.length - 1; i++) {
@@ -157,7 +157,7 @@ describe("Test send functionality from Deb0xCore contract!", async function() {
         let addresses = [add1.address, add2.address, add3.address, add4.address, add5.address, add6.address, add1.address];
         let cids = ["ipfs1", "ipfs2", "ipfs3", "ipfs4", "ipfs5", "ipfs6", "ipfs1"];
 
-        let transaction = await deboxCore.connect(add1).send(addresses, cids);
+        let transaction = await deboxCore.connect(add1).send(addresses, cids, ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") });
         let receipt = await transaction.wait();
         expect(add1.address).to.equal(receipt.events[0].args.from);
 
@@ -176,7 +176,7 @@ describe("Test send functionality from Deb0xCore contract!", async function() {
         let addressesUser2Sent = [add2.address, add3.address, add4.address, add5.address, add6.address, add6.address, add2.address];
         let cidsUser2Sent = ["msg2", "msg3", "msg4", "msg5", "msg6", "msg6", "msg2"];
 
-        let transaction2 = await deboxCore.connect(add2).send(addressesUser2Sent, cidsUser2Sent);
+        let transaction2 = await deboxCore.connect(add2).send(addressesUser2Sent, cidsUser2Sent, ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") });
         let receipt2 = await transaction2.wait();
         expect(add2.address).to.equal(receipt2.events[0].args.from);
 
