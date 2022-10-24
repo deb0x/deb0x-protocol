@@ -32,7 +32,7 @@ import { Encrypt } from './Encrypt';
 import {getKey} from "../Common/EventLogs.mjs";
 import { commify } from 'ethers/lib/utils';
 
-const deb0xAddress = "0x03B4a733d4083Eb92972740372Eb05664c937136";
+const deb0xAddress = "0x168618bde8fa88cc23eadf35a6340a77e0affda7";
 
 export function Decrypt(props: any): any {
     const { account, library } = useWeb3React()
@@ -73,6 +73,7 @@ export function Decrypt(props: any): any {
     }
 
     function Message(props: any) {
+        const { chainId } = useWeb3React()
         const encryptMessage = props.message.fetchedMessage.data
         const [message, setMessage] =
             useState(props.message.fetchedMessage.data)
@@ -123,9 +124,11 @@ export function Decrypt(props: any): any {
 
 
         async function checkENS() {
-            let name = await library.lookupAddress(props.message.sender);
-            if(name !== null) {   
-                setEnsName(name);
+            if(chainId !=137){
+                let name = await library.lookupAddress(props.message.sender);
+                if(name !== null) {   
+                    setEnsName(name);
+                }
             }
         }
 
