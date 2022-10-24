@@ -2,9 +2,10 @@
 pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./Deb0xERC20.sol";
 
-contract Deb0x is ERC2771Context {
+contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     struct Envelope {
         string content;
@@ -403,6 +404,7 @@ contract Deb0x is ERC2771Context {
     function claimRewards()
         external
         calculateCycle
+        nonReentrant()
         updateCycleFeesPerStakeSummed
         updateStats(_msgSender())
     {
@@ -425,6 +427,7 @@ contract Deb0x is ERC2771Context {
 
     function claimClientRewards()
         external
+        nonReentrant()
         calculateCycle
         updateCycleFeesPerStakeSummed
     {
@@ -446,6 +449,7 @@ contract Deb0x is ERC2771Context {
 
     function claimFees()
         external
+        nonReentrant()
         calculateCycle
         updateCycleFeesPerStakeSummed
         updateStats(_msgSender())
@@ -460,6 +464,7 @@ contract Deb0x is ERC2771Context {
 
     function claimClientFees()
         external
+        nonReentrant()
         calculateCycle
         updateCycleFeesPerStakeSummed
     {
@@ -474,6 +479,7 @@ contract Deb0x is ERC2771Context {
 
     function stakeDBX(uint256 amount)
         external
+        nonReentrant()
         calculateCycle
         updateCycleFeesPerStakeSummed
         updateStats(_msgSender())
@@ -506,6 +512,7 @@ contract Deb0x is ERC2771Context {
 
     function unstake(uint256 amount)
         external
+        nonReentrant()
         calculateCycle
         updateCycleFeesPerStakeSummed
         updateStats(_msgSender())
