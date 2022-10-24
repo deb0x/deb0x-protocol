@@ -19,7 +19,7 @@ import cloud3 from '../../photos/icons/clouds/cloud-3.svg';
 import {fetchSentMessages, getKey } from '../Common/EventLogs.mjs';
 
 const axios = require('axios')
-const deb0xAddress = "0x03B4a733d4083Eb92972740372Eb05664c937136"
+const deb0xAddress = "0x168618bde8fa88cc23eadf35a6340a77e0affda7"
 
 export function Sent(props: any): any {
     const { account, library } = useWeb3React()
@@ -56,6 +56,7 @@ export function Sent(props: any): any {
     }
 
     function Message(props: any) {
+        const { chainId} = useWeb3React()
         const encryptMessage = props.message.fetchedMessage.data
         const [message, setMessage] = useState(props.message.fetchedMessage.data)
         const [recipients, setRecipients] = useState<string[]>([]);
@@ -89,13 +90,17 @@ export function Sent(props: any): any {
             var recipientsFiltered = recipients.filter(onlyUnique);
 
             for(let recipient of recipientsFiltered) {
-                let name = await library.lookupAddress(recipient);
-                if(name !== null)
-                {   
-                    recipientsTemp = [...recipientsTemp, name];
-                } else {
-                    recipientsTemp = [...recipientsTemp, recipient];
-                }
+
+                // not suported for Polygon
+                // let name = await library.lookupAddress(recipient);
+                // if(name !== null)
+                // {   
+                //     recipientsTemp = [...recipientsTemp, name];
+                // } else {
+                //     recipientsTemp = [...recipientsTemp, recipient];
+                // }
+                recipientsTemp = [...recipientsTemp, recipient];
+
             }
 
             setRecipients(recipientsTemp)

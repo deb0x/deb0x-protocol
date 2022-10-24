@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const deb0xAddress = "0x03B4a733d4083Eb92972740372Eb05664c937136";
+const deb0xAddress = "0x168618bde8fa88cc23eadf35a6340a77e0affda7";
 
 async function getData(eventName) {
 
@@ -9,14 +9,13 @@ async function getData(eventName) {
     const options = {
         method: 'POST',
         url: `https://deep-index.moralis.io/api/v2/${deb0xAddress}/events`,
-        params: {
-            chain: 'goerli',
-            topic: data.topic
-        },
+        params: {chain: 'polygon', 
+        topic: data.topic
+    },
         headers: {
-            accept: 'application/json',
-            'content-type': 'application/json',
-            'X-API-Key': 'test'
+          accept: 'application/json',
+          'content-type': 'application/json',
+          'X-API-Key': 'test'
         },
         data: data.abi
     };
