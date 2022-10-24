@@ -1,6 +1,7 @@
 require("@nomiclabs/hardhat-waffle");
 require("solidity-coverage");
 require("@nomiclabs/hardhat-solhint");
+require("hardhat-gas-reporter");
 
 const { mnemonic } = require('./.secrets.json')
 
@@ -37,5 +38,12 @@ module.exports = {
     },
     goerli: {
         apiKey: ""
-    }
+    },
+    gasReporter: {
+        currency: 'USD',
+        gasPrice: 21
+      }
+    // gasReporter: {
+    //     enabled: (process.env.REPORT_GAS) ? true : false
+    //   }
 };
