@@ -375,8 +375,8 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     {
         updateClientStats(feeReceiver);
 
-        accCycleMessages[_msgSender()]++;
-        cycleTotalMessages[currentCycle]++;
+        accCycleMessages[_msgSender()] += to.length;
+        cycleTotalMessages[currentCycle] += to.length;
         lastActiveCycle[_msgSender()] = currentCycle;
 
         if (feeReceiver != address(0)) {
