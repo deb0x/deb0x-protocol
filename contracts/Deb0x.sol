@@ -18,9 +18,9 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     uint256 public constant SCALING_FACTOR = 1e18;
 
-    uint256 immutable i_initialTimestamp;
+    uint256 public immutable i_initialTimestamp;
 
-    uint256 immutable i_periodDuration;
+    uint256 public immutable i_periodDuration;
 
     uint256 public currentCycleReward;
 
