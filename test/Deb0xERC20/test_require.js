@@ -1,7 +1,6 @@
 const { expect } = require("chai");
 const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
-const { ContractFunctionVisibility } = require("hardhat/internal/hardhat-network/stack-traces/model");
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
 const { NumUtils } = require("../utils/NumUtils.ts");
 
@@ -24,38 +23,34 @@ describe("Test ERC20 require", async function() {
         frontend = userReward.connect(feeReceiver)
     })
 
-    //Tests without fees
-    it.only(`Should test require`, async() => {
-        for (let i = 0; i <= 15000; i++) {
+    it.ignore(`Should test require`, async() => {
+        for (let i = 0; i <= 22532; i++) {
             await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
             await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
             await hre.ethers.provider.send("evm_mine")
-            totalMinted = totalMinted + NumUtils.day(i + 1);
-            console.log("Cyclu " + i)
+            await user1Reward.claimRewards();
         }
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        console.log("Total supply of ERC20:");
-        console.log(await dbxERC20.totalSupply());
+        let user1Balance = await dbxERC20.balanceOf(user1.address);
+        let totalSupply = await dbxERC20.totalSupply();
+        expect(user1Balance).to.equal(totalSupply);
     });
 
-    it.only(`Should test require`, async() => {
-        console.log("T0TAL DIN PRIMUL " + totalMinted);
-        for (let i = 15001; i < 22532; i++) {
-            await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-            await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-            await hre.ethers.provider.send("evm_mine")
-            totalMinted = totalMinted + NumUtils.day(i + 1);
-            console.log("Cyclu din al doilea it  " + i)
+    //This test can be use to test require in Deb0xERC20 contract. Require condition must be modified with a value lower than total supply
+    it(`Should test require`, async() => {
+        try {
+            for (let i = 0; i < 15000; i++) {
+                await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+                await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+                await hre.ethers.provider.send("evm_mine")
+                await user1Reward.claimRewards();
+            }
+        } catch (error) {
+            expect(error.message).to.include("DBX: max supply already minted");
         }
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-        await hre.ethers.provider.send("evm_mine")
-
-        console.log("Total supply of ERC20:");
-        console.log("T0TAL " + totalMinted);
-        console.log(await dbxERC20.totalSupply());
     });
 
 

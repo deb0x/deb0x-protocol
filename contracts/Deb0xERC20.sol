@@ -13,7 +13,7 @@ contract Deb0xERC20 is ERC20 {
 
     function mintReward(address user, uint256 amount) external {
         require(msg.sender == owner, "DBX: caller is not Deb0x contract.");
-        require(super.totalSupply() < 5010000000000000000000000);
+        require(super.totalSupply() < 5010000000000000000000000, "DBX: max supply already minted");
         _mint(user, amount);
     }
 }
