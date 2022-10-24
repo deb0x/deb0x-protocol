@@ -126,7 +126,7 @@ describe("Test reward distribution for multiple recipients", async function() {
         expect(BigNumber.from(fifthCycleRewardPerUser).mul(BigNumber.from(2))).to.equal(BigNumber.from(balanceForUser3Cycle5).sub(BigNumber.from(balanceForUser3Cycle4)));
     });
 
-    it.only(`Test multiple recipients simple case`, async() => {
+    it(`Test multiple recipients simple case`, async() => {
         await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address, user2.address, user3.address, user4.address, user5.address, user6.address, user7.address, user8.address, user9.address, user10.address], ["ipfs://", "ipfs://", "ipfs://", "ipfs://", "ipfs://", "ipfs://", "ipfs://", "ipfs://", "ipfs://", "ipfs"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
