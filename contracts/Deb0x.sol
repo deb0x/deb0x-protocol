@@ -22,49 +22,49 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     uint256 immutable i_periodDuration;
 
-    uint256 currentCycleReward;
+    uint256 public currentCycleReward;
 
-    uint256 lastCycleReward;
+    uint256 public lastCycleReward;
 
-    uint256 pendingStake;
+    uint256 public pendingStake;
 
-    uint256 currentCycle;
+    uint256 public currentCycle;
 
-    uint256 lastStartedCycle;
+    uint256 public lastStartedCycle;
 
-    uint256 previousStartedCycle;
+    uint256 public previousStartedCycle;
 
     uint256 public currentStartedCycle;
 
-    uint256 pendingCycleRewardsStake;
+    uint256 public pendingCycleRewardsStake;
 
     uint256 public pendingStakeWithdrawal;
 
     uint256 public sentId = 1;
 
-    mapping(address => string) publicKeys;
+    mapping(address => string) public publicKeys;
 
-    mapping(address => uint256) accCycleFeePercent;
+    mapping(address => uint256) public accCycleFeePercent;
 
-    mapping(address => uint256) clientCycleFeePercent;
+    mapping(address => uint256) public clientCycleFeePercent;
 
-    mapping(address => uint256) accCycleMessages;
+    mapping(address => uint256) public accCycleMessages;
 
-    mapping(uint256 => uint256) cycleTotalMessages;
+    mapping(uint256 => uint256) public cycleTotalMessages;
 
-    mapping(address => uint256) lastActiveCycle;
+    mapping(address => uint256) public lastActiveCycle;
 
-    mapping(address => uint256) clientLastRewardUpdate;
+    mapping(address => uint256) public clientLastRewardUpdate;
 
-    mapping(address => uint256) clientLastFeeUpdate;
+    mapping(address => uint256) public clientLastFeeUpdate;
 
-    mapping(address => uint256) clientAccruedFees;
+    mapping(address => uint256) public clientAccruedFees;
 
     mapping(address => uint256) public accRewards;
 
     mapping(address => uint256) public accAccruedFees;
 
-    mapping(address => uint256) clientRewards;
+    mapping(address => uint256) public clientRewards;
 
     mapping(uint256 => uint256) public rewardPerCycle;
 
@@ -76,13 +76,13 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     mapping(uint256 => uint256) public cycleFeesPerStakeSummed;
 
-    mapping(address => mapping(uint256 => uint256)) accStakeCycle;
+    mapping(address => mapping(uint256 => uint256)) public accStakeCycle;
 
     mapping(address => uint256) public accWithdrawableStake;
 
-    mapping(address => uint256) accFirstStake;
+    mapping(address => uint256) public accFirstStake;
 
-    mapping(address => uint256) accSecondStake;
+    mapping(address => uint256) public accSecondStake;
 
     mapping(address => bool) public stakedDuringGapCycle;
 
