@@ -295,48 +295,5 @@ describe("Test DBX tokens distributions", async function() {
         let frontBalanceCycle2 = await dbxERC20.balanceOf(feeReceiver.address);
         // expect(BigNumber.from(secondDayReward).add(BigNumber.from(firstDayReward))).to.equal(frontBalanceCycle2);
 
-        await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
-            feeReceiver.address, 10000, 0, { value: ethers.utils.parseEther("1") })
-        await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
-            feeReceiver.address, 10000, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
-            feeReceiver.address, 10000, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
-            feeReceiver.address, 10000, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
-            feeReceiver.address, 10000, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
-            feeReceiver.address, 10000, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
-            feeReceiver.address, 10000, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
-            feeReceiver.address, 10000, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
-            feeReceiver.address, 10000, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
-            feeReceiver.address, 10000, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
-            feeReceiver.address, 10000, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
-            feeReceiver.address, 10000, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
-            feeReceiver.address, 10000, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
-            feeReceiver.address, 10000, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
-            feeReceiver.address, 10000, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
-            feeReceiver.address, 10000, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
-            feeReceiver.address, 10000, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
-            feeReceiver.address, 10000, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
-            feeReceiver.address, 10000, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
-            feeReceiver.address, 10000, 0, { value: ethers.utils.parseEther("1") })
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-        await hre.ethers.provider.send("evm_mine")
-
     });
 })
