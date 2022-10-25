@@ -43,17 +43,20 @@ describe("Test send messages and fetch functions", async function() {
         let sendFourthMessage = await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
             feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("2") })
         let recepitFourthMessage = await sendFourthMessage.wait();
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+        console.log("ciclu  1")
 
-        //
+        // 33209
         let s5 = await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
         messageReceiver.address, 0, 0, { value: ethers.utils.parseEther("2") })
 
-        //
+        // 16109
         let s6 = await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
         feeReceiver.address, 200, 0, { value: ethers.utils.parseEther("2") })
 
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-        await hre.ethers.provider.send("evm_mine")
+
+
 
         let totalNumberOfMessagesSentByAlice = 0;
         for (let i = 0; i < receiptFirstMessage.events.length - 1; i++) {
