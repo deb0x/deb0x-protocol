@@ -25,7 +25,7 @@ describe("Memory intensive tests: ERC20 supply limit", async function() {
     })
 
     it.ignore(`Should test require`, async() => {
-        for (let i = 0; i <= 22532; i++) {
+        for (let i = 0; i < 22532; i++) {
             await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
             await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
             await hre.ethers.provider.send("evm_mine")
@@ -39,17 +39,17 @@ describe("Memory intensive tests: ERC20 supply limit", async function() {
             }
         }
 
-        console.log(`Last cycle: ${await user1Reward.getCurrentCycle()}`);
-        console.log(`Last reward: ${await user1Reward.calculateCycleReward()}`);
+        console.log(`Last cycle:   ${await user1Reward.getCurrentCycle()}`);
+        console.log(`Last reward:  ${await user1Reward.calculateCycleReward()}`);
+        console.log(`User balance: ${await dbxERC20.balanceOf(user1.address)}`);
+        console.log(`Total supply: ${await dbxERC20.totalSupply()}`);
 
         console.log("Rewards should be ended. Adding 10 more sends");
         for (let i = 0; i < 10; i++) {
             await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
             await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
             await hre.ethers.provider.send("evm_mine")
-            if (i % 100 == 0) {
-                console.log(`Days past: ${i}`);
-            }
+            console.log(`Extra days past: ${i}`);
         }
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
@@ -74,3 +74,60 @@ describe("Memory intensive tests: ERC20 supply limit", async function() {
         }
     });
 });
+
+/// LOG  OUTPUT
+/// LOG  OUTPUT
+/// LOG  OUTPUT
+/// LOG  OUTPUT
+// 
+// 
+// Days past: 22100
+// Days past: 22200
+// Days past: 22300
+// Days past: 22400
+// Days past: 22500
+// Last cycle:   22532
+// Last reward:  1
+// User balance: 5009999999999999994375938
+// Total supply: 5009999999999999994375938
+// Rewards should be ended. Adding 10 more sends
+// Extra days past: 0
+// 
+//     1) Should test require
+// 
+// ·-----------------------------|---------------------------|-----------|-----------------------------·
+// |    Solc version: 0.8.17     ·  Optimizer enabled: true  ·  Runs: 1  ·  Block limit: 30000000 gas  │
+// ······························|···························|···········|······························
+// |  Methods                                                                                          │
+// ·············|················|·············|·············|···········|···············|··············
+// |  Contract  ·  Method        ·  Min        ·  Max        ·  Avg      ·  # calls      ·  usd (avg)  │
+// ·············|················|·············|·············|···········|···············|··············
+// |  Deb0x     ·  claimRewards  ·     143195  ·     245795  ·   143200  ·        22532  ·          -  │
+// ·············|················|·············|·············|···········|···············|··············
+// |  Deb0x     ·  send          ·     129856  ·     329601  ·   229799  ·        22533  ·          -  │
+// ·············|················|·············|·············|···········|···············|··············
+// |  Deployments                ·                                       ·  % of limit   ·             │
+// ······························|·············|·············|···········|···············|··············
+// |  Deb0x                      ·          -  ·          -  ·  6067644  ·       20.2 %  ·          -  │
+// ·-----------------------------|-------------|-------------|-----------|---------------|-------------·
+// 
+//   0 passing (29m)
+//   1 failing
+// 
+//   1) Memory intensive tests: ERC20 supply limit
+//        Should test require:
+//      Error: VM Exception while processing transaction: reverted with panic code 0x12 (Division or modulo division by zero)
+//       at Deb0x.updateCycleFeesPerStakeSummed (contracts/Deb0x.sol:185)
+//       at Deb0x.send (contracts/Deb0x.sol:361)
+//       at runMicrotasks (<anonymous>)
+//       at processTicksAndRejections (internal/process/task_queues.js:95:5)
+//       at runNextTicks (internal/process/task_queues.js:64:3)
+//       at listOnTimeout (internal/timers.js:524:9)
+//       at processTimers (internal/timers.js:498:7)
+//       at HardhatNode._mineBlockWithPendingTxs (node_modules/hardhat/src/internal/hardhat-network/provider/node.ts:1802:23)
+//       at HardhatNode.mineBlock (node_modules/hardhat/src/internal/hardhat-network/provider/node.ts:491:16)
+// 
+// 
+// 
+// npm ERR! Test failed.  See above for more details.
+// 
