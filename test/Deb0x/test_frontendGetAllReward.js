@@ -5,7 +5,7 @@ const { ContractFunctionVisibility } = require("hardhat/internal/hardhat-network
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
 const { NumUtils } = require("../utils/NumUtils.ts");
 
-describe("Test DBX tokens distributions", async function() {
+describe("Test DBX tokens distributions to fontend", async function() {
     let userReward, user1Reward, user2Reward, user3Reward, frontend, dbxERC20;
     let user1, user2;
     beforeEach("Set enviroment", async() => {
@@ -45,7 +45,7 @@ describe("Test DBX tokens distributions", async function() {
         expect(expectedValueForUser2Cycle1).to.equal(user2BalanceCycle1);
 
         let expectedValueForFrontendCycle1 = BigNumber.from("10000000000000000000").mul(BigNumber.from(firstDayReward)).div(BigNumber.from("100000000000000000000"))
-        await frontend.claimFrontEndRewards();
+        await frontend.claimClientRewards();
         let frontBalanceCycle1 = await dbxERC20.balanceOf(feeReceiver.address);
         expect(expectedValueForFrontendCycle1).to.equal(frontBalanceCycle1);
 
@@ -79,7 +79,7 @@ describe("Test DBX tokens distributions", async function() {
         // expect(expectedValueForUser3Cycle2).to.equal(user3BalanceCycle2);
 
         let expectedValueForFrontendCycle2 = BigNumber.from("10000000000000000000").mul(BigNumber.from(secondDayReward)).div(BigNumber.from("100000000000000000000"));
-        await frontend.claimFrontEndRewards();
+        await frontend.claimClientRewards();
         let frontBalanceCycle2 = await dbxERC20.balanceOf(feeReceiver.address);
         expect(BigNumber.from(expectedValueForFrontendCycle2).add(BigNumber.from(frontBalanceCycle1))).to.equal(frontBalanceCycle2);
 
@@ -97,7 +97,7 @@ describe("Test DBX tokens distributions", async function() {
         try {
             await user2Reward.claimRewards();
         } catch (error) {
-            expect(error.message).to.include("Deb0x: You do not have rewards");
+            expect(error.message).to.include("Deb0x: account has no rewards");
         }
         let user2BalanceCycle1 = await dbxERC20.balanceOf(user2.address);
         // expect(user2BalanceCycle1).to.equal(0);
@@ -105,12 +105,12 @@ describe("Test DBX tokens distributions", async function() {
         try {
             await user1Reward.claimRewards();
         } catch (error) {
-            expect(error.message).to.include("Deb0x: You do not have rewards");
+            expect(error.message).to.include("Deb0x: account has no rewards");
         }
         let user1BalanceCycle1 = await dbxERC20.balanceOf(user1.address);
         // expect(user1BalanceCycle1).to.equal(0);
 
-        await frontend.claimFrontEndRewards();
+        await frontend.claimClientRewards();
         let frontBalanceCycle1 = await dbxERC20.balanceOf(feeReceiver.address);
         // expect(firstDayReward).to.equal(frontBalanceCycle1);
 
@@ -128,7 +128,7 @@ describe("Test DBX tokens distributions", async function() {
         try {
             await user2Reward.claimRewards();
         } catch (error) {
-            expect(error.message).to.include("Deb0x: You do not have rewards");
+            expect(error.message).to.include("Deb0x: account has no rewards");
         }
         let user2BalanceCycle1 = await dbxERC20.balanceOf(user2.address);
         //expect(user2BalanceCycle1).to.equal(0);
@@ -136,12 +136,12 @@ describe("Test DBX tokens distributions", async function() {
         try {
             await user1Reward.claimRewards();
         } catch (error) {
-            expect(error.message).to.include("Deb0x: You do not have rewards");
+            expect(error.message).to.include("Deb0x: account has no rewards");
         }
         let user1BalanceCycle1 = await dbxERC20.balanceOf(user1.address);
         //  expect(user1BalanceCycle1).to.equal(0);
 
-        await frontend.claimFrontEndRewards();
+        await frontend.claimClientRewards();
         let frontBalanceCycle1 = await dbxERC20.balanceOf(feeReceiver.address);
         // expect(firstDayReward).to.equal(frontBalanceCycle1);
 
@@ -193,7 +193,7 @@ describe("Test DBX tokens distributions", async function() {
         try {
             await user1Reward.claimRewards();
         } catch (error) {
-            expect(error.message).to.include("Deb0x: You do not have rewards");
+            expect(error.message).to.include("Deb0x: account has no rewards");
         }
         let user1BalanceCycle1 = await dbxERC20.balanceOf(user1.address);
         expect(user1BalanceCycle1).to.equal(0);
@@ -201,13 +201,13 @@ describe("Test DBX tokens distributions", async function() {
         try {
             await user2Reward.claimRewards();
         } catch (error) {
-            expect(error.message).to.include("Deb0x: You do not have rewards");
+            expect(error.message).to.include("Deb0x: account has no rewards");
         }
         let user2BalanceCycle1 = await dbxERC20.balanceOf(user2.address);
         //difference 5 wei
         // expect(user2BalanceCycle1).to.equal(0);
 
-        await frontend.claimFrontEndRewards();
+        await frontend.claimClientRewards();
         let frontBalanceCycle1 = await dbxERC20.balanceOf(feeReceiver.address);
         // expect(firstDayReward).to.equal(frontBalanceCycle1);
 
@@ -258,7 +258,7 @@ describe("Test DBX tokens distributions", async function() {
         try {
             await user3Reward.claimRewards();
         } catch (error) {
-            expect(error.message).to.include("Deb0x: You do not have rewards");
+            expect(error.message).to.include("Deb0x: account has no rewards");
         }
         let user3BalanceCycle2 = await dbxERC20.balanceOf(user3.address);
         //difference 1 wei
@@ -267,12 +267,12 @@ describe("Test DBX tokens distributions", async function() {
         try {
             await user2Reward.claimRewards();
         } catch (error) {
-            expect(error.message).to.include("Deb0x: You do not have rewards");
+            expect(error.message).to.include("Deb0x: account has no rewards");
         }
         let user2BalanceCycle2 = await dbxERC20.balanceOf(user2.address);
         // expect(user2BalanceCycle2).to.equal(0);
 
-        await frontend.claimFrontEndRewards();
+        await frontend.claimClientRewards();
         let frontBalanceCycle2 = await dbxERC20.balanceOf(feeReceiver.address);
         // expect(BigNumber.from(secondDayReward).add(BigNumber.from(firstDayReward))).to.equal(frontBalanceCycle2);
 
