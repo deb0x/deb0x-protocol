@@ -3,6 +3,7 @@ pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import "./Deb0xERC20.sol";
+import "hardhat/console.sol";
 
 contract Deb0x is ERC2771Context {
 
@@ -149,16 +150,16 @@ contract Deb0x is ERC2771Context {
         uint256 startGas = gasleft();
 
         _;
-
+        console.log("1....: ",gasleft());
         uint256 fee = ((startGas - gasleft() + 31108) * tx.gasprice * PROTOCOL_FEE) / 10000;
-        
         require(
             msg.value - nativeTokenFee >= fee,
             "Deb0x: value must be >= 10% of the spent gas"
         );
-        
         sendViaCall(payable(msg.sender), msg.value - fee - nativeTokenFee);
         cycleAccruedFees[currentCycle] += fee;
+        
+        console.log("2....: ",gasleft());
     }
 
     modifier calculateCycle() {
