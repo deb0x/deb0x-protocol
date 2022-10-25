@@ -28,6 +28,11 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     uint256 public pendingStake;
 
+    /**
+     * Index (0-based) of the current cycle.
+     * 
+     * Updated upon cycle setup that is  triggered by contract interraction (account sends message, claims fees, claims rewards, stakes or unstakes).
+     */
     uint256 public currentCycle;
 
     uint256 public lastStartedCycle;
@@ -48,10 +53,20 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     mapping(address => uint256) public clientCycleFeePercent;
 
+    /**
+     * Temporary store of the number of messages sent by an account.
+     * Updated in current cycle. Reset when an account interacts with the contract in a new cycle.
+     */
     mapping(address => uint256) public accCycleMessages;
 
+    /**
+     * Number of messages sent in a cycle.
+     */
     mapping(uint256 => uint256) public cycleTotalMessages;
 
+    /**
+     * The last cycle when an account has sent messages.
+     */
     mapping(address => uint256) public lastActiveCycle;
 
     mapping(address => uint256) public clientLastRewardUpdate;
@@ -60,14 +75,29 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     mapping(address => uint256) public clientAccruedFees;
 
+    /**
+     * ????  why  0? when getUnclaimedRewards is >0 ?
+     * Current unclaimed rewards and staked amounts per account.
+     */
     mapping(address => uint256) public accRewards;
 
+    /**
+     * ?
+     */
     mapping(address => uint256) public accAccruedFees;
 
     mapping(address => uint256) public clientRewards;
 
+    /**
+     * Total token rewards allocated per cycle.
+     */
     mapping(uint256 => uint256) public rewardPerCycle;
 
+    /**
+     * Total active token reward and stake per cycle. 
+     * 
+     * Updated when a new cycle starts and when an account claims rewards, stakes or unstakes externally owned tokens.
+     */
     mapping(uint256 => uint256) public summedCycleStakes;
 
     mapping(address => uint256) public lastFeeUpdateCycle;
@@ -223,6 +253,9 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         _;
     }
 
+    /**
+     * 
+     */
     modifier updateStats(address account) {
         if (
             currentCycle > lastActiveCycle[account] &&
