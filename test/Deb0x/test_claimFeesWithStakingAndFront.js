@@ -61,14 +61,14 @@ describe("Test fee claiming for both users and frontends and concurrently stake/
         await rewardedAlice.claimFees()
         await rewardedBob.claimFees()
         await rewardedCarol.claimFees()
-        await frontend.claimFrontEndFees();
+        await frontend.claimClientFees();
         const feesClaimed = await rewardedAlice.queryFilter("FeesClaimed")
         let totalFeesClaimed = BigNumber.from("0")
         for (let entry of feesClaimed) {
             totalFeesClaimed = totalFeesClaimed.add(entry.args.fees)
         }
         let totalFeesClaimedFrontend = BigNumber.from("0")
-        const feesClaimedAsFrontend = await frontend.queryFilter("FrontEndFeesClaimed");
+        const feesClaimedAsFrontend = await frontend.queryFilter("ClientFeesClaimed");
         for (let entry of feesClaimedAsFrontend) {
             totalFeesClaimedFrontend = totalFeesClaimedFrontend.add(entry.args.fees)
         }

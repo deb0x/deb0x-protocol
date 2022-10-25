@@ -5,14 +5,18 @@ const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.jso
 const { NumUtils } = require("../utils/NumUtils.ts");
 
 describe("Test stake functionality", async function() {
-    let deb0xContract, user1Reward, user2Reward, user3Reward, frontend, dbxERC20;
-    let user1, user2;
+    let deb0xContract, user1Reward, user2Reward, user3Reward, frontend, dbxERC20, deb0xViews;
+    let user1, user2, user3;
     beforeEach("Set enviroment", async() => {
         [user1, user2, user3, messageReceiver, feeReceiver] = await ethers.getSigners();
 
         const Deb0x = await ethers.getContractFactory("Deb0x");
         deb0xContract = await Deb0x.deploy(ethers.constants.AddressZero);
         await deb0xContract.deployed();
+
+        const Deb0xViews = await ethers.getContractFactory("Deb0xViews");
+        deb0xViews = await Deb0xViews.deploy(deb0xContract.address);
+        await deb0xViews.deployed();
 
         const dbxAddress = await deb0xContract.dbx()
         dbxERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
@@ -65,7 +69,7 @@ describe("Test stake functionality", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        let amoutToUnstakeAfterTwoStakeActionInFirstCycle = ethers.utils.formatEther(await user3Reward.getUserWithdrawableStake(user3.address));
+        let amoutToUnstakeAfterTwoStakeActionInFirstCycle = ethers.utils.formatEther(await deb0xViews.connect(user3).getAccWithdrawableStake(user3.address));
         expect(parseInt(amoutToUnstakeAfterTwoStakeActionInFirstCycle)).to.equal(3750);
 
         await user3Reward.stakeDBX(balanceBigNumberFormat)
@@ -76,12 +80,12 @@ describe("Test stake functionality", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        let amoutToUnstakeAfterAnotherStakeInSecoundCycle = ethers.utils.formatEther(await user3Reward.getUserWithdrawableStake(user3.address));
+        let amoutToUnstakeAfterAnotherStakeInSecoundCycle = ethers.utils.formatEther(await deb0xViews.connect(user3).getAccWithdrawableStake(user3.address));
         expect(parseFloat(amoutToUnstakeAfterAnotherStakeInSecoundCycle)).to.equal(5000);
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
-        let amoutToUnstakeAfterAnotherStakeInThirdCyle = ethers.utils.formatEther(await user3Reward.getUserWithdrawableStake(user3.address));
+        let amoutToUnstakeAfterAnotherStakeInThirdCyle = ethers.utils.formatEther(await deb0xViews.connect(user3).getAccWithdrawableStake(user3.address));
         expect(parseFloat(amoutToUnstakeAfterAnotherStakeInThirdCyle)).to.equal(5000);
 
     });
@@ -119,19 +123,19 @@ describe("Test stake functionality", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        let amountStakeInFirstCycle = ethers.utils.formatEther(await user2Reward.getUserWithdrawableStake(user2.address));
+        let amountStakeInFirstCycle = ethers.utils.formatEther(await deb0xViews.connect(user2).getAccWithdrawableStake(user2.address));
         expect(parseInt(amountStakeInFirstCycle)).to.equal(13326);
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        let amountStakeInSecoundCycleFirstAccount = ethers.utils.formatEther(await user1Reward.getUserWithdrawableStake(user1.address));
+        let amountStakeInSecoundCycleFirstAccount = ethers.utils.formatEther(await deb0xViews.connect(user1).getAccWithdrawableStake(user1.address));
         expect(amountStakeInFirtCyclePerAccount).to.equal(amountStakeInSecoundCycleFirstAccount);
 
-        let amountInSecoundCycle = ethers.utils.formatEther(BigNumber.from(await user2Reward.getUserWithdrawableStake(user2.address)).sub(BigNumber.from(await user1Reward.rewardPerCycle(0))));
+        let amountInSecoundCycle = ethers.utils.formatEther(BigNumber.from(await deb0xViews.connect(user2).getAccWithdrawableStake(user2.address)).sub(BigNumber.from(await user1Reward.rewardPerCycle(0))));
         expect(amountStakeInFirtCyclePerAccount).to.equal(amountInSecoundCycle);
 
-        let amountStakeInSecoundCycleThirdAccount = ethers.utils.formatEther(await user3Reward.getUserWithdrawableStake(user3.address));
+        let amountStakeInSecoundCycleThirdAccount = ethers.utils.formatEther(await deb0xViews.connect(user3).getAccWithdrawableStake(user3.address));
         expect(amountStakeInFirtCyclePerAccount).to.equal(amountStakeInSecoundCycleThirdAccount);
 
     });
@@ -167,9 +171,9 @@ describe("Test stake functionality", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 2])
         await hre.ethers.provider.send("evm_mine")
 
-        let amountStakeInFirstCycleFirstAccount = ethers.utils.formatEther(await user1Reward.getUserWithdrawableStake(user1.address));
-        let amountStakeInFirstCycleSeconddAccount = ethers.utils.formatEther(await user2Reward.getUserWithdrawableStake(user2.address));
-        let amountStakeInFirstCycleThirdAccount = ethers.utils.formatEther(await user3Reward.getUserWithdrawableStake(user3.address));
+        let amountStakeInFirstCycleFirstAccount = ethers.utils.formatEther(await deb0xViews.connect(user1).getAccWithdrawableStake(user1.address));
+        let amountStakeInFirstCycleSeconddAccount = ethers.utils.formatEther(await deb0xViews.connect(user2).getAccWithdrawableStake(user2.address));
+        let amountStakeInFirstCycleThirdAccount = ethers.utils.formatEther(await deb0xViews.connect(user3).getAccWithdrawableStake(user3.address));
         expect(ethers.utils.formatEther(balanceUser1)).to.equal(amountStakeInFirstCycleFirstAccount);
         expect(ethers.utils.formatEther(balanceUser2)).to.equal(amountStakeInFirstCycleSeconddAccount);
         expect(ethers.utils.formatEther(balanceUser3)).to.equal(amountStakeInFirstCycleThirdAccount);
@@ -182,8 +186,8 @@ describe("Test stake functionality", async function() {
         await hre.ethers.provider.send("evm_mine")
 
         let amountRewardCycle3Account3 = ethers.utils.formatEther(NumUtils.day(2).div(2));
-        let totalAmountStakeAccount3 = ethers.utils.formatEther(await user3Reward.getUserWithdrawableStake(user3.address));
-        let intermediateValueAccount3 = await user3Reward.getUserWithdrawableStake(user3.address);
+        let totalAmountStakeAccount3 = ethers.utils.formatEther(await deb0xViews.connect(user3).getAccWithdrawableStake(user3.address));
+        let intermediateValueAccount3 = await deb0xViews.connect(user3).getAccWithdrawableStake(user3.address);
         expect(totalAmountStakeAccount3 - amountRewardCycle3Account3).to.equal(parseInt(amountStakeInFirstCycleThirdAccount));
 
         await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -206,7 +210,7 @@ describe("Test stake functionality", async function() {
 
         let amountRewardCycle4Account3 = NumUtils.day(3).div(2);
         let amountRewardCycle5Account3 = NumUtils.day(4).div(2);
-        let totalAmountStakeAccount3Cycle5 = await user3Reward.getUserWithdrawableStake(user3.address);
+        let totalAmountStakeAccount3Cycle5 = await deb0xViews.connect(user3).getAccWithdrawableStake(user3.address);
         let expectedValue = BigNumber.from(amountRewardCycle4Account3).add(BigNumber.from(amountRewardCycle5Account3)).add(BigNumber.from(intermediateValueAccount3))
         expect(expectedValue).to.equal(BigNumber.from(totalAmountStakeAccount3Cycle5))
     });

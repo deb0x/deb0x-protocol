@@ -2,7 +2,7 @@ const { expect, assert } = require("chai");
 const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
-const { abiDBXCore } = require("../../artifacts/contracts/Deb0xCore.sol/Deb0xCore.json")
+// const { abiDBXCore } = require("../../artifacts/contracts/Deb0xCore.sol/Deb0xCore.json")
 
 describe("Test send messages and fetch functions", async function() {
     let rewardedAlice, rewardedBob, rewardedCarol, frontend, dbxERC20;
@@ -213,7 +213,7 @@ describe("Test send messages and fetch functions", async function() {
             feeReceiver.address, 200, 0, ).then(res => {
             assert.fail("must throw err");
         }).catch(err => {
-            expect(err.message).to.contain("Deb0x: must pay 10% of transaction cost")
+            expect(err.message).to.contain("Deb0x: value must be >= 10% of the spent gas")
         })
         let totalNumberOfMessagesSentByAlice = 0;
         if (sendMessage != undefined) {
@@ -236,7 +236,7 @@ describe("Test send messages and fetch functions", async function() {
             feeReceiver.address, 200, 0, { value: 20 }).then(res => {
             assert.fail("must throw err");
         }).catch(err => {
-            expect(err.message).to.contain("Deb0x: must pay 10% of transaction cost")
+            expect(err.message).to.contain("Deb0x: value must be >= 10% of the spent gas")
         })
         let totalNumberOfMessagesSentByAlice = 0;
         if (sendMessage != undefined) {

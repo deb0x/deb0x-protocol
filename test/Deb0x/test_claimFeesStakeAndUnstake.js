@@ -4,8 +4,8 @@ const { ethers } = require("hardhat");
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
 const { NumUtils } = require("../utils/NumUtils.ts");
 
-describe("Test contract", async function() {
-    let rewardedAlice, rewardedBob, rewardedCarol, rewardedDean, dbxERC20;
+describe("Test claimFeesStakeAndUnstake", async function() {
+    let rewardedAlice, rewardedBob, rewardedCarol, rewardedDean, dbxERC20, deb0xViews;
     let alice, bob;
     beforeEach("Set enviroment", async() => {
         [alice, bob, carol, dean, messageReceiver, feeReceiver] = await ethers.getSigners();
@@ -13,6 +13,10 @@ describe("Test contract", async function() {
         const Deb0x = await ethers.getContractFactory("Deb0x");
         rewardedAlice = await Deb0x.deploy(ethers.constants.AddressZero);
         await rewardedAlice.deployed();
+
+        const Deb0xViews = await ethers.getContractFactory("Deb0xViews");
+        deb0xViews = await Deb0xViews.deploy(rewardedAlice.address);
+        await deb0xViews.deployed();
 
         const dbxAddress = await rewardedAlice.dbx()
         dbxERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
@@ -81,7 +85,7 @@ describe("Test contract", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        let unstakeAmount = await rewardedAlice.getUserWithdrawableStake(alice.address)
+        let unstakeAmount = await deb0xViews.getAccWithdrawableStake(alice.address)
         await rewardedAlice.unstake(unstakeAmount)
         const unstakedValueAlice = await rewardedAlice.queryFilter("Unstaked");
         let AliceUnstakedValue = BigNumber.from("0")

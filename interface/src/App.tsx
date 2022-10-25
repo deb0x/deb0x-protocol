@@ -37,10 +37,8 @@ const client = create({
   protocol: 'http'
 })
 
-const ethUtil = require('ethereumjs-util')
-//old address: 0x218c10BAb451BE6A897db102b2f608bC7D3441a0
-// 0x03B4a733d4083Eb92972740372Eb05664c937136
-const deb0xAddress = "0x03B4a733d4083Eb92972740372Eb05664c937136";
+const ethUtil = require('ethereumjs-util');
+const deb0xAddress = "0x168618bde8fa88cc23eadf35a6340a77e0affda7";
 
 
 enum ConnectorNames { Injected = 'Injected', Network = 'Network' };
@@ -136,7 +134,7 @@ function App() {
         try {
             await window.ethereum.request({
             method: 'wallet_switchEthereumChain',
-            params: [{ chainId: "0x5"}],
+            params: [{ chainId: "0x89"}],
             }).then(
                 displayErrorMsg("You have switched to the right network")
             );            
@@ -146,12 +144,12 @@ function App() {
                 method: 'wallet_addEthereumChain',
                 params: [
                     {
-                        chainId: '0x5', 
-                        chainName:'Goerli Test Network',
-                        rpcUrls:['https://goerli.infura.io/v3/'],                   
-                        blockExplorerUrls:['https://goerli.etherscan.io'],  
+                        chainId: '0x89', 
+                        chainName:'Polygon Network',
+                        rpcUrls:['https://rpc-mainnet.maticvigil.com'],                   
+                        blockExplorerUrls:['https://polygonscan.com/'],  
                         nativeCurrency: { 
-                        symbol:'GoerliETH',   
+                        symbol:'Matic',   
                         decimals: 18
                         }       
                     }

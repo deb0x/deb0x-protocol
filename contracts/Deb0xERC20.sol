@@ -1,13 +1,19 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.11;
+pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract Deb0xERC20 is ERC20 {
-    uint256 public constant TOTAL_SUPPLY = 1000000 * (10 ** 18);
 
-    constructor(address deb0x) ERC20("Deb0x", "DBX") {
-        _mint(deb0x, TOTAL_SUPPLY);
+    address public owner;
 
+    constructor() ERC20("Deb0x Reward Token on Polygon", "pDBX") {
+        owner = msg.sender;
+    }
+
+    function mintReward(address user, uint256 amount) external {
+        require(msg.sender == owner, "DBX: caller is not Deb0x contract.");
+        require(super.totalSupply() < 5010000000000000000000000, "DBX: max supply already minted");
+        _mint(user, amount);
     }
 }

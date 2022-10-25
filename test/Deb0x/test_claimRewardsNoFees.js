@@ -30,7 +30,7 @@ describe("Test contract", async function() {
             expect.fail("An exception was expected");
         } catch (error) {
             expect(error.message).to.equal("VM Exception while processing transaction: " +
-                "reverted with reason string 'Deb0x: You do not have rewards'");
+                "reverted with reason string 'Deb0x: account has no rewards'");
         }
     });
 
@@ -42,7 +42,7 @@ describe("Test contract", async function() {
             expect.fail("An exception was expected");
         } catch (error) {
             expect(error.message).to.equal("VM Exception while processing transaction: " +
-                "reverted with reason string 'Deb0x: You do not have rewards'");
+                "reverted with reason string 'Deb0x: account has no rewards'");
         }
     });
 
