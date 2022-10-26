@@ -12,7 +12,7 @@ import Deb0x from "../../ethereum/deb0x"
 import SnackbarNotification from './Snackbar';
 import '../../componentsStyling/stepper.scss';
 import { whitelist } from '../../constants.json'
-const deb0xAddress = "0x168618bde8fa88cc23eadf35a6340a77e0affda7";
+const deb0xAddress = "0xF5c80c305803280B587F8cabBcCdC4d9BF522AbD";
 const steps = ['Provide public encryption key', 'Initialize Deb0x'];
 
 export default function HorizontalLinearStepper(props: any) {
@@ -134,7 +134,7 @@ export default function HorizontalLinearStepper(props: any) {
 
         const from = await signer.getAddress();
         if(whitelist.includes(from)){
-            const url = "https://api.defender.openzeppelin.com/autotasks/6bf2c0e1-7f32-4a9a-af5f-bbad9fa570eb/runs/webhook/d090d479-22fb-450a-b747-40d46161c437/GX31Z25Fq7Hmo3ssWiGiN4";
+            const url = "https://api.defender.openzeppelin.com/autotasks/b939da27-4a61-4464-8d7e-4b0c5dceb270/runs/webhook/f662ac31-8f56-4b4c-9526-35aea314af63/SPs6smVfv41kLtz4zivxr8";
             const forwarder = createInstance(library)
             const data = deb0xContract.interface.encodeFunctionData('setKey', [encryptionKey])
             const to = deb0xContract.address
