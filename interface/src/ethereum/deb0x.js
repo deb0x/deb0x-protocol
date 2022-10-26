@@ -1,7 +1,5 @@
 import { ethers } from "ethers";
 
-import { Deb0x as address } from '../deploy.json';
-
 const abi = [
   {
     "inputs": [
