@@ -33,6 +33,7 @@
         "ethereumjs-util": "^7.1.5",
         "ethers": "^5.7.0",
         "hardhat": "^2.8.0",
+        "hardhat-gas-reporter": "^1.0.9",
         "react-error-overlay": "^6.0.9",
         "rollup": "^2.38.5",
         "solidity-coverage": "^0.8.2"
