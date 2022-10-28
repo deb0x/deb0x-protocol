@@ -4,7 +4,7 @@ const { NumUtils } = require("../utils/NumUtils.ts");
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json");
 
 describe("Test contract claimRewards", async function() {
-    let rewardedAlice, rewardedBob, rewardedCarol, dbxERC20;
+    let rewardedAlice, rewardedBob, rewardedCarol, dbxERC20, deb0xViews;
     let alice, bob;
     beforeEach("Set enviroment", async() => {
         [alice, bob, carol, messageReceiver, feeReceiver] = await ethers.getSigners();
@@ -12,6 +12,10 @@ describe("Test contract claimRewards", async function() {
         const Deb0x = await ethers.getContractFactory("Deb0x");
         rewardedAlice = await Deb0x.deploy(ethers.constants.AddressZero);
         await rewardedAlice.deployed();
+
+        const Deb0xViews = await ethers.getContractFactory("Deb0xViews");
+        deb0xViews = await Deb0xViews.deploy(rewardedAlice.address);
+        await deb0xViews.deployed();
 
         const dbxAddress = await rewardedAlice.dbx()
         dbxERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
@@ -31,7 +35,7 @@ describe("Test contract claimRewards", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        expect((await rewardedAlice.getUnclaimedRewards(alice.address)).toString()).to.eq(NumUtils.day(1))
+        expect((await deb0xViews.getUnclaimedRewards(alice.address)).toString()).to.eq(NumUtils.day(1))
 
     })
 

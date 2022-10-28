@@ -5,7 +5,7 @@ const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.jso
 // const { abiDBXCore } = require("../../artifacts/contracts/Deb0xCore.sol/Deb0xCore.json")
 
 describe("Test fee claiming for users/frontends", async function() {
-    let rewardedAlice, rewardedBob, rewardedCarol, frontend, dbxERC20;
+    let rewardedAlice, rewardedBob, rewardedCarol, frontend, dbxERC20, deb0xViews;
     let alice, bob;
     beforeEach("Set enviroment", async() => {
         [alice, bob, carol, messageReceiver, feeReceiver] = await ethers.getSigners();
@@ -13,6 +13,10 @@ describe("Test fee claiming for users/frontends", async function() {
         const Deb0x = await ethers.getContractFactory("Deb0x");
         rewardedAlice = await Deb0x.deploy(ethers.constants.AddressZero);
         await rewardedAlice.deployed();
+
+        const Deb0xViews = await ethers.getContractFactory("Deb0xViews");
+        deb0xViews = await Deb0xViews.deploy(rewardedAlice.address);
+        await deb0xViews.deployed();
 
         const dbxAddress = await rewardedAlice.dbx()
         dbxERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
@@ -22,10 +26,10 @@ describe("Test fee claiming for users/frontends", async function() {
         frontend = rewardedAlice.connect(feeReceiver)
     });
 
-    it("should test sending some messages and claiming some fees with only 1 account", async() => {
+    it("1. should test sending some messages and claiming some fees with only 1 account", async() => {
 
         aliceBalance = await hre.ethers.provider.getBalance(alice.address)
-        let curCycle = parseInt((await rewardedAlice.getCurrentCycle()).toString())
+        let curCycle = parseInt((await deb0xViews.getCurrentCycle()).toString())
 
         await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
             feeReceiver.address, 200, 0, { value: ethers.utils.parseEther("2") })
@@ -47,11 +51,11 @@ describe("Test fee claiming for users/frontends", async function() {
         await hre.ethers.provider.send("evm_mine")
 
         let contractBalanceBefore = await hre.ethers.provider.getBalance(rewardedAlice.address);
-        let aliceFeesBefore = await rewardedAlice.getUnclaimedFees(alice.address);
+        let aliceFeesBefore = await deb0xViews.getUnclaimedFees(alice.address);
 
         await rewardedAlice.claimFees();
         contractBalanceAfter = await hre.ethers.provider.getBalance(rewardedAlice.address);
-        aliceFeesAfter = await rewardedAlice.getUnclaimedFees(alice.address);
+        aliceFeesAfter = await deb0xViews.getUnclaimedFees(alice.address);
 
         expect(aliceFeesAfter.toString()).to.eq("0");
         expect(contractBalanceAfter).to.eq(contractBalanceBefore.sub(aliceFeesBefore))
@@ -61,7 +65,7 @@ describe("Test fee claiming for users/frontends", async function() {
     it("should send messages with allice and bob and claim fees after cycle0 but we have a difference", async() => {
 
         aliceBalance = await hre.ethers.provider.getBalance(alice.address)
-        let curCycle = parseInt((await rewardedAlice.getCurrentCycle()).toString())
+        //let curCycle = parseInt((await rewardedAlice.getCurrentCycle()).toString()) //never used
 
         await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
             feeReceiver.address, 200, 100, { value: ethers.utils.parseEther("2") })
