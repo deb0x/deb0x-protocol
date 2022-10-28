@@ -23,7 +23,7 @@ describe("Test DBX tokens distributions", async function() {
         bobInstance = deb0x.connect(bob);
         frontend = deb0x.connect(feeReceiver)
     })
-    it.only(`Reward ending simulating`, async() => {
+    it(`Reward ending simulating`, async() => {
         await bobInstance["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine");
