@@ -13,13 +13,17 @@ describe("Test DBX tokens distributions", async function() {
         deb0x = await Deb0x.deploy(ethers.constants.AddressZero);
         await deb0x.deployed();
 
+        const Deb0xViews = await ethers.getContractFactory("Deb0xViews");
+        deb0xViews = await Deb0xViews.deploy(deb0x.address);
+        await deb0xViews.deployed();
+
         const dbxAddress = await deb0x.dbx()
         dbxERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
 
         bobInstance = deb0x.connect(bob);
         frontend = deb0x.connect(feeReceiver)
     })
-    it(`Reward ending simulating`, async() => {
+    it.only(`Reward ending simulating`, async() => {
         await bobInstance["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine");
@@ -37,7 +41,7 @@ describe("Test DBX tokens distributions", async function() {
             await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
             await hre.ethers.provider.send("evm_mine");
             //console.log("Ziua " + i + " reward  " + ethers.utils.formatEther(await deb0x.calculateCycleReward()))
-            let data = await deb0x.calculateCycleReward()
+            let data = await deb0xViews.calculateCycleReward()
             if (i === 22532) {
                 expect(data).to.equal(0)
             }
@@ -54,7 +58,7 @@ describe("Test DBX tokens distributions", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 2])
         await hre.ethers.provider.send("evm_mine");
 
-        let unstakeAmount = await bobInstance.getAccWithdrawableStake(bob.address);
+        let unstakeAmount = await deb0xViews.getAccWithdrawableStake(bob.address);
         expect(unstakeAmount).to.equal(balanceForBob);
 
         let BobStakedAmount = BigNumber.from("0")
@@ -93,7 +97,7 @@ describe("Test DBX tokens distributions", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 2])
         await hre.ethers.provider.send("evm_mine");
 
-        let unstakeAmountAfterTwentyCycles = await bobInstance.getAccWithdrawableStake(bob.address);
+        let unstakeAmountAfterTwentyCycles = await deb0xViews.getAccWithdrawableStake(bob.address);
         expect(unstakeAmountAfterTwentyCycles).to.equal(BigNumber.from(balanceForBobAfterTwentyCycles).div(2));
 
         await bobInstance.unstake(unstakeAmountAfterTwentyCycles)
@@ -138,7 +142,7 @@ describe("Test DBX tokens distributions", async function() {
         await hre.ethers.provider.send("evm_mine");
 
         await bobInstance.claimFees()
-        expect(await deb0x.contractBalance()).to.be.lt(1000);
+        expect(await deb0xViews.deb0xContractBalance()).to.be.lt(1000);
 
     });
 })
