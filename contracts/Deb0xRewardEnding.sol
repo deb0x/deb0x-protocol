@@ -2,10 +2,9 @@
 pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./Deb0xERC20.sol";
 
-contract Deb0x is ERC2771Context, ReentrancyGuard {
+contract Deb0xRewardEnding is ERC2771Context {
 
     struct Envelope {
         string content;
@@ -26,7 +25,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     uint256 lastCycleReward;
 
-    uint256 pendingStake;
+    uint256 public pendingStake;
 
     uint256 currentCycle;
 
@@ -82,7 +81,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     mapping(address => uint256) public accWithdrawableStake;
 
-    mapping(address => uint256) accFirstStake;
+    mapping(address => uint256) public accFirstStake;
 
     mapping(address => uint256) accSecondStake;
 
@@ -273,14 +272,14 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
         if (
             accFirstStake[account] != 0 &&
-            currentCycle - accFirstStake[account] >= 0 &&
+            currentCycle - accFirstStake[account] > 0 &&
             stakedDuringGapCycle[account]
         ) {
             uint256 unlockedFirstStake = accStakeCycle[account][accFirstStake[account]];
 
             accRewards[account] += unlockedFirstStake;
             accWithdrawableStake[account] += unlockedFirstStake;
-            if (lastStartedCycle + 1 > accFirstStake[account]) {
+            if (lastStartedCycle + 1 >= accFirstStake[account]) {
                 accAccruedFees[account] = accAccruedFees[account] + 
                 (
                     (accStakeCycle[account][accFirstStake[account]] * 
@@ -345,7 +344,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
                 }
             }
         }
-
         _;
     }
 
@@ -353,9 +351,9 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         dbx = new Deb0xERC20();
         i_initialTimestamp = block.timestamp;
         i_periodDuration = 1 days;
-        currentCycleReward = 10000 * 1e18;
-        summedCycleStakes[0] = 10000 * 1e18;
-        rewardPerCycle[0] = 10000 * 1e18;
+        currentCycleReward = 0.000000000000000132 * 1e18;
+        summedCycleStakes[0] = 0.000000000000000132 * 1e18;
+        rewardPerCycle[0] = 0.000000000000000132 * 1e18;
     }
 
     function setKey(string memory publicKey) external {
@@ -382,8 +380,8 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         require(msgFee < 10001, "Deb0x: Reward fees can not exceed 100%");
         updateClientStats(feeReceiver);
 
-        accCycleMessages[_msgSender()] += to.length;
-        cycleTotalMessages[currentCycle] += to.length;
+        accCycleMessages[_msgSender()]++;
+        cycleTotalMessages[currentCycle]++;
         lastActiveCycle[_msgSender()] = currentCycle;
 
         if (feeReceiver != address(0)) {
@@ -411,7 +409,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     function claimRewards()
         external
         calculateCycle
-        nonReentrant()
         updateCycleFeesPerStakeSummed
         updateStats(_msgSender())
     {
@@ -434,7 +431,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     function claimClientRewards()
         external
-        nonReentrant()
         calculateCycle
         updateCycleFeesPerStakeSummed
     {
@@ -456,7 +452,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     function claimFees()
         external
-        nonReentrant()
         calculateCycle
         updateCycleFeesPerStakeSummed
         updateStats(_msgSender())
@@ -471,7 +466,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     function claimClientFees()
         external
-        nonReentrant()
         calculateCycle
         updateCycleFeesPerStakeSummed
     {
@@ -486,7 +480,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     function stakeDBX(uint256 amount)
         external
-        nonReentrant()
         calculateCycle
         updateCycleFeesPerStakeSummed
         updateStats(_msgSender())
@@ -508,6 +501,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
                 accFirstStake[_msgSender()] = cycleToSet;
             } else if (accSecondStake[_msgSender()] == 0) {
                 accSecondStake[_msgSender()] = cycleToSet;
+                
             }
         }
 
@@ -519,7 +513,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     function unstake(uint256 amount)
         external
-        nonReentrant()
         calculateCycle
         updateCycleFeesPerStakeSummed
         updateStats(_msgSender())
