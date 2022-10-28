@@ -138,7 +138,7 @@ describe("Test DBX tokens distributions", async function() {
         await hre.ethers.provider.send("evm_mine");
 
         await bobInstance.claimFees()
-        console.log("Contract balance: " + await deb0x.contractBalance());
+        expect(await deb0x.contractBalance()).to.be.lt(1000);
 
     });
 })
