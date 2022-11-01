@@ -2,7 +2,8 @@ import { useState, useEffect, useContext, createContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Deb0x from "../../ethereum/deb0x"
 import { ethers } from "ethers";
-import {fetchMessages,fetchMessageSenders} from '../Common/EventLogs.mjs';
+import {fetchMessages} from '../Common/EventLogs.mjs';
+import {fetchMessageSendersTest, fetchMessagesTest} from  '../Common/TestEvents';
 import {
     Tooltip, List, ListItem, ListItemText, ListItemButton, Typography, Box, 
     CircularProgress,
@@ -31,6 +32,7 @@ import ReadedMessagesProvider from '../Contexts/ReadedMessagesProvider';
 import { Encrypt } from './Encrypt';
 import {getKey} from "../Common/EventLogs.mjs";
 import { commify } from 'ethers/lib/utils';
+import { getEventListeners } from 'events';
 
 const deb0xAddress = "0x168618bde8fa88cc23eadf35a6340a77e0affda7";
 
@@ -67,6 +69,7 @@ export function Decrypt(props: any): any {
             return undefined
         }
     }
+
 
     async function fetchMessage(message: any) {
         return await axios.get(`https://deb0x-test.infura-ipfs.io/ipfs/${message}`)
@@ -287,12 +290,12 @@ export function Decrypt(props: any): any {
         }, []);
 
         async function processMessages() {
-            const deb0xContract = Deb0x(library, deb0xAddress)
-            
+            const deb0xContract = Deb0x(library, deb0xAddress);
             const senderAddresses = 
-                await fetchMessageSenders(account)
+                await fetchMessageSendersTest(account)
             const cidsPromises = 
                 senderAddresses.map(async function(sender:any) {
+                    fetchMessagesTest(account,sender);
                     return { 
                         cids: await fetchMessages(account,sender),
                         sender: sender
