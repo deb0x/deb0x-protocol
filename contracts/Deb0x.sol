@@ -6,10 +6,10 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./Deb0xERC20.sol";
 
 contract Deb0x is ERC2771Context, ReentrancyGuard {
-
-    struct Envelope {
-        string content;
+   
+   struct Envelope {
         uint256 timestamp;
+        string content;
     }
 
     Deb0xERC20 public dbx;
@@ -142,9 +142,11 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         address indexed to,
         address indexed from,
         bytes32 indexed hash,
-        Envelope body,
-        uint256 sentId
+        uint256 sentId,
+        uint256 timestamp,
+        string content
     );
+
 
     event KeySet(address indexed to, bytes32 indexed hash, string value);
 
@@ -585,26 +587,17 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         returns (uint256)
     {
         for (uint256 idx = 0; idx < recipients.length - 1; idx++) {
-            Envelope memory envelope = Envelope({
-                content: crefs[idx],
-                timestamp: block.timestamp
-            });
-
             bytes32 bodyHash = keccak256(abi.encodePacked(crefs[idx]));
             
-            emit Sent(
+                emit Sent(
                 recipients[idx],
                 _msgSender(),
                 bodyHash,
-                envelope,
-                sentId
+                sentId,
+                block.timestamp,
+                crefs[idx]
             );
         }
-
-        Envelope memory selfEnvelope = Envelope({
-            content: crefs[recipients.length - 1],
-            timestamp: block.timestamp
-        });
 
         bytes32 selfBodyHash = keccak256(
             abi.encodePacked(crefs[recipients.length - 1])
@@ -614,8 +607,9 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
             _msgSender(),
             _msgSender(),
             selfBodyHash,
-            selfEnvelope,
-            sentId
+            sentId,
+            block.timestamp,
+            crefs[recipients.length - 1]
         );
 
         uint256 oldSentId = sentId;
