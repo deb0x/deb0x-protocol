@@ -18,53 +18,55 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     uint256 public constant SCALING_FACTOR = 1e18;
 
-    uint256 immutable i_initialTimestamp;
+    uint256 public immutable i_initialTimestamp;
 
-    uint256 immutable i_periodDuration;
+    uint256 public immutable i_periodDuration;
 
-    uint256 currentCycleReward;
+    uint256 public currentCycleReward;
 
-    uint256 lastCycleReward;
+    uint256 public lastCycleReward;
 
-    uint256 pendingStake;
+    uint256 public pendingStake;
 
-    uint256 currentCycle;
+    uint256 public currentCycle;
 
-    uint256 lastStartedCycle;
+    uint256 public lastStartedCycle;
 
-    uint256 previousStartedCycle;
+    uint256 public previousStartedCycle;
 
     uint256 public currentStartedCycle;
 
-    uint256 pendingCycleRewardsStake;
+    uint256 public pendingCycleRewardsStake;
 
     uint256 public pendingStakeWithdrawal;
 
+    uint256 public pendingFees;
+
     uint256 public sentId = 1;
 
-    mapping(address => string) publicKeys;
+    mapping(address => string) public publicKeys;
 
-    mapping(address => uint256) accCycleFeePercent;
+    mapping(address => uint256) public accCycleFeePercent;
 
-    mapping(address => uint256) clientCycleFeePercent;
+    mapping(address => uint256) public clientCycleFeePercent;
 
-    mapping(address => uint256) accCycleMessages;
+    mapping(address => uint256) public accCycleMessages;
 
-    mapping(uint256 => uint256) cycleTotalMessages;
+    mapping(uint256 => uint256) public cycleTotalMessages;
 
-    mapping(address => uint256) lastActiveCycle;
+    mapping(address => uint256) public lastActiveCycle;
 
-    mapping(address => uint256) clientLastRewardUpdate;
+    mapping(address => uint256) public clientLastRewardUpdate;
 
-    mapping(address => uint256) clientLastFeeUpdate;
+    mapping(address => uint256) public clientLastFeeUpdate;
 
-    mapping(address => uint256) clientAccruedFees;
+    mapping(address => uint256) public clientAccruedFees;
 
     mapping(address => uint256) public accRewards;
 
     mapping(address => uint256) public accAccruedFees;
 
-    mapping(address => uint256) clientRewards;
+    mapping(address => uint256) public clientRewards;
 
     mapping(uint256 => uint256) public rewardPerCycle;
 
@@ -76,13 +78,13 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     mapping(uint256 => uint256) public cycleFeesPerStakeSummed;
 
-    mapping(address => mapping(uint256 => uint256)) accStakeCycle;
+    mapping(address => mapping(uint256 => uint256)) public accStakeCycle;
 
     mapping(address => uint256) public accWithdrawableStake;
 
-    mapping(address => uint256) accFirstStake;
+    mapping(address => uint256) public accFirstStake;
 
-    mapping(address => uint256) accSecondStake;
+    mapping(address => uint256) public accSecondStake;
 
     mapping(address => bool) public stakedDuringGapCycle;
 
@@ -183,9 +185,16 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
             currentCycle > lastStartedCycle &&
             cycleFeesPerStakeSummed[lastStartedCycle + 1] == 0
         ) {
-            uint256 feePerStake = (cycleAccruedFees[lastStartedCycle] * SCALING_FACTOR) / 
+            uint256 feePerStake;
+            if(summedCycleStakes[lastStartedCycle] != 0) {
+                feePerStake = ((cycleAccruedFees[lastStartedCycle] + pendingFees) * SCALING_FACTOR) / 
             summedCycleStakes[lastStartedCycle];
-
+                pendingFees = 0;
+            } else {
+                pendingFees += cycleAccruedFees[lastStartedCycle];
+                feePerStake = 0;
+            }
+            
             cycleFeesPerStakeSummed[lastStartedCycle + 1] = cycleFeesPerStakeSummed[previousStartedCycle] + feePerStake;
         }
 
@@ -195,7 +204,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     modifier setUpNewCycle() {
         if (rewardPerCycle[currentCycle] == 0) {
             lastCycleReward = currentCycleReward;
-            uint256 calculatedCycleReward = calculateCycleReward();
+            uint256 calculatedCycleReward = (lastCycleReward * 10000) / 10020;
             currentCycleReward = calculatedCycleReward;
             rewardPerCycle[currentCycle] = calculatedCycleReward;
             pendingCycleRewardsStake = calculatedCycleReward;
@@ -260,7 +269,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
                     )
                 ) /
                 SCALING_FACTOR;
-
             lastFeeUpdateCycle[account] = lastStartedCycle + 1;
         }
 
@@ -273,7 +281,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
             accRewards[account] += unlockedFirstStake;
             accWithdrawableStake[account] += unlockedFirstStake;
-            
             if (lastStartedCycle + 1 > accFirstStake[account]) {
                 accAccruedFees[account] = accAccruedFees[account] + 
                 (
@@ -297,7 +304,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
             accRewards[account] += unlockedFirstStake;
             accWithdrawableStake[account] += unlockedFirstStake;
-
             if (lastStartedCycle + 1 > accFirstStake[account]) {
                 accAccruedFees[account] = accAccruedFees[account] + 
                 (
@@ -374,10 +380,11 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         setUpNewCycle
         updateStats(_msgSender())
     {
+        require(msgFee < 10001, "Deb0x: Reward fees can not exceed 100%");
         updateClientStats(feeReceiver);
 
-        accCycleMessages[_msgSender()]++;
-        cycleTotalMessages[currentCycle]++;
+        accCycleMessages[_msgSender()] += to.length;
+        cycleTotalMessages[currentCycle] += to.length;
         lastActiveCycle[_msgSender()] = currentCycle;
 
         if (feeReceiver != address(0)) {
@@ -538,139 +545,8 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         emit Unstaked(currentCycle, _msgSender(), amount);
     }
 
-    function contractBalance() external view returns (uint256) {
-        return address(this).balance;
-    }
-
-    function getKey(address account) external view returns (string memory) {
-        return publicKeys[account];
-    }
-
-    function getAccWithdrawableStake(address staker)
-        external
-        view
-        returns (uint256)
-    {
-        uint256 calculatedCycle = getCurrentCycle();
-        uint256 unlockedStake = 0;
-
-        if (
-            accFirstStake[staker] != 0 &&
-            currentCycle - accFirstStake[staker] >= 0 &&
-            stakedDuringGapCycle[staker]
-        ) {
-            unlockedStake += accStakeCycle[staker][accFirstStake[staker]];
-        } else if (
-            accFirstStake[staker] != 0 &&
-            calculatedCycle - accFirstStake[staker] > 0
-        ) {
-            unlockedStake += accStakeCycle[staker][accFirstStake[staker]];
-
-            if (
-                accSecondStake[staker] != 0 &&
-                calculatedCycle - accSecondStake[staker] > 0
-            ) {
-                unlockedStake += accStakeCycle[staker][accSecondStake[staker]];
-            }
-        }
-
-        return accWithdrawableStake[staker] + unlockedStake;
-    }
-
-    function getUnclaimedFees(address account) external view returns (uint256) {
-        uint256 calculatedCycle = getCurrentCycle();
-        uint256 currentAccruedFees = accAccruedFees[account];
-        uint256 currentCycleFeesPerStakeSummed;
-        uint256 previousStartedCycleTemp = previousStartedCycle;
-        uint256 lastStartedCycleTemp = lastStartedCycle;
-
-        if (calculatedCycle != currentStartedCycle) {
-            previousStartedCycleTemp = lastStartedCycle + 1;
-            lastStartedCycleTemp = currentStartedCycle;
-        }
-
-        if (
-            calculatedCycle > lastStartedCycleTemp &&
-            cycleFeesPerStakeSummed[lastStartedCycleTemp + 1] == 0
-        ) {
-            uint256 feePerStake = (cycleAccruedFees[lastStartedCycleTemp] * SCALING_FACTOR) / 
-            summedCycleStakes[lastStartedCycleTemp];
-
-            currentCycleFeesPerStakeSummed = cycleFeesPerStakeSummed[previousStartedCycle] + feePerStake;
-        } else {
-            currentCycleFeesPerStakeSummed = cycleFeesPerStakeSummed[previousStartedCycle];
-        }
-
-        uint256 currentRewards = getUnclaimedRewards(account);
-
-        if (
-            calculatedCycle > lastStartedCycleTemp &&
-            lastFeeUpdateCycle[account] != lastStartedCycleTemp + 1
-        ) {
-            currentAccruedFees += (
-                (currentRewards * 
-                    (currentCycleFeesPerStakeSummed - cycleFeesPerStakeSummed[lastFeeUpdateCycle[account]])
-                )
-            ) / 
-            SCALING_FACTOR;
-        }
-
-        if (
-            accFirstStake[account] != 0 &&
-            calculatedCycle - accFirstStake[account] > 1
-        ) {
-            currentAccruedFees += (
-                (accStakeCycle[account][accFirstStake[account]] * 
-                    (currentCycleFeesPerStakeSummed - cycleFeesPerStakeSummed[accFirstStake[account]])
-                )
-            ) /
-            SCALING_FACTOR;
-
-            if (
-                accSecondStake[account] != 0 &&
-                calculatedCycle - accSecondStake[account] > 1
-            ) {
-                currentAccruedFees += (
-                    (accStakeCycle[account][accSecondStake[account]] * 
-                        (currentCycleFeesPerStakeSummed - cycleFeesPerStakeSummed[accSecondStake[account]])
-                    )
-                ) /
-                SCALING_FACTOR;
-            }
-        }
-
-        return currentAccruedFees;
-    }
-
     function getCurrentCycle() public view returns (uint256) {
         return (block.timestamp - i_initialTimestamp) / i_periodDuration;
-    }
-
-    function calculateCycleReward() public view returns (uint256) {
-        return (lastCycleReward * 10000) / 10020;
-    }
-
-    function getUnclaimedRewards(address account) public view returns (uint256) {
-        uint256 currentRewards = accRewards[account];
-        uint256 calculatedCycle = getCurrentCycle();
-
-        if (
-            calculatedCycle > lastActiveCycle[account] &&
-            accCycleMessages[account] != 0
-        ) {
-            uint256 lastCycleAccReward = (accCycleMessages[account] * rewardPerCycle[lastActiveCycle[account]]) / 
-            cycleTotalMessages[lastActiveCycle[account]];
-            
-            currentRewards += lastCycleAccReward;
-
-            if (accCycleFeePercent[account] != 0) {
-                uint256 rewardPerMsg = lastCycleAccReward / accCycleMessages[account];
-                uint256 rewardsOwed = (rewardPerMsg * accCycleFeePercent[account]) / 10000;
-                currentRewards -= rewardsOwed;
-            }
-        }
-
-        return currentRewards;
     }
 
     function updateClientStats(address client) internal {

@@ -10,6 +10,10 @@ describe("Test Deb0xCore contract", async function() {
         const Deb0xCore = await ethers.getContractFactory("Deb0x");
         deboxCore = await Deb0xCore.deploy(ethers.constants.AddressZero);
         await deboxCore.deployed();
+
+        const Deb0xViews = await ethers.getContractFactory("Deb0xViews");
+        deb0xViews = await Deb0xViews.deploy(deboxCore.address);
+        await deb0xViews.deployed();
     });
 
     it(`Test setKey function`, async() => {
@@ -21,7 +25,7 @@ describe("Test Deb0xCore contract", async function() {
     });
 
     it(`Test getKey function`, async() => {
-        let key = await deboxCore.getKey(deployer.address);
+        let key = await deb0xViews.getKey(deployer.address);
         expect(key).to.not.equal(null)
     });
 
