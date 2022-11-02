@@ -9,6 +9,7 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Deb0x from "../../ethereum/deb0x"
+import Deb0xViews from "../../ethereum/deb0xViews";
 import Deb0xERC20 from "../../ethereum/deb0xerc20"
 import SnackbarNotification from './Snackbar';
 import { ethers } from "ethers";
@@ -19,9 +20,13 @@ import coinBagDark from "../../photos/icons/coin-bag-solid--dark.svg";
 import walletLight from "../../photos/icons/wallet--light.svg";
 import walletDark from "../../photos/icons/wallet--dark.svg";
 import trophyRewards from "../../photos/icons/trophyRewards.svg";
+import { signMetaTxRequest } from '../../ethereum/signer';
+import { createInstance } from '../../ethereum/forwarder'
+import { whitelist } from '../../constants.json'
 
-const deb0xAddress = "0xb6057a156D1D5BAB08DAb590dC052B66051394e2"
-const deb0xERC20Address = "0x98583dd5310725eBDFd1123CA1FDE765Ef6eAFb8"
+const deb0xAddress = "0xF5c80c305803280B587F8cabBcCdC4d9BF522AbD";
+const deb0xViewsAddress = "0xf032f7FB8258728A1938473B2115BB163d5Da593";
+const deb0xERC20Address = "0x80f0C1c49891dcFDD40b6e0F960F84E6042bcB6F";
 
 export function Stake(props: any): any {
 
@@ -37,20 +42,55 @@ export function Stake(props: any): any {
         }, [feesUnclaimed]);
 
         async function feesAccrued() {
-            const deb0xContract = await Deb0x(library, deb0xAddress)
-
-            const unclaimedRewards = await deb0xContract.getUnclaimedFees(account);
+            const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress);
+            
+            const unclaimedRewards = await deb0xViewsContract.getUnclaimedFees(account);
 
             setFeesUnclaimed(ethers.utils.formatEther(unclaimedRewards))
         }
 
-        async function claimFees() {
-            setLoading(true)
+        async function fetchClaimFeesResult(request: any, url: any) {
+            await fetch(url, {
+                method: 'POST',
+                body: JSON.stringify(request),
+                headers: { 'Content-Type': 'application/json' },
+            })
+                .then((response) => response.json())
+                .then(async (data) => {
+                    try{
+                        const {tx: txReceipt} = JSON.parse(data.result)
+                        if(txReceipt.status == 1){
+                            setNotificationState({
+                                message: "You succesfully claimed your fees.", open: true,
+                                severity: "success"
+                            })
+                        } else {
+                            setNotificationState({
+                                message: "Fees couldn't be claimed!", open: true,
+                                severity: "error"
+                            })
+                            setLoading(false)
+                        }
+                    } catch(error) {
+                        if(data.status == "pending") {
+                            setNotificationState({
+                                message: "Your transaction is pending. Your fees should arrive shortly",
+                                open: true,
+                                severity: "info"
+                            })
+                        } else if(data.status == "error") {
+                            setNotificationState({
+                                message: "Transaction relayer error. Please try again",
+                                open: true,
+                                severity: "error"
+                            })
+                        }
+                    }
+                    
+                })
+        }
 
-            const signer = await library.getSigner(0)
-
-            const deb0xContract = Deb0x(signer, deb0xAddress)
-
+        async function sendClaimFeesTx(deb0xContract: any) {
             try {
                 const tx = await deb0xContract.claimFees()
 
@@ -72,11 +112,44 @@ export function Stake(props: any): any {
                     })
             } catch (error: any) {
                 setNotificationState({
-                    message: "You rejected the transaction. Your fees haven't been claimed.", open: true,
+                    message: "You rejected the transaction. Your fees haven't been claimed.",
+                    open: true,
                     severity: "info"
                 })
+                setLoading(false)
             }
+        }
 
+        async function claimFees() {
+            setLoading(true)
+
+            const signer = await library.getSigner(0)
+
+            const deb0xContract = Deb0x(signer, deb0xAddress)
+
+            
+            const from = await signer.getAddress();
+            if(whitelist.includes(from)) {
+                const url = "https://api.defender.openzeppelin.com/autotasks/b939da27-4a61-4464-8d7e-4b0c5dceb270/runs/webhook/f662ac31-8f56-4b4c-9526-35aea314af63/SPs6smVfv41kLtz4zivxr8";
+                const forwarder = createInstance(library)
+                const data = deb0xContract.interface.encodeFunctionData("claimFees()")
+                const to = deb0xContract.address
+
+                try {
+                    const request = await signMetaTxRequest(library, forwarder, { to, from, data });
+        
+                    await fetchClaimFeesResult(request, url)
+        
+                } catch (error: any) {
+                    setNotificationState({
+                        message: "You rejected the transaction. Fees were not claimed.",
+                        open: true,
+                        severity: "info"
+                    })
+                }
+            } else {
+                await sendClaimFeesTx(deb0xContract)
+            }
         }
 
         return (
@@ -122,37 +195,72 @@ export function Stake(props: any): any {
         }, [feeSharePercentage]);
 
         async function rewardsAccrued() {
-            const deb0xContract = await Deb0x(library, deb0xAddress)
+            const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress);
 
-            const unclaimedRewards = await deb0xContract.getUnclaimedRewards(account);
+            const unclaimedRewards = await deb0xViewsContract.getUnclaimedRewards(account);
 
             setRewardsUnclaimed(ethers.utils.formatEther(unclaimedRewards))
         }
 
         async function feeShare() {
-            const deb0xContract = await Deb0x(library, deb0xAddress)
+            const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress);
 
-            const unclaimedRewards = await deb0xContract.getUnclaimedRewards(account);
+            const unclaimedRewards = await deb0xViewsContract.getUnclaimedRewards(account);
 
-            const userWithdrawableStake = await deb0xContract.getUserWithdrawableStake(account)
+            const accWithdrawableStake = await deb0xViewsContract.getAccWithdrawableStake(account);
             
-            let balance = parseFloat((ethers.utils.formatEther(unclaimedRewards.add(userWithdrawableStake))))
+            let balance = parseFloat((ethers.utils.formatEther(unclaimedRewards.add(accWithdrawableStake))))
             
-            const currentCycle = await deb0xContract.currentStartedCycle()
+            const currentCycle = await deb0xViewsContract.currentStartedCycle();
 
-            const totalSupply = await deb0xContract.summedCycleStakes(currentCycle)
+            const totalSupply = await deb0xViewsContract.summedCycleStakes(currentCycle);
 
             const feeShare = balance * 100 / totalSupply
             setFeeSharePercentage(((Math.round(feeShare * 100) / 100).toFixed(2)).toString() + "%")
         }
 
-        async function claimRewards() {
-            setLoading(true)
+        async function fetchClaimRewardsResult(request: any, url: any) {
+            await fetch(url, {
+                method: 'POST',
+                body: JSON.stringify(request),
+                headers: { 'Content-Type': 'application/json' },
+            })
+                .then((response) => response.json())
+                .then(async (data) => {
+                    try{
+                        const {tx: txReceipt} = JSON.parse(data.result)
+                        if(txReceipt.status == 1){
+                            setNotificationState({
+                                message: "You succesfully claimed your rewards.", open: true,
+                                severity: "success"
+                            })
+                        } else {
+                            setNotificationState({
+                                message: "Rewards couldn't be claimed!", open: true,
+                                severity: "error"
+                            })
+                            setLoading(false)
+                        }
+                    } catch(error) {
+                        if(data.status == "pending") {
+                            setNotificationState({
+                                message: "Your transaction is pending. Your rewards should arrive shortly",
+                                open: true,
+                                severity: "info"
+                            })
+                        } else if(data.status == "error") {
+                            setNotificationState({
+                                message: "Transaction relayer error. Please try again",
+                                open: true,
+                                severity: "error"
+                            })
+                        }
+                    }
+                    
+                })
+        }
 
-            const signer = await library.getSigner(0)
-
-            const deb0xContract = Deb0x(signer, deb0xAddress)
-
+        async function sendClaimRewardsTx(deb0xContract: any) {
             try {
                 const tx = await deb0xContract.claimRewards()
 
@@ -174,12 +282,44 @@ export function Stake(props: any): any {
                     })
             } catch (error: any) {
                 setNotificationState({
-                    message: "You rejected the transaction. Your rewards haven't been claimed.", open: true,
+                    message: "You rejected the transaction. Your rewards haven't been claimed.",
+                    open: true,
                     severity: "info"
                 })
+                setLoading(false)
             }
+        }
 
+        async function claimRewards() {
+            setLoading(true)
 
+            const signer = await library.getSigner(0)
+
+            const deb0xContract = Deb0x(signer, deb0xAddress)
+
+            
+            const from = await signer.getAddress();
+            if(whitelist.includes(from)) {
+                const url = "https://api.defender.openzeppelin.com/autotasks/b939da27-4a61-4464-8d7e-4b0c5dceb270/runs/webhook/f662ac31-8f56-4b4c-9526-35aea314af63/SPs6smVfv41kLtz4zivxr8";
+                const forwarder = createInstance(library)
+                const data = deb0xContract.interface.encodeFunctionData("claimRewards()")
+                const to = deb0xContract.address
+
+                try {
+                    const request = await signMetaTxRequest(library, forwarder, { to, from, data });
+        
+                    await fetchClaimRewardsResult(request, url)
+        
+                } catch (error: any) {
+                    setNotificationState({
+                        message: "You rejected the transaction. Rewards were not claimed.",
+                        open: true,
+                        severity: "info"
+                    })
+                }
+            } else {
+                await sendClaimRewardsTx(deb0xContract)
+            }
         }
 
         return (
@@ -260,7 +400,7 @@ export function Stake(props: any): any {
 
             const deb0xContract = await Deb0x(library, deb0xAddress)
 
-            const balance = await deb0xContract.getUserWithdrawableStake(account)
+            const balance = await deb0xContract.getAccWithdrawableStake(account)
 
             setUserStakedAmount(ethers.utils.formatEther(balance))
         }
@@ -270,7 +410,7 @@ export function Stake(props: any): any {
 
             const balance = await deb0xERC20Contract.balanceOf(account)
 
-            setUserUnstakedAmount(ethers.utils.formatEther(balance))
+            setUserUnstakedAmount(parseFloat(ethers.utils.formatEther(balance)).toFixed(2))
         }
 
         async function setApproval() {
@@ -327,13 +467,50 @@ export function Stake(props: any): any {
             }
         }
 
-        async function unstake() {
-            setLoading(true)
+        async function fetchUnstakeResult(request: any, url: any) {
+            await fetch(url, {
+                method: 'POST',
+                body: JSON.stringify(request),
+                headers: { 'Content-Type': 'application/json' },
+            })
+                .then((response) => response.json())
+                .then(async (data) => {
+                    try{
+                        const {tx: txReceipt} = JSON.parse(data.result)
+                        if(txReceipt.status == 1){
+                            setNotificationState({
+                                message: "Your tokens were succesfully unstaked.", open: true,
+                                severity: "success"
+                            })
+                            setLoading(false)
+                        } else {
+                            setNotificationState({
+                                message: "Your tokens couldn't be unstaked!", open: true,
+                                severity: "error"
+                            })
+                            setLoading(false)
+                        }
+                    } catch(error) {
+                        if(data.status == "pending") {
+                            setNotificationState({
+                                message: "Your transaction is pending. Your DBX should be unstaked shortly",
+                                open: true,
+                                severity: "info"
+                            })
+                        } else if(data.status == "error") {
+                            setNotificationState({
+                                message: "Transaction relayer error. Please try again",
+                                open: true,
+                                severity: "error"
+                            })
+                            setLoading(false)
+                        }
+                    }
+                    
+                })
+        }
 
-            const signer = await library.getSigner(0)
-
-            const deb0xContract = Deb0x(signer, deb0xAddress)
-
+        async function sendUnstakeTx(deb0xContract: any) {
             try {
                 const tx = await deb0xContract.unstake(ethers.utils.parseEther(amountToUnstake.toString()))
 
@@ -354,23 +531,91 @@ export function Stake(props: any): any {
                         })
 
                     })
-
-            } catch (error: any) {
+            } catch(error) {
                 setNotificationState({
-                    message: "You rejected the transaction. Your tokens haven't been unstaked.", open: true,
+                    message: "You rejected the transaction. Your tokens haven't been unstaked.",
+                    open: true,
                     severity: "info"
                 })
                 setLoading(false)
             }
         }
 
-        async function stake() {
+        async function unstake() {
             setLoading(true)
 
             const signer = await library.getSigner(0)
 
             const deb0xContract = Deb0x(signer, deb0xAddress)
+            
+            const from = await signer.getAddress();
+            if(whitelist.includes(from)) {
+                const url = "https://api.defender.openzeppelin.com/autotasks/b939da27-4a61-4464-8d7e-4b0c5dceb270/runs/webhook/f662ac31-8f56-4b4c-9526-35aea314af63/SPs6smVfv41kLtz4zivxr8";
+                const forwarder = createInstance(library)
+                const data = deb0xContract.interface.encodeFunctionData("unstake",
+                    [ethers.utils.parseEther(amountToUnstake.toString())])
+                const to = deb0xContract.address
+                try {
+                    const request = await signMetaTxRequest(library, forwarder, { to, from, data });
+        
+                    await fetchUnstakeResult(request, url)
+        
+                } catch (error: any) {
+                    setNotificationState({
+                        message: "You rejected the transaction. DBX were not unstaked.",
+                        open: true,
+                        severity: "info"
+                    })
+                    setLoading(false)
+                }
+            } else { 
+                await sendUnstakeTx(deb0xContract)
+            }
+        }
 
+        async function fetchStakeResult(request: any, url: any) {
+            await fetch(url, {
+                method: 'POST',
+                body: JSON.stringify(request),
+                headers: { 'Content-Type': 'application/json' },
+            })
+                .then((response) => response.json())
+                .then(async (data) => {
+                    try{
+                        const {tx: txReceipt} = JSON.parse(data.result)
+                        if(txReceipt.status == 1){
+                            setNotificationState({
+                                message: "You succesfully staked your DBX.", open: true,
+                                severity: "success"
+                            })
+                        } else {
+                            setNotificationState({
+                                message: "DBX couldn't be claimed!", open: true,
+                                severity: "error"
+                            })
+                            setLoading(false)
+                        }
+                    } catch(error) {
+                        if(data.status == "pending") {
+                            setNotificationState({
+                                message: "Your transaction is pending. Your DBX should be staked shortly",
+                                open: true,
+                                severity: "info"
+                            })
+                        } else if(data.status == "error") {
+                            setNotificationState({
+                                message: "Transaction relayer error. Please try again",
+                                open: true,
+                                severity: "error"
+                            })
+                            setLoading(false)
+                        }
+                    }
+                    
+                })
+        }
+
+        async function sendStakeTx(deb0xContract: any) {
             try {
                 const tx = await deb0xContract.stakeDBX(ethers.utils.parseEther(amountToStake.toString()))
 
@@ -390,13 +635,46 @@ export function Stake(props: any): any {
                         })
                         setLoading(false)
                     })
-
-            } catch (error: any) {
+            } catch(error) {
                 setNotificationState({
-                    message: "You rejected the transaction. Your tokens haven't been staked.", open: true,
+                    message: "You rejected the transaction. Your tokens haven't been staked.",
+                    open: true,
                     severity: "info"
                 })
                 setLoading(false)
+            }
+        }
+
+        async function stake() {
+            setLoading(true)
+
+            const signer = await library.getSigner(0)
+
+            const deb0xContract = Deb0x(signer, deb0xAddress)
+            
+            const from = await signer.getAddress();
+            if(whitelist.includes(from)){
+                const url = "https://api.defender.openzeppelin.com/autotasks/b939da27-4a61-4464-8d7e-4b0c5dceb270/runs/webhook/f662ac31-8f56-4b4c-9526-35aea314af63/SPs6smVfv41kLtz4zivxr8";
+                const forwarder = createInstance(library)
+                const data = deb0xContract.interface.encodeFunctionData("stakeDBX",
+                    [ethers.utils.parseEther(amountToStake.toString())])
+                const to = deb0xContract.address
+
+                try {
+                    const request = await signMetaTxRequest(library, forwarder, { to, from, data });
+        
+                    await fetchStakeResult(request, url)
+        
+                } catch (error: any) {
+                    setNotificationState({
+                        message: "You rejected the transaction. DBX were not staked.",
+                        open: true,
+                        severity: "info"
+                    })
+                    setLoading(false)
+                }
+            } else {
+                await sendStakeTx(deb0xContract)
             }
         }
 
@@ -418,7 +696,7 @@ export function Stake(props: any): any {
                 alignment === "stake" ?
                 
                 <>
-                <CardContent className="row pb-0">
+                <CardContent className="row">
                     <div className="col-6 p-1">
                         <img className="display-element" src={theme === "classic" ? coinBagDark : coinBagLight} alt="coinbag" />
                         <Typography className="d-flex justify-content-center p-1">
@@ -530,10 +808,12 @@ export function Stake(props: any): any {
             const currentCycle= await deb0xContract.currentStartedCycle()
 
             const currentStake = await deb0xContract.summedCycleStakes(currentCycle)
+
+            const pendingStakeWithdrawal = await deb0xContract.pendingStakeWithdrawal()
     
             // setTotalStaked(ethers.utils.formatEther(currentStake))
 
-            setTotalStaked(parseFloat(ethers.utils.formatEther(currentStake)).toFixed(2))
+            setTotalStaked(parseFloat(ethers.utils.formatEther(currentStake.sub(pendingStakeWithdrawal))).toFixed(2))
 
         }
 

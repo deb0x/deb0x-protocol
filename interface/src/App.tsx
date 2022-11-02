@@ -37,10 +37,8 @@ const client = create({
   protocol: 'http'
 })
 
-const ethUtil = require('ethereumjs-util')
-//old address: 0x218c10BAb451BE6A897db102b2f608bC7D3441a0
-// 0xb6057a156D1D5BAB08DAb590dC052B66051394e2
-const deb0xAddress = "0xb6057a156D1D5BAB08DAb590dC052B66051394e2";
+const ethUtil = require('ethereumjs-util');
+const deb0xAddress = "0xF5c80c305803280B587F8cabBcCdC4d9BF522AbD";
 
 
 enum ConnectorNames { Injected = 'Injected', Network = 'Network' };
@@ -136,7 +134,7 @@ function App() {
         try {
             await window.ethereum.request({
             method: 'wallet_switchEthereumChain',
-            params: [{ chainId: "0x4"}],
+            params: [{ chainId: "0x89"}],
             }).then(
                 displayErrorMsg("You have switched to the right network")
             );            
@@ -146,14 +144,14 @@ function App() {
                 method: 'wallet_addEthereumChain',
                 params: [
                     {
-                        chainId: '0x4', 
-                        chainName:'Rinkeby Test Network',
-                        rpcUrls:['https://rinkeby.infura.io/v3/'],                   
-                        blockExplorerUrls:['https://rinkeby.etherscan.io'],  
+                        chainId: '0x89', 
+                        chainName:'Polygon Network',
+                        rpcUrls:['https://rpc-mainnet.maticvigil.com'],                   
+                        blockExplorerUrls:['https://polygonscan.com/'],  
                         nativeCurrency: { 
-                        symbol:'ETH',   
+                        symbol:'Matic',   
                         decimals: 18
-                        }     
+                        }       
                     }
                     ]});
             } catch (err) {
@@ -239,7 +237,6 @@ function App() {
                                     const activating = currentConnector === activatingConnector
                                     const connected = currentConnector === connector
                                     const disabled = !triedEager || !!activatingConnector || connected || !!error
-                                    console.log(window.ethereum);
 
                                     return (
                                         <Button variant="contained"

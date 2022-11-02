@@ -1,8 +1,7 @@
-import { sign } from "crypto";
-import { Contract, ethers } from "ethers";
+import { ethers } from "ethers";
 
-const {abi} = require("./Deb0x.json");
+const { abi } = require("./Deb0x.json");
 
 export default (signerOrProvider, address) => {
-    return new ethers.Contract(address, abi, signerOrProvider);
+  return new ethers.Contract(address, abi, signerOrProvider);
 }

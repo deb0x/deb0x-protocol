@@ -8,10 +8,6 @@ $randomNumber: random(4);
     src: url('../src/fonts/Karla/Karla-Regular.ttf');
 }
 
-#root * {
-    font-family: 'Karla';
-}
-
 #root {
     height: 100vh;
     overflow: hidden;
@@ -95,6 +91,10 @@ $randomNumber: random(4);
                 color: t('text');
                 font-size: 22px;
             }
+        }
+        .message-container,
+        .d-none {
+            display: none;
         }
     }
     .initial-page {
@@ -252,11 +252,22 @@ $randomNumber: random(4);
     height: 470px;
     width: 55%;
     margin: 25vh 24% 0;
+    width: 90%;
+    margin-left: 5%;
+    .close-popup {
+        text-decoration: none;
+    }
     &.dark {
-        background: #2B2235 0% 0% no-repeat padding-box;
+        background: #FFEEE8 0% 0% no-repeat padding-box;
         border-radius: 100px;
         box-shadow: 0px 3px 25px #0F0B1380;
-        border: 1px solid #2B2235;
+        border: 1px solid #FFEEE8;
+
+        .close-popup {
+            background: #FFEEE8;
+            color: #333;
+            border: 1px solid #fff;
+        }
         .add-contact-text {
             color: #F2E9DC;
         }
@@ -292,6 +303,8 @@ $randomNumber: random(4);
         border-radius: 100px;
         background-color: #FFEEE8;
         box-shadow: 0px 3px 25px #0F0B1380;
+        position: relative;
+
         .add-contact-text {
             color: #2B2235;
         }
@@ -361,6 +374,20 @@ $randomNumber: random(4);
     display: flex;
     align-items: flex-start;
     flex-direction: column;
+    position: relative;
+
+    .close-popup {
+        position: absolute;
+        top: -20px;
+        right: -20px;
+        background-color: #FFEEE8;
+        border-radius: 20px;
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        color: #333;
+        text-align: center;
+    }
 
     ul {
         list-style-type: none;
@@ -394,10 +421,20 @@ $randomNumber: random(4);
             text-decoration : none;
         }
     }
+
+    h3 img {
+        max-height: 30px;
+        vertical-align: baseline;
+    }
+
+    h4 img {
+        max-height: 30px;
+        vertical-align: baseline;
+    }
 }
 
 .initial-page-popup {
-    .modal-box.classic {
+    .modal-box {
         width: 90%;
         margin-left: 5%;
 

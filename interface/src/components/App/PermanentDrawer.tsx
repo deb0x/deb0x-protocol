@@ -30,7 +30,8 @@ import SnackbarNotification from './Snackbar';
 import { Add } from '@mui/icons-material';
 import ContactsSetter from '../ContactsSetter';
 
-const deb0xERC20Address = "0x98583dd5310725eBDFd1123CA1FDE765Ef6eAFb8"
+const deb0xERC20Address = "0x80f0C1c49891dcFDD40b6e0F960F84E6042bcB6F";
+
 enum ConnectorNames { Injected = 'Injected' };
 
 const connectorsByName: { [connectorName in ConnectorNames]: any } = {
@@ -66,7 +67,7 @@ export function PermanentDrawer(props: any): any {
     let [show, setShow] = useState(false);
 
     if(library){
-        checkENS();
+        // checkENS();
         setUnstakedAmount();
     }
 
@@ -87,11 +88,12 @@ export function PermanentDrawer(props: any): any {
     }
 
     async function checkENS(){
- 
-        var name = await library.lookupAddress(account);
-        if(name !== null)
-        {   
-            setEnsName(name);
+        if(chainId !=137){
+            var name = await library.lookupAddress(account);
+            if(name !== null)
+            {   
+                setEnsName(name);
+            }
         }
     }
 

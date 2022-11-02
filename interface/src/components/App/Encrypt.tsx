@@ -19,9 +19,15 @@ import draftToHtml from 'draftjs-to-html';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { Editor } from 'react-draft-wysiwyg';
 import airplaneBlack from '../../photos/icons/airplane-black.svg';
+import { getKey } from '../Common/EventLogs.mjs';
+import { signMetaTxRequest } from '../../ethereum/signer';
+import { createInstance } from '../../ethereum/forwarder'
+import { whitelist } from '../../constants.json'
+import deb0xViews from '../../ethereum/deb0xViews';
 
 const { BigNumber } = require("ethers");
-const deb0xAddress = "0xb6057a156D1D5BAB08DAb590dC052B66051394e2";
+const deb0xAddress = "0xF5c80c305803280B587F8cabBcCdC4d9BF522AbD";
+const deb0xViewsAddress = "0xf032f7FB8258728A1938473B2115BB163d5Da593";
 const ethUtil = require('ethereumjs-util')
 
 const projectId = process.env.REACT_APP_PROJECT_ID
@@ -93,11 +99,8 @@ export function Encrypt(replyAddress: any): any {
     async function handlePaste(evt: any) {
         evt.preventDefault()
         var paste = evt.clipboardData.getData("text")
-        console.log(paste, "1")
         if(await isValid(paste)) {
             setAddressList([...addressList, paste])
-            console.log([...addressList, paste], "2")
-            console.log(addressList, "3")
         }
     }
 
@@ -128,8 +131,8 @@ export function Encrypt(replyAddress: any): any {
     }
 
     async function isInitialized(address: any) {
-        const deb0xContract = Deb0x(library, deb0xAddress)
-        return await deb0xContract.encryptionKeys(address);
+        const deb0xViewsContract = deb0xViews(library, deb0xViewsAddress);
+        return await deb0xViewsContract.getKey(address);
     }
 
     function isInList(address: any) {
@@ -140,37 +143,56 @@ export function Encrypt(replyAddress: any): any {
         return ethers.utils.isAddress(address);
     }
 
-    async function encryptText(messageToEncrypt: any, destinationAddresses: any)
-    {
-        setLoading(true);
-        const signer = await library.getSigner(0);
-        let cids:any = []
-        console.log(destinationAddresses, "4")
-        let recipients = replyAddress.props ? [replyAddress.props].flat() : destinationAddresses.flat()
-        recipients.push(await signer.getAddress())
-        const deb0xContract = Deb0x(signer, deb0xAddress);
-        for (let address of recipients) {
-            const destinationAddressEncryptionKey = await deb0xContract.getKey(address);
-            const encryptedMessage = ethUtil.bufferToHex(
-                Buffer.from(
-                    JSON.stringify(
-                        encrypt({
-                            publicKey: destinationAddressEncryptionKey,
-                            data: messageToEncrypt,
-                            version: 'x25519-xsalsa20-poly1305'
-                        }
-                        )
-                    ),
-                    'utf8'
-                )
-            )
-            const message = await client.add(encryptedMessage)
-            cids.push(message.path)
-        }
+    async function fetchSendResult(request: any, url: any) {
+        await fetch(url, {
+            method: 'POST',
+            body: JSON.stringify(request),
+            headers: { 'Content-Type': 'application/json' },
+        })
+            .then((response) => response.json())
+            .then(async (data) => {
+                try{
+                    const {tx: txReceipt} = JSON.parse(data.result)
+                    if(txReceipt.status == 1){
+                        setNotificationState({
+                            message: "Message was succesfully sent.",
+                            open: true,
+                            severity: "success"
+                        })
+    
+                        let count = messageSessionSentCounter + 1;
+                        setMessageSessionSentCounter(count);
+                        setEditorState(EditorState.createEmpty());
+                    } else {
+                        setNotificationState({
+                            message: "Message couldn't be sent!",
+                            open: true,
+                            severity: "error"
+                        })
+                    }
+                } catch(error) {
+                    if(data.status == "pending") {
+                        setNotificationState({
+                            message: "Your transaction is pending. Your message should arrive shortly",
+                            open: true,
+                            severity: "info"
+                        })
+                    } else if(data.status == "error") {
+                        setNotificationState({
+                            message: "Transaction relayer error. Please try again",
+                            open: true,
+                            severity: "error"
+                        })
+                    }
+                }
+                
+            })
+    }
 
+    async function sendMessageTx(deb0xContract: any, recipients: any, cids: any) {
         try {
             const overrides = 
-                { value: ethers.utils.parseUnits("0.1", "ether"),
+                { value: ethers.utils.parseUnits("0.01", "ether"),
                     gasLimit:BigNumber.from("1000000") }
             const tx = await deb0xContract["send(address[],string[],address,uint256,uint256)"](recipients,
                 cids,
@@ -198,19 +220,71 @@ export function Encrypt(replyAddress: any): any {
                         severity: "error"
                     })
                 })
-        } catch (error: any) {
-            setNotificationState({
-                message: "You rejected the transaction. Message was not sent.",
-                open: true,
-                severity: "info"
-            })
+            } catch (error: any) {
+                setNotificationState({
+                    message: "You rejected the transaction. Message was not sent.",
+                    open: true,
+                    severity: "info"
+                })
+            }
+    }
+
+    async function encryptText(messageToEncrypt: any, destinationAddresses: any)
+    {
+        setLoading(true);
+        const signer = await library.getSigner(0);
+        let cids:any = []
+        let recipients = replyAddress.props ? [replyAddress.props].flat() : destinationAddresses.flat()
+        recipients.push(await signer.getAddress())
+        const deb0xContract = Deb0x(signer, deb0xAddress);
+        for (let address of recipients) {
+            const destinationAddressEncryptionKey = await getKey(address);
+            const encryptedMessage = ethUtil.bufferToHex(
+                Buffer.from(
+                    JSON.stringify(
+                        encrypt({
+                            publicKey: destinationAddressEncryptionKey,
+                            data: messageToEncrypt,
+                            version: 'x25519-xsalsa20-poly1305'
+                        }
+                        )
+                    ),
+                    'utf8'
+                )
+            )
+            const message = await client.add(encryptedMessage)
+            cids.push(message.path)
         }
+        const from = await signer.getAddress();
+
+        if(whitelist.includes(from)) {
+            const url = "https://api.defender.openzeppelin.com/autotasks/b939da27-4a61-4464-8d7e-4b0c5dceb270/runs/webhook/f662ac31-8f56-4b4c-9526-35aea314af63/SPs6smVfv41kLtz4zivxr8";
+            const forwarder = createInstance(library)
+            const data = deb0xContract.interface.encodeFunctionData("send(address[],string[],address,uint256,uint256)",
+            [recipients, cids, ethers.constants.AddressZero, 0, 0])
+            const to = deb0xContract.address
+
+            try {
+                const request = await signMetaTxRequest(library, forwarder, { to, from, data }, '100000000000000000');
+
+                await fetchSendResult(request, url)
+
+            } catch (error: any) {
+                setNotificationState({
+                    message: "You rejected the transaction. Message was not sent.",
+                    open: true,
+                    severity: "info"
+                })
+            }
+        } else {
+            await sendMessageTx(deb0xContract, recipients, cids)
+        }
+        
 
         setTextToEncrypt('');
         setSenderAddress("");
         setAddressList([]);
         setLoading(false);
-
     }
 
     async function initializeDeb0x() {
@@ -234,7 +308,7 @@ export function Encrypt(replyAddress: any): any {
 
     const getPublicEncryptionKey = async () => {
         const deb0xContract = Deb0x(library, deb0xAddress)
-        const key = await deb0xContract.getKey(account)
+        const key = await getKey(account)
         setEncryptionKeyInitialized(key)
     }
     const [editorState, setEditorState] = useState(() =>
@@ -318,7 +392,7 @@ export function Encrypt(replyAddress: any): any {
                                 }
                                 loadingPosition="end"
                                 sx={{ marginLeft: 2, marginTop: 1 }}
-                                disabled={textToEncrypt == '' || addressList == []}
+                                disabled={textToEncrypt == '' || addressList.length === 0}
                                 onClick={() => {
                                     encryptText(textToEncrypt, addressList)
                                 }
