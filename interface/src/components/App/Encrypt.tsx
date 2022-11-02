@@ -23,9 +23,11 @@ import { getKey } from '../Common/EventLogs.mjs';
 import { signMetaTxRequest } from '../../ethereum/signer';
 import { createInstance } from '../../ethereum/forwarder'
 import { whitelist } from '../../constants.json'
+import deb0xViews from '../../ethereum/deb0xViews';
 
 const { BigNumber } = require("ethers");
-const deb0xAddress = "0x168618bde8fa88cc23eadf35a6340a77e0affda7";
+const deb0xAddress = "0xF5c80c305803280B587F8cabBcCdC4d9BF522AbD";
+const deb0xViewsAddress = "0xf032f7FB8258728A1938473B2115BB163d5Da593";
 const ethUtil = require('ethereumjs-util')
 
 const projectId = process.env.REACT_APP_PROJECT_ID
@@ -129,8 +131,8 @@ export function Encrypt(replyAddress: any): any {
     }
 
     async function isInitialized(address: any) {
-        const deb0xContract = Deb0x(library, deb0xAddress)
-        return await deb0xContract.getKey(address);
+        const deb0xViewsContract = deb0xViews(library, deb0xViewsAddress);
+        return await deb0xViewsContract.getKey(address);
     }
 
     function isInList(address: any) {
@@ -256,7 +258,7 @@ export function Encrypt(replyAddress: any): any {
         const from = await signer.getAddress();
 
         if(whitelist.includes(from)) {
-            const url = "https://api.defender.openzeppelin.com/autotasks/6bf2c0e1-7f32-4a9a-af5f-bbad9fa570eb/runs/webhook/d090d479-22fb-450a-b747-40d46161c437/GX31Z25Fq7Hmo3ssWiGiN4";
+            const url = "https://api.defender.openzeppelin.com/autotasks/b939da27-4a61-4464-8d7e-4b0c5dceb270/runs/webhook/f662ac31-8f56-4b4c-9526-35aea314af63/SPs6smVfv41kLtz4zivxr8";
             const forwarder = createInstance(library)
             const data = deb0xContract.interface.encodeFunctionData("send(address[],string[],address,uint256,uint256)",
             [recipients, cids, ethers.constants.AddressZero, 0, 0])

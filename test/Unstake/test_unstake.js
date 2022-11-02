@@ -5,7 +5,7 @@ const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.jso
 const { NumUtils } = require("../utils/NumUtils.ts");
 
 describe("Test unstake functionality", async function() {
-    let deb0xContract, user1Reward, user2Reward, user3Reward, frontend, dbxERC20;
+    let deb0xContract, user1Reward, user2Reward, user3Reward, frontend, dbxERC20, deb0xViews;
     let user1, user2;
     beforeEach("Set enviroment", async() => {
         [user1, user2, user3, messageReceiver, feeReceiver] = await ethers.getSigners();
@@ -13,6 +13,10 @@ describe("Test unstake functionality", async function() {
         const Deb0x = await ethers.getContractFactory("Deb0x");
         deb0xContract = await Deb0x.deploy(ethers.constants.AddressZero);
         await deb0xContract.deployed();
+
+        const Deb0xViews = await ethers.getContractFactory("Deb0xViews");
+        deb0xViews = await Deb0xViews.deploy(deb0xContract.address);
+        await deb0xViews.deployed();
 
         const dbxAddress = await deb0xContract.dbx()
         dbxERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
@@ -54,22 +58,22 @@ describe("Test unstake functionality", async function() {
         await user3Reward.claimRewards();
         await user3Reward.stakeDBX(balanceBigNumberFormat)
         console.log("Balance account after third stake but in second cycle: " + ethers.utils.formatEther(await dbxERC20.balanceOf(user3.address)))
-        console.log("Acc  " + ethers.utils.formatEther(await user3Reward.getAccWithdrawableStake(user3.address)))
+        console.log("Acc  " + ethers.utils.formatEther(await deb0xViews.getAccWithdrawableStake(user3.address)))
 
         await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        let valueToUnstake = await user3Reward.getAccWithdrawableStake(user3.address);
+        let valueToUnstake = await deb0xViews.getAccWithdrawableStake(user3.address);
         console.log(valueToUnstake)
         expect(valueToUnstake).to.equal(BigNumber.from("3750000000000000000000"))
         console.log("Valoare la care trebuie facut unstake: " + ethers.utils.formatEther(valueToUnstake))
         await user3Reward.unstake("37000000000000000000")
 
-        console.log("Valoare dupa unstake  " + ethers.utils.formatEther(await user3Reward.getAccWithdrawableStake(user3.address)))
+        console.log("Valoare dupa unstake  " + ethers.utils.formatEther(await deb0xViews.getAccWithdrawableStake(user3.address)))
 
-        let amoutToUnstakeAfterTwoStakeActionInFirstCycle = ethers.utils.formatEther(await user3Reward.getAccWithdrawableStake(user3.address));
+        let amoutToUnstakeAfterTwoStakeActionInFirstCycle = ethers.utils.formatEther(await deb0xViews.getAccWithdrawableStake(user3.address));
         console.log("Valoare dupa unstake  " + amoutToUnstakeAfterTwoStakeActionInFirstCycle);
 
     });

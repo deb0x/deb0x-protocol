@@ -9,6 +9,7 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Deb0x from "../../ethereum/deb0x"
+import Deb0xViews from "../../ethereum/deb0xViews";
 import Deb0xERC20 from "../../ethereum/deb0xerc20"
 import SnackbarNotification from './Snackbar';
 import { ethers } from "ethers";
@@ -23,8 +24,9 @@ import { signMetaTxRequest } from '../../ethereum/signer';
 import { createInstance } from '../../ethereum/forwarder'
 import { whitelist } from '../../constants.json'
 
-const deb0xAddress = "0x168618bde8fa88cc23eadf35a6340a77e0affda7"
-const deb0xERC20Address = "0x341B0ceaeD9331F3c0a4548a8AB75D5918076654"
+const deb0xAddress = "0xF5c80c305803280B587F8cabBcCdC4d9BF522AbD";
+const deb0xViewsAddress = "0xf032f7FB8258728A1938473B2115BB163d5Da593";
+const deb0xERC20Address = "0x80f0C1c49891dcFDD40b6e0F960F84E6042bcB6F";
 
 export function Stake(props: any): any {
 
@@ -40,9 +42,9 @@ export function Stake(props: any): any {
         }, [feesUnclaimed]);
 
         async function feesAccrued() {
-            const deb0xContract = await Deb0x(library, deb0xAddress)
-
-            const unclaimedRewards = await deb0xContract.getUnclaimedFees(account);
+            const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress);
+            
+            const unclaimedRewards = await deb0xViewsContract.getUnclaimedFees(account);
 
             setFeesUnclaimed(ethers.utils.formatEther(unclaimedRewards))
         }
@@ -128,7 +130,7 @@ export function Stake(props: any): any {
             
             const from = await signer.getAddress();
             if(whitelist.includes(from)) {
-                const url = "https://api.defender.openzeppelin.com/autotasks/6bf2c0e1-7f32-4a9a-af5f-bbad9fa570eb/runs/webhook/d090d479-22fb-450a-b747-40d46161c437/GX31Z25Fq7Hmo3ssWiGiN4";
+                const url = "https://api.defender.openzeppelin.com/autotasks/b939da27-4a61-4464-8d7e-4b0c5dceb270/runs/webhook/f662ac31-8f56-4b4c-9526-35aea314af63/SPs6smVfv41kLtz4zivxr8";
                 const forwarder = createInstance(library)
                 const data = deb0xContract.interface.encodeFunctionData("claimFees()")
                 const to = deb0xContract.address
@@ -193,25 +195,25 @@ export function Stake(props: any): any {
         }, [feeSharePercentage]);
 
         async function rewardsAccrued() {
-            const deb0xContract = await Deb0x(library, deb0xAddress)
+            const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress);
 
-            const unclaimedRewards = await deb0xContract.getUnclaimedRewards(account);
+            const unclaimedRewards = await deb0xViewsContract.getUnclaimedRewards(account);
 
             setRewardsUnclaimed(ethers.utils.formatEther(unclaimedRewards))
         }
 
         async function feeShare() {
-            const deb0xContract = await Deb0x(library, deb0xAddress)
+            const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress);
 
-            const unclaimedRewards = await deb0xContract.getUnclaimedRewards(account);
+            const unclaimedRewards = await deb0xViewsContract.getUnclaimedRewards(account);
 
-            const accWithdrawableStake = await deb0xContract.getAccWithdrawableStake(account)
+            const accWithdrawableStake = await deb0xViewsContract.getAccWithdrawableStake(account);
             
             let balance = parseFloat((ethers.utils.formatEther(unclaimedRewards.add(accWithdrawableStake))))
             
-            const currentCycle = await deb0xContract.currentStartedCycle()
+            const currentCycle = await deb0xViewsContract.currentStartedCycle();
 
-            const totalSupply = await deb0xContract.summedCycleStakes(currentCycle)
+            const totalSupply = await deb0xViewsContract.summedCycleStakes(currentCycle);
 
             const feeShare = balance * 100 / totalSupply
             setFeeSharePercentage(((Math.round(feeShare * 100) / 100).toFixed(2)).toString() + "%")
@@ -298,7 +300,7 @@ export function Stake(props: any): any {
             
             const from = await signer.getAddress();
             if(whitelist.includes(from)) {
-                const url = "https://api.defender.openzeppelin.com/autotasks/6bf2c0e1-7f32-4a9a-af5f-bbad9fa570eb/runs/webhook/d090d479-22fb-450a-b747-40d46161c437/GX31Z25Fq7Hmo3ssWiGiN4";
+                const url = "https://api.defender.openzeppelin.com/autotasks/b939da27-4a61-4464-8d7e-4b0c5dceb270/runs/webhook/f662ac31-8f56-4b4c-9526-35aea314af63/SPs6smVfv41kLtz4zivxr8";
                 const forwarder = createInstance(library)
                 const data = deb0xContract.interface.encodeFunctionData("claimRewards()")
                 const to = deb0xContract.address
@@ -548,7 +550,7 @@ export function Stake(props: any): any {
             
             const from = await signer.getAddress();
             if(whitelist.includes(from)) {
-                const url = "https://api.defender.openzeppelin.com/autotasks/6bf2c0e1-7f32-4a9a-af5f-bbad9fa570eb/runs/webhook/d090d479-22fb-450a-b747-40d46161c437/GX31Z25Fq7Hmo3ssWiGiN4";
+                const url = "https://api.defender.openzeppelin.com/autotasks/b939da27-4a61-4464-8d7e-4b0c5dceb270/runs/webhook/f662ac31-8f56-4b4c-9526-35aea314af63/SPs6smVfv41kLtz4zivxr8";
                 const forwarder = createInstance(library)
                 const data = deb0xContract.interface.encodeFunctionData("unstake",
                     [ethers.utils.parseEther(amountToUnstake.toString())])
@@ -652,7 +654,7 @@ export function Stake(props: any): any {
             
             const from = await signer.getAddress();
             if(whitelist.includes(from)){
-                const url = "https://api.defender.openzeppelin.com/autotasks/6bf2c0e1-7f32-4a9a-af5f-bbad9fa570eb/runs/webhook/d090d479-22fb-450a-b747-40d46161c437/GX31Z25Fq7Hmo3ssWiGiN4";
+                const url = "https://api.defender.openzeppelin.com/autotasks/b939da27-4a61-4464-8d7e-4b0c5dceb270/runs/webhook/f662ac31-8f56-4b4c-9526-35aea314af63/SPs6smVfv41kLtz4zivxr8";
                 const forwarder = createInstance(library)
                 const data = deb0xContract.interface.encodeFunctionData("stakeDBX",
                     [ethers.utils.parseEther(amountToStake.toString())])

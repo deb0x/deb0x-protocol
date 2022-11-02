@@ -6,14 +6,18 @@ const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.jso
 const { NumUtils } = require("../utils/NumUtils.ts");
 
 describe("Test DBX tokens distributions", async function() {
-    let userReward, user1Reward, user2Reward, user3Reward, frontend, dbxERC20;
-    let user1, user2;
+    let userReward, user1Reward, user2Reward, user3Reward, frontend, dbxERC20, deb0xViews;
+    let user1, user2, user3;
     beforeEach("Set enviroment", async() => {
         [user1, user2, user3, messageReceiver, feeReceiver] = await ethers.getSigners();
 
         const Deb0x = await ethers.getContractFactory("Deb0x");
         userReward = await Deb0x.deploy(ethers.constants.AddressZero);
         await userReward.deployed();
+
+        const Deb0xViews = await ethers.getContractFactory("Deb0xViews");
+        deb0xViews = await Deb0xViews.deploy(userReward.address);
+        await deb0xViews.deployed();
 
         const dbxAddress = await userReward.dbx()
         dbxERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
@@ -611,7 +615,7 @@ describe("Test DBX tokens distributions", async function() {
         let actualBalanceUser3 = await dbxERC20.balanceOf(user3.address);
         expect(expectedValueUser3).to.equal(actualBalanceUser3)
 
-        await user3Reward.unstake(await user3Reward.getAccWithdrawableStake(user3.address))
+        await user3Reward.unstake(await deb0xViews.getAccWithdrawableStake(user3.address))
         let expectedValueUser3ForUnstakeValue = amountToStake;
         let actualBalanceUser3AfterUnstake = await dbxERC20.balanceOf(user3.address);
         //5000 DBX tokens was staked + balance before unstake action
@@ -671,7 +675,7 @@ describe("Test DBX tokens distributions", async function() {
         expect(expectedValueUser3).to.equal(actualBalanceUser3)
 
         await user2Reward.claimRewards()
-        await user2Reward.unstake(await user2Reward.getAccWithdrawableStake(user2.address))
+        await user2Reward.unstake(await deb0xViews.getAccWithdrawableStake(user2.address))
         let actualBalanceUser2AfterUnstake = await dbxERC20.balanceOf(user2.address);
         let cycle2AndCycle3Value = BigNumber.from(user3RewardInCycle3).add(BigNumber.from(userTotalRewardSecondCycle)).add(BigNumber.from(userTotalRewardFirstCycle))
         expect(cycle2AndCycle3Value).to.equal(actualBalanceUser2AfterUnstake)
@@ -784,13 +788,13 @@ describe("Test DBX tokens distributions", async function() {
         await user3Reward.stakeDBX(await dbxERC20.balanceOf(user3.address))
 
         try {
-            await user2Reward.stakeDBX(await userReward.getAccWithdrawableStake(user2.address))
+            await user2Reward.stakeDBX(await deb0xViews.getAccWithdrawableStake(user2.address))
         } catch (error) {
             expect(error.message).to.include("Deb0x: amount arg is zero");
         }
 
         try {
-            await user2Reward.unstake(await userReward.getAccWithdrawableStake(user2.address))
+            await user2Reward.unstake(await deb0xViews.getAccWithdrawableStake(user2.address))
         } catch (error) {
             expect(error.message).to.include("Deb0x: amount arg is zero");
         }
@@ -818,7 +822,7 @@ describe("Test DBX tokens distributions", async function() {
     });
 
     it("Multiple stake action and contract balance tests", async() => {
-        let balanceBeforeSendMessages = await userReward.contractBalance();
+        let balanceBeforeSendMessages = await deb0xViews.deb0xContractBalance();
         expect(parseInt(ethers.utils.formatEther(balanceBeforeSendMessages))).to.equal(0);
 
         await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -848,13 +852,13 @@ describe("Test DBX tokens distributions", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        await user3Reward.getAccWithdrawableStake(user3.address);
+        await deb0xViews.getAccWithdrawableStake(user3.address);
 
         await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        await user3Reward.getAccWithdrawableStake(user3.address);
+        await deb0xViews.getAccWithdrawableStake(user3.address);
         await user3Reward.claimRewards()
         await dbxERC20.connect(user3).approve(userReward.address, await dbxERC20.balanceOf(user3.address))
         await user3Reward.stakeDBX(await dbxERC20.balanceOf(user3.address))
@@ -869,7 +873,7 @@ describe("Test DBX tokens distributions", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        await user3Reward.getAccWithdrawableStake(user3.address);
+        await deb0xViews.getAccWithdrawableStake(user3.address);
         await user3Reward.claimRewards()
         await dbxERC20.connect(user3).approve(userReward.address, await dbxERC20.balanceOf(user3.address))
         await user3Reward.stakeDBX(await dbxERC20.balanceOf(user3.address))
@@ -890,8 +894,8 @@ describe("Test DBX tokens distributions", async function() {
         await dbxERC20.connect(user3).approve(userReward.address, await dbxERC20.balanceOf(user3.address))
         await user3Reward.stakeDBX(await dbxERC20.balanceOf(user3.address))
 
-        let expectedValue = await user3Reward.getAccWithdrawableStake(user3.address);
-        await user3Reward.unstake(await user3Reward.getAccWithdrawableStake(user3.address))
+        let expectedValue = await deb0xViews.getAccWithdrawableStake(user3.address);
+        await user3Reward.unstake(await deb0xViews.getAccWithdrawableStake(user3.address))
         let actualBalanceAfterUnstake = await dbxERC20.balanceOf(user3.address);
         expect(expectedValue).to.equal(actualBalanceAfterUnstake)
     });
