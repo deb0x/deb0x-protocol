@@ -138,7 +138,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         uint256 nativeTokenFee
     );
 
-    event Sent(
+      event Sent(
         address indexed to,
         address indexed from,
         bytes32 indexed hash,
@@ -363,6 +363,10 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         publicKeys[_msgSender()] = publicKey;
         bytes32 bodyHash = keccak256(abi.encodePacked(publicKey));
         emit KeySet(_msgSender(), bodyHash, publicKey);
+    }
+
+ function getKey(address account) external view returns (string memory) {
+        return publicKeys[account];
     }
 
     function send(
@@ -602,7 +606,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
             abi.encodePacked(crefs[recipients.length - 1])
         );
 
-        emit Sent(
+          emit Sent(
             _msgSender(),
             _msgSender(),
             selfBodyHash,

@@ -19,7 +19,7 @@ import cloud3 from '../../photos/icons/clouds/cloud-3.svg';
 import {fetchSentMessages, getKey } from '../Common/EventLogs.mjs';
 
 const axios = require('axios')
-const deb0xAddress = "0xF5c80c305803280B587F8cabBcCdC4d9BF522AbD";
+const deb0xAddress = "0x6560EAf10Cb7955eE90330d601A018daBf2156f3";
 
 export function Sent(props: any): any {
     const { account, library } = useWeb3React()

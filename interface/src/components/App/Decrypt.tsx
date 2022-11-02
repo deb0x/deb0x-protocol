@@ -2,7 +2,7 @@ import { useState, useEffect, useContext, createContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Deb0x from "../../ethereum/deb0x"
 import { ethers } from "ethers";
-import {fetchMessages} from '../Common/EventLogs.mjs';
+import {fetchMessages,fetchMessageSenders} from '../Common/EventLogs.mjs';
 import {fetchMessageSendersTest, fetchMessagesTest} from  '../Common/TestEvents';
 import {
     Tooltip, List, ListItem, ListItemText, ListItemButton, Typography, Box, 
@@ -34,7 +34,7 @@ import {getKey} from "../Common/EventLogs.mjs";
 import { commify } from 'ethers/lib/utils';
 import { getEventListeners } from 'events';
 
-const deb0xAddress = "0xF5c80c305803280B587F8cabBcCdC4d9BF522AbD";
+const deb0xAddress = "0x6560EAf10Cb7955eE90330d601A018daBf2156f3";
 
 export function Decrypt(props: any): any {
     const { account, library } = useWeb3React()
@@ -292,7 +292,7 @@ export function Decrypt(props: any): any {
         async function processMessages() {
             const deb0xContract = Deb0x(library, deb0xAddress);
             const senderAddresses = 
-                await fetchMessageSendersTest(account)
+                await fetchMessageSenders(account)
             const cidsPromises = 
                 senderAddresses.map(async function(sender:any) {
                     fetchMessagesTest(account,sender);

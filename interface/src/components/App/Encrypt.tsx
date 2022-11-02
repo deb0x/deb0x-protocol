@@ -26,7 +26,7 @@ import { whitelist } from '../../constants.json'
 import deb0xViews from '../../ethereum/deb0xViews';
 
 const { BigNumber } = require("ethers");
-const deb0xAddress = "0xF5c80c305803280B587F8cabBcCdC4d9BF522AbD";
+const deb0xAddress = "0x6560EAf10Cb7955eE90330d601A018daBf2156f3";
 const deb0xViewsAddress = "0xf032f7FB8258728A1938473B2115BB163d5Da593";
 const ethUtil = require('ethereumjs-util')
 
