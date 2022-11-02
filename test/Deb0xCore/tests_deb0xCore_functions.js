@@ -31,9 +31,8 @@ describe("Test Deb0xCore contract", async function() {
 
         let transaction = await deboxCore.send(addresses, cids, ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         let receipt = await transaction.wait();
-
         for (let i = 0; i < receipt.events.length - 1; i++) {
-            expect(receipt.events[i].args.body.content).to.equal(cids[i]);
+            expect(receipt.events[i].args.content).to.equal(cids[i]);
         }
 
     });
@@ -46,7 +45,7 @@ describe("Test Deb0xCore contract", async function() {
         let receipt = await transaction.wait();
 
         for (let i = 0; i < receipt.events.length - 1; i++) {
-            expect(receipt.events[i].args.body.content).to.equal(cids[i]);
+            expect(receipt.events[i].args.content).to.equal(cids[i]);
         }
 
     });

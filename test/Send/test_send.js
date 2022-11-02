@@ -103,7 +103,7 @@ describe("Test send functionality from Deb0xCore contract!", async function() {
         let receipt = await transaction.wait();
 
         for (let i = 0; i < receipt.events.length - 1; i++) {
-            expect(receipt.events[i].args.body.content).to.equal(cids[i]);
+            expect(receipt.events[i].args.content).to.equal(cids[i]);
         }
 
     });
@@ -117,7 +117,7 @@ describe("Test send functionality from Deb0xCore contract!", async function() {
         let receipt = await transaction.wait();
 
         for (let i = 0; i < receipt.events.length - 1; i++) {
-            expect(receipt.events[i].args.body.content).to.equal(cids[i]);
+            expect(receipt.events[i].args.content).to.equal(cids[i]);
         }
 
     });
@@ -162,7 +162,7 @@ describe("Test send functionality from Deb0xCore contract!", async function() {
         expect(add1.address).to.equal(receipt.events[0].args.from);
 
         for (let i = 0; i < receipt.events.length - 1; i++) {
-            expect(receipt.events[i].args.body.content).to.equal(cids[i]);
+            expect(receipt.events[i].args.content).to.equal(cids[i]);
         }
 
         let filter = receipt.events.filter(event => event.args.from === add1.address);
@@ -170,7 +170,7 @@ describe("Test send functionality from Deb0xCore contract!", async function() {
             expect(filter[i].args.to).to.equal(addresses[i]);
         }
         for (let i = 0; i < filter.length - 1; i++) {
-            expect(filter[i].args.body.content).to.equal(cids[i]);
+            expect(filter[i].args.content).to.equal(cids[i]);
         }
 
         let addressesUser2Sent = [add2.address, add3.address, add4.address, add5.address, add6.address, add6.address, add2.address];
@@ -185,7 +185,7 @@ describe("Test send functionality from Deb0xCore contract!", async function() {
             expect(filter2[i].args.to).to.equal(addressesUser2Sent[i]);
         }
         for (let i = 0; i < filter2.length - 1; i++) {
-            expect(filter2[i].args.body.content).to.equal(cidsUser2Sent[i]);
+            expect(filter2[i].args.content).to.equal(cidsUser2Sent[i]);
         }
     });
 
