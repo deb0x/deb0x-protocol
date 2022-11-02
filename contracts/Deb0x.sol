@@ -45,6 +45,8 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     uint256 public pendingStakeWithdrawal;
 
+    uint256 public pendingFees;
+
     uint256 public sentId = 1;
 
     mapping(address => string) public publicKeys;
@@ -212,9 +214,16 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
             currentCycle > lastStartedCycle &&
             cycleFeesPerStakeSummed[lastStartedCycle + 1] == 0
         ) {
-            uint256 feePerStake = (cycleAccruedFees[lastStartedCycle] * SCALING_FACTOR) / 
+            uint256 feePerStake;
+            if(summedCycleStakes[lastStartedCycle] != 0) {
+                feePerStake = ((cycleAccruedFees[lastStartedCycle] + pendingFees) * SCALING_FACTOR) / 
             summedCycleStakes[lastStartedCycle];
-
+                pendingFees = 0;
+            } else {
+                pendingFees += cycleAccruedFees[lastStartedCycle];
+                feePerStake = 0;
+            }
+            
             cycleFeesPerStakeSummed[lastStartedCycle + 1] = cycleFeesPerStakeSummed[previousStartedCycle] + feePerStake;
         }
 
@@ -292,7 +301,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
                     )
                 ) /
                 SCALING_FACTOR;
-
             lastFeeUpdateCycle[account] = lastStartedCycle + 1;
         }
 
@@ -305,7 +313,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
             accRewards[account] += unlockedFirstStake;
             accWithdrawableStake[account] += unlockedFirstStake;
-            
             if (lastStartedCycle + 1 > accFirstStake[account]) {
                 accAccruedFees[account] = accAccruedFees[account] + 
                 (
@@ -329,7 +336,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
             accRewards[account] += unlockedFirstStake;
             accWithdrawableStake[account] += unlockedFirstStake;
-
             if (lastStartedCycle + 1 > accFirstStake[account]) {
                 accAccruedFees[account] = accAccruedFees[account] + 
                 (
@@ -406,6 +412,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         setUpNewCycle
         updateStats(_msgSender())
     {
+        require(msgFee < 10001, "Deb0x: Reward fees can not exceed 100%");
         updateClientStats(feeReceiver);
 
         accCycleMessages[_msgSender()] += to.length;
