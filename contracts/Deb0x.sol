@@ -188,12 +188,13 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     )
         external
         payable
+        nonReentrant()
         gasWrapper(nativeTokenFee)
     {
         calculateCycle();
         updateCycleFeesPerStakeSummed();
-        updateStats(_msgSender());
         setUpNewCycle();
+        updateStats(_msgSender());
         require(msgFee < 10001, "Deb0x: Reward fees can not exceed 100%");
         updateClientStats(feeReceiver);
 
