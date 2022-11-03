@@ -164,17 +164,251 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         sendViaCall(payable(msg.sender), msg.value - fee - nativeTokenFee);
     }
 
-    modifier calculateCycle() {
+    constructor(address forwarder) ERC2771Context(forwarder) {
+        dbx = new Deb0xERC20();
+        i_initialTimestamp = block.timestamp;
+        i_periodDuration = 1 days;
+        currentCycleReward = 10000 * 1e18;
+        summedCycleStakes[0] = 10000 * 1e18;
+        rewardPerCycle[0] = 10000 * 1e18;
+    }
+
+    function setKey(string memory publicKey) external {
+        publicKeys[_msgSender()] = publicKey;
+        bytes32 bodyHash = keccak256(abi.encodePacked(publicKey));
+        emit KeySet(_msgSender(), bodyHash, publicKey);
+    }
+
+    function send(
+        address[] memory to,
+        string[] memory payload,
+        address feeReceiver,
+        uint256 msgFee,
+        uint256 nativeTokenFee
+    )
+        external
+        payable
+        nonReentrant()
+        gasWrapper(nativeTokenFee)
+    {
+        calculateCycle();
+        updateCycleFeesPerStakeSummed();
+        setUpNewCycle();
+        updateStats(_msgSender());
+        require(msgFee < 10001, "Deb0x: Reward fees can not exceed 100%");
+        updateClientStats(feeReceiver);
+
+        accCycleMessages[_msgSender()] += to.length;
+        cycleTotalMessages[currentCycle] += to.length;
+        lastActiveCycle[_msgSender()] = currentCycle;
+
+        if (feeReceiver != address(0)) {
+            if (msgFee != 0) {
+                accCycleFeePercent[_msgSender()] += msgFee;
+                clientCycleFeePercent[feeReceiver] += msgFee;
+            }
+
+            if (nativeTokenFee != 0) {
+                clientAccruedFees[feeReceiver] += nativeTokenFee;
+            }
+        }
+
+        uint256 _sentId = _send(to, payload);
+
+        emit SendEntryCreated(
+            currentCycle,
+            _sentId,
+            feeReceiver,
+            msgFee,
+            nativeTokenFee
+        );
+    }
+
+    function claimRewards()
+        external
+        nonReentrant()
+    {
+        calculateCycle();
+        updateCycleFeesPerStakeSummed();
+        updateStats(_msgSender());
+        uint256 reward = accRewards[_msgSender()] -
+            accWithdrawableStake[_msgSender()];
+
+        require(reward > 0, "Deb0x: account has no rewards");
+
+        accRewards[_msgSender()] -= reward;
+        
+        if (lastStartedCycle == currentStartedCycle) {
+            pendingStakeWithdrawal += reward;
+        } else {
+            summedCycleStakes[currentCycle] = summedCycleStakes[currentCycle] - reward;
+        }
+
+        dbx.mintReward(_msgSender(), reward);
+        emit RewardsClaimed(currentCycle, _msgSender(), reward);
+    }
+
+    function claimClientRewards()
+        external
+        nonReentrant()
+    {
+        calculateCycle();
+        updateCycleFeesPerStakeSummed();
+
+        updateClientStats(_msgSender());
+
+        uint256 reward = clientRewards[_msgSender()];
+        require(reward > 0, "Deb0x: account has no rewards");
+        clientRewards[_msgSender()] = 0;
+
+        if (lastStartedCycle == currentStartedCycle) {
+            pendingStakeWithdrawal += reward;
+        } else {
+            summedCycleStakes[currentCycle] = summedCycleStakes[currentCycle] - reward;
+        }
+
+        dbx.mintReward(_msgSender(), reward);
+        emit ClientRewardsClaimed(currentCycle, _msgSender(), reward);
+    }
+
+    function claimFees()
+        external
+        nonReentrant()
+    {
+        calculateCycle();
+        updateCycleFeesPerStakeSummed();
+        updateStats(_msgSender());
+
+        uint256 fees = accAccruedFees[_msgSender()];
+        require(fees > 0, "Deb0x: account has no accrued fees");
+
+        accAccruedFees[_msgSender()] = 0;
+        sendViaCall(payable(_msgSender()), fees);
+        emit FeesClaimed(getCurrentCycle(), _msgSender(), fees);
+    }
+
+    function claimClientFees()
+        external
+        nonReentrant()
+    {
+        calculateCycle();
+        updateCycleFeesPerStakeSummed();
+
+        updateClientStats(_msgSender());
+        uint256 fees = clientAccruedFees[_msgSender()];
+        require(fees > 0, "Deb0x: account has no accrued fees");
+
+        clientAccruedFees[_msgSender()] = 0;
+        sendViaCall(payable(_msgSender()), fees);
+        emit ClientFeesClaimed(getCurrentCycle(), _msgSender(), fees);
+    }
+
+    function stakeDBX(uint256 amount)
+        external
+        nonReentrant()
+    {
+        calculateCycle();
+        updateCycleFeesPerStakeSummed();
+        updateStats(_msgSender());
+        require(amount != 0, "Deb0x: amount arg is zero");
+        pendingStake += amount;
+        uint256 cycleToSet = currentCycle + 1;
+
+        if (lastStartedCycle == currentStartedCycle) {
+            cycleToSet = currentCycle;
+            stakedDuringGapCycle[_msgSender()] = true;
+        }
+
+        if (
+            (cycleToSet != accFirstStake[_msgSender()] &&
+                cycleToSet != accSecondStake[_msgSender()])
+        ) {
+            if (accFirstStake[_msgSender()] == 0) {
+                accFirstStake[_msgSender()] = cycleToSet;
+            } else if (accSecondStake[_msgSender()] == 0) {
+                accSecondStake[_msgSender()] = cycleToSet;
+            }
+        }
+
+        accStakeCycle[_msgSender()][cycleToSet] += amount;
+
+        dbx.transferFrom(_msgSender(), address(this), amount);
+        emit Staked(cycleToSet, _msgSender(), amount);
+    }
+
+    function unstake(uint256 amount)
+        external
+        nonReentrant()
+    {
+        calculateCycle();
+        updateCycleFeesPerStakeSummed();
+        updateStats(_msgSender());
+        require(amount != 0, "Deb0x: amount arg is zero");
+
+        require(
+            amount <= accWithdrawableStake[_msgSender()],
+            "Deb0x: can not unstake more than withdrawable stake"
+        );
+
+        if (lastStartedCycle == currentStartedCycle) {
+            pendingStakeWithdrawal += amount;
+        } else {
+            summedCycleStakes[currentCycle] -= amount;
+        }
+
+        accWithdrawableStake[_msgSender()] -= amount;
+        accRewards[_msgSender()] -= amount;
+
+        dbx.transfer(_msgSender(), amount);
+        emit Unstaked(currentCycle, _msgSender(), amount);
+    }
+
+    function getCurrentCycle() public view returns (uint256) {
+        return (block.timestamp - i_initialTimestamp) / i_periodDuration;
+    }
+
+    function updateClientStats(address client) internal {
+        if (currentCycle > clientLastRewardUpdate[client]) {
+            uint256 lastUpdatedCycle = clientLastRewardUpdate[client];
+
+            if (
+                clientCycleFeePercent[client] != 0 &&
+                cycleTotalMessages[lastUpdatedCycle] != 0
+            ) {
+                uint256 rewardPerMsg = rewardPerCycle[lastUpdatedCycle] / cycleTotalMessages[lastUpdatedCycle];
+                clientRewards[client] += (rewardPerMsg * clientCycleFeePercent[client]) / 10000;
+                clientCycleFeePercent[client] = 0;
+            }
+
+            clientLastRewardUpdate[client] = currentCycle;
+        }
+
+        if (
+            currentCycle > lastStartedCycle &&
+            clientLastFeeUpdate[client] != lastStartedCycle + 1
+        ) {
+            clientAccruedFees[client] += (
+                clientRewards[client] * 
+                    (cycleFeesPerStakeSummed[lastStartedCycle + 1] - 
+                        cycleFeesPerStakeSummed[clientLastFeeUpdate[client]]
+                    )
+            ) /
+            SCALING_FACTOR;
+
+            clientLastFeeUpdate[client] = lastStartedCycle + 1;
+        }
+    }
+
+    function calculateCycle() internal {
         uint256 calculatedCycle = getCurrentCycle();
         
         if (calculatedCycle > currentCycle) {
             currentCycle = calculatedCycle;
         }
         
-        _;
     }
 
-    modifier updateCycleFeesPerStakeSummed() {
+    function updateCycleFeesPerStakeSummed() internal {
         if (currentCycle != currentStartedCycle) {
             previousStartedCycle = lastStartedCycle + 1;
             lastStartedCycle = currentStartedCycle;
@@ -197,10 +431,9 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
             cycleFeesPerStakeSummed[lastStartedCycle + 1] = cycleFeesPerStakeSummed[previousStartedCycle] + feePerStake;
         }
 
-        _;
     }
 
-    modifier setUpNewCycle() {
+    function setUpNewCycle() internal {
         if (rewardPerCycle[currentCycle] == 0) {
             lastCycleReward = currentCycleReward;
             uint256 calculatedCycleReward = (lastCycleReward * 10000) / 10020;
@@ -229,10 +462,9 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
             );
         }
 
-        _;
     }
 
-    modifier updateStats(address account) {
+    function updateStats(address account) internal {
         if (
             currentCycle > lastActiveCycle[account] &&
             accCycleMessages[account] != 0
@@ -346,242 +578,10 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
             }
         }
 
-        _;
-    }
-
-    constructor(address forwarder) ERC2771Context(forwarder) {
-        dbx = new Deb0xERC20();
-        i_initialTimestamp = block.timestamp;
-        i_periodDuration = 1 days;
-        currentCycleReward = 10000 * 1e18;
-        summedCycleStakes[0] = 10000 * 1e18;
-        rewardPerCycle[0] = 10000 * 1e18;
-    }
-
-    function setKey(string memory publicKey) external {
-        publicKeys[_msgSender()] = publicKey;
-        bytes32 bodyHash = keccak256(abi.encodePacked(publicKey));
-        emit KeySet(_msgSender(), bodyHash, publicKey);
-    }
-
-    function send(
-        address[] memory to,
-        string[] memory payload,
-        address feeReceiver,
-        uint256 msgFee,
-        uint256 nativeTokenFee
-    )
-        external
-        payable
-        gasWrapper(nativeTokenFee)
-        calculateCycle
-        updateCycleFeesPerStakeSummed
-        setUpNewCycle
-        updateStats(_msgSender())
-    {
-        require(msgFee < 10001, "Deb0x: Reward fees can not exceed 100%");
-        updateClientStats(feeReceiver);
-
-        accCycleMessages[_msgSender()] += to.length;
-        cycleTotalMessages[currentCycle] += to.length;
-        lastActiveCycle[_msgSender()] = currentCycle;
-
-        if (feeReceiver != address(0)) {
-            if (msgFee != 0) {
-                accCycleFeePercent[_msgSender()] += msgFee;
-                clientCycleFeePercent[feeReceiver] += msgFee;
-            }
-
-            if (nativeTokenFee != 0) {
-                clientAccruedFees[feeReceiver] += nativeTokenFee;
-            }
-        }
-
-        uint256 _sentId = _send(to, payload);
-
-        emit SendEntryCreated(
-            currentCycle,
-            _sentId,
-            feeReceiver,
-            msgFee,
-            nativeTokenFee
-        );
-    }
-
-    function claimRewards()
-        external
-        calculateCycle
-        nonReentrant()
-        updateCycleFeesPerStakeSummed
-        updateStats(_msgSender())
-    {
-        uint256 reward = accRewards[_msgSender()] -
-            accWithdrawableStake[_msgSender()];
-
-        require(reward > 0, "Deb0x: account has no rewards");
-
-        accRewards[_msgSender()] -= reward;
-        
-        if (lastStartedCycle == currentStartedCycle) {
-            pendingStakeWithdrawal += reward;
-        } else {
-            summedCycleStakes[currentCycle] = summedCycleStakes[currentCycle] - reward;
-        }
-
-        dbx.mintReward(_msgSender(), reward);
-        emit RewardsClaimed(currentCycle, _msgSender(), reward);
-    }
-
-    function claimClientRewards()
-        external
-        nonReentrant()
-        calculateCycle
-        updateCycleFeesPerStakeSummed
-    {
-        updateClientStats(_msgSender());
-
-        uint256 reward = clientRewards[_msgSender()];
-        require(reward > 0, "Deb0x: account has no rewards");
-        clientRewards[_msgSender()] = 0;
-
-        if (lastStartedCycle == currentStartedCycle) {
-            pendingStakeWithdrawal += reward;
-        } else {
-            summedCycleStakes[currentCycle] = summedCycleStakes[currentCycle] - reward;
-        }
-
-        dbx.mintReward(_msgSender(), reward);
-        emit ClientRewardsClaimed(currentCycle, _msgSender(), reward);
-    }
-
-    function claimFees()
-        external
-        nonReentrant()
-        calculateCycle
-        updateCycleFeesPerStakeSummed
-        updateStats(_msgSender())
-    {
-        uint256 fees = accAccruedFees[_msgSender()];
-        require(fees > 0, "Deb0x: account has no accrued fees");
-
-        accAccruedFees[_msgSender()] = 0;
-        sendViaCall(payable(_msgSender()), fees);
-        emit FeesClaimed(getCurrentCycle(), _msgSender(), fees);
-    }
-
-    function claimClientFees()
-        external
-        nonReentrant()
-        calculateCycle
-        updateCycleFeesPerStakeSummed
-    {
-        updateClientStats(_msgSender());
-        uint256 fees = clientAccruedFees[_msgSender()];
-        require(fees > 0, "Deb0x: account has no accrued fees");
-
-        clientAccruedFees[_msgSender()] = 0;
-        sendViaCall(payable(_msgSender()), fees);
-        emit ClientFeesClaimed(getCurrentCycle(), _msgSender(), fees);
-    }
-
-    function stakeDBX(uint256 amount)
-        external
-        nonReentrant()
-        calculateCycle
-        updateCycleFeesPerStakeSummed
-        updateStats(_msgSender())
-    {
-        require(amount != 0, "Deb0x: amount arg is zero");
-        pendingStake += amount;
-        uint256 cycleToSet = currentCycle + 1;
-
-        if (lastStartedCycle == currentStartedCycle) {
-            cycleToSet = currentCycle;
-            stakedDuringGapCycle[_msgSender()] = true;
-        }
-
-        if (
-            (cycleToSet != accFirstStake[_msgSender()] &&
-                cycleToSet != accSecondStake[_msgSender()])
-        ) {
-            if (accFirstStake[_msgSender()] == 0) {
-                accFirstStake[_msgSender()] = cycleToSet;
-            } else if (accSecondStake[_msgSender()] == 0) {
-                accSecondStake[_msgSender()] = cycleToSet;
-            }
-        }
-
-        accStakeCycle[_msgSender()][cycleToSet] += amount;
-
-        dbx.transferFrom(_msgSender(), address(this), amount);
-        emit Staked(cycleToSet, _msgSender(), amount);
-    }
-
-    function unstake(uint256 amount)
-        external
-        nonReentrant()
-        calculateCycle
-        updateCycleFeesPerStakeSummed
-        updateStats(_msgSender())
-    {
-        require(amount != 0, "Deb0x: amount arg is zero");
-
-        require(
-            amount <= accWithdrawableStake[_msgSender()],
-            "Deb0x: can not unstake more than withdrawable stake"
-        );
-
-        if (lastStartedCycle == currentStartedCycle) {
-            pendingStakeWithdrawal += amount;
-        } else {
-            summedCycleStakes[currentCycle] -= amount;
-        }
-
-        accWithdrawableStake[_msgSender()] -= amount;
-        accRewards[_msgSender()] -= amount;
-
-        dbx.transfer(_msgSender(), amount);
-        emit Unstaked(currentCycle, _msgSender(), amount);
-    }
-
-    function getCurrentCycle() public view returns (uint256) {
-        return (block.timestamp - i_initialTimestamp) / i_periodDuration;
-    }
-
-    function updateClientStats(address client) internal {
-        if (currentCycle > clientLastRewardUpdate[client]) {
-            uint256 lastUpdatedCycle = clientLastRewardUpdate[client];
-
-            if (
-                clientCycleFeePercent[client] != 0 &&
-                cycleTotalMessages[lastUpdatedCycle] != 0
-            ) {
-                uint256 rewardPerMsg = rewardPerCycle[lastUpdatedCycle] / cycleTotalMessages[lastUpdatedCycle];
-                clientRewards[client] += (rewardPerMsg * clientCycleFeePercent[client]) / 10000;
-                clientCycleFeePercent[client] = 0;
-            }
-
-            clientLastRewardUpdate[client] = currentCycle;
-        }
-
-        if (
-            currentCycle > lastStartedCycle &&
-            clientLastFeeUpdate[client] != lastStartedCycle + 1
-        ) {
-            clientAccruedFees[client] += (
-                clientRewards[client] * 
-                    (cycleFeesPerStakeSummed[lastStartedCycle + 1] - 
-                        cycleFeesPerStakeSummed[clientLastFeeUpdate[client]]
-                    )
-            ) /
-            SCALING_FACTOR;
-
-            clientLastFeeUpdate[client] = lastStartedCycle + 1;
-        }
     }
 
     function _send(address[] memory recipients, string[] memory crefs)
-        private
+        internal
         returns (uint256)
     {
         for (uint256 idx = 0; idx < recipients.length - 1; idx++) {
@@ -623,7 +623,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         return oldSentId;
     }
 
-    function sendViaCall(address payable to, uint256 amount) private {
+    function sendViaCall(address payable to, uint256 amount) internal {
         (bool sent, ) = to.call{value: amount}("");
         require(sent, "Deb0x: failed to send amount");
     }
