@@ -19,7 +19,7 @@ import draftToHtml from 'draftjs-to-html';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { Editor } from 'react-draft-wysiwyg';
 import airplaneBlack from '../../photos/icons/airplane-black.svg';
-import { getKey } from '../Common/EventLogs.mjs';
+import {getKey} from "../Common/TestEvents.js";
 import { signMetaTxRequest } from '../../ethereum/signer';
 import { createInstance } from '../../ethereum/forwarder'
 import { whitelist } from '../../constants.json'
@@ -132,7 +132,7 @@ export function Encrypt(replyAddress: any): any {
 
     async function isInitialized(address: any) {
         const deb0xViewsContract = deb0xViews(library, deb0xViewsAddress);
-        return await deb0xViewsContract.getKey(address);
+        return await getKey(address);
     }
 
     function isInList(address: any) {
