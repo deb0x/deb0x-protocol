@@ -164,187 +164,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         sendViaCall(payable(msg.sender), msg.value - fee - nativeTokenFee);
     }
 
-    function calculateCycle() private {
-        uint256 calculatedCycle = getCurrentCycle();
-        
-        if (calculatedCycle > currentCycle) {
-            currentCycle = calculatedCycle;
-        }
-        
-    }
-
-    function updateCycleFeesPerStakeSummed() private {
-        if (currentCycle != currentStartedCycle) {
-            previousStartedCycle = lastStartedCycle + 1;
-            lastStartedCycle = currentStartedCycle;
-        }
-       
-        if (
-            currentCycle > lastStartedCycle &&
-            cycleFeesPerStakeSummed[lastStartedCycle + 1] == 0
-        ) {
-            uint256 feePerStake;
-            if(summedCycleStakes[lastStartedCycle] != 0) {
-                feePerStake = ((cycleAccruedFees[lastStartedCycle] + pendingFees) * SCALING_FACTOR) / 
-            summedCycleStakes[lastStartedCycle];
-                pendingFees = 0;
-            } else {
-                pendingFees += cycleAccruedFees[lastStartedCycle];
-                feePerStake = 0;
-            }
-            
-            cycleFeesPerStakeSummed[lastStartedCycle + 1] = cycleFeesPerStakeSummed[previousStartedCycle] + feePerStake;
-        }
-
-    }
-
-    function setUpNewCycle() private {
-        if (rewardPerCycle[currentCycle] == 0) {
-            lastCycleReward = currentCycleReward;
-            uint256 calculatedCycleReward = (lastCycleReward * 10000) / 10020;
-            currentCycleReward = calculatedCycleReward;
-            rewardPerCycle[currentCycle] = calculatedCycleReward;
-            pendingCycleRewardsStake = calculatedCycleReward;
-
-            currentStartedCycle = currentCycle;
-            
-            summedCycleStakes[currentStartedCycle] += summedCycleStakes[lastStartedCycle] + currentCycleReward;
-            
-            if (pendingStake != 0) {
-                summedCycleStakes[currentStartedCycle] += pendingStake;
-                pendingStake = 0;
-            }
-            
-            if (pendingStakeWithdrawal != 0) {
-                summedCycleStakes[currentStartedCycle] -= pendingStakeWithdrawal;
-                pendingStakeWithdrawal = 0;
-            }
-            
-            emit NewCycleStarted(
-                currentCycle,
-                calculatedCycleReward,
-                summedCycleStakes[currentStartedCycle]
-            );
-        }
-
-    }
-
-    function updateStats(address account) private {
-        if (
-            currentCycle > lastActiveCycle[account] &&
-            accCycleMessages[account] != 0
-        ) {
-            uint256 lastCycleAccReward = (accCycleMessages[account] * rewardPerCycle[lastActiveCycle[account]]) / 
-            cycleTotalMessages[lastActiveCycle[account]];
-
-            accRewards[account] += lastCycleAccReward;
-
-            if (accCycleFeePercent[account] != 0) {
-                uint256 rewardPerMsg = lastCycleAccReward / accCycleMessages[account];
-
-                uint256 rewardsOwed = (rewardPerMsg * accCycleFeePercent[account]) / 10000;
-
-                accRewards[account] -= rewardsOwed;
-                accCycleFeePercent[account] = 0;
-            }
-
-            accCycleMessages[account] = 0;
-        }
-
-        if (
-            currentCycle > lastStartedCycle &&
-            lastFeeUpdateCycle[account] != lastStartedCycle + 1
-        ) {
-            accAccruedFees[account] =
-                accAccruedFees[account] +
-                (
-                    (accRewards[account] * 
-                        (cycleFeesPerStakeSummed[lastStartedCycle + 1] - 
-                            cycleFeesPerStakeSummed[lastFeeUpdateCycle[account]]
-                        )
-                    )
-                ) /
-                SCALING_FACTOR;
-            lastFeeUpdateCycle[account] = lastStartedCycle + 1;
-        }
-
-        if (
-            accFirstStake[account] != 0 &&
-            currentCycle - accFirstStake[account] >= 0 &&
-            stakedDuringGapCycle[account]
-        ) {
-            uint256 unlockedFirstStake = accStakeCycle[account][accFirstStake[account]];
-
-            accRewards[account] += unlockedFirstStake;
-            accWithdrawableStake[account] += unlockedFirstStake;
-            if (lastStartedCycle + 1 > accFirstStake[account]) {
-                accAccruedFees[account] = accAccruedFees[account] + 
-                (
-                    (accStakeCycle[account][accFirstStake[account]] * 
-                        (cycleFeesPerStakeSummed[lastStartedCycle + 1] - 
-                            cycleFeesPerStakeSummed[accFirstStake[account]]
-                        )
-                    )
-                ) /
-                SCALING_FACTOR;
-            }
-
-            accStakeCycle[account][accFirstStake[account]] = 0;
-            accFirstStake[account] = 0;
-            stakedDuringGapCycle[account] = false;
-        } else if (
-            accFirstStake[account] != 0 &&
-            currentCycle - accFirstStake[account] > 0
-        ) {
-            uint256 unlockedFirstStake = accStakeCycle[account][accFirstStake[account]];
-
-            accRewards[account] += unlockedFirstStake;
-            accWithdrawableStake[account] += unlockedFirstStake;
-            if (lastStartedCycle + 1 > accFirstStake[account]) {
-                accAccruedFees[account] = accAccruedFees[account] + 
-                (
-                    (accStakeCycle[account][accFirstStake[account]] * 
-                        (cycleFeesPerStakeSummed[lastStartedCycle + 1] - 
-                            cycleFeesPerStakeSummed[accFirstStake[account]]
-                        )
-                    )
-                ) / 
-                SCALING_FACTOR;
-            }
-
-            accStakeCycle[account][accFirstStake[account]] = 0;
-            accFirstStake[account] = 0;
-
-            if (accSecondStake[account] != 0) {
-                if (currentCycle - accSecondStake[account] > 0) {
-                    uint256 unlockedSecondStake = accStakeCycle[account][accSecondStake[account]];
-
-                    accRewards[account] += unlockedSecondStake;
-                    accWithdrawableStake[account] += unlockedSecondStake;
-                    
-                    if (lastStartedCycle + 1 > accSecondStake[account]) {
-                        accAccruedFees[account] = accAccruedFees[account] + 
-                        (
-                            (accStakeCycle[account][accSecondStake[account]] * 
-                                (cycleFeesPerStakeSummed[lastStartedCycle + 1] - 
-                                    cycleFeesPerStakeSummed[accSecondStake[account]]
-                                )
-                            )
-                        ) / 
-                        SCALING_FACTOR;
-                    }
-
-                    accStakeCycle[account][accSecondStake[account]] = 0;
-                    accSecondStake[account] = 0;
-                } else {
-                    accFirstStake[account] = accSecondStake[account];
-                    accSecondStake[account] = 0;
-                }
-            }
-        }
-
-    }
-
     constructor(address forwarder) ERC2771Context(forwarder) {
         dbx = new Deb0xERC20();
         i_initialTimestamp = block.timestamp;
@@ -577,6 +396,187 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
             clientLastFeeUpdate[client] = lastStartedCycle + 1;
         }
+    }
+
+        function calculateCycle() private {
+        uint256 calculatedCycle = getCurrentCycle();
+        
+        if (calculatedCycle > currentCycle) {
+            currentCycle = calculatedCycle;
+        }
+        
+    }
+
+    function updateCycleFeesPerStakeSummed() private {
+        if (currentCycle != currentStartedCycle) {
+            previousStartedCycle = lastStartedCycle + 1;
+            lastStartedCycle = currentStartedCycle;
+        }
+       
+        if (
+            currentCycle > lastStartedCycle &&
+            cycleFeesPerStakeSummed[lastStartedCycle + 1] == 0
+        ) {
+            uint256 feePerStake;
+            if(summedCycleStakes[lastStartedCycle] != 0) {
+                feePerStake = ((cycleAccruedFees[lastStartedCycle] + pendingFees) * SCALING_FACTOR) / 
+            summedCycleStakes[lastStartedCycle];
+                pendingFees = 0;
+            } else {
+                pendingFees += cycleAccruedFees[lastStartedCycle];
+                feePerStake = 0;
+            }
+            
+            cycleFeesPerStakeSummed[lastStartedCycle + 1] = cycleFeesPerStakeSummed[previousStartedCycle] + feePerStake;
+        }
+
+    }
+
+    function setUpNewCycle() private {
+        if (rewardPerCycle[currentCycle] == 0) {
+            lastCycleReward = currentCycleReward;
+            uint256 calculatedCycleReward = (lastCycleReward * 10000) / 10020;
+            currentCycleReward = calculatedCycleReward;
+            rewardPerCycle[currentCycle] = calculatedCycleReward;
+            pendingCycleRewardsStake = calculatedCycleReward;
+
+            currentStartedCycle = currentCycle;
+            
+            summedCycleStakes[currentStartedCycle] += summedCycleStakes[lastStartedCycle] + currentCycleReward;
+            
+            if (pendingStake != 0) {
+                summedCycleStakes[currentStartedCycle] += pendingStake;
+                pendingStake = 0;
+            }
+            
+            if (pendingStakeWithdrawal != 0) {
+                summedCycleStakes[currentStartedCycle] -= pendingStakeWithdrawal;
+                pendingStakeWithdrawal = 0;
+            }
+            
+            emit NewCycleStarted(
+                currentCycle,
+                calculatedCycleReward,
+                summedCycleStakes[currentStartedCycle]
+            );
+        }
+
+    }
+
+    function updateStats(address account) private {
+        if (
+            currentCycle > lastActiveCycle[account] &&
+            accCycleMessages[account] != 0
+        ) {
+            uint256 lastCycleAccReward = (accCycleMessages[account] * rewardPerCycle[lastActiveCycle[account]]) / 
+            cycleTotalMessages[lastActiveCycle[account]];
+
+            accRewards[account] += lastCycleAccReward;
+
+            if (accCycleFeePercent[account] != 0) {
+                uint256 rewardPerMsg = lastCycleAccReward / accCycleMessages[account];
+
+                uint256 rewardsOwed = (rewardPerMsg * accCycleFeePercent[account]) / 10000;
+
+                accRewards[account] -= rewardsOwed;
+                accCycleFeePercent[account] = 0;
+            }
+
+            accCycleMessages[account] = 0;
+        }
+
+        if (
+            currentCycle > lastStartedCycle &&
+            lastFeeUpdateCycle[account] != lastStartedCycle + 1
+        ) {
+            accAccruedFees[account] =
+                accAccruedFees[account] +
+                (
+                    (accRewards[account] * 
+                        (cycleFeesPerStakeSummed[lastStartedCycle + 1] - 
+                            cycleFeesPerStakeSummed[lastFeeUpdateCycle[account]]
+                        )
+                    )
+                ) /
+                SCALING_FACTOR;
+            lastFeeUpdateCycle[account] = lastStartedCycle + 1;
+        }
+
+        if (
+            accFirstStake[account] != 0 &&
+            currentCycle - accFirstStake[account] >= 0 &&
+            stakedDuringGapCycle[account]
+        ) {
+            uint256 unlockedFirstStake = accStakeCycle[account][accFirstStake[account]];
+
+            accRewards[account] += unlockedFirstStake;
+            accWithdrawableStake[account] += unlockedFirstStake;
+            if (lastStartedCycle + 1 > accFirstStake[account]) {
+                accAccruedFees[account] = accAccruedFees[account] + 
+                (
+                    (accStakeCycle[account][accFirstStake[account]] * 
+                        (cycleFeesPerStakeSummed[lastStartedCycle + 1] - 
+                            cycleFeesPerStakeSummed[accFirstStake[account]]
+                        )
+                    )
+                ) /
+                SCALING_FACTOR;
+            }
+
+            accStakeCycle[account][accFirstStake[account]] = 0;
+            accFirstStake[account] = 0;
+            stakedDuringGapCycle[account] = false;
+        } else if (
+            accFirstStake[account] != 0 &&
+            currentCycle - accFirstStake[account] > 0
+        ) {
+            uint256 unlockedFirstStake = accStakeCycle[account][accFirstStake[account]];
+
+            accRewards[account] += unlockedFirstStake;
+            accWithdrawableStake[account] += unlockedFirstStake;
+            if (lastStartedCycle + 1 > accFirstStake[account]) {
+                accAccruedFees[account] = accAccruedFees[account] + 
+                (
+                    (accStakeCycle[account][accFirstStake[account]] * 
+                        (cycleFeesPerStakeSummed[lastStartedCycle + 1] - 
+                            cycleFeesPerStakeSummed[accFirstStake[account]]
+                        )
+                    )
+                ) / 
+                SCALING_FACTOR;
+            }
+
+            accStakeCycle[account][accFirstStake[account]] = 0;
+            accFirstStake[account] = 0;
+
+            if (accSecondStake[account] != 0) {
+                if (currentCycle - accSecondStake[account] > 0) {
+                    uint256 unlockedSecondStake = accStakeCycle[account][accSecondStake[account]];
+
+                    accRewards[account] += unlockedSecondStake;
+                    accWithdrawableStake[account] += unlockedSecondStake;
+                    
+                    if (lastStartedCycle + 1 > accSecondStake[account]) {
+                        accAccruedFees[account] = accAccruedFees[account] + 
+                        (
+                            (accStakeCycle[account][accSecondStake[account]] * 
+                                (cycleFeesPerStakeSummed[lastStartedCycle + 1] - 
+                                    cycleFeesPerStakeSummed[accSecondStake[account]]
+                                )
+                            )
+                        ) / 
+                        SCALING_FACTOR;
+                    }
+
+                    accStakeCycle[account][accSecondStake[account]] = 0;
+                    accSecondStake[account] = 0;
+                } else {
+                    accFirstStake[account] = accSecondStake[account];
+                    accSecondStake[account] = 0;
+                }
+            }
+        }
+
     }
 
     function _send(address[] memory recipients, string[] memory crefs)
