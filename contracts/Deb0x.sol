@@ -164,17 +164,16 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         sendViaCall(payable(msg.sender), msg.value - fee - nativeTokenFee);
     }
 
-    modifier calculateCycle() {
+    function calculateCycle() public{
         uint256 calculatedCycle = getCurrentCycle();
         
         if (calculatedCycle > currentCycle) {
             currentCycle = calculatedCycle;
         }
         
-        _;
     }
 
-    modifier updateCycleFeesPerStakeSummed() {
+    function updateCycleFeesPerStakeSummed() public{
         if (currentCycle != currentStartedCycle) {
             previousStartedCycle = lastStartedCycle + 1;
             lastStartedCycle = currentStartedCycle;
@@ -197,10 +196,9 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
             cycleFeesPerStakeSummed[lastStartedCycle + 1] = cycleFeesPerStakeSummed[previousStartedCycle] + feePerStake;
         }
 
-        _;
     }
 
-    modifier setUpNewCycle() {
+    function setUpNewCycle() public {
         if (rewardPerCycle[currentCycle] == 0) {
             lastCycleReward = currentCycleReward;
             uint256 calculatedCycleReward = (lastCycleReward * 10000) / 10020;
@@ -229,10 +227,9 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
             );
         }
 
-        _;
     }
 
-    modifier updateStats(address account) {
+    function updateStats(address account) public {
         if (
             currentCycle > lastActiveCycle[account] &&
             accCycleMessages[account] != 0
@@ -346,7 +343,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
             }
         }
 
-        _;
     }
 
     constructor(address forwarder) ERC2771Context(forwarder) {
@@ -374,11 +370,11 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         external
         payable
         gasWrapper(nativeTokenFee)
-        calculateCycle
-        updateCycleFeesPerStakeSummed
-        setUpNewCycle
-        updateStats(_msgSender())
     {
+        calculateCycle();
+        updateCycleFeesPerStakeSummed();
+        updateStats(_msgSender());
+        setUpNewCycle();
         require(msgFee < 10001, "Deb0x: Reward fees can not exceed 100%");
         updateClientStats(feeReceiver);
 
@@ -410,11 +406,11 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     function claimRewards()
         external
-        calculateCycle
         nonReentrant()
-        updateCycleFeesPerStakeSummed
-        updateStats(_msgSender())
     {
+        calculateCycle();
+        updateCycleFeesPerStakeSummed();
+        updateStats(_msgSender());
         uint256 reward = accRewards[_msgSender()] -
             accWithdrawableStake[_msgSender()];
 
@@ -435,9 +431,10 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     function claimClientRewards()
         external
         nonReentrant()
-        calculateCycle
-        updateCycleFeesPerStakeSummed
     {
+        calculateCycle();
+        updateCycleFeesPerStakeSummed();
+
         updateClientStats(_msgSender());
 
         uint256 reward = clientRewards[_msgSender()];
@@ -457,10 +454,11 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     function claimFees()
         external
         nonReentrant()
-        calculateCycle
-        updateCycleFeesPerStakeSummed
-        updateStats(_msgSender())
     {
+        calculateCycle();
+        updateCycleFeesPerStakeSummed();
+        updateStats(_msgSender());
+
         uint256 fees = accAccruedFees[_msgSender()];
         require(fees > 0, "Deb0x: account has no accrued fees");
 
@@ -472,9 +470,10 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     function claimClientFees()
         external
         nonReentrant()
-        calculateCycle
-        updateCycleFeesPerStakeSummed
     {
+        calculateCycle();
+        updateCycleFeesPerStakeSummed();
+
         updateClientStats(_msgSender());
         uint256 fees = clientAccruedFees[_msgSender()];
         require(fees > 0, "Deb0x: account has no accrued fees");
@@ -487,10 +486,10 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     function stakeDBX(uint256 amount)
         external
         nonReentrant()
-        calculateCycle
-        updateCycleFeesPerStakeSummed
-        updateStats(_msgSender())
     {
+        calculateCycle();
+        updateCycleFeesPerStakeSummed();
+        updateStats(_msgSender());
         require(amount != 0, "Deb0x: amount arg is zero");
         pendingStake += amount;
         uint256 cycleToSet = currentCycle + 1;
@@ -520,10 +519,10 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     function unstake(uint256 amount)
         external
         nonReentrant()
-        calculateCycle
-        updateCycleFeesPerStakeSummed
-        updateStats(_msgSender())
     {
+        calculateCycle();
+        updateCycleFeesPerStakeSummed();
+        updateStats(_msgSender());
         require(amount != 0, "Deb0x: amount arg is zero");
 
         require(
