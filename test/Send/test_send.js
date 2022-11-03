@@ -30,58 +30,79 @@ describe("Test send functionality", async function() {
         await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        
+        user1GasUsed = await user1Reward.accCycleGasUsed(user1.address)
+        user2GasUsed = await user1Reward.accCycleGasUsed(user2.address)
+        user3GasUsed = await user1Reward.accCycleGasUsed(user3.address)
+        cycleTotalGasUsed = await user1Reward.cycleTotalGasUsed(await user1Reward.currentCycle())
+        
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        let rewardForFirstCycle = NumUtils.day(1);
-
+        let cycle1User1Reward = NumUtils.day(1).mul(user1GasUsed).div(cycleTotalGasUsed)
         await user1Reward.claimRewards()
         let user1Balance = await dbxERC20.balanceOf(user1.address);
-        expect(user1Balance).to.equal(rewardForFirstCycle.div(6));
+        expect(cycle1User1Reward).to.equal(user1Balance);
 
+        let cycle1User2Reward = NumUtils.day(1).mul(user2GasUsed).div(cycleTotalGasUsed)
         await user2Reward.claimRewards()
         let user2Balance = await dbxERC20.balanceOf(user2.address);
-        expect(user2Balance).to.equal("3333333333333333333333");
+        expect(cycle1User2Reward).to.equal(user2Balance);
 
+        let cycle1User3Reward = NumUtils.day(1).mul(user3GasUsed).div(cycleTotalGasUsed)
         await user3Reward.claimRewards()
         let user3Balance = await dbxERC20.balanceOf(user3.address);
-        expect(user3Balance).to.equal(rewardForFirstCycle.div(2));
+        expect(cycle1User3Reward).to.equal(user3Balance);
 
         await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+ 
+        user3GasUsed = await user1Reward.accCycleGasUsed(user3.address)
+        cycleTotalGasUsed = await user1Reward.cycleTotalGasUsed(await user1Reward.currentCycle())
+        
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        let rewardForSecondCycle = NumUtils.day(2);
+        let cycle2User3Reward = NumUtils.day(2).mul(user3GasUsed).div(cycleTotalGasUsed)
         await user3Reward.claimRewards()
         let user3BalanceScondCycle = await dbxERC20.balanceOf(user3.address);
-        expect(user3BalanceScondCycle).to.equal(rewardForSecondCycle.add(user3Balance));
+        expect(cycle2User3Reward.add(cycle1User3Reward)).to.equal(user3BalanceScondCycle);
 
         await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        
+        user3GasUsed = await user1Reward.accCycleGasUsed(user3.address)
+        cycleTotalGasUsed = await user1Reward.cycleTotalGasUsed(await user1Reward.currentCycle())
+        
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        let rewardForThirdCycle = NumUtils.day(3);
+        let cycle3User3Reward = NumUtils.day(3).mul(user3GasUsed).div(cycleTotalGasUsed)
         await user3Reward.claimRewards()
         let user3BalanceThirdCycle = await dbxERC20.balanceOf(user3.address);
-        expect(user3BalanceThirdCycle).to.equal(user3BalanceScondCycle.add(rewardForThirdCycle.div(3)));
+        expect(cycle3User3Reward.add(cycle2User3Reward)
+            .add(cycle1User3Reward)).to.equal(user3BalanceThirdCycle);
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 99])
         await hre.ethers.provider.send("evm_mine")
 
         await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 
+        user3GasUsed = await user1Reward.accCycleGasUsed(user3.address)
+        cycleTotalGasUsed = await user1Reward.cycleTotalGasUsed(await user1Reward.currentCycle())
+
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 8])
         await hre.ethers.provider.send("evm_mine")
 
         //In 102 cycle user will recieve reward from cycle 4 
-        let rewardForHundredTenCycle = NumUtils.day(4);
+        let cycle4User3Reward = NumUtils.day(4).mul(user3GasUsed).div(cycleTotalGasUsed)
         await user3Reward.claimRewards()
         let user3BalanceHundredTenCycle = await dbxERC20.balanceOf(user3.address);
-        expect(user3BalanceHundredTenCycle).to.equal(rewardForHundredTenCycle.add(user3BalanceThirdCycle));
+        expect(cycle4User3Reward
+            .add(cycle3User3Reward).add(cycle2User3Reward)
+            .add(cycle1User3Reward)).to.equal(user3BalanceHundredTenCycle);
 
     });
 
