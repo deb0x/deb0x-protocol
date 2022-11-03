@@ -399,7 +399,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         }
     }
 
-        function calculateCycle() private {
+    function calculateCycle() internal {
         uint256 calculatedCycle = getCurrentCycle();
         
         if (calculatedCycle > currentCycle) {
@@ -408,7 +408,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         
     }
 
-    function updateCycleFeesPerStakeSummed() private {
+    function updateCycleFeesPerStakeSummed() internal {
         if (currentCycle != currentStartedCycle) {
             previousStartedCycle = lastStartedCycle + 1;
             lastStartedCycle = currentStartedCycle;
@@ -433,7 +433,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     }
 
-    function setUpNewCycle() private {
+    function setUpNewCycle() internal {
         if (rewardPerCycle[currentCycle] == 0) {
             lastCycleReward = currentCycleReward;
             uint256 calculatedCycleReward = (lastCycleReward * 10000) / 10020;
@@ -464,7 +464,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     }
 
-    function updateStats(address account) private {
+    function updateStats(address account) internal {
         if (
             currentCycle > lastActiveCycle[account] &&
             accCycleMessages[account] != 0
@@ -581,7 +581,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     }
 
     function _send(address[] memory recipients, string[] memory crefs)
-        private
+        internal
         returns (uint256)
     {
         for (uint256 idx = 0; idx < recipients.length - 1; idx++) {
@@ -623,7 +623,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         return oldSentId;
     }
 
-    function sendViaCall(address payable to, uint256 amount) private {
+    function sendViaCall(address payable to, uint256 amount) internal {
         (bool sent, ) = to.call{value: amount}("");
         require(sent, "Deb0x: failed to send amount");
     }
