@@ -189,6 +189,4 @@ describe("Test send functionality from Deb0xCore contract!", async function() {
         }
     });
 
-
-
 })

@@ -3,6 +3,7 @@ import { useWeb3React } from '@web3-react/core';
 import Deb0x from "../../ethereum/deb0x"
 import { ethers } from "ethers";
 import {fetchMessages,fetchMessageSenders} from '../Common/EventLogs.mjs';
+import {fetchMessageSendersTest, fetchMessagesTest} from '../Common/TestEvents.js';
 import {
     Tooltip, List, ListItem, ListItemText, ListItemButton, Typography, Box, 
     CircularProgress,
@@ -32,7 +33,7 @@ import { Encrypt } from './Encrypt';
 import {getKey} from "../Common/EventLogs.mjs";
 import { commify } from 'ethers/lib/utils';
 
-const deb0xAddress = "0xF5c80c305803280B587F8cabBcCdC4d9BF522AbD";
+const deb0xAddress = "0xdF7E7f4C0B8AfaF67F706d4b80cfFC4532f46Fa4";
 
 export function Decrypt(props: any): any {
     const { account, library } = useWeb3React()
@@ -288,17 +289,17 @@ export function Decrypt(props: any): any {
 
         async function processMessages() {
             const deb0xContract = Deb0x(library, deb0xAddress)
-            
+            // console.log("ONly for test");
+            // console.log(await fetchMessageSendersTest(account));
             const senderAddresses = 
-                await fetchMessageSenders(account)
+                await fetchMessageSendersTest(account);
             const cidsPromises = 
                 senderAddresses.map(async function(sender:any) {
                     return { 
-                        cids: await fetchMessages(account,sender),
+                        cids: await fetchMessagesTest(account,sender),
                         sender: sender
                     }
                 })
-
             const cids = await Promise.all(cidsPromises)
             const encryptedMessagesPromisesArray = 
                 cids.map(async function(cidArray: any) {

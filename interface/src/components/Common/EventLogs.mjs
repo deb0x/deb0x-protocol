@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const deb0xAddress = "0xF5c80c305803280B587F8cabBcCdC4d9BF522AbD";
+const deb0xAddress = "0xdF7E7f4C0B8AfaF67F706d4b80cfFC4532f46Fa4";
 
 async function getData(eventName) {
 
@@ -9,13 +9,14 @@ async function getData(eventName) {
     const options = {
         method: 'POST',
         url: `https://deep-index.moralis.io/api/v2/${deb0xAddress}/events`,
-        params: {chain: 'polygon', 
-        topic: data.topic
-    },
+        params: {
+            chain: 'polygon',
+            topic: data.topic
+        },
         headers: {
-          accept: 'application/json',
-          'content-type': 'application/json',
-          'X-API-Key': 'test'
+            accept: 'application/json',
+            'content-type': 'application/json',
+            'X-API-Key': 'test'
         },
         data: data.abi
     };
@@ -28,7 +29,7 @@ function selectEvent(name) {
     let abi, topic;
     switch (name) {
         case 'Sent':
-            topic = "0xd255a04e9537ee418651bfdd3be3efed3b9f677f36ba9e488e0d27340c97961f";
+            topic = "0x30292b34f392337af6a42d59615abadbf77da5245b82b2246293c759a9b9361e";
             abi = {
                 "anonymous": false,
                 "inputs": [{
@@ -50,32 +51,27 @@ function selectEvent(name) {
                         "type": "bytes32"
                     },
                     {
-                        "components": [{
-                                "internalType": "string",
-                                "name": "content",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "uint256",
-                                "name": "timestamp",
-                                "type": "uint256"
-                            }
-                        ],
-                        "indexed": false,
-                        "internalType": "struct Deb0xCore.Envelope",
-                        "name": "body",
-                        "type": "tuple"
-                    },
-                    {
                         "indexed": false,
                         "internalType": "uint256",
                         "name": "sentId",
                         "type": "uint256"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "timestamp",
+                        "type": "uint256"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "string",
+                        "name": "content",
+                        "type": "string"
                     }
                 ],
                 "name": "Sent",
                 "type": "event"
-            };
+            }
             break;
         case 'KeySet':
             topic = "0x1db169902a3b228ab764219bfc023384698a05b8a3d1bd2e046867a1dedf78a9";
@@ -299,10 +295,10 @@ function selectEvent(name) {
 export async function fetchMessages(to, from) {
     let data = await getData("Sent");
     let messages = data.filter(data => data.data.to.toLowerCase() === to.toLowerCase() &&
-        data.data.from.toLowerCase() === from.toLowerCase()).
-    map(data => data.data.body);
+        data.data.from.toLowerCase() === from.toLowerCase())
     let returnedData = [];
-    messages.forEach(message => returnedData.push({ "content": message[0], "timestamp": message[1] }))
+    let timestampAndToAddress = messages.map(data => [data.data.timestamp, data.data.content]);
+    timestampAndToAddress.forEach(message => returnedData.push({ "content": message[1], "timestamp": message[0] }));
     return returnedData;
 }
 
@@ -316,6 +312,7 @@ export async function fetchSentMessages(sender) {
     let data = await getData("Sent");
     let mapForRecipients = new Map();
     let mapForEnvelope = new Map();
+    console.log(data)
     data.forEach((event) => {
         if (event.data.from.toLowerCase() === sender.toLowerCase()) {
             if (mapForRecipients.has(event.data.sentId)) {
