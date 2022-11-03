@@ -153,15 +153,15 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
         _;
 
-        uint256 fee = ((startGas - gasleft() + 31108) * tx.gasprice * PROTOCOL_FEE) / 10000;
+        uint256 fee = ((startGas - gasleft() + 37700) * tx.gasprice * PROTOCOL_FEE) / 10000;
         
         require(
             msg.value - nativeTokenFee >= fee,
             "Deb0x: value must be >= 10% of the spent gas"
         );
         
-        sendViaCall(payable(msg.sender), msg.value - fee - nativeTokenFee);
         cycleAccruedFees[currentCycle] += fee;
+        sendViaCall(payable(msg.sender), msg.value - fee - nativeTokenFee);
     }
 
     modifier calculateCycle() {
