@@ -164,7 +164,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         sendViaCall(payable(msg.sender), msg.value - fee - nativeTokenFee);
     }
 
-    function calculateCycle() public{
+    function calculateCycle() private {
         uint256 calculatedCycle = getCurrentCycle();
         
         if (calculatedCycle > currentCycle) {
@@ -173,7 +173,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         
     }
 
-    function updateCycleFeesPerStakeSummed() public{
+    function updateCycleFeesPerStakeSummed() private {
         if (currentCycle != currentStartedCycle) {
             previousStartedCycle = lastStartedCycle + 1;
             lastStartedCycle = currentStartedCycle;
@@ -198,7 +198,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     }
 
-    function setUpNewCycle() public {
+    function setUpNewCycle() private {
         if (rewardPerCycle[currentCycle] == 0) {
             lastCycleReward = currentCycleReward;
             uint256 calculatedCycleReward = (lastCycleReward * 10000) / 10020;
@@ -229,7 +229,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     }
 
-    function updateStats(address account) public {
+    function updateStats(address account) private {
         if (
             currentCycle > lastActiveCycle[account] &&
             accCycleMessages[account] != 0
