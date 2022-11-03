@@ -90,9 +90,11 @@ function App() {
     const [selectedOption, setSelectedOption] = useState('Deb0x');
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [networkName, setNetworkName] = useState<any>();
+    const [currentChainId, setCurrentChainId] = useState<any>();
     let errorMsg;
     const [isVisible, setIsVisible] = useState(false);
     let [show, setShow] = useState(false);
+    let [walletInitialized, setWalletInitialized] = useState<any>();
 
     useEffect(() => {
         injected.supportedChainIds?.forEach(chainId => 
@@ -122,6 +124,11 @@ function App() {
         setAnchorEl(anchorEl ? null : event.currentTarget);
     };
 
+    function checkIfInit(initialized: any) {
+        setWalletInitialized(initialized);
+    }
+
+
     useEffect(() => {    
         window.ethereum ?
             window.ethereum.request({method: "eth_requestAccounts"}).then(() => {
@@ -129,6 +136,14 @@ function App() {
             }).catch((err: any) => displayErrorMsg(err))
             : displayErrorMsg("Please install MetaMask")
         }, [])
+
+    useEffect(() => {
+        if(window.ethereum) {
+            window.ethereum.request({method: 'eth_chainId'}).then((chainId: any) => {
+                setCurrentChainId(chainId);
+            }).catch((err: any) => displayErrorMsg(err)) 
+        }
+    });
 
     async function switchNetwork() {
         try {
@@ -187,17 +202,21 @@ function App() {
                 <div className="app-container container-fluid">
                     <div className="row main-row">
                         <div className="col col-md-3 col-sm-12 p-0 side-menu-container">
-                            <PermanentDrawer onChange={handleChange}/>
+                            <PermanentDrawer onChange={handleChange} walletInitialized={walletInitialized}/>
                         </div>
                         <div className="col col-md-9 col-sm-12">
-                        <AppBarComponent />
+                        <AppBarComponent walletInitialized={walletInitialized}/>
                         {account ? 
-                            !!(library && account) && (
+                            !!(library && account ) && (
+                                walletInitialized ? 
                                 <Box className="main-container" sx={{marginTop: 12}}>
                                     {selectedOption === "Compose" && <Encrypt />}
-                                    {selectedOption === "Deb0x" && <Decrypt account={account}/>}
+                                    {selectedOption === "Deb0x" && <Decrypt account={account} checkIfInit={checkIfInit}/>}
                                     {selectedOption === "Stake" && <Stake />}
                                     {selectedOption === "Sent" && <Sent />}
+                                </Box> : 
+                                <Box className="main-container" sx={{marginTop: 12}}>
+                                    <Decrypt account={account} checkIfInit={checkIfInit}/>
                                 </Box>
                             ):
                                 <Box className="home-page-box">
@@ -226,7 +245,11 @@ function App() {
                                 <p>Let's get you started</p>
                                 
                                 <p>Connect your wallet & start using <img className="content-logo" src={logoGreen} /></p>
-                                <p>Here's how to do this in <IconButton className='info show-popup' onClick={() => setShow(true)}>3 easy steps</IconButton></p>
+                                {currentChainId === "0x89" ?
+                                    <p>Here's how to do this in 
+                                        <IconButton className='info show-popup' onClick={() => setShow(true)}>3 easy steps</IconButton>
+                                    </p> : ""
+                                }
                                 {show ? 
                                     <HowTo show={show} onClickOutside={() => setShow(false)}/> : 
                                         <></>

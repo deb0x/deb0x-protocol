@@ -452,12 +452,6 @@ $randomNumber: random(4);
     }
 }
 
-@media (min-width: 769px) {
-    .app-container {
-        padding-left: 300px;
-    }
-}
-
 @media (max-width: 768px) {
     #root {
         height: 100vh;
