@@ -7,10 +7,8 @@ import "./Deb0xERC20.sol";
 
 contract Deb0x is ERC2771Context, ReentrancyGuard {
    
-   struct Envelope {
-        uint256 timestamp;
-        string content;
-    }
+    uint256 timestamp;
+    string content;
 
     Deb0xERC20 public dbx;
 
