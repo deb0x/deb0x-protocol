@@ -2,7 +2,7 @@ import { useState, useEffect, useContext, createContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Deb0x from "../../ethereum/deb0x"
 import { ethers } from "ethers";
-import {fetchMessageSenders, fetchMessages} from '../Common/EventsProcessing.js';
+import {fetchMessageSenders, fetchMessages, getKey} from '../../ethereum/EventLogs.js';
 import {
     Tooltip, List, ListItem, ListItemText, ListItemButton, Typography, Box, 
     CircularProgress,
@@ -29,8 +29,6 @@ import avatar from '../../photos/icons/avatars/test-avatar-1.svg';
 import ReadedMessagesContext from '../Contexts/ReadedMessagesContext';
 import ReadedMessagesProvider from '../Contexts/ReadedMessagesProvider';
 import { Encrypt } from './Encrypt';
-import {getKey} from "../Common/EventsProcessing.js";
-import { commify } from 'ethers/lib/utils';
 
 const deb0xAddress = "0xdF7E7f4C0B8AfaF67F706d4b80cfFC4532f46Fa4";
 
