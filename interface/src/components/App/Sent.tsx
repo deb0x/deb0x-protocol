@@ -16,7 +16,7 @@ import formatAccountName from '../Common/AccountName';
 import cloud1 from '../../photos/icons/clouds/cloud-1.svg';
 import cloud2 from '../../photos/icons/clouds/cloud-2.svg';
 import cloud3 from '../../photos/icons/clouds/cloud-3.svg';
-import {fetchSentMessages,getKey} from '../Common/TestEvents.js';
+import {fetchSentMessages,getKey} from '../Common/EventsProcessing.js';
 const axios = require('axios')
 const deb0xAddress = "0xdF7E7f4C0B8AfaF67F706d4b80cfFC4532f46Fa4";
 
