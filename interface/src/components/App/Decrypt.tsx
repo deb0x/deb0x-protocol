@@ -2,7 +2,7 @@ import { useState, useEffect, useContext, createContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Deb0x from "../../ethereum/deb0x"
 import { ethers } from "ethers";
-import {fetchMessages,fetchMessageSenders} from '../Common/EventLogs.mjs';
+import {fetchMessageSenders, fetchMessages, getKey} from '../../ethereum/EventLogs.js';
 import {
     Tooltip, List, ListItem, ListItemText, ListItemButton, Typography, Box, 
     CircularProgress,
@@ -29,10 +29,8 @@ import avatar from '../../photos/icons/avatars/test-avatar-1.svg';
 import ReadedMessagesContext from '../Contexts/ReadedMessagesContext';
 import ReadedMessagesProvider from '../Contexts/ReadedMessagesProvider';
 import { Encrypt } from './Encrypt';
-import {getKey} from "../Common/EventLogs.mjs";
-import { commify } from 'ethers/lib/utils';
 
-const deb0xAddress = "0xF5c80c305803280B587F8cabBcCdC4d9BF522AbD";
+const deb0xAddress = "0xdF7E7f4C0B8AfaF67F706d4b80cfFC4532f46Fa4";
 
 export function Decrypt(props: any): any {
     const { account, library } = useWeb3React()
@@ -288,9 +286,8 @@ export function Decrypt(props: any): any {
 
         async function processMessages() {
             const deb0xContract = Deb0x(library, deb0xAddress)
-            
             const senderAddresses = 
-                await fetchMessageSenders(account)
+                await fetchMessageSenders(account);
             const cidsPromises = 
                 senderAddresses.map(async function(sender:any) {
                     return { 
@@ -298,7 +295,6 @@ export function Decrypt(props: any): any {
                         sender: sender
                     }
                 })
-
             const cids = await Promise.all(cidsPromises)
             const encryptedMessagesPromisesArray = 
                 cids.map(async function(cidArray: any) {

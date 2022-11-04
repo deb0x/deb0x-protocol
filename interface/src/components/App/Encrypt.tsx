@@ -19,14 +19,14 @@ import draftToHtml from 'draftjs-to-html';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { Editor } from 'react-draft-wysiwyg';
 import airplaneBlack from '../../photos/icons/airplane-black.svg';
-import { getKey } from '../Common/EventLogs.mjs';
+import {getKey} from "../../ethereum/EventLogs.js";
 import { signMetaTxRequest } from '../../ethereum/signer';
 import { createInstance } from '../../ethereum/forwarder'
 import { whitelist } from '../../constants.json'
 import deb0xViews from '../../ethereum/deb0xViews';
 
 const { BigNumber } = require("ethers");
-const deb0xAddress = "0xF5c80c305803280B587F8cabBcCdC4d9BF522AbD";
+const deb0xAddress = "0xdF7E7f4C0B8AfaF67F706d4b80cfFC4532f46Fa4";
 const deb0xViewsAddress = "0xf032f7FB8258728A1938473B2115BB163d5Da593";
 const ethUtil = require('ethereumjs-util')
 
@@ -132,7 +132,7 @@ export function Encrypt(replyAddress: any): any {
 
     async function isInitialized(address: any) {
         const deb0xViewsContract = deb0xViews(library, deb0xViewsAddress);
-        return await deb0xViewsContract.getKey(address);
+        return await getKey(address);
     }
 
     function isInList(address: any) {

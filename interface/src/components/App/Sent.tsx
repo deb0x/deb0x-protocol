@@ -16,10 +16,9 @@ import formatAccountName from '../Common/AccountName';
 import cloud1 from '../../photos/icons/clouds/cloud-1.svg';
 import cloud2 from '../../photos/icons/clouds/cloud-2.svg';
 import cloud3 from '../../photos/icons/clouds/cloud-3.svg';
-import {fetchSentMessages, getKey } from '../Common/EventLogs.mjs';
-
+import {fetchSentMessages,getKey} from '../../ethereum/EventLogs.js';;
 const axios = require('axios')
-const deb0xAddress = "0xF5c80c305803280B587F8cabBcCdC4d9BF522AbD";
+const deb0xAddress = "0xdF7E7f4C0B8AfaF67F706d4b80cfFC4532f46Fa4";
 
 export function Sent(props: any): any {
     const { account, library } = useWeb3React()
@@ -266,6 +265,7 @@ export function Sent(props: any): any {
 
         async function processMessages() {
             const deb0xContract = Deb0x(library, deb0xAddress)
+            await fetchSentMessages(account);
             const sentMessages = await fetchSentMessages(account)
             const sentMessagesRetrieved = sentMessages.map(async function (item: any) {
                 let intermediateValueForContentData = item[1];
