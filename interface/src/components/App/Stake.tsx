@@ -205,15 +205,17 @@ export function Stake(props: any): any {
         async function feeShare() {
             const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress);
 
+            const deb0xContract = await Deb0x(library, deb0xAddress);
+
             const unclaimedRewards = await deb0xViewsContract.getUnclaimedRewards(account);
 
             const accWithdrawableStake = await deb0xViewsContract.getAccWithdrawableStake(account);
             
             let balance = parseFloat((ethers.utils.formatEther(unclaimedRewards.add(accWithdrawableStake))))
             
-            const currentCycle = await deb0xViewsContract.currentStartedCycle();
+            const currentCycle = await deb0xContract.currentStartedCycle();
 
-            const totalSupply = await deb0xViewsContract.summedCycleStakes(currentCycle);
+            const totalSupply = await deb0xContract.summedCycleStakes(currentCycle);
 
             const feeShare = balance * 100 / totalSupply
             setFeeSharePercentage(((Math.round(feeShare * 100) / 100).toFixed(2)).toString() + "%")
@@ -398,9 +400,9 @@ export function Stake(props: any): any {
 
         async function setStakedAmount() {
 
-            const deb0xContract = await Deb0x(library, deb0xAddress)
+            const deb0xViewsContract = await Deb0xViews(library, deb0xAddress)
 
-            const balance = await deb0xContract.getAccWithdrawableStake(account)
+            const balance = await deb0xViewsContract.getAccWithdrawableStake(account)
 
             setUserStakedAmount(ethers.utils.formatEther(balance))
         }
