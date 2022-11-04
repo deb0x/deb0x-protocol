@@ -19,7 +19,7 @@ import draftToHtml from 'draftjs-to-html';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { Editor } from 'react-draft-wysiwyg';
 import airplaneBlack from '../../photos/icons/airplane-black.svg';
-import {getKey} from "../Common/TestEvents.js";
+import {getKey} from "../Common/EventsProcessing.js";
 import { signMetaTxRequest } from '../../ethereum/signer';
 import { createInstance } from '../../ethereum/forwarder'
 import { whitelist } from '../../constants.json'

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Deb0x from "../../ethereum/deb0x"
-import {fetchMessages,fetchMessageSenders} from '../Common/TestEvents.js';
+import {fetchMessages,fetchMessageSenders} from '../Common/EventsProcessing.js';
 import {
     List, Card, CardActions, CardContent, Button, Grid, Box,
     Typography, TextField, CircularProgress, Divider
