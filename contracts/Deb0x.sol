@@ -6,9 +6,6 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./Deb0xERC20.sol";
 
 contract Deb0x is ERC2771Context, ReentrancyGuard {
-   
-    uint256 timestamp;
-    string content;
 
     Deb0xERC20 public dbx;
 
