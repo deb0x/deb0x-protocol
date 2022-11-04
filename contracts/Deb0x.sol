@@ -584,7 +584,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         for (uint256 idx = 0; idx < recipients.length - 1; idx++) {
             bytes32 bodyHash = keccak256(abi.encodePacked(crefs[idx]));
             
-                emit Sent(
+            emit Sent(
                 recipients[idx],
                 _msgSender(),
                 bodyHash,
