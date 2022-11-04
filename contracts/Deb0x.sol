@@ -613,6 +613,9 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         }
     }
 
+    /**
+     * 
+     */
     function _send(address[] memory recipients, string[] memory crefs)
         private
         returns (uint256)
@@ -656,6 +659,12 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         return oldSentId;
     }
 
+    /**
+     * Recommended method to use to send native coins.
+     * 
+     * @param to receiving address
+     * @param amount in wei
+     */
     function sendViaCall(address payable to, uint256 amount) private {
         (bool sent, ) = to.call{value: amount}("");
         require(sent, "Deb0x: failed to send amount");
