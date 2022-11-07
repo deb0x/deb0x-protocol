@@ -44,6 +44,6 @@ npx hardhat run --network goerli scritps/deploy.js
 | ------------------------ | ----------- | -------------------------------------------  | ------------------------------------------ | 
 | Forwarder                |  -          |                                              |                                            |
 | Deb0x                    |  1d9e1ac          | 0xdF7E7f4C0B8AfaF67F706d4b80cfFC4532f46Fa4   |                                            |
-| Deb0xERC20               |  1d9e1ac          | 0x8345742746c41BC9C004aD7BEE0b65E92F227347   |                                            |
-| Deb0xView                |  1d9e1ac          |                                              |                                            |
+| Deb0xERC20               |  1d9e1ac          | 0x2f4238727fBC7d205f5C6504dA9bc623A55fE0C5   |                                            |
+| Deb0xView                |  1d9e1ac          | 0xf032f7FB8258728A1938473B2115BB163d5Da593                                            |                                            |
 
