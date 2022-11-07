@@ -27,119 +27,178 @@ describe("Test reward distribution for multiple recipients", async function() {
     it(`Test multiple recipients simple case`, async() => {
         await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address, user2.address, user3.address], ["ipfs://", "ipfs://", "ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        
+        user1GasUsed = await user1Reward.accCycleGasUsed(user1.address)
+        user2GasUsed = await user1Reward.accCycleGasUsed(user2.address)
+        cycleTotalGasUsed = await user1Reward.cycleTotalGasUsed(await user1Reward.currentCycle())
+        
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        let firstCycleRewardPerUser = NumUtils.day(1).div(4);
+        let cycle1User1Reward = NumUtils.day(1).mul(user1GasUsed).div(cycleTotalGasUsed)
         await user1Reward.claimRewards();
         let balanceForUser1 = await dbxERC20.balanceOf(user1.address);
-        expect(BigNumber.from(firstCycleRewardPerUser).mul(BigNumber.from(3))).to.equal(balanceForUser1)
+        expect(cycle1User1Reward).to.equal(balanceForUser1)
 
+        let cycle1User2Reward = NumUtils.day(1).mul(user2GasUsed).div(cycleTotalGasUsed)
         await user2Reward.claimRewards();
         let balanceForUser2 = await dbxERC20.balanceOf(user2.address);
-        expect(firstCycleRewardPerUser).to.equal(balanceForUser2)
+        expect(cycle1User2Reward).to.equal(balanceForUser2)
     });
 
     it(`Test multiple recipients, multiple cycles`, async() => {
         await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address, user2.address], ["ipfs://", "ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        
+        user1GasUsed = await user1Reward.accCycleGasUsed(user1.address)
+        user2GasUsed = await user1Reward.accCycleGasUsed(user2.address)
+        cycleTotalGasUsed = await user1Reward.cycleTotalGasUsed(await user1Reward.currentCycle())
+        
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        let firstCycleRewardPerUser = NumUtils.day(1).div(3);
+        let cycle1User1Reward = NumUtils.day(1).mul(user1GasUsed).div(cycleTotalGasUsed)
         await user1Reward.claimRewards();
         let balanceForUser1 = await dbxERC20.balanceOf(user1.address);
-        expect(BigNumber.from(firstCycleRewardPerUser).mul(BigNumber.from(2))).to.equal(balanceForUser1)
+        expect(cycle1User1Reward).to.equal(balanceForUser1)
 
+        let cycle1User2Reward = NumUtils.day(1).mul(user2GasUsed).div(cycleTotalGasUsed)
         await user2Reward.claimRewards();
         let balanceForUser2 = await dbxERC20.balanceOf(user2.address);
-        expect(firstCycleRewardPerUser).to.equal(balanceForUser2)
+        expect(cycle1User2Reward).to.equal(balanceForUser2)
 
         await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address, user2.address], ["ipfs://", "ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        
+        user1GasUsed = await user1Reward.accCycleGasUsed(user1.address)
+        user2GasUsed = await user1Reward.accCycleGasUsed(user2.address)
+        cycleTotalGasUsed = await user1Reward.cycleTotalGasUsed(await user1Reward.currentCycle())
+        
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        let secondCycleRewardPerUser = NumUtils.day(2).div(3);
+        let cycle2User1Reward = NumUtils.day(2).mul(user1GasUsed).div(cycleTotalGasUsed)
         await user1Reward.claimRewards();
         let balanceForUser1Cycle2 = await dbxERC20.balanceOf(user1.address);
-        expect(BigNumber.from(secondCycleRewardPerUser).mul(BigNumber.from(2))).to.equal(BigNumber.from(balanceForUser1Cycle2.sub(BigNumber.from(balanceForUser1))))
+        expect(cycle2User1Reward
+            .add(cycle1User1Reward)).to.equal(balanceForUser1Cycle2)
 
+        let cycle2User2Reward = NumUtils.day(2).mul(user2GasUsed).div(cycleTotalGasUsed)
         await user2Reward.claimRewards();
         let balanceForUser2Cycle2 = await dbxERC20.balanceOf(user2.address);
-        expect(secondCycleRewardPerUser).to.equal(BigNumber.from(balanceForUser2Cycle2.sub(BigNumber.from(balanceForUser2))))
+        expect(cycle2User2Reward
+            .add(cycle1User2Reward)).to.equal(balanceForUser2Cycle2)
 
         await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address, user2.address], ["ipfs://", "ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        
+        user1GasUsed = await user1Reward.accCycleGasUsed(user1.address)
+        user2GasUsed = await user1Reward.accCycleGasUsed(user2.address)
+        cycleTotalGasUsed = await user1Reward.cycleTotalGasUsed(await user1Reward.currentCycle())
+        
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        let thirdCycleRewardPerUser = NumUtils.day(3).div(3);
+        let cycle3User1Reward = NumUtils.day(3).mul(user1GasUsed).div(cycleTotalGasUsed)
         await user1Reward.claimRewards();
         let balanceForUser1Cycle3 = await dbxERC20.balanceOf(user1.address);
-        expect(BigNumber.from(thirdCycleRewardPerUser).mul(BigNumber.from(2))).to.equal(BigNumber.from(balanceForUser1Cycle3.sub(BigNumber.from(balanceForUser1Cycle2))))
+        expect(cycle3User1Reward
+            .add(cycle2User1Reward).add(cycle1User1Reward)).to.equal(BigNumber.from(balanceForUser1Cycle3))
 
+        let cycle3User2Reward = NumUtils.day(3).mul(user2GasUsed).div(cycleTotalGasUsed)
         await user2Reward.claimRewards();
         let balanceForUser2Cycle3 = await dbxERC20.balanceOf(user2.address);
-        expect(thirdCycleRewardPerUser).to.equal(BigNumber.from(balanceForUser2Cycle3.sub(BigNumber.from(balanceForUser2Cycle2))))
+        expect(cycle3User2Reward
+            .add(cycle2User2Reward).add(cycle1User2Reward)).to.equal(balanceForUser2Cycle3)
 
         await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address, user2.address], ["ipfs://", "ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address, user1.address], ["ipfs://", "ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        
+        user1GasUsed = await user1Reward.accCycleGasUsed(user1.address)
+        user2GasUsed = await user1Reward.accCycleGasUsed(user2.address)
+        user3GasUsed = await user1Reward.accCycleGasUsed(user3.address)
+        cycleTotalGasUsed = await user1Reward.cycleTotalGasUsed(await user1Reward.currentCycle())
+        
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
         // 1 wei difference 
-        let fourthCycleRewardPerUser = NumUtils.day(4).div(5);
+        let cycle4User1Reward = NumUtils.day(4).mul(user1GasUsed).div(cycleTotalGasUsed)
         await user1Reward.claimRewards();
         let balanceForUser1Cycle4 = await dbxERC20.balanceOf(user1.address);
-        // expect(BigNumber.from(fourthCycleRewardPerUser).mul(BigNumber.from(2))).to.equal(BigNumber.from(balanceForUser1Cycle4.sub(BigNumber.from(balanceForUser1Cycle3))))
+        expect(cycle4User1Reward
+            .add(cycle3User1Reward).add(cycle2User1Reward)
+            .add(cycle1User1Reward)).to.equal(balanceForUser1Cycle4)
 
+        let cycle4User2Reward = NumUtils.day(4).mul(user2GasUsed).div(cycleTotalGasUsed)
         await user2Reward.claimRewards();
         let balanceForUser2Cycle4 = await dbxERC20.balanceOf(user2.address);
-        expect(fourthCycleRewardPerUser).to.equal(BigNumber.from(balanceForUser2Cycle4.sub(BigNumber.from(balanceForUser2Cycle3))))
+        expect(cycle4User2Reward
+            .add(cycle3User2Reward).add(cycle2User2Reward)
+            .add(cycle1User2Reward)).to.equal(balanceForUser2Cycle4)
 
         // 1 wei difference 
+        let cycle4User3Reward = NumUtils.day(4).mul(user3GasUsed).div(cycleTotalGasUsed)
         await user3Reward.claimRewards();
         let balanceForUser3Cycle4 = await dbxERC20.balanceOf(user3.address);
-        // expect(BigNumber.from(fourthCycleRewardPerUser).mul(BigNumber.from(2))).to.equal(balanceForUser3Cycle4);
+        expect(cycle4User3Reward).to.equal(balanceForUser3Cycle4);
 
         await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address, user2.address, user1.address], ["ipfs://", "ipfs://", "ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address, user1.address, user2.address], ["ipfs://", "ipfs://", "ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address, user1.address], ["ipfs://", "ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        
+        user1GasUsed = await user1Reward.accCycleGasUsed(user1.address)
+        user2GasUsed = await user1Reward.accCycleGasUsed(user2.address)
+        user3GasUsed = await user1Reward.accCycleGasUsed(user3.address)
+        cycleTotalGasUsed = await user1Reward.cycleTotalGasUsed(await user1Reward.currentCycle())
+        
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
         // 1 wei difference 
-        let fifthCycleRewardPerUser = NumUtils.day(5).div(8);
+        let cycle5User1Reward = NumUtils.day(5).mul(user1GasUsed).div(cycleTotalGasUsed)
         await user1Reward.claimRewards();
         let balanceForUser1Cycle5 = await dbxERC20.balanceOf(user1.address);
-        //   expect(BigNumber.from(fifthCycleRewardPerUser).mul(BigNumber.from(3))).to.equal(BigNumber.from(balanceForUser1Cycle5.sub(BigNumber.from(balanceForUser1Cycle4))))
+        expect(cycle5User1Reward.add(cycle4User1Reward)
+            .add(cycle3User1Reward).add(cycle2User1Reward)
+            .add(cycle1User1Reward)).to.equal(balanceForUser1Cycle5)
 
-        // 1 wei difference 
+        // 1 wei difference
+        let cycle5User2Reward = NumUtils.day(5).mul(user2GasUsed).div(cycleTotalGasUsed)
         await user2Reward.claimRewards();
         let balanceForUser2Cycle5 = await dbxERC20.balanceOf(user2.address);
-        // expect(fifthCycleRewardPerUser.mul(BigNumber.from(3))).to.equal(BigNumber.from(balanceForUser2Cycle5.sub(BigNumber.from(balanceForUser2Cycle4))))
+        expect(cycle5User2Reward.add(cycle4User2Reward)
+            .add(cycle3User2Reward).add(cycle2User2Reward)
+            .add(cycle1User2Reward)).to.equal(balanceForUser2Cycle5)
 
+        let cycle5User3Reward = NumUtils.day(5).mul(user3GasUsed).div(cycleTotalGasUsed)
         await user3Reward.claimRewards();
         let balanceForUser3Cycle5 = await dbxERC20.balanceOf(user3.address);
-        expect(BigNumber.from(fifthCycleRewardPerUser).mul(BigNumber.from(2))).to.equal(BigNumber.from(balanceForUser3Cycle5).sub(BigNumber.from(balanceForUser3Cycle4)));
+        expect(cycle5User3Reward
+            .add(cycle4User3Reward)).to.equal(balanceForUser3Cycle5);
     });
 
     it(`Test multiple recipients simple case`, async() => {
         await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address, user2.address, user3.address, user4.address, user5.address, user6.address, user7.address, user8.address, user9.address, user10.address], ["ipfs://", "ipfs://", "ipfs://", "ipfs://", "ipfs://", "ipfs://", "ipfs://", "ipfs://", "ipfs://", "ipfs"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        
+        user1GasUsed = await user1Reward.accCycleGasUsed(user1.address)
+        user2GasUsed = await user1Reward.accCycleGasUsed(user2.address)
+        cycleTotalGasUsed = await user1Reward.cycleTotalGasUsed(await user1Reward.currentCycle())
+        
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        let firstCycleRewardPerUser = NumUtils.day(1).div(11);
+        let cycle1User1Reward = NumUtils.day(1).mul(user1GasUsed).div(cycleTotalGasUsed)
         await user1Reward.claimRewards();
         let balanceForUser1 = await dbxERC20.balanceOf(user1.address);
-        expect(BigNumber.from(firstCycleRewardPerUser).mul(BigNumber.from(10))).to.equal(balanceForUser1)
+        expect(cycle1User1Reward).to.equal(balanceForUser1)
 
+        let cycle1User2Reward = NumUtils.day(1).mul(user2GasUsed).div(cycleTotalGasUsed)
         await user2Reward.claimRewards();
         let balanceForUser2 = await dbxERC20.balanceOf(user2.address);
-        expect(firstCycleRewardPerUser).to.equal(balanceForUser2)
+        expect(cycle1User2Reward).to.equal(balanceForUser2)
     });
 
 

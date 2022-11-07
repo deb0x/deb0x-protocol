@@ -41,13 +41,13 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     mapping(address => string) public publicKeys;
 
-    mapping(address => uint256) public accCycleFeePercent;
+    mapping(address => uint256) public accCycleGasOwed;
 
-    mapping(address => uint256) public clientCycleFeePercent;
+    mapping(address => uint256) public clientCycleGasEarned;
 
-    mapping(address => uint256) public accCycleMessages;
+    mapping(address => uint256) public accCycleGasUsed;
 
-    mapping(uint256 => uint256) public cycleTotalMessages;
+    mapping(uint256 => uint256) public cycleTotalGasUsed;
 
     mapping(address => uint256) public lastActiveCycle;
 
@@ -145,6 +145,25 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     event KeySet(address indexed to, bytes32 indexed hash, string value);
 
+    modifier gasUsed(address feeReceiver, uint256 msgFee) {
+        uint256 startGas = gasleft();
+
+        _;
+
+        uint256 gasConsumed = startGas - gasleft();
+
+        cycleTotalGasUsed[currentCycle] += gasConsumed;
+
+        if (feeReceiver != address(0) && msgFee != 0) {
+            uint256 gasOwed = (gasConsumed * msgFee) / 10000;
+            gasConsumed -= gasOwed;
+            clientCycleGasEarned[feeReceiver] += gasOwed;
+        }
+
+        accCycleGasUsed[_msgSender()] += gasConsumed;
+        
+    }
+
     modifier gasWrapper(uint256 nativeTokenFee) {
         uint256 startGas = gasleft();
 
@@ -187,6 +206,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         payable
         nonReentrant()
         gasWrapper(nativeTokenFee)
+        gasUsed(feeReceiver, msgFee)
     {
         calculateCycle();
         updateCycleFeesPerStakeSummed();
@@ -195,20 +215,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         require(msgFee < 10001, "Deb0x: Reward fees can not exceed 100%");
         updateClientStats(feeReceiver);
 
-        accCycleMessages[_msgSender()] += to.length;
-        cycleTotalMessages[currentCycle] += to.length;
         lastActiveCycle[_msgSender()] = currentCycle;
-
-        if (feeReceiver != address(0)) {
-            if (msgFee != 0) {
-                accCycleFeePercent[_msgSender()] += msgFee;
-                clientCycleFeePercent[feeReceiver] += msgFee;
-            }
-
-            if (nativeTokenFee != 0) {
-                clientAccruedFees[feeReceiver] += nativeTokenFee;
-            }
-        }
 
         uint256 _sentId = _send(to, payload);
 
@@ -369,12 +376,13 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
             uint256 lastUpdatedCycle = clientLastRewardUpdate[client];
 
             if (
-                clientCycleFeePercent[client] != 0 &&
-                cycleTotalMessages[lastUpdatedCycle] != 0
+                clientCycleGasEarned[client] != 0 &&
+                cycleTotalGasUsed[lastUpdatedCycle] != 0
             ) {
-                uint256 rewardPerMsg = rewardPerCycle[lastUpdatedCycle] / cycleTotalMessages[lastUpdatedCycle];
-                clientRewards[client] += (rewardPerMsg * clientCycleFeePercent[client]) / 10000;
-                clientCycleFeePercent[client] = 0;
+                uint256 clientRewardsEarned = (clientCycleGasEarned[client] * rewardPerCycle[lastUpdatedCycle]) / 
+                    cycleTotalGasUsed[lastUpdatedCycle];
+                clientRewards[client] += clientRewardsEarned;
+                clientCycleGasEarned[client] = 0;
             }
 
             clientLastRewardUpdate[client] = currentCycle;
@@ -462,25 +470,15 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     }
 
     function updateStats(address account) internal {
-        if (
-            currentCycle > lastActiveCycle[account] &&
-            accCycleMessages[account] != 0
-        ) {
-            uint256 lastCycleAccReward = (accCycleMessages[account] * rewardPerCycle[lastActiveCycle[account]]) / 
-            cycleTotalMessages[lastActiveCycle[account]];
-
-            accRewards[account] += lastCycleAccReward;
-
-            if (accCycleFeePercent[account] != 0) {
-                uint256 rewardPerMsg = lastCycleAccReward / accCycleMessages[account];
-
-                uint256 rewardsOwed = (rewardPerMsg * accCycleFeePercent[account]) / 10000;
-
-                accRewards[account] -= rewardsOwed;
-                accCycleFeePercent[account] = 0;
-            }
-
-            accCycleMessages[account] = 0;
+         if (	
+            currentCycle > lastActiveCycle[account] &&	
+            accCycleGasUsed[account] != 0	
+        ) {	
+            uint256 lastCycleAccReward = (accCycleGasUsed[account] * rewardPerCycle[lastActiveCycle[account]]) / 	
+            cycleTotalGasUsed[lastActiveCycle[account]];	
+            accRewards[account] += lastCycleAccReward;	
+         
+            accCycleGasUsed[account] = 0;
         }
 
         if (
