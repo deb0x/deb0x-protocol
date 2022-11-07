@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 
-contract Deb0xERC20 is ERC20 {
+
+contract Deb0xERC20 is ERC20Permit {
 
     address public owner;
 
-    constructor() ERC20("Deb0x Reward Token on Polygon", "pDBX") {
+    constructor() ERC20("Deb0x Reward Token on Polygon", "pDBX")
+    ERC20Permit("Deb0x Reward Token on Polygon") {
         owner = msg.sender;
     }
 
