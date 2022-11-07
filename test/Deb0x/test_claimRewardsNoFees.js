@@ -117,6 +117,10 @@ describe("Test contract", async function() {
         await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 
+        const aliceGasUsed = await rewardedAlice.accCycleGasUsed(alice.address)
+        const bobGasUsed = await rewardedAlice.accCycleGasUsed(bob.address)
+        const cycleTotalGasUsed = await rewardedAlice.cycleTotalGasUsed(await rewardedAlice.currentCycle())
+
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 2])
         await hre.ethers.provider.send("evm_mine")
 
@@ -131,15 +135,15 @@ describe("Test contract", async function() {
 
         // Alice  gets entire day2 reward and 2/3 of day3   
         const aliceExpected = NumUtils.day(2).add(
-            NumUtils.day(3).mul(2).div(3)
+            NumUtils.day(3).mul(aliceGasUsed).div(cycleTotalGasUsed)
         );
         expect(await dbxERC20.balanceOf(alice.address)).to.equal(aliceExpected);
 
-        // Bob    gets entire 1/3 of day3
-        const bobExpected = NumUtils.day(3).div(3);
+        // // Bob    gets entire 1/3 of day3
+        const bobExpected = NumUtils.day(3).mul(bobGasUsed).div(cycleTotalGasUsed);
         expect(await dbxERC20.balanceOf(bob.address)).to.equal(bobExpected);
 
-        // Carol  gets entire day4 reward
+        // // Carol  gets entire day4 reward
         const carolExpected = NumUtils.day(4);
         expect(await dbxERC20.balanceOf(carol.address)).to.equal(carolExpected);
     });
