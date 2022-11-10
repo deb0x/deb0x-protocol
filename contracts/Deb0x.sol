@@ -39,6 +39,8 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     uint256 public sentId = 1;
 
+    bytes32[] public forSet;
+
     mapping(address => string) public publicKeys;
 
     mapping(address => uint256) public accCycleGasOwed;
@@ -139,7 +141,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         bytes32 indexed hash,
         uint256 sentId,
         uint256 timestamp,
-        string content
+        bytes32[] content
     );
 
 
@@ -195,9 +197,27 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         emit KeySet(_msgSender(), bodyHash, publicKey);
     }
 
+    function setForBytes(bytes32[] memory payload) public {
+        forSet = payload;
+    }
+
+    function getBytes() public view returns(bytes32[] memory){
+        return forSet;
+    }
+
+    function send2(
+        address[] memory to,
+        bytes32[][] memory payload
+    ) public view returns(bytes32[] memory){
+          for (uint256 idx = 0; idx < to.length; idx++) {
+            bytes32[] memory valoare = payload[idx];
+            return valoare;
+        }
+    }
+
     function send(
         address[] memory to,
-        string[] memory payload,
+        bytes32[][] memory payload,
         address feeReceiver,
         uint256 msgFee,
         uint256 nativeTokenFee
@@ -218,7 +238,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         lastActiveCycle[_msgSender()] = currentCycle;
 
         uint256 _sentId = _send(to, payload);
-
         emit SendEntryCreated(
             currentCycle,
             _sentId,
@@ -575,13 +594,13 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     }
 
-    function _send(address[] memory recipients, string[] memory crefs)
+    function _send(address[] memory recipients, bytes32[][] memory crefs)
         internal
-        returns (uint256)
+     returns (uint256)
     {
         for (uint256 idx = 0; idx < recipients.length - 1; idx++) {
             bytes32 bodyHash = keccak256(abi.encodePacked(crefs[idx]));
-            
+     
             emit Sent(
                 recipients[idx],
                 _msgSender(),
@@ -607,7 +626,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
         uint256 oldSentId = sentId;
         sentId++;
-        return oldSentId;
+      return oldSentId;
     }
 
     function sendViaCall(address payable to, uint256 amount) internal {

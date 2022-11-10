@@ -29,6 +29,6 @@ contract Deb0xAttacker {
 
         tempPayload[0] = "0x";
         tempPayload[1] = "0x";
-        deb0xInstance.send{value: 100000000 gwei}(tempTo, tempPayload, 0x0000000000000000000000000000000000000000, 0 ,0);
+      //  deb0xInstance.send{value: 100000000 gwei}(tempTo, tempPayload, 0x0000000000000000000000000000000000000000, 0 ,0);
     }
 }
