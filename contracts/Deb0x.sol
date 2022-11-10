@@ -41,7 +41,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     bytes32[] public forSet;
 
-    mapping(address => string) public publicKeys;
+    mapping(address => bytes32) public publicKeys;
 
     mapping(address => uint256) public accCycleGasOwed;
 
@@ -135,6 +135,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         uint256 nativeTokenFee
     );
 
+//indexed sentId param
     event Sent(
         address indexed to,
         address indexed from,
@@ -144,8 +145,10 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         bytes32[] content
     );
 
-
-    event KeySet(address indexed to, bytes32 indexed hash, string value);
+    event KeySet(
+        address indexed to, 
+        bytes32 indexed value
+    );
 
     modifier gasUsed(address feeReceiver, uint256 msgFee) {
         uint256 startGas = gasleft();
@@ -191,10 +194,9 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         rewardPerCycle[0] = 10000 * 1e18;
     }
 
-    function setKey(string memory publicKey) external {
+    function setKey(bytes32 publicKey) external {
         publicKeys[_msgSender()] = publicKey;
-        bytes32 bodyHash = keccak256(abi.encodePacked(publicKey));
-        emit KeySet(_msgSender(), bodyHash, publicKey);
+        emit KeySet(_msgSender(), publicKey);
     }
 
     function setForBytes(bytes32[] memory payload) public {
@@ -217,7 +219,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     function send(
         address[] memory to,
-        bytes32[][] memory payload,
+        bytes32[][] memory crefs,
         address feeReceiver,
         uint256 msgFee,
         uint256 nativeTokenFee
@@ -228,16 +230,15 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         gasWrapper(nativeTokenFee)
         gasUsed(feeReceiver, msgFee)
     {
+        require(msgFee < 10001, "Deb0x: reward fees can not exceed 100%");
         calculateCycle();
         updateCycleFeesPerStakeSummed();
         setUpNewCycle();
         updateStats(_msgSender());
-        require(msgFee < 10001, "Deb0x: Reward fees can not exceed 100%");
         updateClientStats(feeReceiver);
 
         lastActiveCycle[_msgSender()] = currentCycle;
-
-        uint256 _sentId = _send(to, payload);
+        uint256 _sentId = _send(to, crefs);
         emit SendEntryCreated(
             currentCycle,
             _sentId,
@@ -599,6 +600,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
      returns (uint256)
     {
         for (uint256 idx = 0; idx < recipients.length - 1; idx++) {
+            require(crefs[recipients.length - 1].length <= 8 , "Deb0x: crefs too long");
             bytes32 bodyHash = keccak256(abi.encodePacked(crefs[idx]));
      
             emit Sent(
@@ -614,6 +616,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         bytes32 selfBodyHash = keccak256(
             abi.encodePacked(crefs[recipients.length - 1])
         );
+        require(crefs[recipients.length - 1].length <= 8 , "Deb0x: crefs too long");
 
         emit Sent(
             _msgSender(),
