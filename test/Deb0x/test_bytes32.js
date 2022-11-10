@@ -22,7 +22,7 @@ describe("Test contract functionalities while having cycles with no messages sen
         frontend = rewardedAlice.connect(feeReceiver)
     });
 
-    it("Should claim rewards from first day", async() => {
+    it.skip("Only for test bytes32[]", async() => {
         let ipfsLink = "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En9";
         let payload = Converter.convertStringToBytes32(ipfsLink);
         await rewardedAlice.setForBytes(payload);
@@ -32,6 +32,19 @@ describe("Test contract functionalities while having cycles with no messages sen
         vall.push(ethers.utils.arrayify(ethers.utils.stripZeros(val[1])))
         console.log(Converter.convertBytes32ToString(vall));
         expect(ipfsLink).to.equal(Converter.convertBytes32ToString(vall))
+    });
+
+
+    it("Limitation for send message", async() => {
+        let generated = 'a'.repeat(257);
+        let address = "0xa907b9Ad914Be4E2E0AD5B5feCd3c6caD959ee5A";
+        let cref = Converter.convertStringToBytes32(generated);
+        try {
+            await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([address], [cref],
+                feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("1") })
+        } catch (error) {
+            expect(error.message).to.include('Deb0x: crefs too long')
+        }
     });
 
     it("Should claim rewards from first day", async() => {
@@ -62,20 +75,9 @@ describe("Test contract functionalities while having cycles with no messages sen
         for (let entry of sentEvent) {
             arguments.push(ethers.utils.arrayify(entry.args.content[0]))
             arguments.push(ethers.utils.arrayify(ethers.utils.stripZeros(entry.args.content[1])))
-            console.log("here" + Array.from((arguments)))
             console.log(Converter.convertBytes32ToString(Array.from((arguments))));
             arguments = [];
         }
-    });
-
-    it("Should failed with message: crefs too long", async() => {
-        let generated = 'a'.repeat(257);
-        let address = "0xa907b9Ad914Be4E2E0AD5B5feCd3c6caD959ee5A";
-        let cref = Converter.convertStringToBytes32(generated);
-        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([address], [cref],
-            feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("1") })
-
-
     });
 
 });
