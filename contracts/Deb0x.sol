@@ -84,7 +84,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     mapping(uint256 => uint256) public rewardPerCycle;
 
     /**
-     * Total active token reward and stake per cycle. 
+     * Total unclaimed token reward and stake. 
      * 
      * Updated when a new cycle starts and when an account claims rewards, stakes or unstakes externally owned tokens.
      */
@@ -434,7 +434,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
                 clientCycleGasEarned[client] != 0 &&
                 cycleTotalGasUsed[lastUpdatedCycle] != 0
             ) {
-                // TODO! - big divisor!
+                // TODO! - big divisor! MAX: 1.2e+12 = total block gas per day = 40,000 * 30,000,000
                 uint256 clientRewardsEarned = (clientCycleGasEarned[client] * rewardPerCycle[lastUpdatedCycle]) / 
                     cycleTotalGasUsed[lastUpdatedCycle];
                 clientRewards[client] += clientRewardsEarned;
@@ -487,7 +487,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         ) {
             uint256 feePerStake;
             if(summedCycleStakes[lastStartedCycle] != 0) {
-                // TODO! - big divisor!
+                // TODO! - big divisor! (MAX: 5.01 MM ether ~ 5 * 1e+24)
                 feePerStake = ((cycleAccruedFees[lastStartedCycle] + pendingFees) * SCALING_FACTOR) / 
             summedCycleStakes[lastStartedCycle];
                 pendingFees = 0;
@@ -547,7 +547,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
             currentCycle > lastActiveCycle[account] &&	
             accCycleGasUsed[account] != 0	
         ) {	
-            // TODO! - big divisor!
+            // TODO! - big divisor! MAX: 1.2e+12 = total block gas per day
             uint256 lastCycleAccReward = (accCycleGasUsed[account] * rewardPerCycle[lastActiveCycle[account]]) / 	
             cycleTotalGasUsed[lastActiveCycle[account]];	
             accRewards[account] += lastCycleAccReward;	
