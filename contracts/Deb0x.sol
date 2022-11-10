@@ -661,6 +661,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         returns (uint256)
     {
         // TODO! - require that recipients and crefs length match
+        // TODO! - require recipients (and crefs) lengths > 1
         for (uint256 idx = 0; idx < recipients.length - 1; idx++) {
             bytes32 bodyHash = keccak256(abi.encodePacked(crefs[idx]));
             
@@ -687,6 +688,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
             crefs[recipients.length - 1]
         );
 
+        // TODO! - move before emit. and replace Sent.sentId = oldSentId
         uint256 oldSentId = sentId;
         sentId++;
         return oldSentId;
