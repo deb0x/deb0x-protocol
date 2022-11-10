@@ -24,9 +24,9 @@ import { signMetaTxRequest } from '../../ethereum/signer';
 import { createInstance } from '../../ethereum/forwarder'
 import { whitelist } from '../../constants.json'
 
-const deb0xAddress = "0xF5c80c305803280B587F8cabBcCdC4d9BF522AbD";
+const deb0xAddress = "0xdF7E7f4C0B8AfaF67F706d4b80cfFC4532f46Fa4";
 const deb0xViewsAddress = "0xf032f7FB8258728A1938473B2115BB163d5Da593";
-const deb0xERC20Address = "0x80f0C1c49891dcFDD40b6e0F960F84E6042bcB6F";
+const deb0xERC20Address = "0x8345742746c41BC9C004aD7BEE0b65E92F227347";
 
 export function Stake(props: any): any {
 
@@ -205,15 +205,17 @@ export function Stake(props: any): any {
         async function feeShare() {
             const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress);
 
+            const deb0xContract = await Deb0x(library, deb0xAddress);
+
             const unclaimedRewards = await deb0xViewsContract.getUnclaimedRewards(account);
 
             const accWithdrawableStake = await deb0xViewsContract.getAccWithdrawableStake(account);
             
             let balance = parseFloat((ethers.utils.formatEther(unclaimedRewards.add(accWithdrawableStake))))
             
-            const currentCycle = await deb0xViewsContract.currentStartedCycle();
+            const currentCycle = await deb0xContract.currentStartedCycle();
 
-            const totalSupply = await deb0xViewsContract.summedCycleStakes(currentCycle);
+            const totalSupply = await deb0xContract.summedCycleStakes(currentCycle);
 
             const feeShare = balance * 100 / totalSupply
             setFeeSharePercentage(((Math.round(feeShare * 100) / 100).toFixed(2)).toString() + "%")
@@ -398,9 +400,9 @@ export function Stake(props: any): any {
 
         async function setStakedAmount() {
 
-            const deb0xContract = await Deb0x(library, deb0xAddress)
+            const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress)
 
-            const balance = await deb0xContract.getAccWithdrawableStake(account)
+            const balance = await deb0xViewsContract.getAccWithdrawableStake(account)
 
             setUserStakedAmount(ethers.utils.formatEther(balance))
         }
