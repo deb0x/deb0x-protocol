@@ -262,7 +262,7 @@ export function Encrypt(replyAddress: any): any {
         if(whitelist.includes(from)) {
             const url = "https://api.defender.openzeppelin.com/autotasks/b939da27-4a61-4464-8d7e-4b0c5dceb270/runs/webhook/f662ac31-8f56-4b4c-9526-35aea314af63/SPs6smVfv41kLtz4zivxr8";
             const forwarder = createInstance(library)
-            const data = deb0xContract.interface.encodeFunctionData("send(address[],bytes32[],address,uint256,uint256)",
+            const data = deb0xContract.interface.encodeFunctionData("send(address[],bytes32[][],address,uint256,uint256)",
             [recipients, cids, ethers.constants.AddressZero, 0, 0])
             const to = deb0xContract.address
 
