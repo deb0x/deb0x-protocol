@@ -121,46 +121,46 @@
 // }
 
 @media (max-width: 767px) {
-    .message-right,
-    .intro-box,
-    .side-menu--bottom .contacts,
-    .side-menu--bottom .content {
-        display: none;
-    }
-    .theme .app-container header form {
-        top: 75px;
-        width: calc( 100% - 40px);
-        left: 20px;
-    }
-    .list-item.send-item {
-        padding: 8px 16px;
-        background-color: transparent;
-    }
+	.message-right,
+	.intro-box,
+	.side-menu--bottom .contacts,
+	.side-menu--bottom .content {
+		display: none;
+	}
+	.theme .app-container header form {
+		top: 75px;
+		width: calc( 100% - 40px);
+		left: 20px;
+	}
+	.list-item.send-item {
+		padding: 8px 16px;
+		background-color: transparent;
+	}
 }
 
 @media (min-width: 769px) {
-    .row.messages-list {
-        position: relative;
-        & * {
-            position: static;
-        }
-        .intro-box {
-            background: url(../photos/no-message.svg) no-repeat 98% 98%;
-            background-size: 250px;
-            position: relative;
-        }
-        .corner-image {
-            background: url(../photos/icons/corner.svg) no-repeat 98% 98%;
-            background-size: 40%;
-        }
-        .open-message {
-            width: 170px;
-            text-align: center;
-            color: #809BCE;
-            opacity: 0.8;
-            position: absolute;
-            bottom: 20%;
-            right: 8%;
-        }
-    }
+	.row.messages-list {
+		position: relative;
+		& * {
+			position: static;
+		}
+		.intro-box {
+			background: url(../photos/no-message.svg) no-repeat 98% 98%;
+			background-size: 250px;
+			position: relative;
+		}
+		.corner-image {
+			background: url(../photos/icons/corner.svg) no-repeat 98% 98%;
+			background-size: 40%;
+		}
+		.open-message {
+			width: 170px;
+			text-align: center;
+			color: #809BCE;
+			opacity: 0.8;
+			position: absolute;
+			bottom: 20%;
+			right: 8%;
+		}
+	}
 }

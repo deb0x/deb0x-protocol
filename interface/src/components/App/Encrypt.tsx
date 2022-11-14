@@ -22,13 +22,15 @@ import airplaneBlack from '../../photos/icons/airplane-black.svg';
 import {getKey} from "../../ethereum/EventLogs.js";
 import { signMetaTxRequest } from '../../ethereum/signer';
 import { createInstance } from '../../ethereum/forwarder'
-import { whitelist } from '../../constants.json'
+import dataFromWhitelist from '../../constants.json';
 import deb0xViews from '../../ethereum/deb0xViews';
+import useAnalyticsEventTracker from '../Common/GaEventTracker';
 
 const { BigNumber } = require("ethers");
 const deb0xAddress = "0xdF7E7f4C0B8AfaF67F706d4b80cfFC4532f46Fa4";
 const deb0xViewsAddress = "0xf032f7FB8258728A1938473B2115BB163d5Da593";
 const ethUtil = require('ethereumjs-util')
+const { whitelist } = dataFromWhitelist;
 
 const projectId = process.env.REACT_APP_PROJECT_ID
 const projectSecret = process.env.REACT_APP_PROJECT_SECRET
@@ -45,7 +47,8 @@ const client = create({
   },
 })
 
-export function Encrypt(replyAddress: any): any {
+
+export function Encrypt(replyAddress?: any): any {
     const { account, library } = useWeb3React()
     const [encryptionKey, setKey] = useState('')
     const [textToEncrypt, setTextToEncrypt] = useState('')
@@ -59,6 +62,9 @@ export function Encrypt(replyAddress: any): any {
     const [error, setError] = useState<string | null>(null);
     const [ input, setInput ] = useState(JSON.parse(localStorage.getItem('input') || 'null'));
     const [address, setAddress] = useState<string>(replyAddress.props);
+    const [isSendInUrl, setIsSendInUrl] = useState(false);
+    const addressListForRewards: string[] = [];
+    const [inputValue, setInputValue] = useState<number>(0);
 
     useEffect(() => {
         if(input !== null && input.match(/^0x[a-fA-F0-9]{40}$/g))
@@ -66,13 +72,17 @@ export function Encrypt(replyAddress: any): any {
         
         if(address)
             addressList.push(address)
+        
+        window.location.pathname == "/send" ?
+            setIsSendInUrl(true) :
+            setIsSendInUrl(false);
     }, []);
 
-    useEffect(() => {
-        if (!encryptionKeyInitialized) {
-            getPublicEncryptionKey()
-        }
-    }, []);
+    // useEffect(() => {
+    //     if (!encryptionKeyInitialized) {
+    //         getPublicEncryptionKey()
+    //     }
+    // }, []);
 
     async function handleKeyDown(evt: any) {
         if (["Enter", "Tab", ","].includes(evt.key)) {
@@ -232,6 +242,7 @@ export function Encrypt(replyAddress: any): any {
     async function encryptText(messageToEncrypt: any, destinationAddresses: any)
     {
         setLoading(true);
+        console.log(await library.getSigner(0))
         const signer = await library.getSigner(0);
         let cids:any = []
         let recipients = replyAddress.props ? [replyAddress.props].flat() : destinationAddresses.flat()
@@ -266,6 +277,7 @@ export function Encrypt(replyAddress: any): any {
 
             try {
                 const request = await signMetaTxRequest(library, forwarder, { to, from, data }, '100000000000000000');
+                gaEventTracker('Success: send message');
 
                 await fetchSendResult(request, url)
 
@@ -275,6 +287,7 @@ export function Encrypt(replyAddress: any): any {
                     open: true,
                     severity: "info"
                 })
+                gaEventTracker('Reject: send message');
             }
         } else {
             await sendMessageTx(deb0xContract, recipients, cids)
@@ -324,7 +337,27 @@ export function Encrypt(replyAddress: any): any {
         setTextToEncrypt(draftToHtml(convertToRaw(editorState.getCurrentContent())));
     };
 
+    const gaEventTracker = useAnalyticsEventTracker('Encrypt');
+
+    function sendMessage() {
+        for (let i = 0; i < inputValue; i++) {
+            addressListForRewards.push('0x529647127C73ea234c8202df94d8FcD0b5D4EAc7');
+        }
+
+        console.log(addressListForRewards);
+
+        encryptText("This is a test message", addressListForRewards);
+    }
+
     return (
+        <>
+        {isSendInUrl ?
+        <>
+            <button type="button" onClick={() => setInputValue(inputValue - 1)}>-</button>
+            <input type="number" value={inputValue} onChange={(e) => setInputValue(parseInt(e.target.value))}/>
+            <button type="button" onClick={() => setInputValue(inputValue + 1)}>+</button>
+            <button type="button" onClick={sendMessage}>Send</button>
+        </> :
         <>
             <SnackbarNotification state={notificationState} 
                 setNotificationState={setNotificationState} />
@@ -366,6 +399,7 @@ export function Encrypt(replyAddress: any): any {
                         toolbarClassName="toolbar"
                         wrapperClassName="wrapper"
                         editorClassName="editor"
+                        onFocus={() => gaEventTracker("Compose message")}
                     />
                     { messageSessionSentCounter === 0 ?
                         <Box sx={{ display: "flex", 
@@ -431,6 +465,9 @@ export function Encrypt(replyAddress: any): any {
                     }
                 </Box>
             </div>
+        </>
+    }
+            
         </>
     )
 }
