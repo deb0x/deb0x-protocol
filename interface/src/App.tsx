@@ -150,9 +150,7 @@ function App() {
                         blockExplorerUrls:['https://polygonscan.com/'],  
                         nativeCurrency: { 
                         symbol:'Matic',   
-                        decimals: 18,
-                        gas: 5000000,
-                        gasPrice: 25000000000
+                        decimals: 18
                         }       
                     }
                     ]});
