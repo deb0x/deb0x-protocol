@@ -238,7 +238,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
      * @param msgFee on-top reward token fee charged by the client (in basis points). If 0, no reward token fee applies.
      * @param nativeTokenFee on-top native coin fee charged by the client. If 0, no 
      */
-    // TODO! - rename payload to crefs
     // TODO! - require to.length == payload.length
     function send(
         address[] memory to,
@@ -434,7 +433,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
                 clientCycleGasEarned[client] != 0 &&
                 cycleTotalGasUsed[lastUpdatedCycle] != 0
             ) {
-                // TODO! - big divisor! MAX: 1.2e+12 = total block gas per day = 40,000 * 30,000,000
                 uint256 clientRewardsEarned = (clientCycleGasEarned[client] * rewardPerCycle[lastUpdatedCycle]) / 
                     cycleTotalGasUsed[lastUpdatedCycle];
                 clientRewards[client] += clientRewardsEarned;
@@ -487,7 +485,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         ) {
             uint256 feePerStake;
             if(summedCycleStakes[lastStartedCycle] != 0) {
-                // TODO! - big divisor! (MAX: 5.01 MM ether ~ 5 * 1e+24)
                 feePerStake = ((cycleAccruedFees[lastStartedCycle] + pendingFees) * SCALING_FACTOR) / 
             summedCycleStakes[lastStartedCycle];
                 pendingFees = 0;
@@ -547,7 +544,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
             currentCycle > lastActiveCycle[account] &&	
             accCycleGasUsed[account] != 0	
         ) {	
-            // TODO! - big divisor! MAX: 1.2e+12 = total block gas per day
             uint256 lastCycleAccReward = (accCycleGasUsed[account] * rewardPerCycle[lastActiveCycle[account]]) / 	
             cycleTotalGasUsed[lastActiveCycle[account]];	
             accRewards[account] += lastCycleAccReward;	
