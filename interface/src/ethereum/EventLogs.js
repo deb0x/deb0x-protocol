@@ -1,7 +1,8 @@
-const Web3 = require('web3');
-const web3 = new Web3();
+import { CompressOutlined } from '@mui/icons-material';
 let { convertBytes32ToString } = require('./Converter.js')
 let { ethers } = require("ethers");
+const Web3 = require('web3');
+const web3 = new Web3();
 
 const APIKEY = 'ckey_b065aa22fc1e4b68a13efab2521';
 const baseURL = 'https://api.covalenthq.com/v1'
@@ -9,7 +10,7 @@ const blockchainChainId = '137'
 const sentEventTopic = '0xa33bc9a10d8f3a335b59663beb6a02681748ac0b3db1251c7bb08f3e99dd0bb4';
 const startBlock = '35113469';
 const endBlock = 'latest';
-const contractAddress = '0xC1D6E87b2Fcd76B086eA662bbd2B4cBd151010A2';
+const contractAddress = '0xe37426141A752E65D35806f3E374c5D84e550645';
 
 async function getEvents(secondaryTopicsData) {
     const url = new URL(`${baseURL}/${blockchainChainId}/events/topics/${sentEventTopic}/?quote-currency=USD&format=JSON&starting-block=${startBlock}&ending-block=${endBlock}&sender-address=${contractAddress}&secondary-topics=${secondaryTopicsData}&key=${APIKEY}`);
@@ -84,7 +85,6 @@ export async function fetchSentMessages(sender) {
     let contentValue = '';
     for (let i = 0; i < froms.length; i++) {
         let dataAboutEvent = web3.eth.abi.decodeParameters(typesArray, froms[i].raw_log_data);
-
         argumentsArray.push(ethers.utils.arrayify(dataAboutEvent[2][0]))
         argumentsArray.push(ethers.utils.arrayify(ethers.utils.stripZeros(dataAboutEvent[2][1])))
         contentValue = convertBytes32ToString(argumentsArray);
@@ -122,16 +122,15 @@ export async function fetchSentMessages(sender) {
 export async function getKey(to) {
     let secondaryTopics = '0x000000000000000000000000' + to.slice(2);
     let events = await getSetKeyEvents(secondaryTopics);
-    console.log(events)
     if (events.items.length != 0) {
         for (let i = 0; i < events.items.length; i++) {
             if (events.items[i].raw_log_topics[1].toLowerCase() === secondaryTopics.toLowerCase()) {
-                console.log(ethers.utils.base64.encode(ethers.utils.arrayify(events.items[i].raw_log_topics[2])))
                 return ethers.utils.base64.encode(ethers.utils.arrayify(events.items[i].raw_log_topics[2]));
             } else {
-                return '';;
+                return '';
             }
         }
     } else
-        return '';;
+        return '';
+
 }

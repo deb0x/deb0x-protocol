@@ -24,7 +24,7 @@ import { signMetaTxRequest } from '../../ethereum/signer';
 import { createInstance } from '../../ethereum/forwarder'
 import { whitelist } from '../../constants.json'
 
-const deb0xAddress = "0xC1D6E87b2Fcd76B086eA662bbd2B4cBd151010A2";
+const deb0xAddress = "0xe37426141A752E65D35806f3E374c5D84e550645";
 const deb0xViewsAddress = "0xf032f7FB8258728A1938473B2115BB163d5Da593";
 const deb0xERC20Address = "0xB7c908eEDb18588Af6A4984B821Fe1a3bF627D13";
 

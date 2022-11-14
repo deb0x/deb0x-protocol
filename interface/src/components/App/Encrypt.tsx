@@ -27,7 +27,7 @@ import deb0xViews from '../../ethereum/deb0xViews';
 import { convertStringToBytes32} from '../../../src/ethereum/Converter.js';
 
 const { BigNumber } = require("ethers");
-const deb0xAddress = "0xC1D6E87b2Fcd76B086eA662bbd2B4cBd151010A2";
+const deb0xAddress = "0xe37426141A752E65D35806f3E374c5D84e550645";
 const deb0xViewsAddress = "0xf032f7FB8258728A1938473B2115BB163d5Da593";
 const ethUtil = require('ethereumjs-util')
 
@@ -247,7 +247,7 @@ export function Encrypt(replyAddress: any): any {
                 Buffer.from(
                     JSON.stringify(
                         encrypt({
-                            publicKey: destinationAddressEncryptionKey,
+                            publicKey: destinationAddressEncryptionKey || '',
                             data: messageToEncrypt,
                             version: 'x25519-xsalsa20-poly1305'
                         }
@@ -313,7 +313,7 @@ export function Encrypt(replyAddress: any): any {
     const getPublicEncryptionKey = async () => {
         const deb0xContract = Deb0x(library, deb0xAddress)
         const key = await getKey(account)
-        setEncryptionKeyInitialized(key)
+        setEncryptionKeyInitialized(key || '')
     }
     const [editorState, setEditorState] = useState(() =>
         EditorState.createEmpty()

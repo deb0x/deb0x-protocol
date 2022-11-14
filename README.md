@@ -43,6 +43,6 @@ npx hardhat run --network goerli scritps/deploy.js
 | Contract name            | Commit hash | Goerli Testnet                               | Mainnet                                    |
 | ------------------------ | ----------- | -------------------------------------------  | ------------------------------------------ | 
 | Forwarder                |  -          |                                              |                                            |
-| Deb0x                    |  1d9e1ac          | 0xC1D6E87b2Fcd76B086eA662bbd2B4cBd151010A2   |                                        |
+| Deb0x                    |  1d9e1ac          | 0xe37426141A752E65D35806f3E374c5D84e550645   |                                        |
 | Deb0xERC20               |  1d9e1ac          | 0x2f4238727fBC7d205f5C6504dA9bc623A55fE0C5   |                                        |
 | Deb0xView                |  1d9e1ac          | 0xf032f7FB8258728A1938473B2115BB163d5Da593   |                                        |                                            

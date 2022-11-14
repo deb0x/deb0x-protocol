@@ -12,7 +12,8 @@ import Deb0x from "../../ethereum/deb0x"
 import SnackbarNotification from './Snackbar';
 import '../../componentsStyling/stepper.scss';
 import { whitelist } from '../../constants.json'
-const deb0xAddress = "0xC1D6E87b2Fcd76B086eA662bbd2B4cBd151010A2";
+import { ConstructionOutlined } from '@mui/icons-material';
+const deb0xAddress = "0xe37426141A752E65D35806f3E374c5D84e550645";
 const steps = ['Provide public encryption key', 'Initialize Deb0x'];
 const ethers = require('ethers')
 const utils = ethers.utils
