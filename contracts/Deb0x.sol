@@ -23,6 +23,11 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     uint256 public pendingStake;
 
+    /**
+     * Index (0-based) of the current cycle.
+     * 
+     * Updated upon cycle setup that is  triggered by contract interraction (account sends message, claims fees, claims rewards, stakes or unstakes).
+     */
     uint256 public currentCycle;
 
     uint256 public lastStartedCycle;
@@ -39,8 +44,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     uint256 public sentId = 1;
 
-    bytes32[] public forSet;
-
     mapping(address => bytes32) public publicKeys;
 
     mapping(address => uint256) public accCycleGasOwed;
@@ -51,6 +54,9 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     mapping(uint256 => uint256) public cycleTotalGasUsed;
 
+    /**
+     * The last cycle when an account has sent messages.
+     */
     mapping(address => uint256) public lastActiveCycle;
 
     mapping(address => uint256) public clientLastRewardUpdate;
@@ -59,14 +65,29 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     mapping(address => uint256) public clientAccruedFees;
 
+    /**
+     * ????  why  0? when getUnclaimedRewards is >0 ?
+     * Current unclaimed rewards and staked amounts per account.
+     */
     mapping(address => uint256) public accRewards;
 
+    /**
+     * ?
+     */
     mapping(address => uint256) public accAccruedFees;
 
     mapping(address => uint256) public clientRewards;
 
+    /**
+     * Total token rewards allocated per cycle.
+     */
     mapping(uint256 => uint256) public rewardPerCycle;
 
+    /**
+     * Total unclaimed token reward and stake. 
+     * 
+     * Updated when a new cycle starts and when an account claims rewards, stakes or unstakes externally owned tokens.
+     */
     mapping(uint256 => uint256) public summedCycleStakes;
 
     mapping(address => uint256) public lastFeeUpdateCycle;
@@ -185,6 +206,9 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         sendViaCall(payable(msg.sender), msg.value - fee - nativeTokenFee);
     }
 
+    /**
+     * @param forwarder forwarder contract address.
+     */
     constructor(address forwarder) ERC2771Context(forwarder) {
         dbx = new Deb0xERC20();
         i_initialTimestamp = block.timestamp;
@@ -194,11 +218,28 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         rewardPerCycle[0] = 10000 * 1e18;
     }
 
+    /**
+     * @dev Stores the public key of the sender account.
+     * 
+     * @param publicKey as encoded by the client.
+     */
     function setKey(bytes32 publicKey) external {
         publicKeys[_msgSender()] = publicKey;
         emit KeySet(_msgSender(), publicKey);
     }
 
+    /**
+     * @dev Sends messages to multiple accounts. Triggers helper functions 
+     * used to update cycle, rewards and fees related state.
+     * Optionally may include extra reward token fee and native coin fees on-top of the default protocol fee. 
+     * These fees are set by the transaction sender also called "client".
+     * 
+     * @param to account addresses to send messages to.
+     * @param crefs content references to the messages.
+     * @param feeReceiver client address.
+     * @param msgFee on-top reward token fee charged by the client (in basis points). If 0, no reward token fee applies.
+     * @param nativeTokenFee on-top native coin fee charged by the client. If 0, no 
+     */
     function send(
         address[] memory to,
         bytes32[][] memory crefs,
@@ -211,8 +252,13 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         nonReentrant()
         gasWrapper(nativeTokenFee)
         gasUsed(feeReceiver, msgFee)
+
     {
-        require(msgFee < 10001, "Deb0x: reward fees can not exceed 100%");
+        require(msgFee < 10001, "Deb0x: Reward fees can not exceed 100%");
+
+        
+        uint256 _sentId = _send(to, crefs);
+
         calculateCycle();
         updateCycleFeesPerStakeSummed();
         setUpNewCycle();
@@ -220,7 +266,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         updateClientStats(feeReceiver);
 
         lastActiveCycle[_msgSender()] = currentCycle;
-        uint256 _sentId = _send(to, crefs);
         emit SendEntryCreated(
             currentCycle,
             _sentId,
@@ -369,10 +414,19 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         emit Unstaked(currentCycle, _msgSender(), amount);
     }
 
+    /**
+     * @dev Returns the index of the cycle at the current block time.
+     */
     function getCurrentCycle() public view returns (uint256) {
         return (block.timestamp - i_initialTimestamp) / i_periodDuration;
     }
 
+    /**
+     * @dev Updates various helper state variables used to compute token rewards 
+     * and fees distribution for a given client.
+     * 
+     * @param client the address of the client to make the updates for.
+     */
     function updateClientStats(address client) internal {
         if (currentCycle > clientLastRewardUpdate[client]) {
             uint256 lastUpdatedCycle = clientLastRewardUpdate[client];
@@ -406,6 +460,9 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         }
     }
 
+    /**
+     * @dev Updates the index of the cycle.
+     */
     function calculateCycle() internal {
         uint256 calculatedCycle = getCurrentCycle();
         
@@ -415,6 +472,9 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         
     }
 
+    /**
+     * @dev Updates the global helper variables related to fee distribution.
+     */
     function updateCycleFeesPerStakeSummed() internal {
         if (currentCycle != currentStartedCycle) {
             previousStartedCycle = lastStartedCycle + 1;
@@ -440,6 +500,10 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     }
 
+    /**
+     * @dev Updates the global state related to the opening of a new cycle along 
+     * with helper state variables used in computation of staking rewards.
+     */
     function setUpNewCycle() internal {
         if (rewardPerCycle[currentCycle] == 0) {
             lastCycleReward = currentCycleReward;
@@ -471,6 +535,12 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     }
 
+    /**
+     * @dev Updates various helper state variables used to compute token rewards 
+     * and fees distribution for a given account.
+     * 
+     * @param account the address of the account to make the updates for.
+     */
     function updateStats(address account) internal {
          if (	
             currentCycle > lastActiveCycle[account] &&	
@@ -577,12 +647,24 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     }
 
+    /**
+     * @dev For each recipient emits events with correspondig cref.
+     * Lengths of recipients and crefs arrays must match.
+     * 
+     * @param recipients recipient addresses that messages are stored for.
+     * @param crefs content references to the messages.
+     */
     function _send(address[] memory recipients, bytes32[][] memory crefs)
         internal
-     returns (uint256)
+        returns (uint256)
     {
+        require(recipients.length == crefs.length, "Deb0x: Arrays must have same length");
+        require(recipients.length > 0, "Deb0x: Length of arrays must be greater than 0");
         for (uint256 idx = 0; idx < recipients.length - 1; idx++) {
             require(crefs[recipients.length - 1].length <= 8 , "Deb0x: crefs too long");
+        }
+
+        for (uint256 idx = 0; idx < recipients.length - 1; idx++) {
             bytes32 bodyHash = keccak256(abi.encodePacked(crefs[idx]));
      
             emit Sent(
@@ -600,20 +682,27 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         );
         require(crefs[recipients.length - 1].length <= 8 , "Deb0x: crefs too long");
 
+        uint256 oldSentId = sentId;
+        sentId++;
+
         emit Sent(
             _msgSender(),
             _msgSender(),
             selfBodyHash,
-            sentId,
+            oldSentId,
             block.timestamp,
             crefs[recipients.length - 1]
         );
 
-        uint256 oldSentId = sentId;
-        sentId++;
-      return oldSentId;
+        return oldSentId;
     }
 
+    /**
+     * Recommended method to use to send native coins.
+     * 
+     * @param to receiving address
+     * @param amount in wei
+     */
     function sendViaCall(address payable to, uint256 amount) internal {
         (bool sent, ) = to.call{value: amount}("");
         require(sent, "Deb0x: failed to send amount");

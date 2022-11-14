@@ -72,6 +72,7 @@ contract Deb0xViews {
             calculatedCycle > lastStartedCycleTemp &&
             deb0x.cycleFeesPerStakeSummed(lastStartedCycleTemp + 1) == 0
         ) {
+            // TODO! - big divisor! (MAX: 5.01 MM ether ~ 5 * 1e+24)
             uint256 feePerStake = (deb0x.cycleAccruedFees(
                 lastStartedCycleTemp
             ) * deb0x.SCALING_FACTOR()) /
@@ -157,6 +158,7 @@ contract Deb0xViews {
             calculatedCycle > deb0x.lastActiveCycle(account) &&
             deb0x.accCycleGasUsed(account) != 0
         ) {
+            // TODO! - big divisor! MAX: 1.2e+12 = total block gas per day            
             uint256 lastCycleAccReward = (deb0x.accCycleGasUsed(account) *
                 deb0x.rewardPerCycle(deb0x.lastActiveCycle(account))) /
                 deb0x.cycleTotalGasUsed(deb0x.lastActiveCycle(account));
@@ -165,6 +167,7 @@ contract Deb0xViews {
 
             if (deb0x.accCycleGasOwed(account) != 0) {
                 uint256 accLastActiveCycle = deb0x.lastActiveCycle(account);
+                // TODO! - big divisor! MAX: 1.2e+12 = total block gas per day
                 uint256 accRewardsOwed = (deb0x.accCycleGasOwed(account) * deb0x.rewardPerCycle(accLastActiveCycle)) / 
                     deb0x.cycleTotalGasUsed(accLastActiveCycle);
                 currentRewards -= accRewardsOwed;
