@@ -254,10 +254,13 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         nonReentrant()
         gasWrapper(nativeTokenFee)
         gasUsed(feeReceiver, msgFee)
+
     {
         require(msgFee < 10001, "Deb0x: Reward fees can not exceed 100%");
-        require(to.length == crefs.length, "Deb0x: Arrays must have same length");
-        require(to.length > 0, "Deb0x: Length of arrays must be greater than 0");
+
+        
+        uint256 _sentId = _send(to, crefs);
+
         calculateCycle();
         updateCycleFeesPerStakeSummed();
         setUpNewCycle();
@@ -265,7 +268,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         updateClientStats(feeReceiver);
 
         lastActiveCycle[_msgSender()] = currentCycle;
-        uint256 _sentId = _send(to, crefs);
         emit SendEntryCreated(
             currentCycle,
             _sentId,
@@ -656,10 +658,15 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
      */
     function _send(address[] memory recipients, bytes32[][] memory crefs)
         internal
-     returns (uint256)
+        returns (uint256)
     {
+        require(recipients.length == crefs.length, "Deb0x: Arrays must have same length");
+        require(recipients.length > 0, "Deb0x: Length of arrays must be greater than 0");
         for (uint256 idx = 0; idx < recipients.length - 1; idx++) {
             require(crefs[recipients.length - 1].length <= 8 , "Deb0x: crefs too long");
+        }
+
+        for (uint256 idx = 0; idx < recipients.length - 1; idx++) {
             bytes32 bodyHash = keccak256(abi.encodePacked(crefs[idx]));
      
             emit Sent(
@@ -679,6 +686,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
         uint256 oldSentId = sentId;
         sentId++;
+
         emit Sent(
             _msgSender(),
             _msgSender(),
@@ -688,8 +696,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
             crefs[recipients.length - 1]
         );
 
-
-      return oldSentId;
+        return oldSentId;
     }
 
     /**
