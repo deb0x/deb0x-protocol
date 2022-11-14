@@ -24,10 +24,10 @@ import { signMetaTxRequest } from '../../ethereum/signer';
 import { createInstance } from '../../ethereum/forwarder'
 import { whitelist } from '../../constants.json'
 import deb0xViews from '../../ethereum/deb0xViews';
-import { convertStringToBytes32, convertBytes32ToString} from '../../../src/ethereum/Converter.js';
+import { convertStringToBytes32} from '../../../src/ethereum/Converter.js';
 
 const { BigNumber } = require("ethers");
-const deb0xAddress = "0x1006f84F288B666c452615bA4cc245f870f2eBb9";
+const deb0xAddress = "0xC1D6E87b2Fcd76B086eA662bbd2B4cBd151010A2";
 const deb0xViewsAddress = "0xf032f7FB8258728A1938473B2115BB163d5Da593";
 const ethUtil = require('ethereumjs-util')
 
@@ -133,6 +133,7 @@ export function Encrypt(replyAddress: any): any {
 
     async function isInitialized(address: any) {
         const deb0xViewsContract = deb0xViews(library, deb0xViewsAddress);
+        console.log(await getKey(address))
         return await getKey(address);
     }
 

@@ -38,7 +38,7 @@ const client = create({
 })
 
 const ethUtil = require('ethereumjs-util');
-const deb0xAddress = "0x1006f84F288B666c452615bA4cc245f870f2eBb9";
+const deb0xAddress = "0xC1D6E87b2Fcd76B086eA662bbd2B4cBd151010A2";
 
 
 enum ConnectorNames { Injected = 'Injected', Network = 'Network' };
@@ -150,7 +150,9 @@ function App() {
                         blockExplorerUrls:['https://polygonscan.com/'],  
                         nativeCurrency: { 
                         symbol:'Matic',   
-                        decimals: 18
+                        decimals: 18,
+                        gas: 5000000,
+                        gasPrice: 25000000000
                         }       
                     }
                     ]});

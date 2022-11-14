@@ -199,16 +199,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         emit KeySet(_msgSender(), publicKey);
     }
 
-    function send2(
-        address[] memory to,
-        bytes32[][] memory payload
-    ) public view returns(bytes32[] memory){
-          for (uint256 idx = 0; idx < to.length; idx++) {
-            bytes32[] memory valoare = payload[idx];
-            return valoare;
-        }
-    }
-
     function send(
         address[] memory to,
         bytes32[][] memory crefs,
