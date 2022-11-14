@@ -252,12 +252,13 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         gasWrapper(nativeTokenFee)
         gasUsed(feeReceiver, msgFee)
     {
+        require(msgFee < 10001, "Deb0x: Reward fees can not exceed 100%");
+        require(to.length == payload.length, "Deb0x: Arrays must have same length");
+        require(to.length > 0, "Deb0x: Length of arrays must be greater than 0");
         calculateCycle();
         updateCycleFeesPerStakeSummed();
         setUpNewCycle();
         updateStats(_msgSender());
-        // TODO! - move require to the top
-        require(msgFee < 10001, "Deb0x: Reward fees can not exceed 100%");
         updateClientStats(feeReceiver);
 
         lastActiveCycle[_msgSender()] = currentCycle;
@@ -656,8 +657,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         internal
         returns (uint256)
     {
-        // TODO! - require that recipients and crefs length match
-        // TODO! - require recipients (and crefs) lengths > 1
         for (uint256 idx = 0; idx < recipients.length - 1; idx++) {
             bytes32 bodyHash = keccak256(abi.encodePacked(crefs[idx]));
             
