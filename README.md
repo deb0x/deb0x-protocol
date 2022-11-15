@@ -10,9 +10,10 @@ Decentralized Private Mail App and Protocol
 ### Steps to run the frontend
 
 1. `npm install` in root dir
-2. `cd interface` and then `npm install`
-3. `npm start`
-4. open http://localhost:3000/
+2. `npx hardhat compile` in root dir
+3. `cd interface` and then `npm install`
+4. `npm start`
+5. open http://localhost:3000
 
 For a quick overview and explanations, see the demo video: https://youtu.be/8coLe-z6jHg 
 
