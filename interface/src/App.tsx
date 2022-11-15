@@ -38,7 +38,7 @@ const client = create({
 })
 
 const ethUtil = require('ethereumjs-util');
-const deb0xAddress = "0xF5c80c305803280B587F8cabBcCdC4d9BF522AbD";
+const deb0xAddress = "0x3a473a59820929D42c47aAf1Ea9878a2dDa93E18";
 
 
 enum ConnectorNames { Injected = 'Injected', Network = 'Network' };
@@ -122,7 +122,7 @@ function App() {
         setAnchorEl(anchorEl ? null : event.currentTarget);
     };
 
-    useEffect(() => {    
+    useEffect(() => {   
         window.ethereum ?
             window.ethereum.request({method: "eth_requestAccounts"}).then(() => {
                 switchNetwork();               

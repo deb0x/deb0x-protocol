@@ -3,6 +3,9 @@ const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
 const { NumUtils } = require("../utils/NumUtils.ts");
+const { Converter } = require("../utils/Converter.ts");
+let ipfsLink = "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En9";
+let payload = Converter.convertStringToBytes32(ipfsLink);
 
 describe("Memory intensive tests: ERC20 supply limit", async function() {
 
@@ -26,7 +29,7 @@ describe("Memory intensive tests: ERC20 supply limit", async function() {
 
     it.ignore(`Should test require`, async() => {
         for (let i = 0; i < 22532; i++) {
-            await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+            await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
             await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
             await hre.ethers.provider.send("evm_mine")
             try {
@@ -46,7 +49,7 @@ describe("Memory intensive tests: ERC20 supply limit", async function() {
 
         console.log("Rewards should be ended. Adding 10 more sends");
         for (let i = 0; i < 10; i++) {
-            await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+            await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
             await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
             await hre.ethers.provider.send("evm_mine")
             console.log(`Extra days past: ${i}`);
@@ -64,7 +67,7 @@ describe("Memory intensive tests: ERC20 supply limit", async function() {
     it.ignore(`Should test require`, async() => {
         try {
             for (let i = 0; i < 15000; i++) {
-                await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+                await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
                 await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
                 await hre.ethers.provider.send("evm_mine")
                 await user1Reward.claimRewards();
@@ -130,4 +133,4 @@ describe("Memory intensive tests: ERC20 supply limit", async function() {
 // 
 // 
 // npm ERR! Test failed.  See above for more details.
-// 
+//
