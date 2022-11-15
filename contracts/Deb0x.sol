@@ -249,13 +249,9 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         gasUsed(feeReceiver, msgFee)
 
     {
-<<<<<<< HEAD
-        require(msgFee < 10001, "Deb0x: Reward fees can not exceed 100%");
-=======
         require(msgFee < 10001, "Deb0x: reward fees exceed 10000 bps");
 
         
->>>>>>> 57c88ea393fd5ac3b0f4cd18d3c819cddd1c78a4
         uint256 _sentId = _send(to, crefs);
         calculateCycle();
         updateCycleFeesPerStakeSummed();
