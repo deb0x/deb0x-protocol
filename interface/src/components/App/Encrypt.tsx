@@ -271,7 +271,6 @@ export function Encrypt(replyAddress: any): any {
                 await fetchSendResult(request, url)
 
             } catch (error: any) {
-                console.log(error)
                 setNotificationState({
                     message: "You rejected the transaction. Message was not sent.",
                     open: true,

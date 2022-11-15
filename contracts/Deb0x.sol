@@ -66,14 +66,10 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     mapping(address => uint256) public clientAccruedFees;
 
     /**
-     * ????  why  0? when getUnclaimedRewards is >0 ?
      * Current unclaimed rewards and staked amounts per account.
      */
     mapping(address => uint256) public accRewards;
 
-    /**
-     * ?
-     */
     mapping(address => uint256) public accAccruedFees;
 
     mapping(address => uint256) public clientRewards;
@@ -156,7 +152,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         uint256 nativeTokenFee
     );
 
-//indexed sentId param
     event Sent(
         address indexed to,
         address indexed from,
@@ -255,10 +250,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     {
         require(msgFee < 10001, "Deb0x: Reward fees can not exceed 100%");
-
-        
         uint256 _sentId = _send(to, crefs);
-
         calculateCycle();
         updateCycleFeesPerStakeSummed();
         setUpNewCycle();

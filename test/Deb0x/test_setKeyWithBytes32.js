@@ -3,7 +3,7 @@ const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
 
-describe("Test setKey event with bytes32 parameter", async function() {
+describe("Should check if the publicKey is stored in the correct format on Deb0x.sol", async function() {
     let rewardedAlice, rewardedBob, rewardedCarol, frontend, dbxERC20;
     let alice, bob;
     beforeEach("Set enviroment", async() => {
