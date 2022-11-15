@@ -3,6 +3,9 @@ const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
 const { NumUtils } = require("../utils/NumUtils.ts");
+const { Converter } = require("../utils/Converter.ts");
+let ipfsLink = "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En9";
+let payload = Converter.convertStringToBytes32(ipfsLink);
 
 describe("Test unstake functionality", async function() {
     let deb0xContract, user1Reward, user2Reward, user3Reward, frontend, dbxERC20, deb0xViews;
@@ -28,12 +31,12 @@ describe("Test unstake functionality", async function() {
     })
 
     it("Stake action from a single account and check user address stake amount", async() => {
-        await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
@@ -49,9 +52,9 @@ describe("Test unstake functionality", async function() {
         await user3Reward.stakeDBX(balanceBigNumberFormat)
         console.log("Balance account after second stake: " + ethers.utils.formatEther(await dbxERC20.balanceOf(user3.address)))
 
-        await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
@@ -60,8 +63,8 @@ describe("Test unstake functionality", async function() {
         console.log("Balance account after third stake but in second cycle: " + ethers.utils.formatEther(await dbxERC20.balanceOf(user3.address)))
         console.log("Acc  " + ethers.utils.formatEther(await deb0xViews.getAccWithdrawableStake(user3.address)))
 
-        await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
@@ -79,8 +82,8 @@ describe("Test unstake functionality", async function() {
     });
 
     it("Action during gap cycles should convert stake back to rewards and not grant fees for that stake", async() => {
-        await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        
+        await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
@@ -105,31 +108,31 @@ describe("Test unstake functionality", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 2])
         await hre.ethers.provider.send("evm_mine")
 
-        await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         const user1accAccruedFees3 = await user1Reward.accAccruedFees(user1.address)
         expect(user1accAccruedFees3).equal(user1accAccruedFees2)
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
         console.log((await hre.ethers.provider.getBalance(deb0xContract.address)).toString())
-        
+
         await user1Reward.claimFees()
 
         feesClaimed = await user1Reward.queryFilter("FeesClaimed")
         let totalFeesClaimed = BigNumber.from("0")
-        for(let entry of feesClaimed){
+        for (let entry of feesClaimed) {
             totalFeesClaimed = totalFeesClaimed.add(entry.args.fees)
         }
         const feesCollected = (await user1Reward.cycleAccruedFees(0))
-        .add(await user1Reward.cycleAccruedFees(6))
+            .add(await user1Reward.cycleAccruedFees(6))
 
         const remainder = await hre.ethers.provider.getBalance(user1Reward.address);
         expect(totalFeesClaimed.add(remainder)).to.equal(feesCollected)
     })
 
     it("Action during gap cycles should convert stake back to rewards and not grant fees for that stake", async() => {
-        await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        
+        await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
@@ -139,7 +142,7 @@ describe("Test unstake functionality", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 
         let user1Balance = await dbxERC20.balanceOf(user1.address)
         await dbxERC20.connect(user1).approve(deb0xContract.address, user1Balance)
@@ -148,21 +151,21 @@ describe("Test unstake functionality", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 2])
         await hre.ethers.provider.send("evm_mine")
 
-        await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        
+        await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
         await user1Reward.claimFees()
 
         let feesClaimed = await user1Reward.queryFilter("FeesClaimed")
         let user1ClaimedFees = BigNumber.from("0")
-        for(let entry of feesClaimed){
+        for (let entry of feesClaimed) {
             user1ClaimedFees = user1ClaimedFees.add(entry.args.fees)
         }
         expect(user1ClaimedFees).to.equal(user1accAccruedFees1)
-        // const user1accAccruedFees1 = await user1Reward.accAccruedFees(user1.address)
-        // console.log(user1accAccruedFees1.toString())
-        // await user1Reward.unstake(user1Balance.div(BigNumber.from("2")))
-        // const user1accAccruedFees2 = await user1Reward.accAccruedFees(user1.address)
-        // console.log(user1accAccruedFees2.toString())
+            // const user1accAccruedFees1 = await user1Reward.accAccruedFees(user1.address)
+            // console.log(user1accAccruedFees1.toString())
+            // await user1Reward.unstake(user1Balance.div(BigNumber.from("2")))
+            // const user1accAccruedFees2 = await user1Reward.accAccruedFees(user1.address)
+            // console.log(user1accAccruedFees2.toString())
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
@@ -172,20 +175,20 @@ describe("Test unstake functionality", async function() {
 
         feesClaimed = await user1Reward.queryFilter("FeesClaimed")
         let totalFeesClaimed = BigNumber.from("0")
-        for(let entry of feesClaimed){
+        for (let entry of feesClaimed) {
             totalFeesClaimed = totalFeesClaimed.add(entry.args.fees)
         }
         const feesCollected = (await user1Reward.cycleAccruedFees(0))
-        .add(await user1Reward.cycleAccruedFees(2))
-        .add(await user1Reward.cycleAccruedFees(4))
+            .add(await user1Reward.cycleAccruedFees(2))
+            .add(await user1Reward.cycleAccruedFees(4))
 
         const remainder = await hre.ethers.provider.getBalance(user1Reward.address);
         expect(totalFeesClaimed.add(remainder)).to.equal(feesCollected)
     })
 
     it("Staking before reward cycle start and after should properly unlock in the next cycles", async() => {
-        await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        
+        await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
@@ -195,8 +198,8 @@ describe("Test unstake functionality", async function() {
         await dbxERC20.connect(user1).approve(deb0xContract.address, user1Balance)
         await user1Reward.stakeDBX(user1Balance.div(BigNumber.from("2")))
 
-        await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-    
+        await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
         await user1Reward.stakeDBX(user1Balance.div(BigNumber.from("2")))
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
@@ -204,7 +207,7 @@ describe("Test unstake functionality", async function() {
 
         await user1Reward.unstake(user1Balance.div(BigNumber.from("2")))
 
-        await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
@@ -214,20 +217,20 @@ describe("Test unstake functionality", async function() {
 
         feesClaimed = await user1Reward.queryFilter("FeesClaimed")
         let totalFeesClaimed = BigNumber.from("0")
-        for(let entry of feesClaimed){
+        for (let entry of feesClaimed) {
             totalFeesClaimed = totalFeesClaimed.add(entry.args.fees)
         }
         const feesCollected = (await user1Reward.cycleAccruedFees(0))
-        .add(await user1Reward.cycleAccruedFees(1))
-        .add(await user1Reward.cycleAccruedFees(2))
+            .add(await user1Reward.cycleAccruedFees(1))
+            .add(await user1Reward.cycleAccruedFees(2))
 
         const remainder = await hre.ethers.provider.getBalance(user1Reward.address);
         expect(totalFeesClaimed.add(remainder)).to.equal(feesCollected)
     })
 
     it("Staking before reward cycle start and after should properly unlock both stakes after two cycles", async() => {
-        await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        
+        await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
@@ -237,14 +240,14 @@ describe("Test unstake functionality", async function() {
         await dbxERC20.connect(user1).approve(deb0xContract.address, user1Balance)
         await user1Reward.stakeDBX(user1Balance.div(BigNumber.from("2")))
 
-        await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-    
+        await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
         await user1Reward.stakeDBX(user1Balance.div(BigNumber.from("2")))
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
@@ -254,12 +257,12 @@ describe("Test unstake functionality", async function() {
 
         feesClaimed = await user1Reward.queryFilter("FeesClaimed")
         let totalFeesClaimed = BigNumber.from("0")
-        for(let entry of feesClaimed){
+        for (let entry of feesClaimed) {
             totalFeesClaimed = totalFeesClaimed.add(entry.args.fees)
         }
         const feesCollected = (await user1Reward.cycleAccruedFees(0))
-        .add(await user1Reward.cycleAccruedFees(1))
-        .add(await user1Reward.cycleAccruedFees(2))
+            .add(await user1Reward.cycleAccruedFees(1))
+            .add(await user1Reward.cycleAccruedFees(2))
 
         const remainder = await hre.ethers.provider.getBalance(user1Reward.address);
         expect(totalFeesClaimed.add(remainder)).to.equal(feesCollected)

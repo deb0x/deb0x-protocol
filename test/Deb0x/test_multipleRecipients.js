@@ -4,6 +4,9 @@ const { ethers } = require("hardhat");
 const { ContractFunctionVisibility } = require("hardhat/internal/hardhat-network/stack-traces/model");
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
 const { NumUtils } = require("../utils/NumUtils.ts");
+const { Converter } = require("../utils/Converter.ts");
+let ipfsLink = "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En9";
+let payload = Converter.convertStringToBytes32(ipfsLink);
 
 describe("Test reward distribution for multiple recipients", async function() {
     let userReward, user1Reward, user2Reward, user3Reward, frontend, dbxERC20;
@@ -25,13 +28,13 @@ describe("Test reward distribution for multiple recipients", async function() {
     })
 
     it(`Test multiple recipients simple case`, async() => {
-        await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address, user2.address, user3.address], ["ipfs://", "ipfs://", "ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        
+        await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address, user2.address, user3.address], [payload, payload, payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
         user1GasUsed = await user1Reward.accCycleGasUsed(user1.address)
         user2GasUsed = await user1Reward.accCycleGasUsed(user2.address)
         cycleTotalGasUsed = await user1Reward.cycleTotalGasUsed(await user1Reward.currentCycle())
-        
+
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
@@ -47,13 +50,13 @@ describe("Test reward distribution for multiple recipients", async function() {
     });
 
     it(`Test multiple recipients, multiple cycles`, async() => {
-        await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address, user2.address], ["ipfs://", "ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        
+        await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address, user2.address], [payload, payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
         user1GasUsed = await user1Reward.accCycleGasUsed(user1.address)
         user2GasUsed = await user1Reward.accCycleGasUsed(user2.address)
         cycleTotalGasUsed = await user1Reward.cycleTotalGasUsed(await user1Reward.currentCycle())
-        
+
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
@@ -67,13 +70,13 @@ describe("Test reward distribution for multiple recipients", async function() {
         let balanceForUser2 = await dbxERC20.balanceOf(user2.address);
         expect(cycle1User2Reward).to.equal(balanceForUser2)
 
-        await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address, user2.address], ["ipfs://", "ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        
+        await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address, user2.address], [payload, payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
         user1GasUsed = await user1Reward.accCycleGasUsed(user1.address)
         user2GasUsed = await user1Reward.accCycleGasUsed(user2.address)
         cycleTotalGasUsed = await user1Reward.cycleTotalGasUsed(await user1Reward.currentCycle())
-        
+
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
@@ -89,13 +92,13 @@ describe("Test reward distribution for multiple recipients", async function() {
         expect(cycle2User2Reward
             .add(cycle1User2Reward)).to.equal(balanceForUser2Cycle2)
 
-        await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address, user2.address], ["ipfs://", "ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        
+        await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address, user2.address], [payload, payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
         user1GasUsed = await user1Reward.accCycleGasUsed(user1.address)
         user2GasUsed = await user1Reward.accCycleGasUsed(user2.address)
         cycleTotalGasUsed = await user1Reward.cycleTotalGasUsed(await user1Reward.currentCycle())
-        
+
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
@@ -111,15 +114,15 @@ describe("Test reward distribution for multiple recipients", async function() {
         expect(cycle3User2Reward
             .add(cycle2User2Reward).add(cycle1User2Reward)).to.equal(balanceForUser2Cycle3)
 
-        await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address, user2.address], ["ipfs://", "ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address, user1.address], ["ipfs://", "ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        
+        await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address, user2.address], [payload, payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address, user1.address], [payload, payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
         user1GasUsed = await user1Reward.accCycleGasUsed(user1.address)
         user2GasUsed = await user1Reward.accCycleGasUsed(user2.address)
         user3GasUsed = await user1Reward.accCycleGasUsed(user3.address)
         cycleTotalGasUsed = await user1Reward.cycleTotalGasUsed(await user1Reward.currentCycle())
-        
+
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
@@ -144,15 +147,15 @@ describe("Test reward distribution for multiple recipients", async function() {
         let balanceForUser3Cycle4 = await dbxERC20.balanceOf(user3.address);
         expect(cycle4User3Reward).to.equal(balanceForUser3Cycle4);
 
-        await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address, user2.address, user1.address], ["ipfs://", "ipfs://", "ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address, user1.address, user2.address], ["ipfs://", "ipfs://", "ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address, user1.address], ["ipfs://", "ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        
+        await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address, user2.address, user1.address], [payload, payload, payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address, user1.address, user2.address], [payload, payload, payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address, user1.address], [payload, payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
         user1GasUsed = await user1Reward.accCycleGasUsed(user1.address)
         user2GasUsed = await user1Reward.accCycleGasUsed(user2.address)
         user3GasUsed = await user1Reward.accCycleGasUsed(user3.address)
         cycleTotalGasUsed = await user1Reward.cycleTotalGasUsed(await user1Reward.currentCycle())
-        
+
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
@@ -180,13 +183,13 @@ describe("Test reward distribution for multiple recipients", async function() {
     });
 
     it(`Test multiple recipients simple case`, async() => {
-        await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address, user2.address, user3.address, user4.address, user5.address, user6.address, user7.address, user8.address, user9.address, user10.address], ["ipfs://", "ipfs://", "ipfs://", "ipfs://", "ipfs://", "ipfs://", "ipfs://", "ipfs://", "ipfs://", "ipfs"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        
+        await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address, user2.address, user3.address, user4.address, user5.address, user6.address, user7.address, user8.address, user9.address, user10.address], [payload, payload, payload, payload, payload, payload, payload, payload, payload, payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
         user1GasUsed = await user1Reward.accCycleGasUsed(user1.address)
         user2GasUsed = await user1Reward.accCycleGasUsed(user2.address)
         cycleTotalGasUsed = await user1Reward.cycleTotalGasUsed(await user1Reward.currentCycle())
-        
+
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 

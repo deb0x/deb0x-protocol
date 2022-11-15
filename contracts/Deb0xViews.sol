@@ -16,10 +16,6 @@ contract Deb0xViews {
         return address(deb0x).balance;
     }
 
-    function getKey(address account) external view returns (string memory) {
-        return deb0x.publicKeys(account);
-    }
-
     function getAccWithdrawableStake(address staker)
         external
         view

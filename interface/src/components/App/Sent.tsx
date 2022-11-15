@@ -18,7 +18,7 @@ import cloud2 from '../../photos/icons/clouds/cloud-2.svg';
 import cloud3 from '../../photos/icons/clouds/cloud-3.svg';
 import {fetchSentMessages,getKey} from '../../ethereum/EventLogs.js';;
 const axios = require('axios')
-const deb0xAddress = "0xdF7E7f4C0B8AfaF67F706d4b80cfFC4532f46Fa4";
+const deb0xAddress = "0xe37426141A752E65D35806f3E374c5D84e550645";
 
 export function Sent(props: any): any {
     const { account, library } = useWeb3React()
