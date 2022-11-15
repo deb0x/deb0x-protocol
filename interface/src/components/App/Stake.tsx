@@ -400,7 +400,7 @@ export function Stake(props: any): any {
 
         async function setStakedAmount() {
 
-            const deb0xViewsContract = await Deb0xViews(library, deb0xAddress)
+            const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress)
 
             const balance = await deb0xViewsContract.getAccWithdrawableStake(account)
 
