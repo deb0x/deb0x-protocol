@@ -251,7 +251,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     {
         require(msgFee < 10001, "Deb0x: reward fees exceed 10000 bps");
 
-        
         uint256 _sentId = _send(to, crefs);
         calculateCycle();
         updateCycleFeesPerStakeSummed();
