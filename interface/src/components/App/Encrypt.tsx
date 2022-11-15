@@ -133,7 +133,6 @@ export function Encrypt(replyAddress: any): any {
 
     async function isInitialized(address: any) {
         const deb0xViewsContract = deb0xViews(library, deb0xViewsAddress);
-        console.log(await getKey(address))
         return await getKey(address);
     }
 
@@ -223,7 +222,6 @@ export function Encrypt(replyAddress: any): any {
                     })
                 })
             } catch (error: any) {
-                console.log(error)
                 setNotificationState({
                     message: "You rejected the transaction. Message was not sent.",
                     open: true,
