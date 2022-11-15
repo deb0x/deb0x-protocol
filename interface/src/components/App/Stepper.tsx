@@ -13,7 +13,7 @@ import SnackbarNotification from './Snackbar';
 import '../../componentsStyling/stepper.scss';
 import { whitelist } from '../../constants.json'
 import { ConstructionOutlined } from '@mui/icons-material';
-const deb0xAddress = "0xe37426141A752E65D35806f3E374c5D84e550645";
+const deb0xAddress = "0x3a473a59820929D42c47aAf1Ea9878a2dDa93E18";
 const steps = ['Provide public encryption key', 'Initialize Deb0x'];
 const ethers = require('ethers')
 const utils = ethers.utils
