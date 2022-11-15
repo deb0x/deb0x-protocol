@@ -42,7 +42,7 @@ describe("Test send event with bytes32[] parameter", async function() {
             await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([address], [cref],
                 feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("1") })
         } catch (error) {
-            expect(error.message).to.include('Deb0x: crefs too long')
+            expect(error.message).to.include('Deb0x: cref too long')
         }
     });
 
