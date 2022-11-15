@@ -3,7 +3,7 @@ const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
 
-describe("Test contract functionalities while having cycles with no messages sent", async function() {
+describe("Test setKey event with bytes32 parameter", async function() {
     let rewardedAlice, rewardedBob, rewardedCarol, frontend, dbxERC20;
     let alice, bob;
     beforeEach("Set enviroment", async() => {
@@ -21,7 +21,7 @@ describe("Test contract functionalities while having cycles with no messages sen
         frontend = rewardedAlice.connect(feeReceiver)
     });
 
-    it("Should test set from contract", async() => {
+    it("Only for check", async() => {
         let publicKey = "R2d/rObocjapTQdbm33pbqAeOhQ8VGD5E6jaBoLaGgE=";
         await rewardedBob.setKey(Array.from(ethers.utils.base64.decode(publicKey)));
         let val = await rewardedBob.publicKeys(bob.address);

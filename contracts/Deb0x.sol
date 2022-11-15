@@ -658,10 +658,10 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         internal
         returns (uint256)
     {
-        require(recipients.length == crefs.length, "Deb0x: Arrays must have same length");
-        require(recipients.length > 0, "Deb0x: Length of arrays must be greater than 0");
+        require(recipients.length == crefs.length, "Deb0x: crefs and recipients lengths not equal");
+        require(recipients.length > 0, "Deb0x: recipients array empty");
         for (uint256 idx = 0; idx < recipients.length - 1; idx++) {
-            require(crefs[recipients.length - 1].length <= 8 , "Deb0x: crefs too long");
+            require(crefs[recipients.length - 1].length <= 8 , "Deb0x: one of crefs is too long");
         }
 
         for (uint256 idx = 0; idx < recipients.length - 1; idx++) {
@@ -680,7 +680,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         bytes32 selfBodyHash = keccak256(
             abi.encodePacked(crefs[recipients.length - 1])
         );
-        require(crefs[recipients.length - 1].length <= 8 , "Deb0x: crefs too long");
+        require(crefs[recipients.length - 1].length <= 8 , "Deb0x: cref too long");
 
         uint256 oldSentId = sentId;
         sentId++;
