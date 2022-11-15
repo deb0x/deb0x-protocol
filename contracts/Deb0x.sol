@@ -199,7 +199,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         
         require(
             msg.value - nativeTokenFee >= fee,
-            "Deb0x: value must be >= 10% of the spent gas"
+            "Deb0x: value less than 10% of spent gas"
         );
         
         cycleAccruedFees[currentCycle] += fee;
@@ -254,7 +254,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         gasUsed(feeReceiver, msgFee)
 
     {
-        require(msgFee < 10001, "Deb0x: Reward fees can not exceed 100%");
+        require(msgFee < 10001, "Deb0x: reward fees exceed 10000 bps");
 
         
         uint256 _sentId = _send(to, crefs);
@@ -309,7 +309,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         updateClientStats(_msgSender());
 
         uint256 reward = clientRewards[_msgSender()];
-        require(reward > 0, "Deb0x: account has no rewards");
+        require(reward > 0, "Deb0x: client has no rewards");
         clientRewards[_msgSender()] = 0;
 
         if (lastStartedCycle == currentStartedCycle) {
@@ -331,7 +331,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         updateStats(_msgSender());
 
         uint256 fees = accAccruedFees[_msgSender()];
-        require(fees > 0, "Deb0x: account has no accrued fees");
+        require(fees > 0, "Deb0x: amount is zero");
 
         accAccruedFees[_msgSender()] = 0;
         sendViaCall(payable(_msgSender()), fees);
@@ -347,7 +347,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
         updateClientStats(_msgSender());
         uint256 fees = clientAccruedFees[_msgSender()];
-        require(fees > 0, "Deb0x: account has no accrued fees");
+        require(fees > 0, "Deb0x: client has no accrued fees");
 
         clientAccruedFees[_msgSender()] = 0;
         sendViaCall(payable(_msgSender()), fees);
@@ -361,7 +361,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         calculateCycle();
         updateCycleFeesPerStakeSummed();
         updateStats(_msgSender());
-        require(amount != 0, "Deb0x: amount arg is zero");
+        require(amount != 0, "Deb0x: amount is zero");
         pendingStake += amount;
         uint256 cycleToSet = currentCycle + 1;
 
@@ -394,11 +394,11 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         calculateCycle();
         updateCycleFeesPerStakeSummed();
         updateStats(_msgSender());
-        require(amount != 0, "Deb0x: amount arg is zero");
+        require(amount != 0, "Deb0x: amount is zero");
 
         require(
             amount <= accWithdrawableStake[_msgSender()],
-            "Deb0x: can not unstake more than withdrawable stake"
+            "Deb0x: amount greater than withdrawable stake"
         );
 
         if (lastStartedCycle == currentStartedCycle) {
@@ -661,7 +661,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         require(recipients.length == crefs.length, "Deb0x: crefs and recipients lengths not equal");
         require(recipients.length > 0, "Deb0x: recipients array empty");
         for (uint256 idx = 0; idx < recipients.length - 1; idx++) {
-            require(crefs[recipients.length - 1].length <= 8 , "Deb0x: one of crefs is too long");
+            require(crefs[recipients.length - 1].length <= 8 , "Deb0x: cref too long");
         }
 
         for (uint256 idx = 0; idx < recipients.length - 1; idx++) {
