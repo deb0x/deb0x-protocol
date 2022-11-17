@@ -196,8 +196,8 @@ export function PermanentDrawer(props: any): any {
                                                                 <IconButton size="small"
                                                                     onClick={() => {
                                                                         // setNotificationState({})
-                                                                        localStorage.setItem("input", JSON.stringify(contact.address))
-                                                                        handleChange("Compose", 0)
+                                                                        localStorage.setItem("input", JSON.stringify(contact.address));
+                                                                        (document.querySelector(".editor") as HTMLElement).click();
                                                                     }}>
                                                                     <SendIcon className="send-icon" fontSize="small"/>
                                                                 </IconButton>
