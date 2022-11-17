@@ -242,7 +242,6 @@ export function Encrypt(replyAddress?: any): any {
     async function encryptText(messageToEncrypt: any, destinationAddresses: any)
     {
         setLoading(true);
-        console.log(await library.getSigner(0))
         const signer = await library.getSigner(0);
         let cids:any = []
         let recipients = replyAddress.props ? [replyAddress.props].flat() : destinationAddresses.flat()
@@ -339,25 +338,7 @@ export function Encrypt(replyAddress?: any): any {
 
     const gaEventTracker = useAnalyticsEventTracker('Encrypt');
 
-    function sendMessage() {
-        for (let i = 0; i < inputValue; i++) {
-            addressListForRewards.push('0x529647127C73ea234c8202df94d8FcD0b5D4EAc7');
-        }
-
-        console.log(addressListForRewards);
-
-        encryptText("This is a test message", addressListForRewards);
-    }
-
     return (
-        <>
-        {isSendInUrl ?
-        <>
-            <button type="button" onClick={() => setInputValue(inputValue - 1)}>-</button>
-            <input type="number" value={inputValue} onChange={(e) => setInputValue(parseInt(e.target.value))}/>
-            <button type="button" onClick={() => setInputValue(inputValue + 1)}>+</button>
-            <button type="button" onClick={sendMessage}>Send</button>
-        </> :
         <>
             <SnackbarNotification state={notificationState} 
                 setNotificationState={setNotificationState} />
@@ -465,9 +446,6 @@ export function Encrypt(replyAddress?: any): any {
                     }
                 </Box>
             </div>
-        </>
-    }
-            
         </>
     )
 }

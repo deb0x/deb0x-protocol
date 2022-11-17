@@ -162,7 +162,7 @@ function App() {
                     {
                         chainId: '0x89', 
                         chainName:'Polygon Network',
-                        rpcUrls:['https://rpc-mainnet.maticvigil.com'],                   
+                        rpcUrls:['https://polygon-rpc.com/'],                   
                         blockExplorerUrls:['https://polygonscan.com/'],  
                         nativeCurrency: { 
                         symbol:'Matic',   
