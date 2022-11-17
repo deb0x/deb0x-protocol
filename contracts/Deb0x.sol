@@ -4,6 +4,7 @@ pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./Deb0xERC20.sol";
+import "hardhat/console.sol";
 
 contract Deb0x is ERC2771Context, ReentrancyGuard {
 
@@ -281,7 +282,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         require(reward > 0, "Deb0x: account has no rewards");
 
         accRewards[_msgSender()] -= reward;
-        
         if (lastStartedCycle == currentStartedCycle) {
             pendingStakeWithdrawal += reward;
         } else {
@@ -621,7 +621,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
                         accAccruedFees[account] = accAccruedFees[account] + 
                         (
                             (accStakeCycle[account][accSecondStake[account]] * 
-                                (cycleFeesPerStakeSummed[lastStartedCycle + 1] - 
+                                 (cycleFeesPerStakeSummed[lastStartedCycle + 1] - 
                                     cycleFeesPerStakeSummed[accSecondStake[account]]
                                 )
                             )

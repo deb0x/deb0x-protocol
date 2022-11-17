@@ -162,13 +162,6 @@ contract Deb0xViews {
                 deb0x.cycleTotalGasUsed(deb0x.lastActiveCycle(account));
 
             currentRewards += lastCycleAccReward;
-
-            if (deb0x.accCycleGasOwed(account) != 0) {
-                uint256 accLastActiveCycle = deb0x.lastActiveCycle(account);
-                uint256 accRewardsOwed = (deb0x.accCycleGasOwed(account) * deb0x.rewardPerCycle(accLastActiveCycle)) / 
-                    deb0x.cycleTotalGasUsed(accLastActiveCycle);
-                currentRewards -= accRewardsOwed;
-            }
         }
 
         return currentRewards;
