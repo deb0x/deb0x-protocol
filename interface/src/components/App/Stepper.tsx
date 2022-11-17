@@ -12,8 +12,13 @@ import Deb0x from "../../ethereum/deb0x"
 import SnackbarNotification from './Snackbar';
 import '../../componentsStyling/stepper.scss';
 import dataFromWhitelist from '../../constants.json';
-const deb0xAddress = "0xdF7E7f4C0B8AfaF67F706d4b80cfFC4532f46Fa4";
+import { ConstructionOutlined } from '@mui/icons-material';
+
 const steps = ['Start your deb0x account.', 'Get validated as deb0x user on blockchain.'];
+const deb0xAddress = "0x3a473a59820929D42c47aAf1Ea9878a2dDa93E18";
+const steps = ['Provide public encryption key', 'Initialize Deb0x'];
+const ethers = require('ethers')
+const utils = ethers.utils
 
 export default function HorizontalLinearStepper(props: any) {
     const { account, library } = useWeb3React()
@@ -42,7 +47,6 @@ export default function HorizontalLinearStepper(props: any) {
 
     async function getEncryptionKey() {
         setLoading(true)
-
         library.provider.request({
             method: 'eth_getEncryptionPublicKey',
             params: [account],
@@ -104,7 +108,7 @@ export default function HorizontalLinearStepper(props: any) {
 
     async function sendInitializeTx(deb0xContract: any) {
         try {
-            const tx = await deb0xContract.setKey(encryptionKey)
+            const tx = await deb0xContract.setKey(Array.from(ethers.utils.base64.decode(encryptionKey)))
 
             tx.wait()
             .then((result: any) => {

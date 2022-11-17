@@ -25,10 +25,10 @@ import { createInstance } from '../../ethereum/forwarder'
 import dataFromWhitelist from '../../constants.json';
 import useAnalyticsEventTracker from '../Common/GaEventTracker';
 
-const deb0xAddress = "0xdF7E7f4C0B8AfaF67F706d4b80cfFC4532f46Fa4";
-const deb0xViewsAddress = "0xf032f7FB8258728A1938473B2115BB163d5Da593";
-const deb0xERC20Address = "0x8345742746c41BC9C004aD7BEE0b65E92F227347";
 const { whitelist } = dataFromWhitelist;
+const deb0xAddress = "0x3a473a59820929D42c47aAf1Ea9878a2dDa93E18";
+const deb0xViewsAddress = "0x9FBbD4cAcf0f23c2015759522B298fFE888Cf005";
+const deb0xERC20Address = "0x855201bA0e531DfdD84B41e34257165D745eE97F";
 
 export function Stake(props: any): any {
 

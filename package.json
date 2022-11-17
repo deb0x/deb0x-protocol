@@ -29,6 +29,7 @@
         "builtin-modules": "^3.2.0",
         "chai": "^4.3.4",
         "defender-autotask-client": "^1.31.1",
+        "eth-sig-util": "^3.0.0",
         "ethereum-waffle": "^3.4.0",
         "ethereumjs-util": "^7.1.5",
         "ethers": "^5.7.0",
@@ -39,7 +40,7 @@
         "solidity-coverage": "^0.8.2"
     },
     "dependencies": {
-        "@openzeppelin/contracts": "^4.5.0",
+        "@openzeppelin/contracts": "^4.7.3",
         "defender-relay-client": "^1.31.1",
         "dotenv": "^10.0.0",
         "draftjs-to-html": "^0.9.1",

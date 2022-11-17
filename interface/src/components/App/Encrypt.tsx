@@ -25,10 +25,11 @@ import { createInstance } from '../../ethereum/forwarder'
 import dataFromWhitelist from '../../constants.json';
 import deb0xViews from '../../ethereum/deb0xViews';
 import useAnalyticsEventTracker from '../Common/GaEventTracker';
+import { convertStringToBytes32} from '../../../src/ethereum/Converter.js';
 
 const { BigNumber } = require("ethers");
-const deb0xAddress = "0xdF7E7f4C0B8AfaF67F706d4b80cfFC4532f46Fa4";
-const deb0xViewsAddress = "0xf032f7FB8258728A1938473B2115BB163d5Da593";
+const deb0xAddress = "0x3a473a59820929D42c47aAf1Ea9878a2dDa93E18";
+const deb0xViewsAddress = "0x9FBbD4cAcf0f23c2015759522B298fFE888Cf005";
 const ethUtil = require('ethereumjs-util')
 const { whitelist } = dataFromWhitelist;
 
@@ -204,7 +205,7 @@ export function Encrypt(replyAddress?: any): any {
             const overrides = 
                 { value: ethers.utils.parseUnits("0.01", "ether"),
                     gasLimit:BigNumber.from("1000000") }
-            const tx = await deb0xContract["send(address[],string[],address,uint256,uint256)"](recipients,
+            const tx = await deb0xContract["send(address[],bytes32[][],address,uint256,uint256)"](recipients,
                 cids,
                 ethers.constants.AddressZero,
                 0,
@@ -247,13 +248,14 @@ export function Encrypt(replyAddress?: any): any {
         let recipients = replyAddress.props ? [replyAddress.props].flat() : destinationAddresses.flat()
         recipients.push(await signer.getAddress())
         const deb0xContract = Deb0x(signer, deb0xAddress);
+
         for (let address of recipients) {
             const destinationAddressEncryptionKey = await getKey(address);
             const encryptedMessage = ethUtil.bufferToHex(
                 Buffer.from(
                     JSON.stringify(
                         encrypt({
-                            publicKey: destinationAddressEncryptionKey,
+                            publicKey: destinationAddressEncryptionKey || '',
                             data: messageToEncrypt,
                             version: 'x25519-xsalsa20-poly1305'
                         }
@@ -262,15 +264,14 @@ export function Encrypt(replyAddress?: any): any {
                     'utf8'
                 )
             )
-            const message = await client.add(encryptedMessage)
-            cids.push(message.path)
+            const message = await client.add(encryptedMessage);
+            cids.push(convertStringToBytes32(message.path))
         }
         const from = await signer.getAddress();
-
         if(whitelist.includes(from)) {
             const url = "https://api.defender.openzeppelin.com/autotasks/b939da27-4a61-4464-8d7e-4b0c5dceb270/runs/webhook/f662ac31-8f56-4b4c-9526-35aea314af63/SPs6smVfv41kLtz4zivxr8";
             const forwarder = createInstance(library)
-            const data = deb0xContract.interface.encodeFunctionData("send(address[],string[],address,uint256,uint256)",
+            const data = deb0xContract.interface.encodeFunctionData("send(address[],bytes32[][],address,uint256,uint256)",
             [recipients, cids, ethers.constants.AddressZero, 0, 0])
             const to = deb0xContract.address
 
@@ -321,7 +322,7 @@ export function Encrypt(replyAddress?: any): any {
     const getPublicEncryptionKey = async () => {
         const deb0xContract = Deb0x(library, deb0xAddress)
         const key = await getKey(account)
-        setEncryptionKeyInitialized(key)
+        setEncryptionKeyInitialized(key || '')
     }
     const [editorState, setEditorState] = useState(() =>
         EditorState.createEmpty()

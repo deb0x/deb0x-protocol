@@ -45,7 +45,7 @@ const client = create({
 })
 
 const ethUtil = require('ethereumjs-util');
-const deb0xAddress = "0xdF7E7f4C0B8AfaF67F706d4b80cfFC4532f46Fa4";
+const deb0xAddress = "0x3a473a59820929D42c47aAf1Ea9878a2dDa93E18";
 
 
 enum ConnectorNames { Injected = 'Injected', Network = 'Network' };
@@ -138,7 +138,7 @@ function App() {
         gaEventTracker("Connect Wallet");
     };
 
-    useEffect(() => {    
+    useEffect(() => {   
         window.ethereum ?
             window.ethereum.request({method: "eth_requestAccounts"}).then(() => {
                 switchNetwork();               

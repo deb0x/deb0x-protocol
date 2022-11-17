@@ -10,9 +10,10 @@ Decentralized Private Mail App and Protocol
 ### Steps to run the frontend
 
 1. `npm install` in root dir
-2. `cd interface` and then `npm install`
-3. `npm start`
-4. open http://localhost:3000/
+2. `npx hardhat compile` in root dir
+3. `cd interface` and then `npm install`
+4. `npm start`
+5. open http://localhost:3000
 
 For a quick overview and explanations, see the demo video: https://youtu.be/8coLe-z6jHg 
 
@@ -40,9 +41,9 @@ npx hardhat run --network goerli scritps/deploy.js
 
 # Deb0x Contract Addresses 
 
-| Contract name            | Commit hash | Goerli Testnet                               | Mainnet                                    |
+| Contract name            | Commit hash | Staging                               | Mainnet                                    |
 | ------------------------ | ----------- | -------------------------------------------  | ------------------------------------------ | 
-| Forwarder                |  -          |                                              |                                            |
-| Deb0x                    |  1d9e1ac          | 0xdF7E7f4C0B8AfaF67F706d4b80cfFC4532f46Fa4   |                                        |
-| Deb0xERC20               |  1d9e1ac          | 0x2f4238727fBC7d205f5C6504dA9bc623A55fE0C5   |                                        |
-| Deb0xView                |  1d9e1ac          | 0xf032f7FB8258728A1938473B2115BB163d5Da593   |                                        |                                            
+| Forwarder                |  006a9ec    |0x30782c020FE90614f08a863B41CbB07A2D2D94fF                                            |                                            |
+| Deb0x                    |  29d18d6    | 0x3a473a59820929D42c47aAf1Ea9878a2dDa93E18   |                                        |
+| Deb0xERC20               |  ab8d403    | 0x855201bA0e531DfdD84B41e34257165D745eE97F   |                                        |
+| Deb0xView                |  437f608    | 0x9FBbD4cAcf0f23c2015759522B298fFE888Cf005   |                                        |                                            
