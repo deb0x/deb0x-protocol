@@ -2,7 +2,10 @@ const { expect, assert } = require("chai");
 const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
-const { abiDBXCore } = require("../../artifacts/contracts/Deb0xCore.sol/Deb0xCore.json")
+    // const { abiDBXCore } = require("../../artifacts/contracts/Deb0xCore.sol/Deb0xCore.json")
+const { Converter } = require("../utils/Converter.ts");
+let ipfsLink = "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En9";
+let payload = Converter.convertStringToBytes32(ipfsLink);
 
 describe("Test send messages and fetch functions", async function() {
     let rewardedAlice, rewardedBob, rewardedCarol, frontend, dbxERC20;
@@ -27,15 +30,15 @@ describe("Test send messages and fetch functions", async function() {
         aliceBalance = await hre.ethers.provider.getBalance(alice.address)
         let curCycle = parseInt((await rewardedAlice.getCurrentCycle()).toString())
 
-        let sendFirstMessage = await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+        let sendFirstMessage = await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
             feeReceiver.address, 200, 0, { value: ethers.utils.parseEther("2") })
         let receiptFirstMessage = await sendFirstMessage.wait();
 
-        let sendSecondMessage = await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+        let sendSecondMessage = await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
             feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("2") })
         let receiptSecondMessage = await sendSecondMessage.wait();
 
-        let sendThirdMessage = await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+        let sendThirdMessage = await rewardedBob["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
             feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("2") })
         let receiptThirdMessage = await sendThirdMessage.wait();
 
@@ -67,26 +70,26 @@ describe("Test send messages and fetch functions", async function() {
         aliceBalance = await hre.ethers.provider.getBalance(alice.address)
         let curCycle = parseInt((await rewardedAlice.getCurrentCycle()).toString())
 
-        let sendFirstMessage = await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+        let sendFirstMessage = await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
             feeReceiver.address, 200, 0, { value: ethers.utils.parseEther("2") })
         let receiptFirstMessage = await sendFirstMessage.wait();
 
-        let sendSecondMessage = await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+        let sendSecondMessage = await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
             feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("2") })
         let receiptSecondMessage = await sendSecondMessage.wait();
 
-        let sendThirdMessage = await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+        let sendThirdMessage = await rewardedBob["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
             feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("2") })
         let receiptThirdMessage = await sendThirdMessage.wait();
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        let sendFourthMessage = await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+        let sendFourthMessage = await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
             feeReceiver.address, 200, 0, { value: ethers.utils.parseEther("2") })
         let receiptForthMessage = await sendFourthMessage.wait();
 
-        let sendFifthMessage = await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+        let sendFifthMessage = await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
             feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("2") })
         let receiptFifthMessage = await sendFifthMessage.wait();
 
@@ -95,7 +98,7 @@ describe("Test send messages and fetch functions", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        let sendSixthMessage = await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+        let sendSixthMessage = await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
             feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("2") })
         let receiptSixthMessage = await sendSixthMessage.wait();
 
@@ -139,11 +142,11 @@ describe("Test send messages and fetch functions", async function() {
         aliceBalance = await hre.ethers.provider.getBalance(alice.address)
         let curCycle = parseInt((await rewardedAlice.getCurrentCycle()).toString())
 
-        let sendFirstMessage = await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+        let sendFirstMessage = await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
             "0x0000000000000000000000000000000000000000", 200, 0, { value: ethers.utils.parseEther("2") })
         let receiptFirstMessage = await sendFirstMessage.wait();
 
-        let sendSecondMessage = await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+        let sendSecondMessage = await rewardedBob["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
             feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("2") })
         let receiptSecondMessage = await sendSecondMessage.wait();
 
@@ -170,15 +173,15 @@ describe("Test send messages and fetch functions", async function() {
         aliceBalance = await hre.ethers.provider.getBalance(alice.address)
         let curCycle = parseInt((await rewardedAlice.getCurrentCycle()).toString())
 
-        let sendFirstMessage = await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+        let sendFirstMessage = await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
             feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("2") })
         let receiptFirstMessage = await sendFirstMessage.wait();
 
-        let sendSecondMessage = await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+        let sendSecondMessage = await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
             feeReceiver.address, 100, 110, { value: ethers.utils.parseEther("2") })
         let receiptSecondMessage = await sendSecondMessage.wait();
 
-        let sendThirdMessage = await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+        let sendThirdMessage = await rewardedBob["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
             feeReceiver.address, 0, 100, { value: ethers.utils.parseEther("2") })
         let receiptThirdMessage = await sendThirdMessage.wait();
 
@@ -209,11 +212,11 @@ describe("Test send messages and fetch functions", async function() {
         aliceBalance = await hre.ethers.provider.getBalance(alice.address)
         let curCycle = parseInt((await rewardedAlice.getCurrentCycle()).toString())
 
-        let sendMessage = await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+        let sendMessage = await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
             feeReceiver.address, 200, 0, ).then(res => {
             assert.fail("must throw err");
         }).catch(err => {
-            expect(err.message).to.contain("Deb0x: must pay 10% of transaction cost")
+            expect(err.message).to.contain("Deb0x: value less than 10% of spent gas")
         })
         let totalNumberOfMessagesSentByAlice = 0;
         if (sendMessage != undefined) {
@@ -232,11 +235,11 @@ describe("Test send messages and fetch functions", async function() {
         aliceBalance = await hre.ethers.provider.getBalance(alice.address)
         let curCycle = parseInt((await rewardedAlice.getCurrentCycle()).toString())
 
-        let sendMessage = await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+        let sendMessage = await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
             feeReceiver.address, 200, 0, { value: 20 }).then(res => {
             assert.fail("must throw err");
         }).catch(err => {
-            expect(err.message).to.contain("Deb0x: must pay 10% of transaction cost")
+            expect(err.message).to.contain("Deb0x: value less than 10% of spent gas")
         })
         let totalNumberOfMessagesSentByAlice = 0;
         if (sendMessage != undefined) {

@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Deb0x from "../../ethereum/deb0x"
-import {fetchMessages,fetchMessageSenders} from '../Common/EventLogs.mjs';
+import {fetchMessages,fetchMessageSenders} from '../../ethereum/EventLogs.js';
 import {
     List, Card, CardActions, CardContent, Button, Grid, Box,
     Typography, TextField, CircularProgress, Divider
 } from '@mui/material';
 
 const axios = require('axios')
-const deb0xAddress = "0x03B4a733d4083Eb92972740372Eb05664c937136"
+const deb0xAddress = "0x3a473a59820929D42c47aAf1Ea9878a2dDa93E18";
 
 
 export function Governance(props: any): any {

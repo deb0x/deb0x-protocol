@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import './App.css';
 import { 
     Web3ReactProvider,
@@ -15,7 +16,7 @@ import { PermanentDrawer } from './components/App/PermanentDrawer'
 import { create } from 'ipfs-http-client'
 import { Encrypt } from './components/App/Encrypt';
 import { Decrypt } from './components/App/Decrypt';
-import {Stake} from './components/App/Stake';
+import { Stake } from './components/App/Stake';
 import { Sent } from './components/App/Sent';
 import { Box,Typography, Fab, Button} from '@mui/material';
 import ThemeProvider from './components/Contexts/ThemeProvider';
@@ -29,7 +30,13 @@ import { Spinner } from './components/App/Spinner';
 import { AppBarComponent } from './components/App/AppBar';
 import IconButton from "@mui/material/IconButton";
 import { Add } from '@mui/icons-material';
-import HowTo from './components/HowTo'
+import HowTo from './components/HowTo';
+import ReactGA from 'react-ga';
+import { Home } from './components/App/Home';
+import { SendMessages } from './components/App/SendMessages';
+import useAnalyticsEventTracker from './components/Common/GaEventTracker';
+
+ReactGA.initialize("UA-151967719-3");
 
 const client = create({
   host: 'ipfs.infura.io',
@@ -37,10 +44,8 @@ const client = create({
   protocol: 'http'
 })
 
-const ethUtil = require('ethereumjs-util')
-//old address: 0x218c10BAb451BE6A897db102b2f608bC7D3441a0
-// 0x03B4a733d4083Eb92972740372Eb05664c937136
-const deb0xAddress = "0x03B4a733d4083Eb92972740372Eb05664c937136";
+const ethUtil = require('ethereumjs-util');
+const deb0xAddress = "0x3a473a59820929D42c47aAf1Ea9878a2dDa93E18";
 
 
 enum ConnectorNames { Injected = 'Injected', Network = 'Network' };
@@ -95,6 +100,9 @@ function App() {
     let errorMsg;
     const [isVisible, setIsVisible] = useState(false);
     let [show, setShow] = useState(false);
+    const [isOptionSelected, setIsOptionSelected] = useState(true);
+    const gaEventTracker = useAnalyticsEventTracker('Login');
+    const gaEventMenuTracker = useAnalyticsEventTracker('Menu');
 
     useEffect(() => {
         injected.supportedChainIds?.forEach(chainId => 
@@ -112,19 +120,25 @@ function App() {
     useInactiveListener(!triedEager || !!activatingConnector)
 
     function handleChange(newValue: any) {
-        setSelectedOption(newValue)
+        setSelectedOption(newValue);
+        setIsOptionSelected(true);
+        gaEventMenuTracker(newValue);
     }
 
     useEffect(() => {
+        window.location.pathname == "/send" ?
+            setIsOptionSelected(false) :
+            setIsOptionSelected(true);
         localStorage.removeItem('input');
         setIsVisible(false);
     }, [])
 
     function handleClick (event: React.MouseEvent<HTMLElement>) {
         setAnchorEl(anchorEl ? null : event.currentTarget);
+        gaEventTracker("Connect Wallet");
     };
 
-    useEffect(() => {    
+    useEffect(() => {   
         window.ethereum ?
             window.ethereum.request({method: "eth_requestAccounts"}).then(() => {
                 switchNetwork();               
@@ -136,7 +150,7 @@ function App() {
         try {
             await window.ethereum.request({
             method: 'wallet_switchEthereumChain',
-            params: [{ chainId: "0x5"}],
+            params: [{ chainId: "0x89"}],
             }).then(
                 displayErrorMsg("You have switched to the right network")
             );            
@@ -146,12 +160,12 @@ function App() {
                 method: 'wallet_addEthereumChain',
                 params: [
                     {
-                        chainId: '0x5', 
-                        chainName:'Goerli Test Network',
-                        rpcUrls:['https://goerli.infura.io/v3/'],                   
-                        blockExplorerUrls:['https://goerli.etherscan.io'],  
+                        chainId: '0x89', 
+                        chainName:'Polygon Network',
+                        rpcUrls:['https://polygon-rpc.com/'],                   
+                        blockExplorerUrls:['https://polygonscan.com/'],  
                         nativeCurrency: { 
-                        symbol:'GoerliETH',   
+                        symbol:'Matic',   
                         decimals: 18
                         }       
                     }
@@ -182,7 +196,8 @@ function App() {
             </p>
         }
     </div>
-    <ThemeProvider>
+    {isOptionSelected ? 
+        <ThemeProvider>
         {
             account ? 
             <ContactsProvider>
@@ -200,6 +215,7 @@ function App() {
                                     {selectedOption === "Deb0x" && <Decrypt account={account}/>}
                                     {selectedOption === "Stake" && <Stake />}
                                     {selectedOption === "Sent" && <Sent />}
+                                    {selectedOption === "Home" && <Home onChange={handleChange} />}
                                 </Box>
                             ):
                                 <Box className="home-page-box">
@@ -248,6 +264,7 @@ function App() {
                                                 () => {
                                                     setActivatingConnector(currentConnector)
                                                     activate(currentConnector)
+                                                    gaEventTracker("Connect Wallet");
                                                 } : 
                                                 handleClick}
                                                 className="connect-button">
@@ -290,6 +307,15 @@ function App() {
             </div>
         }
     </ThemeProvider>
+    :
+    <Router>
+        <Routes>
+            <Route path={ "/send" } element={ <SendMessages /> } />
+        </Routes>
+    </Router>
+
+    }
+    
     </>
   )
 }

@@ -16,10 +16,9 @@ import formatAccountName from '../Common/AccountName';
 import cloud1 from '../../photos/icons/clouds/cloud-1.svg';
 import cloud2 from '../../photos/icons/clouds/cloud-2.svg';
 import cloud3 from '../../photos/icons/clouds/cloud-3.svg';
-import {fetchSentMessages, getKey } from '../Common/EventLogs.mjs';
-
+import {fetchSentMessages,getKey} from '../../ethereum/EventLogs.js';;
 const axios = require('axios')
-const deb0xAddress = "0x03B4a733d4083Eb92972740372Eb05664c937136"
+const deb0xAddress = "0x3a473a59820929D42c47aAf1Ea9878a2dDa93E18";
 
 export function Sent(props: any): any {
     const { account, library } = useWeb3React()
@@ -56,6 +55,7 @@ export function Sent(props: any): any {
     }
 
     function Message(props: any) {
+        const { chainId} = useWeb3React()
         const encryptMessage = props.message.fetchedMessage.data
         const [message, setMessage] = useState(props.message.fetchedMessage.data)
         const [recipients, setRecipients] = useState<string[]>([]);
@@ -89,13 +89,17 @@ export function Sent(props: any): any {
             var recipientsFiltered = recipients.filter(onlyUnique);
 
             for(let recipient of recipientsFiltered) {
-                let name = await library.lookupAddress(recipient);
-                if(name !== null)
-                {   
-                    recipientsTemp = [...recipientsTemp, name];
-                } else {
-                    recipientsTemp = [...recipientsTemp, recipient];
-                }
+
+                // not suported for Polygon
+                // let name = await library.lookupAddress(recipient);
+                // if(name !== null)
+                // {   
+                //     recipientsTemp = [...recipientsTemp, name];
+                // } else {
+                //     recipientsTemp = [...recipientsTemp, recipient];
+                // }
+                recipientsTemp = [...recipientsTemp, recipient];
+
             }
 
             setRecipients(recipientsTemp)
@@ -261,6 +265,7 @@ export function Sent(props: any): any {
 
         async function processMessages() {
             const deb0xContract = Deb0x(library, deb0xAddress)
+            await fetchSentMessages(account);
             const sentMessages = await fetchSentMessages(account)
             const sentMessagesRetrieved = sentMessages.map(async function (item: any) {
                 let intermediateValueForContentData = item[1];
