@@ -29,6 +29,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import SnackbarNotification from './Snackbar';
 import { Add } from '@mui/icons-material';
 import ContactsSetter from '../ContactsSetter';
+import useAnalyticsEventTracker from '../Common/GaEventTracker';
 
 const deb0xERC20Address = "0x855201bA0e531DfdD84B41e34257165D745eE97F";
 
@@ -49,7 +50,7 @@ export function PermanentDrawer(props: any): any {
     const { connector, library, chainId, account, activate, deactivate, active, error } = context
     const [activatingConnector, setActivatingConnector] = useState<any>()
     const triedEager = useEagerConnect()
-    const [selectedIndex, setSelectedIndex] = useState<any>(1);
+    const [selectedIndex, setSelectedIndex] = useState<any>(4);
     const [searchBarValue, setSearchBarValue] = useState<any>("search");
     const [ensName, setEnsName] = useState<any>("");
     // const [balance, setBalance] = useState<any>("8.13");
@@ -65,6 +66,7 @@ export function PermanentDrawer(props: any): any {
     const [networkName, setNetworkName] = useState<any>();
     let errorMessage;
     let [show, setShow] = useState(false);
+    const gaEventTracker = useAnalyticsEventTracker('Add Contact');
 
     if(library){
         // checkENS();
@@ -143,7 +145,8 @@ export function PermanentDrawer(props: any): any {
                 <Drawer variant="permanent"
                     anchor={dimensions.width > 768 ? 'left' : 'bottom'}
                     className="side-menu">
-                    <div className="image-container">
+                    <div className="image-container" 
+                        onClick={() => handleChange("Home", 4)}>
                         <div className="img"></div>
                     </div>
                     { account  && 
@@ -170,7 +173,7 @@ export function PermanentDrawer(props: any): any {
                     
                     <div className="side-menu--bottom">
                         <>
-                            { account && 
+                            { (account && props.walletInitialized) && 
                                 <div className="contacts">
                                     <List>
                                         {
@@ -193,8 +196,8 @@ export function PermanentDrawer(props: any): any {
                                                                 <IconButton size="small"
                                                                     onClick={() => {
                                                                         // setNotificationState({})
-                                                                        localStorage.setItem("input", JSON.stringify(contact.address))
-                                                                        handleChange("Compose", 0)
+                                                                        localStorage.setItem("input", JSON.stringify(contact.address));
+                                                                        (document.querySelector(".editor") as HTMLElement).click();
                                                                     }}>
                                                                     <SendIcon className="send-icon" fontSize="small"/>
                                                                 </IconButton>
@@ -211,7 +214,7 @@ export function PermanentDrawer(props: any): any {
                                         }
                                     </List>
                                     <>
-                                        <IconButton className='add-new-all' onClick={() => setShow(true)}>
+                                        <IconButton className='add-new-all' onClick={() => {setShow(true); gaEventTracker('New contact menu');}}>
                                             <Add className="add-button"/>
                                             <p className='add-new mb-0'>Add new</p>
                                         </IconButton>

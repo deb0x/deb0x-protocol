@@ -3,6 +3,7 @@
 .main-container {
     @include themed() {
         .content-box.form-container {
+            // display: block;
             form {
                 padding-top: 15px;
                 .MuiFormControl-root {
@@ -11,7 +12,7 @@
                         margin: 5px 0;
                         input {
                             box-sizing: inherit;
-                            font-size: 12px;
+                            font-size: 14px;
                             color: t('text');
                             background-color: t('text-field-color');
                             border: 1px solid t('text-field-color');
