@@ -16,7 +16,6 @@ import { ConstructionOutlined } from '@mui/icons-material';
 
 const steps = ['Start your deb0x account.', 'Get validated as deb0x user on blockchain.'];
 const deb0xAddress = "0x3a473a59820929D42c47aAf1Ea9878a2dDa93E18";
-const steps = ['Provide public encryption key', 'Initialize Deb0x'];
 const ethers = require('ethers')
 const utils = ethers.utils
 
