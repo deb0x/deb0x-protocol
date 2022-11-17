@@ -306,7 +306,19 @@ describe("Test send messages and fetch functions", async function() {
             await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([address], [cref],
                 feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("1") })
         } catch (error) {
-            console.log("INTRU->>>>>>>>> " + error.message)
+            expect(error.message).to.include('Deb0x: cref too long')
+        }
+    });
+
+    it("Limitation for send multiple message", async() => {
+        let generated1 = 'a'.repeat(257);
+        let generated2 = 'a'.repeat(257);
+        let address = ["0xa907b9Ad914Be4E2E0AD5B5feCd3c6caD959ee5A", "0xa907b9Ad914Be4E2E0AD5B5feCd3c6caD959ee5A"]
+        let crefs = [Converter.convertStringToBytes32(generated1), Converter.convertStringToBytes32(generated2)]
+        try {
+            await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"](address, crefs,
+                feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("1") })
+        } catch (error) {
             expect(error.message).to.include('Deb0x: cref too long')
         }
     });
