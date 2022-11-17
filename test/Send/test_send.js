@@ -3,6 +3,9 @@ const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
 const { NumUtils } = require("../utils/NumUtils.ts");
+const { Converter } = require("../utils/Converter.ts");
+let ipfsLink = "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En9";
+let payload = Converter.convertStringToBytes32(ipfsLink);
 
 describe("Test send functionality", async function() {
     let deb0xContract, user1Reward, user2Reward, user3Reward, frontend, dbxERC20;
@@ -24,70 +27,91 @@ describe("Test send functionality", async function() {
     })
 
     it("Check send message and reward distributed", async() => {
-        await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
+        user1GasUsed = await user1Reward.accCycleGasUsed(user1.address)
+        user2GasUsed = await user1Reward.accCycleGasUsed(user2.address)
+        user3GasUsed = await user1Reward.accCycleGasUsed(user3.address)
+        cycleTotalGasUsed = await user1Reward.cycleTotalGasUsed(await user1Reward.currentCycle())
+
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        let rewardForFirstCycle = NumUtils.day(1);
-
+        let cycle1User1Reward = NumUtils.day(1).mul(user1GasUsed).div(cycleTotalGasUsed)
         await user1Reward.claimRewards()
         let user1Balance = await dbxERC20.balanceOf(user1.address);
-        expect(user1Balance).to.equal(rewardForFirstCycle.div(6));
+        expect(cycle1User1Reward).to.equal(user1Balance);
 
+        let cycle1User2Reward = NumUtils.day(1).mul(user2GasUsed).div(cycleTotalGasUsed)
         await user2Reward.claimRewards()
         let user2Balance = await dbxERC20.balanceOf(user2.address);
-        expect(user2Balance).to.equal("3333333333333333333333");
+        expect(cycle1User2Reward).to.equal(user2Balance);
 
+        let cycle1User3Reward = NumUtils.day(1).mul(user3GasUsed).div(cycleTotalGasUsed)
         await user3Reward.claimRewards()
         let user3Balance = await dbxERC20.balanceOf(user3.address);
-        expect(user3Balance).to.equal(rewardForFirstCycle.div(2));
+        expect(cycle1User3Reward).to.equal(user3Balance);
 
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
+        user3GasUsed = await user1Reward.accCycleGasUsed(user3.address)
+        cycleTotalGasUsed = await user1Reward.cycleTotalGasUsed(await user1Reward.currentCycle())
+
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        let rewardForSecondCycle = NumUtils.day(2);
+        let cycle2User3Reward = NumUtils.day(2).mul(user3GasUsed).div(cycleTotalGasUsed)
         await user3Reward.claimRewards()
         let user3BalanceScondCycle = await dbxERC20.balanceOf(user3.address);
-        expect(user3BalanceScondCycle).to.equal(rewardForSecondCycle.add(user3Balance));
+        expect(cycle2User3Reward.add(cycle1User3Reward)).to.equal(user3BalanceScondCycle);
 
-        await user1Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user2Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
+        user3GasUsed = await user1Reward.accCycleGasUsed(user3.address)
+        cycleTotalGasUsed = await user1Reward.cycleTotalGasUsed(await user1Reward.currentCycle())
+
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        let rewardForThirdCycle = NumUtils.day(3);
+        let cycle3User3Reward = NumUtils.day(3).mul(user3GasUsed).div(cycleTotalGasUsed)
         await user3Reward.claimRewards()
         let user3BalanceThirdCycle = await dbxERC20.balanceOf(user3.address);
-        expect(user3BalanceThirdCycle).to.equal(user3BalanceScondCycle.add(rewardForThirdCycle.div(3)));
+        expect(cycle3User3Reward.add(cycle2User3Reward)
+            .add(cycle1User3Reward)).to.equal(user3BalanceThirdCycle);
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 99])
         await hre.ethers.provider.send("evm_mine")
 
-        await user3Reward["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
+        user3GasUsed = await user1Reward.accCycleGasUsed(user3.address)
+        cycleTotalGasUsed = await user1Reward.cycleTotalGasUsed(await user1Reward.currentCycle())
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 8])
         await hre.ethers.provider.send("evm_mine")
 
         //In 102 cycle user will recieve reward from cycle 4 
-        let rewardForHundredTenCycle = NumUtils.day(4);
+        let cycle4User3Reward = NumUtils.day(4).mul(user3GasUsed).div(cycleTotalGasUsed)
         await user3Reward.claimRewards()
         let user3BalanceHundredTenCycle = await dbxERC20.balanceOf(user3.address);
-        expect(user3BalanceHundredTenCycle).to.equal(rewardForHundredTenCycle.add(user3BalanceThirdCycle));
+        expect(cycle4User3Reward
+            .add(cycle3User3Reward).add(cycle2User3Reward)
+            .add(cycle1User3Reward)).to.equal(user3BalanceHundredTenCycle);
 
     });
 
 });
 
-describe("Test send functionality from Deb0xCore contract!", async function() {
+describe("Test send functionality", async function() {
     beforeEach("Set enviroment", async() => {
         [deployer, add1, add2, add3, add4, add5, add6, add7] = await ethers.getSigners();
 
@@ -98,33 +122,40 @@ describe("Test send functionality from Deb0xCore contract!", async function() {
 
     it(`Test send function`, async() => {
         let addresses = [add1.address, add2.address, add2.address];
-        let cids = ["ipfs1", "ipfs2", "ipfs2"];
+        let cids = [payload, payload, payload];
         let transaction = await deboxCore.send(addresses, cids, ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         let receipt = await transaction.wait();
-
+        let arguments = [];
         for (let i = 0; i < receipt.events.length - 1; i++) {
-            expect(receipt.events[i].args.body.content).to.equal(cids[i]);
+            arguments.push(ethers.utils.arrayify(receipt.events[i].args.content[0]))
+            arguments.push(ethers.utils.arrayify(ethers.utils.stripZeros(receipt.events[i].args.content[1])))
+            expect(Converter.convertBytes32ToString(Array.from((arguments)))).to.equal(ipfsLink);
+            arguments = [];
         }
 
     });
 
     it(`Test send function with multimple messages`, async() => {
         let addresses = [add1.address, add2.address, add3.address, add4.address, add5.address, add5.address, add5.address, add5.address];
-        let cids = ["ipfs1", "ipfs2", "ipfs4", "ipfs4", "ipfs5", "ipfs5", "ipfs5", "ipfs5"];
+        let cids = [payload, payload, payload, payload, payload, payload, payload, payload];
         // await deboxCore.send(addresses, cids)
 
         let transaction = await deboxCore.send(addresses, cids, ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         let receipt = await transaction.wait();
+        let arguments = [];
 
         for (let i = 0; i < receipt.events.length - 1; i++) {
-            expect(receipt.events[i].args.body.content).to.equal(cids[i]);
+            arguments.push(ethers.utils.arrayify(receipt.events[i].args.content[0]))
+            arguments.push(ethers.utils.arrayify(ethers.utils.stripZeros(receipt.events[i].args.content[1])))
+            expect(Converter.convertBytes32ToString(Array.from((arguments)))).to.equal(ipfsLink);
+            arguments = [];
         }
 
     });
 
     it(`Test fetch messages in case of multimple messages`, async() => {
         let addresses = [add1.address, add2.address, add3.address, add3.address];
-        let cids = ["ipfs1", "ipfs2", "ipfs4", "ipfs4"];
+        let cids = [payload, payload, payload, payload];
         let transaction = await deboxCore.send(addresses, cids, ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         let receipt = await transaction.wait();
 
@@ -133,7 +164,7 @@ describe("Test send functionality from Deb0xCore contract!", async function() {
         }
 
         let addresses2 = [add1.address, add2.address, add3.address, add3.address];
-        let cids2 = ["ipfs1", "ipfs2", "ipfs4", "ipfs4"];
+        let cids2 = [payload, payload, payload, payload];
 
         let transactionAddress1 = await deboxCore.connect(add1).send(addresses2, cids2, ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         let receiptAddress1 = await transactionAddress1.wait();
@@ -143,7 +174,7 @@ describe("Test send functionality from Deb0xCore contract!", async function() {
         }
 
         let addresses3 = [add1.address, add2.address, add3.address, add3.address];
-        let cids3 = ["ipfs1", "ipfs2", "ipfs4", "ipfs4"];
+        let cids3 = [payload, payload, payload, payload];
 
         let transactionAddress2 = await deboxCore.connect(add2).send(addresses3, cids3, ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         let receiptAddress2 = await transactionAddress2.wait();
@@ -155,26 +186,35 @@ describe("Test send functionality from Deb0xCore contract!", async function() {
 
     it(`Test inbox and outbox`, async() => {
         let addresses = [add1.address, add2.address, add3.address, add4.address, add5.address, add6.address, add1.address];
-        let cids = ["ipfs1", "ipfs2", "ipfs3", "ipfs4", "ipfs5", "ipfs6", "ipfs1"];
+        let cids = [payload, payload, payload, payload, payload, payload, payload];
 
         let transaction = await deboxCore.connect(add1).send(addresses, cids, ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") });
         let receipt = await transaction.wait();
         expect(add1.address).to.equal(receipt.events[0].args.from);
+        let arguments = [];
 
         for (let i = 0; i < receipt.events.length - 1; i++) {
-            expect(receipt.events[i].args.body.content).to.equal(cids[i]);
+            arguments.push(ethers.utils.arrayify(receipt.events[i].args.content[0]))
+            arguments.push(ethers.utils.arrayify(ethers.utils.stripZeros(receipt.events[i].args.content[1])))
+            expect(Converter.convertBytes32ToString(Array.from((arguments)))).to.equal(ipfsLink);
+            arguments = [];
         }
 
         let filter = receipt.events.filter(event => event.args.from === add1.address);
         for (let i = 0; i < filter.length - 1; i++) {
             expect(filter[i].args.to).to.equal(addresses[i]);
         }
+
+        let arguments2 = [];
         for (let i = 0; i < filter.length - 1; i++) {
-            expect(filter[i].args.body.content).to.equal(cids[i]);
+            arguments2.push(ethers.utils.arrayify(filter[i].args.content[0]))
+            arguments2.push(ethers.utils.arrayify(ethers.utils.stripZeros(filter[i].args.content[1])))
+            expect(Converter.convertBytes32ToString(Array.from((arguments2)))).to.equal(ipfsLink);
+            arguments2 = [];
         }
 
         let addressesUser2Sent = [add2.address, add3.address, add4.address, add5.address, add6.address, add6.address, add2.address];
-        let cidsUser2Sent = ["msg2", "msg3", "msg4", "msg5", "msg6", "msg6", "msg2"];
+        let cidsUser2Sent = [payload, payload, payload, payload, payload, payload, payload];
 
         let transaction2 = await deboxCore.connect(add2).send(addressesUser2Sent, cidsUser2Sent, ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") });
         let receipt2 = await transaction2.wait();
@@ -184,11 +224,14 @@ describe("Test send functionality from Deb0xCore contract!", async function() {
         for (let i = 0; i < filter2.length - 1; i++) {
             expect(filter2[i].args.to).to.equal(addressesUser2Sent[i]);
         }
+
+        let arguments3 = [];
         for (let i = 0; i < filter2.length - 1; i++) {
-            expect(filter2[i].args.body.content).to.equal(cidsUser2Sent[i]);
+            arguments3.push(ethers.utils.arrayify(filter2[i].args.content[0]))
+            arguments3.push(ethers.utils.arrayify(ethers.utils.stripZeros(filter2[i].args.content[1])))
+            expect(Converter.convertBytes32ToString(Array.from((arguments3)))).to.equal(ipfsLink);
+            arguments3 = [];
         }
     });
-
-
 
 })

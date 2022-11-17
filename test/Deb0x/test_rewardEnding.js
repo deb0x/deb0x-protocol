@@ -4,6 +4,9 @@ const fs = require('fs');
 const { expect } = require("chai");
 const { BigNumber } = require("ethers");
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
+const { Converter } = require("../utils/Converter.ts");
+let ipfsLink = "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En9";
+let payload = Converter.convertStringToBytes32(ipfsLink);
 
 describe("Test DBX tokens distributions", async function() {
     let deployer, bobInstance, bob, deb0x, frontend, dbxERC20;
@@ -24,7 +27,7 @@ describe("Test DBX tokens distributions", async function() {
         frontend = deb0x.connect(feeReceiver)
     })
     it(`Reward ending simulating`, async() => {
-        await bobInstance["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await bobInstance["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine");
         try {
@@ -37,7 +40,7 @@ describe("Test DBX tokens distributions", async function() {
         await hre.ethers.provider.send("evm_mine");
 
         for (let i = 22399; i <= 22532; i++) {
-            await bobInstance["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+            await bobInstance["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
             await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
             await hre.ethers.provider.send("evm_mine");
             //console.log("Ziua " + i + " reward  " + ethers.utils.formatEther(await deb0x.calculateCycleReward()))
@@ -111,7 +114,7 @@ describe("Test DBX tokens distributions", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 2])
         await hre.ethers.provider.send("evm_mine");
 
-        await bobInstance["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await bobInstance["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 
         await dbxERC20.connect(bob).approve(deb0x.address, balanceForBob)
         await bobInstance.stakeDBX(BigNumber.from(balanceForBobAfterTwentyCycles).div(2));
@@ -119,7 +122,7 @@ describe("Test DBX tokens distributions", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine");
 
-        await bobInstance["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await bobInstance["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine");
@@ -131,14 +134,14 @@ describe("Test DBX tokens distributions", async function() {
         await hre.ethers.provider.send("evm_mine");
         await bobInstance.claimFees()
 
-        await bobInstance["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await bobInstance["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 ])
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine");
 
-        await bobInstance["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await bobInstance["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 ])
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine");
 
         await bobInstance.claimFees()

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import './App.css';
 import { 
     Web3ReactProvider,
@@ -15,7 +16,7 @@ import { PermanentDrawer } from './components/App/PermanentDrawer'
 import { create } from 'ipfs-http-client'
 import { Encrypt } from './components/App/Encrypt';
 import { Decrypt } from './components/App/Decrypt';
-import {Stake} from './components/App/Stake';
+import { Stake } from './components/App/Stake';
 import { Sent } from './components/App/Sent';
 import { Box,Typography, Fab, Button} from '@mui/material';
 import ThemeProvider from './components/Contexts/ThemeProvider';
@@ -29,7 +30,13 @@ import { Spinner } from './components/App/Spinner';
 import { AppBarComponent } from './components/App/AppBar';
 import IconButton from "@mui/material/IconButton";
 import { Add } from '@mui/icons-material';
-import HowTo from './components/HowTo'
+import HowTo from './components/HowTo';
+import ReactGA from 'react-ga';
+import { Home } from './components/App/Home';
+import { SendMessages } from './components/App/SendMessages';
+import useAnalyticsEventTracker from './components/Common/GaEventTracker';
+
+ReactGA.initialize("UA-151967719-3");
 
 const client = create({
   host: 'ipfs.infura.io',
@@ -38,7 +45,7 @@ const client = create({
 })
 
 const ethUtil = require('ethereumjs-util');
-const deb0xAddress = "0xF5c80c305803280B587F8cabBcCdC4d9BF522AbD";
+const deb0xAddress = "0x3a473a59820929D42c47aAf1Ea9878a2dDa93E18";
 
 
 enum ConnectorNames { Injected = 'Injected', Network = 'Network' };
@@ -95,6 +102,9 @@ function App() {
     const [isVisible, setIsVisible] = useState(false);
     let [show, setShow] = useState(false);
     let [walletInitialized, setWalletInitialized] = useState<any>();
+    const [isOptionSelected, setIsOptionSelected] = useState(true);
+    const gaEventTracker = useAnalyticsEventTracker('Login');
+    const gaEventMenuTracker = useAnalyticsEventTracker('Menu');
 
     useEffect(() => {
         injected.supportedChainIds?.forEach(chainId => 
@@ -112,24 +122,30 @@ function App() {
     useInactiveListener(!triedEager || !!activatingConnector)
 
     function handleChange(newValue: any) {
-        setSelectedOption(newValue)
+        setSelectedOption(newValue);
+        setIsOptionSelected(true);
+        gaEventMenuTracker(newValue);
     }
 
     useEffect(() => {
+        window.location.pathname == "/send" ?
+            setIsOptionSelected(false) :
+            setIsOptionSelected(true);
         localStorage.removeItem('input');
         setIsVisible(false);
     }, [])
 
     function handleClick (event: React.MouseEvent<HTMLElement>) {
         setAnchorEl(anchorEl ? null : event.currentTarget);
+        gaEventTracker("Connect Wallet");
     };
-
+    
     function checkIfInit(initialized: any) {
         setWalletInitialized(initialized);
     }
 
 
-    useEffect(() => {    
+    useEffect(() => {   
         window.ethereum ?
             window.ethereum.request({method: "eth_requestAccounts"}).then(() => {
                 switchNetwork();               
@@ -161,7 +177,7 @@ function App() {
                     {
                         chainId: '0x89', 
                         chainName:'Polygon Network',
-                        rpcUrls:['https://rpc-mainnet.maticvigil.com'],                   
+                        rpcUrls:['https://polygon-rpc.com/'],                   
                         blockExplorerUrls:['https://polygonscan.com/'],  
                         nativeCurrency: { 
                         symbol:'Matic',   
@@ -195,7 +211,8 @@ function App() {
             </p>
         }
     </div>
-    <ThemeProvider>
+    {isOptionSelected ? 
+        <ThemeProvider>
         {
             account ? 
             <ContactsProvider>
@@ -214,6 +231,7 @@ function App() {
                                     {selectedOption === "Deb0x" && <Decrypt account={account} checkIfInit={checkIfInit}/>}
                                     {selectedOption === "Stake" && <Stake />}
                                     {selectedOption === "Sent" && <Sent />}
+                                    {selectedOption === "Home" && <Home onChange={handleChange} />}
                                 </Box> : 
                                 <Box className="main-container" sx={{marginTop: 12}}>
                                     <Decrypt account={account} checkIfInit={checkIfInit}/>
@@ -269,6 +287,7 @@ function App() {
                                                 () => {
                                                     setActivatingConnector(currentConnector)
                                                     activate(currentConnector)
+                                                    gaEventTracker("Connect Wallet");
                                                 } : 
                                                 handleClick}
                                                 className="connect-button">
@@ -311,6 +330,15 @@ function App() {
             </div>
         }
     </ThemeProvider>
+    :
+    <Router>
+        <Routes>
+            <Route path={ "/send" } element={ <SendMessages /> } />
+        </Routes>
+    </Router>
+
+    }
+    
     </>
   )
 }

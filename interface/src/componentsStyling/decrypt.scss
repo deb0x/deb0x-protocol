@@ -5,6 +5,7 @@
     @include themed() {
         .row.messages-list {
             height: 100%;
+            width: 100%;
             ul.MuiList-root {
                 padding-top: 0;
                 height: 65vh;

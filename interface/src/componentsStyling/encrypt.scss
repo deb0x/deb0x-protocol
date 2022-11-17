@@ -3,6 +3,7 @@
 .main-container {
     @include themed() {
         .content-box.form-container {
+            // display: block;
             form {
                 padding-top: 15px;
                 .MuiFormControl-root {

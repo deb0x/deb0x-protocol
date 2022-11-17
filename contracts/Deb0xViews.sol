@@ -16,10 +16,6 @@ contract Deb0xViews {
         return address(deb0x).balance;
     }
 
-    function getKey(address account) external view returns (string memory) {
-        return deb0x.publicKeys(account);
-    }
-
     function getAccWithdrawableStake(address staker)
         external
         view
@@ -139,6 +135,9 @@ contract Deb0xViews {
         return currentAccruedFees;
     }
 
+    /**
+     * TODO! - duplicate - to delete
+     */
     function getCurrentCycle() public view returns (uint256) {
         return
             (block.timestamp - deb0x.i_initialTimestamp()) /
@@ -159,20 +158,19 @@ contract Deb0xViews {
 
        if (
             calculatedCycle > deb0x.lastActiveCycle(account) &&
-            deb0x.accCycleMessages(account) != 0
+            deb0x.accCycleGasUsed(account) != 0
         ) {
-            uint256 lastCycleAccReward = (deb0x.accCycleMessages(account) *
+            uint256 lastCycleAccReward = (deb0x.accCycleGasUsed(account) *
                 deb0x.rewardPerCycle(deb0x.lastActiveCycle(account))) /
-                deb0x.cycleTotalMessages(deb0x.lastActiveCycle(account));
+                deb0x.cycleTotalGasUsed(deb0x.lastActiveCycle(account));
 
             currentRewards += lastCycleAccReward;
 
-            if (deb0x.accCycleFeePercent(account) != 0) {
-                uint256 rewardPerMsg = lastCycleAccReward /
-                    deb0x.accCycleMessages(account);
-                uint256 rewardsOwed = (rewardPerMsg *
-                    deb0x.accCycleFeePercent(account)) / 10000;
-                currentRewards -= rewardsOwed;
+            if (deb0x.accCycleGasOwed(account) != 0) {
+                uint256 accLastActiveCycle = deb0x.lastActiveCycle(account);
+                uint256 accRewardsOwed = (deb0x.accCycleGasOwed(account) * deb0x.rewardPerCycle(accLastActiveCycle)) / 
+                    deb0x.cycleTotalGasUsed(accLastActiveCycle);
+                currentRewards -= accRewardsOwed;
             }
         }
 

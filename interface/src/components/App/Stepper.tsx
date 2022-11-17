@@ -11,9 +11,14 @@ import Typography from '@mui/material/Typography';
 import Deb0x from "../../ethereum/deb0x"
 import SnackbarNotification from './Snackbar';
 import '../../componentsStyling/stepper.scss';
-import { whitelist } from '../../constants.json'
-const deb0xAddress = "0xF5c80c305803280B587F8cabBcCdC4d9BF522AbD";
+import dataFromWhitelist from '../../constants.json';
+import { ConstructionOutlined } from '@mui/icons-material';
+
+const steps = ['Start your deb0x account.', 'Get validated as deb0x user on blockchain.'];
+const deb0xAddress = "0x3a473a59820929D42c47aAf1Ea9878a2dDa93E18";
 const steps = ['Provide public encryption key', 'Initialize Deb0x'];
+const ethers = require('ethers')
+const utils = ethers.utils
 
 export default function HorizontalLinearStepper(props: any) {
     const { account, library } = useWeb3React()
@@ -22,6 +27,7 @@ export default function HorizontalLinearStepper(props: any) {
     const [whichStepFailed, setStepFailed] = useState<number | undefined>(undefined)
     const [loading, setLoading] = useState(false)
     const [notificationState, setNotificationState] = useState({})
+    const { whitelist } = dataFromWhitelist;
 
     const handleNext = () => {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -41,7 +47,6 @@ export default function HorizontalLinearStepper(props: any) {
 
     async function getEncryptionKey() {
         setLoading(true)
-
         library.provider.request({
             method: 'eth_getEncryptionPublicKey',
             params: [account],
@@ -103,7 +108,7 @@ export default function HorizontalLinearStepper(props: any) {
 
     async function sendInitializeTx(deb0xContract: any) {
         try {
-            const tx = await deb0xContract.setKey(encryptionKey)
+            const tx = await deb0xContract.setKey(Array.from(ethers.utils.base64.decode(encryptionKey)))
 
             tx.wait()
             .then((result: any) => {
@@ -157,7 +162,7 @@ export default function HorizontalLinearStepper(props: any) {
         <>
             <SnackbarNotification state={notificationState} setNotificationState={setNotificationState}/>
             <Box className="stepper-box" sx={{ width: '100%', maxWidth: 1080 }}>
-                <Stepper activeStep={activeStep} className="stepper">
+                <Stepper activeStep={activeStep} className="stepper" alternativeLabel>
                     {steps.map((label, index) => {
                         const stepProps: { completed?: boolean } = {};
                         const labelProps: {
@@ -179,18 +184,29 @@ export default function HorizontalLinearStepper(props: any) {
                         );
                     })}
                 </Stepper>
-                {<Fragment>
-                    <Box
-                        className={activeStep === steps.length - 1 ? 'right button-box' : 'left button-box'}
-                        sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-                        <LoadingButton className='init-btn' loading={loading} sx={{ marginLeft: 5 }} variant="contained" onClick={
-                            (activeStep === 0) ? getEncryptionKey : initializeDeb0x
-                        }>
-                            {activeStep === steps.length - 1 ? 'Initialize' : 'Provide'}
-                        </LoadingButton>
-                    </Box>
-                </Fragment>
-                }
+                <Box
+                    className={activeStep === steps.length - 1 ? 'col-12 col-md-6 right button-box' : 'col-12 col-md-6 left button-box'}
+                    sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+                    {activeStep === steps.length - 1 ? 
+                        <div>
+                            <p>By hitting Initialize button your public encryption key 
+                                will be uploaded on the deb0x protocol smart contract.
+                            </p> 
+                            <p>This will validate your user on the blockchain.</p>
+                        </div> :
+                        <div>
+                            <p>Start your deb0x account. By hitting Provide button you consent for deb0x 
+                                to access your public encryptrion key though MetaMask.
+                            </p> 
+                            <p>This will allow you to send & receive messages through the deb0x protocol.</p>
+                        </div>
+                    }
+                    <LoadingButton className='init-btn' loading={loading} variant="contained" onClick={
+                        (activeStep === 0) ? getEncryptionKey : initializeDeb0x
+                    }>
+                        {activeStep === steps.length - 1 ? 'Initialize' : 'Provide'}
+                    </LoadingButton>
+                </Box>
             </Box>
         </>
     );
