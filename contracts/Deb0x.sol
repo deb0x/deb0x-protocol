@@ -20,6 +20,11 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     uint16 public constant PROTOCOL_FEE = 1000;
 
     /**
+     * Basis points representation of 100 percent.
+     */
+    uint16 public constant MAX_BPS = 10000;
+
+    /**
      * Used to minimise division remainder when earned fees are calculated.
      */
     uint256 public constant SCALING_FACTOR = 1e40;
@@ -65,7 +70,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     uint256 public lastStartedCycle;
 
     /**
-     * ???
+     * Stores the value of penultimate active cycle plus one.
      */
     uint256 public previousStartedCycle;
 
@@ -73,11 +78,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
      * Helper variable to store the index of the last active cycle.
      */
     uint256 public currentStartedCycle;
-
-    /**
-     * TODO - not used!!!
-     */
-    uint256 public pendingCycleRewardsStake;
 
     uint256 public pendingStakeWithdrawal;
 
@@ -217,9 +217,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         cycleTotalGasUsed[currentCycle] += gasConsumed;
 
         if (feeReceiver != address(0) && msgFee != 0) {
-            // TODO! - constant BPS
-            uint256 gasOwed = (gasConsumed * msgFee) / 10000;
-            // TODO! - wrap in if (gasOwed > 0)
+            uint256 gasOwed = (gasConsumed * msgFee) / MAX_BPS;
             gasConsumed -= gasOwed;
             clientCycleGasEarned[feeReceiver] += gasOwed;
         }
@@ -233,8 +231,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
         _;
 
-        // TODO! - 10000 bps constant
-        uint256 fee = ((startGas - gasleft() + 37700) * tx.gasprice * PROTOCOL_FEE) / 10000;
+        uint256 fee = ((startGas - gasleft() + 37700) * tx.gasprice * PROTOCOL_FEE) / MAX_BPS;
         
         require(
             msg.value - nativeTokenFee >= fee,
@@ -293,8 +290,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         gasUsed(feeReceiver, msgFee)
 
     {
-        // TODO! - <= bps constant
-        require(msgFee < 10001, "Deb0x: reward fees exceed 10000 bps");
+        require(msgFee <= MAX_BPS, "Deb0x: reward fees exceed 10000 bps");
 
         uint256 _sentId = _send(to, crefs);
         calculateCycle();
@@ -399,8 +395,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         calculateCycle();
         updateCycleFeesPerStakeSummed();
         updateStats(_msgSender());
-        // TODO! - amount > 0
-        require(amount != 0, "Deb0x: amount is zero");
+        require(amount > 0, "Deb0x: amount is zero");
         pendingStake += amount;
         uint256 cycleToSet = currentCycle + 1;
 
@@ -433,8 +428,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         calculateCycle();
         updateCycleFeesPerStakeSummed();
         updateStats(_msgSender());
-        // TODO! - amount > 0
-        require(amount != 0, "Deb0x: amount is zero");
+        require(amount > 0, "Deb0x: amount is zero");
 
         require(
             amount <= accWithdrawableStake[_msgSender()],
@@ -550,7 +544,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
             uint256 calculatedCycleReward = (lastCycleReward * 10000) / 10020;
             currentCycleReward = calculatedCycleReward;
             rewardPerCycle[currentCycle] = calculatedCycleReward;
-            pendingCycleRewardsStake = calculatedCycleReward;
 
             currentStartedCycle = currentCycle;
             
