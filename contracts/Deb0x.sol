@@ -70,7 +70,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     uint256 public lastStartedCycle;
 
     /**
-     * Stores the penultimate active cycle.
+     * Stores the value of penultimate active cycle plus one.
      */
     uint256 public previousStartedCycle;
 
@@ -511,7 +511,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
      */
     function updateCycleFeesPerStakeSummed() internal {
         if (currentCycle != currentStartedCycle) {
-            previousStartedCycle = lastStartedCycle;
+            previousStartedCycle = lastStartedCycle + 1;
             lastStartedCycle = currentStartedCycle;
         }
        
@@ -529,7 +529,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
                 feePerStake = 0;
             }
             
-            cycleFeesPerStakeSummed[lastStartedCycle + 1] = cycleFeesPerStakeSummed[previousStartedCycle + 1] + feePerStake;
+            cycleFeesPerStakeSummed[lastStartedCycle + 1] = cycleFeesPerStakeSummed[previousStartedCycle] + feePerStake;
         }
 
     }
