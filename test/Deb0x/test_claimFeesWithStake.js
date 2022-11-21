@@ -107,9 +107,25 @@ describe("Test fee claiming for users and concurrently stake/unstake", async fun
         await hre.ethers.provider.send("evm_mine")
 
         await deb0xViews.getAccWithdrawableStake(bob.address);
-        await deb0xViews.getUnclaimedFees(bob.address);
-        await rewardedBob["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
 
+        await rewardedBob["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
+            //    await deb0xViews.getUnclaimedFees(bob.address);
+
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+
+        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
+
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+
+        await deb0xViews.getAccWithdrawableStake(bob.address);
+
+        await rewardedBob["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
+        await deb0xViews.getUnclaimedFees(bob.address);
     });
 
 });
