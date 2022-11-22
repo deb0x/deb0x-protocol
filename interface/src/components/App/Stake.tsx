@@ -22,8 +22,10 @@ import walletDark from "../../photos/icons/wallet--dark.svg";
 import trophyRewards from "../../photos/icons/trophyRewards.svg";
 import { signMetaTxRequest } from '../../ethereum/signer';
 import { createInstance } from '../../ethereum/forwarder'
-import { whitelist } from '../../constants.json'
+import dataFromWhitelist from '../../constants.json';
+import useAnalyticsEventTracker from '../Common/GaEventTracker';
 
+const { whitelist } = dataFromWhitelist;
 const deb0xAddress = "0x3a473a59820929D42c47aAf1Ea9878a2dDa93E18";
 const deb0xViewsAddress = "0x9FBbD4cAcf0f23c2015759522B298fFE888Cf005";
 const deb0xERC20Address = "0x855201bA0e531DfdD84B41e34257165D745eE97F";
@@ -32,6 +34,7 @@ export function Stake(props: any): any {
 
     const { account, library } = useWeb3React()
     const [notificationState, setNotificationState] = useState({})
+    const gaEventTracker = useAnalyticsEventTracker('Stake');
 
     function FeesPanel() {
         const [feesUnclaimed, setFeesUnclaimed] = useState("")
@@ -137,6 +140,8 @@ export function Stake(props: any): any {
 
                 try {
                     const request = await signMetaTxRequest(library, forwarder, { to, from, data });
+
+                    gaEventTracker("Success: Claim fees");
         
                     await fetchClaimFeesResult(request, url)
         
@@ -146,6 +151,8 @@ export function Stake(props: any): any {
                         open: true,
                         severity: "info"
                     })
+
+                    gaEventTracker("Rejected: Claim fees");
                 }
             } else {
                 await sendClaimFeesTx(deb0xContract)
@@ -309,6 +316,8 @@ export function Stake(props: any): any {
 
                 try {
                     const request = await signMetaTxRequest(library, forwarder, { to, from, data });
+
+                    gaEventTracker("Success: Claim rewards");
         
                     await fetchClaimRewardsResult(request, url)
         
@@ -318,6 +327,8 @@ export function Stake(props: any): any {
                         open: true,
                         severity: "info"
                     })
+
+                    gaEventTracker("Rejected: Claim rewards");
                 }
             } else {
                 await sendClaimRewardsTx(deb0xContract)
@@ -375,6 +386,7 @@ export function Stake(props: any): any {
             newAlignment: string,
         ) => {
             setAlignment(newAlignment);
+            gaEventTracker(newAlignment + " tab");
         };
         
         const [theme, setTheme] = useState(localStorage.getItem('globalTheme'));
@@ -452,6 +464,8 @@ export function Stake(props: any): any {
                         })
                         setLoading(false)
 
+                        gaEventTracker("Success: Approve staking");
+
                     })
                     .catch((error: any) => {
                         setNotificationState({
@@ -459,6 +473,7 @@ export function Stake(props: any): any {
                             severity: "error"
                         })
                         setLoading(false)
+                        gaEventTracker("Error: Approve staking");
                     })
             } catch (error) {
                 setNotificationState({
@@ -466,6 +481,7 @@ export function Stake(props: any): any {
                     severity: "info"
                 })
                 setLoading(false)
+                gaEventTracker("Rejected: Approve staking");
             }
         }
 
@@ -559,6 +575,8 @@ export function Stake(props: any): any {
                 const to = deb0xContract.address
                 try {
                     const request = await signMetaTxRequest(library, forwarder, { to, from, data });
+
+                    gaEventTracker("Success: Unstake");
         
                     await fetchUnstakeResult(request, url)
         
@@ -569,6 +587,8 @@ export function Stake(props: any): any {
                         severity: "info"
                     })
                     setLoading(false)
+
+                    gaEventTracker("Rejected: Unstake");
                 }
             } else { 
                 await sendUnstakeTx(deb0xContract)
@@ -664,6 +684,8 @@ export function Stake(props: any): any {
 
                 try {
                     const request = await signMetaTxRequest(library, forwarder, { to, from, data });
+
+                    gaEventTracker("Success: Stake");
         
                     await fetchStakeResult(request, url)
         
@@ -674,6 +696,7 @@ export function Stake(props: any): any {
                         severity: "info"
                     })
                     setLoading(false)
+                    gaEventTracker("Rejected: Stake");
                 }
             } else {
                 await sendStakeTx(deb0xContract)

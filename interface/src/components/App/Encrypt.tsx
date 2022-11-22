@@ -22,14 +22,16 @@ import airplaneBlack from '../../photos/icons/airplane-black.svg';
 import {getKey} from "../../ethereum/EventLogs.js";
 import { signMetaTxRequest } from '../../ethereum/signer';
 import { createInstance } from '../../ethereum/forwarder'
-import { whitelist } from '../../constants.json'
+import dataFromWhitelist from '../../constants.json';
 import deb0xViews from '../../ethereum/deb0xViews';
+import useAnalyticsEventTracker from '../Common/GaEventTracker';
 import { convertStringToBytes32} from '../../../src/ethereum/Converter.js';
 
 const { BigNumber } = require("ethers");
 const deb0xAddress = "0x3a473a59820929D42c47aAf1Ea9878a2dDa93E18";
 const deb0xViewsAddress = "0x9FBbD4cAcf0f23c2015759522B298fFE888Cf005";
 const ethUtil = require('ethereumjs-util')
+const { whitelist } = dataFromWhitelist;
 
 const projectId = process.env.REACT_APP_PROJECT_ID
 const projectSecret = process.env.REACT_APP_PROJECT_SECRET
@@ -46,7 +48,8 @@ const client = create({
   },
 })
 
-export function Encrypt(replyAddress: any): any {
+
+export function Encrypt(replyAddress?: any): any {
     const { account, library } = useWeb3React()
     const [encryptionKey, setKey] = useState('')
     const [textToEncrypt, setTextToEncrypt] = useState('')
@@ -60,20 +63,31 @@ export function Encrypt(replyAddress: any): any {
     const [error, setError] = useState<string | null>(null);
     const [ input, setInput ] = useState(JSON.parse(localStorage.getItem('input') || 'null'));
     const [address, setAddress] = useState<string>(replyAddress.props);
+    const [isSendInUrl, setIsSendInUrl] = useState(false);
+    const addressListForRewards: string[] = [];
+    const [inputValue, setInputValue] = useState<number>(0);
+
+    useEffect(() => {        
+        if(address)
+            addressList.push(address)
+        
+        window.location.pathname == "/send" ?
+            setIsSendInUrl(true) :
+            setIsSendInUrl(false);
+    }, []);
 
     useEffect(() => {
         if(input !== null && input.match(/^0x[a-fA-F0-9]{40}$/g))
-            addressList.push(input)
-        
-        if(address)
-            addressList.push(address)
-    }, []);
+            addressList.push(input);
+    }, [input]);
 
-    useEffect(() => {
-        if (!encryptionKeyInitialized) {
-            getPublicEncryptionKey()
-        }
-    }, []);
+    useEffect(() => setInput(JSON.parse(localStorage.getItem('input') || 'null')));
+
+    // useEffect(() => {
+    //     if (!encryptionKeyInitialized) {
+    //         getPublicEncryptionKey()
+    //     }
+    // }, []);
 
     async function handleKeyDown(evt: any) {
         if (["Enter", "Tab", ","].includes(evt.key)) {
@@ -267,6 +281,7 @@ export function Encrypt(replyAddress: any): any {
 
             try {
                 const request = await signMetaTxRequest(library, forwarder, { to, from, data }, '100000000000000000');
+                gaEventTracker('Success: send message');
 
                 await fetchSendResult(request, url)
 
@@ -276,6 +291,7 @@ export function Encrypt(replyAddress: any): any {
                     open: true,
                     severity: "info"
                 })
+                gaEventTracker('Reject: send message');
             }
         } else {
             await sendMessageTx(deb0xContract, recipients, cids)
@@ -325,6 +341,8 @@ export function Encrypt(replyAddress: any): any {
         setTextToEncrypt(draftToHtml(convertToRaw(editorState.getCurrentContent())));
     };
 
+    const gaEventTracker = useAnalyticsEventTracker('Encrypt');
+
     return (
         <>
             <SnackbarNotification state={notificationState} 
@@ -367,6 +385,7 @@ export function Encrypt(replyAddress: any): any {
                         toolbarClassName="toolbar"
                         wrapperClassName="wrapper"
                         editorClassName="editor"
+                        onFocus={() => gaEventTracker("Compose message")}
                     />
                     { messageSessionSentCounter === 0 ?
                         <Box sx={{ display: "flex", 
