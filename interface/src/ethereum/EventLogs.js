@@ -46,10 +46,10 @@ function calculateStartBlockAndEndBlock(currentCycle) {
     } else {
         if (currentCycle == 2) {
             startBlockForLastEvents = parseInt(startBlock);
-            endBlockForLastEvents = parseInt(startBlock) + 43200;
+            endBlockForLastEvents = parseInt(startBlock) + 32000;
         } else {
-            startBlockForLastEvents = (parseInt(startBlock) + ((currentCycle - 2) * 43200) + 1);
-            endBlockForLastEvents = (parseInt(startBlock) + ((currentCycle - 1) * 43200));
+            startBlockForLastEvents = (parseInt(startBlock) + ((currentCycle - 2) * 32000) + 1);
+            endBlockForLastEvents = (parseInt(startBlock) + ((currentCycle - 1) * 32000));
         }
     }
     return { startBlockForLastEvents, endBlockForLastEvents }
