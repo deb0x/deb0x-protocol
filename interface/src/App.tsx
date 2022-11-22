@@ -97,11 +97,9 @@ function App() {
     const [selectedOption, setSelectedOption] = useState('Deb0x');
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [networkName, setNetworkName] = useState<any>();
-    const [currentChainId, setCurrentChainId] = useState<any>();
     let errorMsg;
     const [isVisible, setIsVisible] = useState(false);
     let [show, setShow] = useState(false);
-    let [walletInitialized, setWalletInitialized] = useState<any>();
     const [isOptionSelected, setIsOptionSelected] = useState(true);
     const gaEventTracker = useAnalyticsEventTracker('Login');
     const gaEventMenuTracker = useAnalyticsEventTracker('Menu');
@@ -139,11 +137,6 @@ function App() {
         setAnchorEl(anchorEl ? null : event.currentTarget);
         gaEventTracker("Connect Wallet");
     };
-    
-    function checkIfInit(initialized: any) {
-        setWalletInitialized(initialized);
-    }
-
 
     useEffect(() => {   
         window.ethereum ?
@@ -152,14 +145,6 @@ function App() {
             }).catch((err: any) => displayErrorMsg(err))
             : displayErrorMsg("Please install MetaMask")
         }, [])
-
-    useEffect(() => {
-        if(window.ethereum) {
-            window.ethereum.request({method: 'eth_chainId'}).then((chainId: any) => {
-                setCurrentChainId(chainId);
-            }).catch((err: any) => displayErrorMsg(err)) 
-        }
-    });
 
     async function switchNetwork() {
         try {
@@ -219,22 +204,18 @@ function App() {
                 <div className="app-container container-fluid">
                     <div className="row main-row">
                         <div className="col col-md-3 col-sm-12 p-0 side-menu-container">
-                            <PermanentDrawer onChange={handleChange} walletInitialized={walletInitialized}/>
+                            <PermanentDrawer onChange={handleChange}/>
                         </div>
                         <div className="col col-md-9 col-sm-12">
-                        <AppBarComponent walletInitialized={walletInitialized}/>
+                        <AppBarComponent />
                         {account ? 
-                            !!(library && account ) && (
-                                walletInitialized ? 
+                            !!(library && account) && (
                                 <Box className="main-container" sx={{marginTop: 12}}>
                                     {selectedOption === "Compose" && <Encrypt />}
-                                    {selectedOption === "Deb0x" && <Decrypt account={account} checkIfInit={checkIfInit}/>}
+                                    {selectedOption === "Deb0x" && <Decrypt account={account}/>}
                                     {selectedOption === "Stake" && <Stake />}
                                     {selectedOption === "Sent" && <Sent />}
                                     {selectedOption === "Home" && <Home onChange={handleChange} />}
-                                </Box> : 
-                                <Box className="main-container" sx={{marginTop: 12}}>
-                                    <Decrypt account={account} checkIfInit={checkIfInit}/>
                                 </Box>
                             ):
                                 <Box className="home-page-box">
@@ -263,11 +244,7 @@ function App() {
                                 <p>Let's get you started</p>
                                 
                                 <p>Connect your wallet & start using <img className="content-logo" src={logoGreen} /></p>
-                                {currentChainId === "0x89" ?
-                                    <p>Here's how to do this in 
-                                        <IconButton className='info show-popup' onClick={() => setShow(true)}>3 easy steps</IconButton>
-                                    </p> : ""
-                                }
+                                <p>Here's how to do this in <IconButton className='info show-popup' onClick={() => setShow(true)}>3 easy steps</IconButton></p>
                                 {show ? 
                                     <HowTo show={show} onClickOutside={() => setShow(false)}/> : 
                                         <></>

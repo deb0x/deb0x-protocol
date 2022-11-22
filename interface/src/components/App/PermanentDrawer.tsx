@@ -173,7 +173,7 @@ export function PermanentDrawer(props: any): any {
                     
                     <div className="side-menu--bottom">
                         <>
-                            { (account && props.walletInitialized) && 
+                            { account && 
                                 <div className="contacts">
                                     <List>
                                         {

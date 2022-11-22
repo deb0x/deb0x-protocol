@@ -101,7 +101,7 @@ export function AppBarComponent(props: any): any {
         <>
             <div className="app-bar--top">
                 <Box className="main-menu--right">
-                {(account && props.walletInitialized) ? 
+                {account  ? 
                     <Button variant ="contained"
                             onClick={() => handleChange("Stake", 2)}>
                         {userUnstakedAmount} DBX

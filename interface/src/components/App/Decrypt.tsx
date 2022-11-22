@@ -53,8 +53,7 @@ export function Decrypt(props: any): any {
       
         const key = await getKey(account);
         const initialized = (key != '') ? true : false
-        setEncryptionKeyInitialized(initialized);
-        props.checkIfInit(initialized)
+        setEncryptionKeyInitialized(initialized)
     }
 
     async function decrypt(encryptedMessage: any) {
