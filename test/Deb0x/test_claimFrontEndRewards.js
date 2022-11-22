@@ -166,19 +166,6 @@ describe("Test rewards claiming for frontends", async function() {
     });
 
     it(`Try to claimClientFees`, async() => {
-        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
-        await rewardedBob["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-        await hre.ethers.provider.send("evm_mine")
-
-        try {
-            await rewardedFeeReceiver.claimClientFees();
-        } catch (error) {
-            expect(error.message).to.include("client has no accrued fees");
-        }
-    });
-
-    it(`Try to claimClientFees`, async() => {
         await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 1500, 0, { value: ethers.utils.parseEther("1") })
         await rewardedBob["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver2.address, 1000, 0, { value: ethers.utils.parseEther("1") })
         await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 2000, 0, { value: ethers.utils.parseEther("1") })

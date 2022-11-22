@@ -246,11 +246,14 @@ describe("Test stake functionality", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
+        expect(await deb0xViews.getAccWithdrawableStake(user3.address)).to.equal(BigNumber.from(balanceUser3).div(BigNumber.from("4000000000000000000")))
         await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
-
+        let partialStake = BigNumber.from(balanceUser3).div(BigNumber.from("4000000000000000000"));
+        let expectedStake = partialStake.mul(2);
+        expect(await deb0xViews.getAccWithdrawableStake(user3.address)).to.equal(expectedStake)
         await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
 
     });
@@ -278,12 +281,14 @@ describe("Test stake functionality", async function() {
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
-
+        let partialStake = BigNumber.from(balanceUser3).div(BigNumber.from("4000000000000000000"));
+        expect(await deb0xViews.getAccWithdrawableStake(user3.address)).to.equal(partialStake)
         await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
-
+        let expectedStake = partialStake.mul(2);
+        expect(await deb0xViews.getAccWithdrawableStake(user3.address)).to.equal(expectedStake)
         await deb0xViews.getAccWithdrawableStake(user3.address);
         await deb0xViews.getUnclaimedFees(user3.address);
         await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -314,12 +319,14 @@ describe("Test stake functionality", async function() {
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
-
+        let partialStake = BigNumber.from(balanceUser3).div(BigNumber.from("4000000000000000000"));
+        expect(await deb0xViews.getAccWithdrawableStake(user3.address)).to.equal(partialStake)
         await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
-
+        let expectedStake = partialStake.mul(3);
+        expect(await deb0xViews.getAccWithdrawableStake(user3.address)).to.equal(expectedStake)
         await deb0xViews.getAccWithdrawableStake(user3.address);
         await deb0xViews.getUnclaimedFees(user3.address);
         await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
