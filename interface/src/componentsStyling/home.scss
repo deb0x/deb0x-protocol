@@ -2,7 +2,6 @@
 
 .content-box.full-height.home {
     flex-direction: column;
-    align-items: flex-start;
     .tiles-container {
         @include themed() {
             .tile {
@@ -44,6 +43,14 @@
     .home-bottom {
         a {
             color: #000;
+        }
+    }
+}
+
+.app-container {
+    .main-container {
+        .content-box.full-height.home {
+            align-items: flex-start;
         }
     }
 }

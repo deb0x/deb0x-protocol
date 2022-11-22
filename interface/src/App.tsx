@@ -33,7 +33,6 @@ import { Add } from '@mui/icons-material';
 import HowTo from './components/HowTo';
 import ReactGA from 'react-ga';
 import { Home } from './components/App/Home';
-import { SendMessages } from './components/App/SendMessages';
 import useAnalyticsEventTracker from './components/Common/GaEventTracker';
 
 ReactGA.initialize("UA-151967719-3");
@@ -211,7 +210,6 @@ function App() {
             </p>
         }
     </div>
-    {isOptionSelected ? 
         <ThemeProvider>
         {
             account ? 
@@ -329,16 +327,7 @@ function App() {
                 </div>
             </div>
         }
-    </ThemeProvider>
-    :
-    <Router>
-        <Routes>
-            <Route path={ "/send" } element={ <SendMessages /> } />
-        </Routes>
-    </Router>
-
-    }
-    
+        </ThemeProvider>
     </>
   )
 }
