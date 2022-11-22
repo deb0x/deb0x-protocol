@@ -70,7 +70,7 @@ $randomNumber: random(4);
             }
             .content-box {
                 background-color: t('logo-bg');
-                margin: 15px;
+                margin: 15px 30px 15px 15px;
                 padding: 0 15px;
                 box-shadow: t('box-shadow');
                 border-radius: 25px 10px 85px 25px;
@@ -256,18 +256,18 @@ $randomNumber: random(4);
 
 .modal-box {
     height: 470px;
-    width: 55%;
-    margin: 25vh 24% 0;
-    width: 90%;
-    margin-left: 5%;
+    width: 100%;
+    max-width: 750px;
+    margin-left: 50%;
+    transform: translate(-50%,  50%);
     .close-popup {
         text-decoration: none;
     }
     &.dark {
-        background: #FFEEE8 0% 0% no-repeat padding-box;
+        background: #2B2235 0% 0% no-repeat padding-box;
         border-radius: 100px;
         box-shadow: 0px 3px 25px #0F0B1380;
-        border: 1px solid #FFEEE8;
+        border: 1px solid #2B2235;
 
         .close-popup {
             background: #FFEEE8;
@@ -333,7 +333,7 @@ $randomNumber: random(4);
         font-size: 26px;
     }
     .for-field {
-        margin: 25px;
+        margin: 25px 50px;
         position: relative;
     }
     .for-label {
@@ -342,10 +342,13 @@ $randomNumber: random(4);
     .buttons-container {
         display: flex;
         justify-content: space-between;
-        padding: 0 65px;
+        padding: 0 50px;
         .cancel-button {
+            width: 150px;
+            border: 2px solid #F5B700;
             transition: 0.5s;
             border-radius: 33px;
+            padding: 10px auto;
             text-transform: uppercase;
             &:hover {
                 transition: 0.5s;
@@ -353,10 +356,12 @@ $randomNumber: random(4);
             }
         }
         .add-button {
-            border: 2px solid #F5B700;
+            width: 150px;
+            background-color:#F5B700;
             border-radius: 33px;
-            padding: 10px 20px;
+            padding: 10px auto;
             transition: 0.5s;
+            color: #2B2235 !important;
             text-transform: uppercase;
             &:hover {
                 background: #F5B700;

@@ -186,9 +186,42 @@ export function Stake(props: any): any {
         )
     }
 
+    function CyclePanel() {
+        const [currentReward, setCurrentReward] = useState("")
+        useEffect(() => {
+            cycleReward()
+        }, [currentReward]);
+        async function cycleReward() {
+            const deb0xContract = await Deb0x(library, deb0xAddress);
+            const currentReward = await deb0xContract.currentCycleReward();
+            setCurrentReward(ethers.utils.formatEther(currentReward))
+        }
+        return (
+            <>
+            <Card variant="outlined" className="card-container">
+                <CardContent className="row">
+                    <div className="col-12 col-md-12 mb-2">
+                        <Typography variant="h4" component="div" className="rewards mb-3">
+                            DAILY STATS
+                        </Typography>
+                        <Typography >
+                            Total amount of daily cycle tokens: <strong>{currentReward}</strong>
+                        </Typography>
+                        {/* <Typography>
+                            Total amount of messages today: <strong>234</strong>
+                        </Typography>
+                        <Typography>
+                            You sent today: <strong>6 msg</strong>
+                        </Typography> */}
+                    </div>
+                </CardContent>
+            </Card>
+            </>
+        )
+    }
+
     function RewardsPanel() {
         
-
         const [rewardsUnclaimed, setRewardsUnclaimed] = useState("")
         const [feeSharePercentage, setFeeSharePercentage] = useState("")
         const [loading, setLoading] = useState(false)
@@ -361,7 +394,7 @@ export function Stake(props: any): any {
                     </div>
                 </CardContent>
                 <CardActions className='button-container'>
-                    <LoadingButton className="collect-btn" loading={loading} variant="contained" onClick={claimRewards}>Collect</LoadingButton>
+                    <LoadingButton className="collect-btn" loading={loading} variant="contained" onClick={claimRewards}>Claim</LoadingButton>
                 </CardActions>
             </Card>
             </>
@@ -864,7 +897,7 @@ export function Stake(props: any): any {
                 <div className="cards-grid">
                     <div className='row'>
                         <Grid item className="col col-md-6 ">
-                            <TotalStaked/>                        
+                            <CyclePanel />
                             <RewardsPanel />
                         </Grid>
                         <Grid item className="col col-md-6">

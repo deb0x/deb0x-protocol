@@ -100,6 +100,7 @@ function App() {
     let errorMsg;
     const [isVisible, setIsVisible] = useState(false);
     let [show, setShow] = useState(false);
+    const [selectedIndex, setSelectedIndex] = useState<any>(1);
     let [walletInitialized, setWalletInitialized] = useState<any>();
     const [isOptionSelected, setIsOptionSelected] = useState(true);
     const gaEventTracker = useAnalyticsEventTracker('Login');

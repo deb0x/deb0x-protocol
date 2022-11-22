@@ -160,7 +160,7 @@ export function Decrypt(props: any): any {
                 user = ensName;
             } else {
                 savedContacts.map((contact: any) => {
-                    if (sender == contact.address) {
+                    if (sender == (contact.address).toLowerCase()) {
                         user = true;
                     }
                 })
@@ -207,7 +207,7 @@ export function Decrypt(props: any): any {
                                         <p>From: 
                                             {
                                                 checkSenderInLocalStorage(props.message.sender) ?
-                                                savedContacts.filter((contact: any) => props.message.sender == contact.address)
+                                                savedContacts.filter((contact: any) => props.message.sender == (contact.address).toLowerCase())
                                                     .map((filteredPerson: any) => (
                                                         filteredPerson.name
                                                     )) :
@@ -239,7 +239,7 @@ export function Decrypt(props: any): any {
                                             <strong>
                                             {
                                                 checkSenderInLocalStorage(props.message.sender) ?
-                                                    savedContacts.filter((contact: any) => props.message.sender == contact.address)
+                                                    savedContacts.filter((contact: any) => props.message.sender == (contact.address).toLowerCase())
                                                         .map((filteredPerson: any) => (
                                                             filteredPerson.name
                                                         )) :
