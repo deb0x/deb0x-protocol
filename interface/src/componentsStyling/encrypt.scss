@@ -3,7 +3,6 @@
 .main-container {
     @include themed() {
         .content-box.form-container {
-            // display: block;
             position: relative;
             form {
                 padding-top: 15px;

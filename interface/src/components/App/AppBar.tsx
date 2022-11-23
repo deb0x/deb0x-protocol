@@ -45,7 +45,6 @@ export function AppBarComponent(props: any): any {
     const [rewardsUnclaimed, setRewardsUnclaimed] = useState("")
     const [open, setOpen] = useState<any>();
 
-    // var open = Boolean(anchorEl);
     const id = open ? 'simple-popper' : undefined;
 
     if(library){
@@ -157,12 +156,12 @@ export function AppBarComponent(props: any): any {
 
     function copyWalletID() {
         if(account) {
+            navigator.clipboard.writeText(account)
             setNotificationState({
                 message: "The address ID was copied successfully",
                 open: true,
                 severity: "success"
             })
-            navigator.clipboard.writeText(account)
         }
     }
 
@@ -186,10 +185,6 @@ export function AppBarComponent(props: any): any {
         setStakedAmount()
     }, [userStakedAmount]);
 
-
-    // function handleClick (event: React.MouseEvent<HTMLElement>) {
-    //     setAnchorEl(anchorEl ? null : event.currentTarget);
-    // };
 
     const handleClick = (event: any) => {
         const { currentTarget } = event;
@@ -290,7 +285,6 @@ export function AppBarComponent(props: any): any {
                     </Button>  
 
                 </Popper>
-
         </>
     );
 }
