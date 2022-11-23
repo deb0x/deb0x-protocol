@@ -232,11 +232,9 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         _;
 
         uint256 fee = ((startGas - gasleft() + 37700) * tx.gasprice * PROTOCOL_FEE) / MAX_BPS;
-        //TODO The fee is not ~10%
-        //change messege to "value less than required protocol fee"
         require(
             msg.value - nativeTokenFee >= fee,
-            "Deb0x: value less than 10% of spent gas"
+            "Deb0x: value less than required protocol fee"
         );
         
         cycleAccruedFees[currentCycle] += fee;
