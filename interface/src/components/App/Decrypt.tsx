@@ -48,9 +48,7 @@ export function Decrypt(props: any): any {
         getPublicEncryptionKey()
     }, [account]);
 
-    const getPublicEncryptionKey = async () => {
-        const deb0xContract = Deb0x(library, deb0xAddress)
-      
+    const getPublicEncryptionKey = async () => {      
         const key = await getKey(account);
         const initialized = (key != '') ? true : false
         setEncryptionKeyInitialized(initialized);
@@ -412,7 +410,7 @@ export function Decrypt(props: any): any {
     
     if (encryptionKeyInitialized === true) {
         return (
-            <div className="content-box full-height">
+            <div className="content-box">
                 <GetMessages />
             </div>
         )

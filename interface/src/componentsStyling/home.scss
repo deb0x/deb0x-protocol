@@ -6,7 +6,7 @@
         @include themed() {
             .tile {
                 .tile-content {
-                    background-color: t('stake-bg');
+                    background-color: t('card-color');
                     border-radius: 25px;
                     min-height: 210px;
                     font-size: 2vh;
@@ -42,7 +42,7 @@
     }
     .home-bottom {
         a {
-            color: #000;
+            color: #3a5b9a;
         }
     }
 }

@@ -57,7 +57,6 @@ $randomNumber: random(4);
         .main-container {
             margin-top: 0;
             display: flex;
-            align-items: center;
             height: 85%;
             min-height: 85%;
             .floating-btn {
@@ -70,7 +69,7 @@ $randomNumber: random(4);
             }
             .content-box {
                 background-color: t('logo-bg');
-                margin: 15px 30px 15px 15px;
+                margin: 15px 30px 45px 15px;
                 padding: 0 15px;
                 box-shadow: t('box-shadow');
                 border-radius: 25px 10px 85px 25px;
@@ -321,9 +320,9 @@ $randomNumber: random(4);
             color: #2B2235;
         }
         .inputs {
-            background: #E6D6D1 0% 0% no-repeat padding-box;
+            background: #F2E2DC 0% 0% no-repeat padding-box;
             &:focus {
-                background: #E6D6D1 0% 0% no-repeat padding-box;
+                background: #F2E2DC 0% 0% no-repeat padding-box;
             }
         }
     }

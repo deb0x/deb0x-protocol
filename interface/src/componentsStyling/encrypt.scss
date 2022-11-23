@@ -4,6 +4,7 @@
     @include themed() {
         .content-box.form-container {
             // display: block;
+            position: relative;
             form {
                 padding-top: 15px;
                 .MuiFormControl-root {
@@ -71,13 +72,13 @@
                 .wrapper {
                     border: 1px solid t('text-field-color');
                     background-color: t('text-field-color');
-                    border-radius: 25px 25px 84px 25px;
+                    border-radius: 25px 25px 0 0px;
                     margin-bottom: 50px;
                     position: relative;
                     .rdw-editor-toolbar {
-                        border-radius: 25px;
+                        border-radius: 0 0 25px 25px;
                         border: none;
-                        width: 80%;
+                        width: 100%;
                         position: absolute;
                         bottom: -25px;
                         margin: 0;
@@ -112,34 +113,50 @@
                         padding-bottom: 50px;
                     }
                 }
-                .send-btn {
-                    font-size: 12px;
-                    background-color:  #F5B700;
-                    border-radius: 50%;
-                    width: 88px;
-                    height: 88px;
-                    position: absolute;
-                    margin-bottom: 35px;
-                    z-index: 9;
+
+                .form-bottom {
+                    position: relative;
+                    .send-btn {
+                        font-size: 16px;
+                        background-color:  #F5B700;
+                        color: #000;
+                        font-weight: bold;
+                        border-radius: 25px;
+                        padding: 15px auto;
+                        width: 150px;
+                        position: absolute;
+                        text-transform: none;
+                        z-index: 9;
+                        .MuiLoadingButton-loadingIndicator {
+                            color: black;
+                            .MuiCircularProgress-root {
+                                width: 32px !important;
+                                height: 32px !important;
+                            }
+                        }
+                        
+                    }
+                    .send-papper-airplane {
+                        margin-right: 17px;
+                        height: 15px;
+                    }
                     .MuiLoadingButton-loadingIndicator {
-                        color: black;
-                        .MuiCircularProgress-root {
-                            width: 32px !important;
-                            height: 32px !important;
+                        color: t('text');
+                        position: relative;
+                        left: 0;
+                        transform: none;
+                    }
+                    .rewards {
+                        position: absolute;
+                        margin-top: 10px;
+                        right: 25px;
+                        p {
+                            font-weight: bold;
+                            color: #F5B700;
                         }
                     }
-                    
                 }
-                .send-papper-airplane {
-                    margin-right: 17px;
-                    height: 47px;
-                }
-                .MuiLoadingButton-loadingIndicator {
-                    color: t('text');
-                    position: relative;
-                    left: 0;
-                    transform: none;
-                }
+
             }
         }
     }

@@ -893,7 +893,7 @@ export function Stake(props: any): any {
     return (
         <>
             <SnackbarNotification state={notificationState} setNotificationState={setNotificationState} />
-            <Box className="container">
+            <Box className="content-box">
                 <div className="cards-grid">
                     <div className='row'>
                         <Grid item className="col col-md-6 ">

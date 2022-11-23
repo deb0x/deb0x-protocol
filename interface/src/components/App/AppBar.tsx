@@ -13,6 +13,7 @@ import Deb0x from "../../ethereum/deb0x"
 import Deb0xViews from "../../ethereum/deb0xViews";
 import Deb0xERC20 from "../../ethereum/deb0xerc20";
 import Popper from '@mui/material/Popper';
+import ClickAwayListener from '@mui/base/ClickAwayListener';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import SnackbarNotification from './Snackbar';
@@ -42,8 +43,9 @@ export function AppBarComponent(props: any): any {
     const [theme, setTheme] = useState(localStorage.getItem('globalTheme'));
     const [userStakedAmount, setUserStakedAmount] = useState("")
     const [rewardsUnclaimed, setRewardsUnclaimed] = useState("")
+    const [open, setOpen] = useState<any>();
 
-    const open = Boolean(anchorEl);
+    // var open = Boolean(anchorEl);
     const id = open ? 'simple-popper' : undefined;
 
     if(library){
@@ -155,12 +157,12 @@ export function AppBarComponent(props: any): any {
 
     function copyWalletID() {
         if(account) {
-            navigator.clipboard.writeText(account)
             setNotificationState({
                 message: "The address ID was copied successfully",
                 open: true,
                 severity: "success"
             })
+            navigator.clipboard.writeText(account)
         }
     }
 
@@ -185,9 +187,20 @@ export function AppBarComponent(props: any): any {
     }, [userStakedAmount]);
 
 
-    function handleClick (event: React.MouseEvent<HTMLElement>) {
-        setAnchorEl(anchorEl ? null : event.currentTarget);
-    };
+    // function handleClick (event: React.MouseEvent<HTMLElement>) {
+    //     setAnchorEl(anchorEl ? null : event.currentTarget);
+    // };
+
+    const handleClick = (event: any) => {
+        const { currentTarget } = event;
+        setAnchorEl(currentTarget)
+        setOpen(!open)
+      };
+
+     const handleClickAway = () => {
+        setOpen(false)
+      };
+
 
     function handleChange(text: any, index: any) {
         // setSelectedIndex(index)
@@ -211,69 +224,73 @@ export function AppBarComponent(props: any): any {
                     const disabled = !triedEager || !!activatingConnector || connected || !!error
 
                     return (
-                        <Button variant="contained"
-                            key={ConnectorNames.Injected}
-                            aria-describedby={id}
-                            onClick={!connected ? 
-                                () => {
-                                    setActivatingConnector(currentConnector)
-                                    activate(currentConnector)
-                                } : 
-                                handleClick
-                            }>
-                            
-                            { activating ? 
-                                <Spinner color={'black'} /> :
-                                !connected ? 
-                                    "Connect Wallet" :
-                                    <span>
-                                        {account === undefined ? 
-                                            `Unsupported Network. Switch to ${networkName}` : 
-                                            account ? 
-                                                ensName === "" ? 
-                                                    `${formatAccountName(account)}` :
-                                                    `${ensName.toLowerCase()} 
-                                                    (${formatAccountName(account)})`
-                                            : ''}
-                                    </span>
-                            }
-                        </Button>
+                        <ClickAwayListener onClickAway={handleClickAway}>
+                            <Button variant="contained"
+                                key={ConnectorNames.Injected}
+                                aria-describedby={id}
+                                onClick={!connected ? 
+                                    () => {
+                                        setActivatingConnector(currentConnector)
+                                        activate(currentConnector)
+                                    } : 
+                                    handleClick
+                                }>
+                                
+                                { activating ? 
+                                    <Spinner color={'black'} /> :
+                                    !connected ? 
+                                        "Connect Wallet" :
+                                        <span>
+                                            {account === undefined ? 
+                                                `Unsupported Network. Switch to ${networkName}` : 
+                                                account ? 
+                                                    ensName === "" ? 
+                                                        `${formatAccountName(account)}` :
+                                                        `${ensName.toLowerCase()} 
+                                                        (${formatAccountName(account)})`
+                                                : ''}
+                                        </span>
+                                }
+                            </Button>
+                        </ClickAwayListener> 
+
                     )
                 }) ()}
                         
                     <ThemeSetter />
                 </Box>
             </div>
-            <Popper className={`popper ${theme === "classic" ? "classic" : "dark"}` } id={id} open={open} anchorEl={anchorEl}>
-                <ul>
-                    <li>Unclaimed rewards: {rewardsUnclaimed}</li>
-                    <li>Active stake: {userStakedAmount} DBX</li>
-                    <li>In wallet: {userUnstakedAmount} DBX</li>
-                </ul>
-                <Button 
-                    onClick={(event: any) => {
-                        copyWalletID()
-                    }}
-                    className="copy-wallet-btn">
-                    Copy wallet ID
-                </Button>
-                <Button
-                    onClick={(event: any) => {
-                        addToken()
-                    }}
-                    className="add-token-btn">
-                    Add token to wallet
-                </Button>
-                 <Button 
-                    onClick={(event: any) => {
-                        handleClick(event)
-                        deactivate()
-                    }}
-                        className="logout-btn">
-                        Disconnect wallet
-                </Button>  
+                <Popper className={`popper ${theme === "classic" ? "classic" : "dark"}` } id={id} open={open} anchorEl={anchorEl}>
+                    <ul>
+                        <li>Unclaimed rewards: {rewardsUnclaimed}</li>
+                        <li>Active stake: {userStakedAmount} DBX</li>
+                        <li>In wallet: {userUnstakedAmount} DBX</li>
+                    </ul>
+                    <Button 
+                        onClick={(event: any) => {
+                            copyWalletID()
+                        }}
+                        className="copy-wallet-btn">
+                        Copy wallet ID
+                    </Button>
+                    <Button
+                        onClick={(event: any) => {
+                            addToken()
+                        }}
+                        className="add-token-btn">
+                        Add token to wallet
+                    </Button>
+                    <Button 
+                        onClick={(event: any) => {
+                            handleClick(event)
+                            deactivate()
+                        }}
+                            className="logout-btn">
+                            Disconnect wallet
+                    </Button>  
 
-            </Popper>
+                </Popper>
+
         </>
     );
 }
