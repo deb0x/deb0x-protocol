@@ -232,10 +232,9 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         _;
 
         uint256 fee = ((startGas - gasleft() + 37700) * tx.gasprice * PROTOCOL_FEE) / MAX_BPS;
-        
         require(
             msg.value - nativeTokenFee >= fee,
-            "Deb0x: value less than 10% of spent gas"
+            "Deb0x: value less than required protocol fee"
         );
         
         cycleAccruedFees[currentCycle] += fee;
@@ -316,8 +315,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         calculateCycle();
         updateCycleFeesPerStakeSummed();
         updateStats(_msgSender());
-        uint256 reward = accRewards[_msgSender()] -
-            accWithdrawableStake[_msgSender()];
+        uint256 reward = accRewards[_msgSender()] - accWithdrawableStake[_msgSender()];
 
         require(reward > 0, "Deb0x: account has no rewards");
 
@@ -696,11 +694,12 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         require(recipients.length == crefs.length, "Deb0x: crefs and recipients lengths not equal");
         require(recipients.length > 0, "Deb0x: recipients array empty");
         for (uint256 idx = 0; idx < recipients.length - 1; idx++) {
+            require(crefs[recipients.length - 1].length > 0 , "Deb0x: empty cref");
             require(crefs[recipients.length - 1].length <= 8 , "Deb0x: cref too long");
         }
 
         for (uint256 idx = 0; idx < recipients.length - 1; idx++) {
-            bytes32 bodyHash = keccak256(abi.encodePacked(crefs[idx]));
+            bytes32 bodyHash = keccak256(abi.encode(crefs[idx]));
      
             emit Sent(
                 recipients[idx],
@@ -713,8 +712,9 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         }
 
         bytes32 selfBodyHash = keccak256(
-            abi.encodePacked(crefs[recipients.length - 1])
+            abi.encode(crefs[recipients.length - 1])
         );
+        require(crefs[recipients.length - 1].length > 0 , "Deb0x: empty cref");
         require(crefs[recipients.length - 1].length <= 8 , "Deb0x: cref too long");
 
         uint256 oldSentId = sentId;

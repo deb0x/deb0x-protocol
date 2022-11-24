@@ -857,7 +857,7 @@ describe("Test DBX tokens distributions", async function() {
             await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
                 feeReceiver.address, 1000, 0)
         } catch (error) {
-            expect(error.message).to.include("Deb0x: value less than 10% of spent gas")
+            expect(error.message).to.include("Deb0x: value less than required protocol fee")
         }
     });
 

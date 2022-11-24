@@ -108,4 +108,17 @@ describe("Test Deb0xCore contract", async function() {
         }
     });
 
+    it(`Should revert the _send with empty crefs`, async() => {
+        let addresses = [add1.address, add2.address, add2.address];
+        let cids = [[], [], []];
+
+        try {
+            await deboxCore.send(addresses, cids, ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
+        } catch (error) {
+            expect(error.message).to.include("Deb0x: empty cref");
+        }
+
+    });
+
 })
