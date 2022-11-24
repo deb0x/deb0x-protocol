@@ -603,31 +603,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
         if (
             accFirstStake[account] != 0 &&
-            currentCycle - accFirstStake[account] >= 0 &&
-            stakedDuringGapCycle[account]
-        ) {
-            uint256 unlockedFirstStake = accStakeCycle[account][accFirstStake[account]];
-
-            accRewards[account] += unlockedFirstStake;
-            accWithdrawableStake[account] += unlockedFirstStake;
-            if (lastStartedCycle + 1 > accFirstStake[account]) {
-                accAccruedFees[account] = accAccruedFees[account] + 
-                (
-                    (accStakeCycle[account][accFirstStake[account]] * 
-                        (cycleFeesPerStakeSummed[lastStartedCycle + 1] - 
-                            cycleFeesPerStakeSummed[accFirstStake[account]]
-                        )
-                    )
-                ) /
-                SCALING_FACTOR;
-            }
-
-            accStakeCycle[account][accFirstStake[account]] = 0;
-            accFirstStake[account] = 0;
-            stakedDuringGapCycle[account] = false;
-        } else if (
-            accFirstStake[account] != 0 &&
-            currentCycle - accFirstStake[account] > 0
+            currentCycle > accFirstStake[account]
         ) {
             uint256 unlockedFirstStake = accStakeCycle[account][accFirstStake[account]];
 
@@ -649,7 +625,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
             accFirstStake[account] = 0;
 
             if (accSecondStake[account] != 0) {
-                if (currentCycle - accSecondStake[account] > 0) {
+                if (currentCycle > accSecondStake[account]) {
                     uint256 unlockedSecondStake = accStakeCycle[account][accSecondStake[account]];
 
                     accRewards[account] += unlockedSecondStake;
