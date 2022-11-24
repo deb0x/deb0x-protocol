@@ -267,7 +267,7 @@ describe("Test unstake functionality", async function() {
         const remainder = await hre.ethers.provider.getBalance(user1Reward.address);
         expect(totalFeesClaimed.add(remainder)).to.equal(feesCollected)
     })
-    it("Should not be able to unstake in the same cycle in which DBX was staked", async function(){
+    it("Should not be able to unstake in the same cycle in which DBX was staked(stake before message)", async function(){
         await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
@@ -289,7 +289,7 @@ describe("Test unstake functionality", async function() {
         }
 
     })
-    it("Should not be able to unstake in the same cycle in which DBX was staked", async function(){
+    it("Should not be able to unstake in the same cycle in which DBX was staked(stake after message)", async function(){
         await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
@@ -311,7 +311,7 @@ describe("Test unstake functionality", async function() {
         }
 
     })
-    it.only("Can unstake next day if the stake was done before first message that day", async function() {
+    it("Can unstake next day if the stake was done before first message that day", async function() {
         await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
