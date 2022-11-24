@@ -135,12 +135,6 @@ contract Deb0xViews {
         return currentAccruedFees;
     }
 
-    function getCurrentCycle() public view returns (uint256) {
-        return
-            (block.timestamp - deb0x.i_initialTimestamp()) /
-            deb0x.i_periodDuration();
-    }
-
     function calculateCycleReward() public view returns (uint256) {
         return (deb0x.lastCycleReward() * 10000) / 10020;
     }

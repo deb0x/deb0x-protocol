@@ -7,36 +7,77 @@ import "./Deb0xERC20.sol";
 
 contract Deb0x is ERC2771Context, ReentrancyGuard {
 
+    /**
+     * Deb0x Reward Token contract.
+     * Initialized in constructor.
+     */
     Deb0xERC20 public dbx;
 
+    /**
+     * Basis points (bps) representation of the protocol fee (i.e. 10 percent).
+     * Calls to send function charge 1000 bps of transaction cost.
+     */
     uint16 public constant PROTOCOL_FEE = 1000;
 
+    /**
+     * Basis points representation of 100 percent.
+     */
+    uint16 public constant MAX_BPS = 10000;
+
+    /**
+     * Used to minimise division remainder when earned fees are calculated.
+     */
     uint256 public constant SCALING_FACTOR = 1e40;
 
+    /**
+     * Contract creation timestamp.
+     * Initialized in constructor.
+     */
     uint256 public immutable i_initialTimestamp;
 
+    /**
+     * Length of a reward distribution cycle. 
+     * Initialized in contstructor to 1 day.
+     */
     uint256 public immutable i_periodDuration;
 
+    /**
+     * Reward token amount allocated for the current cycle.
+     */
     uint256 public currentCycleReward;
 
+    /**
+     * Reward token amount allocated for the previous cycle.
+     */
     uint256 public lastCycleReward;
 
+    /**
+     * Helper variable to store pending stake amount.   
+     */
     uint256 public pendingStake;
 
     /**
      * Index (0-based) of the current cycle.
      * 
-     * Updated upon cycle setup that is  triggered by contract interraction (account sends message, claims fees, claims rewards, stakes or unstakes).
+     * Updated upon cycle setup that is  triggered by contract interraction 
+     * (account sends message, claims fees, claims rewards, stakes or unstakes).
      */
     uint256 public currentCycle;
 
+    /**
+     * Helper variable to store the index of the last active cycle.
+     */
     uint256 public lastStartedCycle;
 
+    /**
+     * Stores the value of penultimate active cycle plus one.
+     */
     uint256 public previousStartedCycle;
 
+    /**
+     * Helper variable to store the index of the last active cycle.
+     */
     uint256 public currentStartedCycle;
-
-    uint256 public pendingCycleRewardsStake;
 
     uint256 public pendingStakeWithdrawal;
 
@@ -176,7 +217,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         cycleTotalGasUsed[currentCycle] += gasConsumed;
 
         if (feeReceiver != address(0) && msgFee != 0) {
-            uint256 gasOwed = (gasConsumed * msgFee) / 10000;
+            uint256 gasOwed = (gasConsumed * msgFee) / MAX_BPS;
             gasConsumed -= gasOwed;
             clientCycleGasEarned[feeReceiver] += gasOwed;
         }
@@ -190,11 +231,10 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
         _;
 
-        uint256 fee = ((startGas - gasleft() + 37700) * tx.gasprice * PROTOCOL_FEE) / 10000;
-        
+        uint256 fee = ((startGas - gasleft() + 37700) * tx.gasprice * PROTOCOL_FEE) / MAX_BPS;
         require(
             msg.value - nativeTokenFee >= fee,
-            "Deb0x: value less than 10% of spent gas"
+            "Deb0x: value less than required protocol fee"
         );
         
         cycleAccruedFees[currentCycle] += fee;
@@ -249,7 +289,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         gasUsed(feeReceiver, msgFee)
 
     {
-        require(msgFee < 10001, "Deb0x: reward fees exceed 10000 bps");
+        require(msgFee <= MAX_BPS, "Deb0x: reward fees exceed 10000 bps");
 
         uint256 _sentId = _send(to, crefs);
         calculateCycle();
@@ -275,8 +315,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         calculateCycle();
         updateCycleFeesPerStakeSummed();
         updateStats(_msgSender());
-        uint256 reward = accRewards[_msgSender()] -
-            accWithdrawableStake[_msgSender()];
+        uint256 reward = accRewards[_msgSender()] - accWithdrawableStake[_msgSender()];
 
         require(reward > 0, "Deb0x: account has no rewards");
 
@@ -353,7 +392,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         calculateCycle();
         updateCycleFeesPerStakeSummed();
         updateStats(_msgSender());
-        require(amount != 0, "Deb0x: amount is zero");
+        require(amount > 0, "Deb0x: amount is zero");
         pendingStake += amount;
         uint256 cycleToSet = currentCycle + 1;
 
@@ -386,7 +425,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         calculateCycle();
         updateCycleFeesPerStakeSummed();
         updateStats(_msgSender());
-        require(amount != 0, "Deb0x: amount is zero");
+        require(amount > 0, "Deb0x: amount is zero");
 
         require(
             amount <= accWithdrawableStake[_msgSender()],
@@ -502,7 +541,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
             uint256 calculatedCycleReward = (lastCycleReward * 10000) / 10020;
             currentCycleReward = calculatedCycleReward;
             rewardPerCycle[currentCycle] = calculatedCycleReward;
-            pendingCycleRewardsStake = calculatedCycleReward;
 
             currentStartedCycle = currentCycle;
             
@@ -539,7 +577,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
             accCycleGasUsed[account] != 0	
         ) {	
             uint256 lastCycleAccReward = (accCycleGasUsed[account] * rewardPerCycle[lastActiveCycle[account]]) / 	
-            cycleTotalGasUsed[lastActiveCycle[account]];	
+                cycleTotalGasUsed[lastActiveCycle[account]];	
             accRewards[account] += lastCycleAccReward;	
          
             accCycleGasUsed[account] = 0;
@@ -642,6 +680,8 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     /**
      * @dev For each recipient emits events with correspondig cref.
      * Lengths of recipients and crefs arrays must match.
+     * All crefs (content references) must be less than 8 bytes32 long and 
+     * are purposed to store pointers (e.g. HTTP urls, IPFS CIDs) to messages content.
      * 
      * @param recipients recipient addresses that messages are stored for.
      * @param crefs content references to the messages.
@@ -653,11 +693,12 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         require(recipients.length == crefs.length, "Deb0x: crefs and recipients lengths not equal");
         require(recipients.length > 0, "Deb0x: recipients array empty");
         for (uint256 idx = 0; idx < recipients.length - 1; idx++) {
+            require(crefs[recipients.length - 1].length > 0 , "Deb0x: empty cref");
             require(crefs[recipients.length - 1].length <= 8 , "Deb0x: cref too long");
         }
 
         for (uint256 idx = 0; idx < recipients.length - 1; idx++) {
-            bytes32 bodyHash = keccak256(abi.encodePacked(crefs[idx]));
+            bytes32 bodyHash = keccak256(abi.encode(crefs[idx]));
      
             emit Sent(
                 recipients[idx],
@@ -670,8 +711,9 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         }
 
         bytes32 selfBodyHash = keccak256(
-            abi.encodePacked(crefs[recipients.length - 1])
+            abi.encode(crefs[recipients.length - 1])
         );
+        require(crefs[recipients.length - 1].length > 0 , "Deb0x: empty cref");
         require(crefs[recipients.length - 1].length <= 8 , "Deb0x: cref too long");
 
         uint256 oldSentId = sentId;

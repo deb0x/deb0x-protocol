@@ -31,7 +31,6 @@ describe("Test fee claiming for users/frontends", async function() {
     it("1. should test sending some messages and claiming some fees with only 1 account", async() => {
 
         aliceBalance = await hre.ethers.provider.getBalance(alice.address)
-        let curCycle = parseInt((await deb0xViews.getCurrentCycle()).toString())
 
         await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
             feeReceiver.address, 200, 0, { value: ethers.utils.parseEther("2") })
@@ -67,7 +66,6 @@ describe("Test fee claiming for users/frontends", async function() {
     it("1. should test getUnclaimedFees function", async() => {
 
         aliceBalance = await hre.ethers.provider.getBalance(alice.address)
-        let curCycle = parseInt((await deb0xViews.getCurrentCycle()).toString())
         await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
             feeReceiver.address, 200, 0, { value: ethers.utils.parseEther("2") })
         await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],

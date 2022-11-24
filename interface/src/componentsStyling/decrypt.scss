@@ -5,6 +5,7 @@
     @include themed() {
         .row.messages-list {
             height: 100%;
+            width: 100%;
             ul.MuiList-root {
                 padding-top: 0;
                 height: 65vh;
@@ -214,7 +215,7 @@
                 }
                 .message {
                     padding: 10px 15px;
-                    height: calc(100% - 270px);
+                    height: calc(100% - 100px);
                     overflow: auto;
                 }
                 .address {
