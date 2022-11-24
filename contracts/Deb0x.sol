@@ -620,7 +620,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
                         accAccruedFees[account] = accAccruedFees[account] + 
                         (
                             (accStakeCycle[account][accSecondStake[account]] * 
-                                 (cycleFeesPerStakeSummed[lastStartedCycle + 1] - 
+                                (cycleFeesPerStakeSummed[lastStartedCycle + 1] - 
                                     cycleFeesPerStakeSummed[accSecondStake[account]]
                                 )
                             )
