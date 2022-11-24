@@ -194,7 +194,7 @@ describe("Test rewards claiming for frontends", async function() {
         let feeReceiver3Reward2 = BigNumber.from("9000000000000000000").mul(BigNumber.from(NumUtils.day(2))).div(BigNumber.from("100000000000000000000"));
         let totalFeeReciver3 = feeReceiver3Reward1.add(feeReceiver3Reward2);
         //5 wei difference !
-        //expect(ethers.utils.formatEther(totalFeeRecoever)).to.equal(ethers.utils.formatEther(await dbxERC20.balanceOf(feeReceiver.address)));
+        //expect(ethers.utils.formatEther(totalFeeReciver)).to.equal(ethers.utils.formatEther(await dbxERC20.balanceOf(feeReceiver.address)));
         //5 wei difference !
         // expect(ethers.utils.formatEther(feeReceiver2Reward)).to.equal(ethers.utils.formatEther(await dbxERC20.balanceOf(feeReceiver2.address)));
         //1 wei difference !
