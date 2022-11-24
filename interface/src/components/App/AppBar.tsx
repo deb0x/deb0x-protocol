@@ -24,7 +24,8 @@ const deb0xViewsAddress = "0xf032f7FB8258728A1938473B2115BB163d5Da593";
 const deb0xERC20Address = "0x8345742746c41BC9C004aD7BEE0b65E92F227347"
 const tokenSymbol = 'DBX';
 
-const tokenDecimals = 18;enum ConnectorNames { Injected = 'Injected' };
+const tokenDecimals = 18;
+enum ConnectorNames { Injected = 'Injected' };
 
 const connectorsByName: { [connectorName in ConnectorNames]: any } = {
     [ConnectorNames.Injected]: injected

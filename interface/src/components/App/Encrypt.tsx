@@ -67,7 +67,7 @@ export function Encrypt(replyAddress?: any): any {
     const addressListForRewards: string[] = [];
     const [inputValue, setInputValue] = useState<number>(0);
 
-    useEffect(() => {        
+    useEffect(() => {  
         if(address)
             addressList.push(address)
         
@@ -328,11 +328,20 @@ export function Encrypt(replyAddress?: any): any {
         const key = await getKey(account)
         setEncryptionKeyInitialized(key || '')
     }
-    const [editorState, setEditorState] = useState(() =>
+    const [editorState, setEditorState] = useState(() => 
         EditorState.createEmpty()
     );
 
     const handleEditorChange = (state: any) => {
+        if (senderAddress != '') {
+            isValid(senderAddress);
+        } else {
+            setNotificationState({
+                message: null,
+                severity: "error"
+            })
+            setError(null);
+        }
         setEditorState(state);
         sendContent();
     };
@@ -396,7 +405,7 @@ export function Encrypt(replyAddress?: any): any {
                                 </Box> : 
                                 null
                             }
-
+                            <div>
                             <LoadingButton className="send-btn" 
                                 loading={loading} 
                                 endIcon={ loading ? 
@@ -411,6 +420,7 @@ export function Encrypt(replyAddress?: any): any {
                                 } >
                                     Send
                             </LoadingButton>
+                            </div>
                         </Box>
                 </Box>
             </div>
