@@ -216,7 +216,7 @@ describe("Test send messages and fetch functions", async function() {
             feeReceiver.address, 200, 0, ).then(res => {
             assert.fail("must throw err");
         }).catch(err => {
-            expect(err.message).to.contain("Deb0x: value less than 10% of spent gas")
+            expect(err.message).to.contain("Deb0x: value less than required protocol fee")
         })
         let totalNumberOfMessagesSentByAlice = 0;
         if (sendMessage != undefined) {
@@ -239,7 +239,7 @@ describe("Test send messages and fetch functions", async function() {
             feeReceiver.address, 200, 0, { value: 20 }).then(res => {
             assert.fail("must throw err");
         }).catch(err => {
-            expect(err.message).to.contain("Deb0x: value less than 10% of spent gas")
+            expect(err.message).to.contain("Deb0x: value less than required protocol fee")
         })
         let totalNumberOfMessagesSentByAlice = 0;
         if (sendMessage != undefined) {

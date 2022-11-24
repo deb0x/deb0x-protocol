@@ -328,7 +328,6 @@ export function Sent(props: any): any {
                         </List>
                         <Box className="intro-box sent col-md-8">
                             <div className="open-message">
-                                <p>Come on, don't be shy. Open a message</p>
                             </div>
                         </Box>
                     </div>

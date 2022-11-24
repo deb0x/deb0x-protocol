@@ -44,6 +44,6 @@ npx hardhat run --network goerli scritps/deploy.js
 | Contract name            | Commit hash | Staging                               | Mainnet                                    |
 | ------------------------ | ----------- | -------------------------------------------  | ------------------------------------------ | 
 | Forwarder                |  006a9ec    |0x30782c020FE90614f08a863B41CbB07A2D2D94fF                                            |                                            |
-| Deb0x                    |  29d18d6    | 0x3a473a59820929D42c47aAf1Ea9878a2dDa93E18 |                                        |
-| Deb0xERC20               |  ab8d403    | 0x855201bA0e531DfdD84B41e34257165D745eE97F |                                        |
+| Deb0x                    |  29d18d6    | 0x3a473a59820929D42c47aAf1Ea9878a2dDa93E18|                                        |
+| Deb0xERC20               |  ab8d403    | 0x855201bA0e531DfdD84B41e34257165D745eE97F|                                        |
 | Deb0xView                |  437f608    | 0x9FBbD4cAcf0f23c2015759522B298fFE888Cf005   |                                        |                                            

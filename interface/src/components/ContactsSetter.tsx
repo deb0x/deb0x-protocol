@@ -88,7 +88,7 @@ export default function ContactsSetter(props: any) {
                             </button>
                             <button className="btn mt-3 add-button" type="button"
                                 onClick={addContact}>
-                                OK / SAVE / ADD
+                                ADD
                             </button>
                         </div>
                     </form>

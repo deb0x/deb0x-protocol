@@ -2,7 +2,7 @@
 
 .app-container {
     @include themed() {
-        .container{
+        .content-box{
             min-height: 65vh;
             background: t('stake-bg');
             box-shadow: t('box-shadow');
@@ -25,7 +25,6 @@
             .card-container {
                 * {
                     font-family: 'Karla';
-                    color: #fff;
                 }
                 background-color: t('card-color');
                 color: t('text');

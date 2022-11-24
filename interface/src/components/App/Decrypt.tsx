@@ -29,6 +29,7 @@ import avatar from '../../photos/icons/avatars/test-avatar-1.svg';
 import ReadedMessagesContext from '../Contexts/ReadedMessagesContext';
 import ReadedMessagesProvider from '../Contexts/ReadedMessagesProvider';
 import { Encrypt } from './Encrypt';
+import useAnalyticsEventTracker from '../Common/GaEventTracker';
 
 const deb0xAddress = "0x3a473a59820929D42c47aAf1Ea9878a2dDa93E18";
 
@@ -39,19 +40,19 @@ export function Decrypt(props: any): any {
         useState<boolean|undefined>(undefined);
     const [decrypted, setDecrypted] = useState<any>();
     const savedContacts = JSON.parse(localStorage.getItem('contacts') || 'null'); 
-
+    const gaEventTracker = useAnalyticsEventTracker('Decrypt');
+    const gaContactTracker = useAnalyticsEventTracker('Decrypt');
 
     useEffect(() => {
         setLoading(true)
         getPublicEncryptionKey()
     }, [account]);
 
-    const getPublicEncryptionKey = async () => {
-        const deb0xContract = Deb0x(library, deb0xAddress)
-      
+    const getPublicEncryptionKey = async () => {      
         const key = await getKey(account);
         const initialized = (key != '') ? true : false
-        setEncryptionKeyInitialized(initialized)
+        setEncryptionKeyInitialized(initialized);
+        props.checkIfInit(initialized)
     }
 
     async function decrypt(encryptedMessage: any) {
@@ -60,8 +61,10 @@ export function Decrypt(props: any): any {
                 method: 'eth_decrypt',
                 params: [encryptedMessage, account],
             });
+            gaEventTracker('Success: message decrypted');
             return decryptedMessage
         } catch (error) {
+            gaEventTracker('Rejected: message decrypted');
             return undefined
         }
     }
@@ -155,7 +158,7 @@ export function Decrypt(props: any): any {
                 user = ensName;
             } else {
                 savedContacts.map((contact: any) => {
-                    if (sender == contact.address) {
+                    if (sender == (contact.address).toLowerCase()) {
                         user = true;
                     }
                 })
@@ -191,7 +194,6 @@ export function Decrypt(props: any): any {
                                 decryptMessage()
                             }
                             addMessage();
-
                         }}>
                         <div>
                             <img width="58px" height="58px" src={require(`../../photos/icons/avatars/animal-${randomImage}.svg`).default} alt="avatar"/>
@@ -203,7 +205,7 @@ export function Decrypt(props: any): any {
                                         <p>From: 
                                             {
                                                 checkSenderInLocalStorage(props.message.sender) ?
-                                                savedContacts.filter((contact: any) => props.message.sender == contact.address)
+                                                savedContacts.filter((contact: any) => props.message.sender == (contact.address).toLowerCase())
                                                     .map((filteredPerson: any) => (
                                                         filteredPerson.name
                                                     )) :
@@ -235,7 +237,7 @@ export function Decrypt(props: any): any {
                                             <strong>
                                             {
                                                 checkSenderInLocalStorage(props.message.sender) ?
-                                                    savedContacts.filter((contact: any) => props.message.sender == contact.address)
+                                                    savedContacts.filter((contact: any) => props.message.sender == (contact.address).toLowerCase())
                                                         .map((filteredPerson: any) => (
                                                             filteredPerson.name
                                                         )) :
@@ -247,7 +249,10 @@ export function Decrypt(props: any): any {
                                         </p>
                                         <>
                                             {!checkSenderInLocalStorage(props.message.sender) ? 
-                                                <IconButton onClick={() => setShow(true)}>
+                                                <IconButton onClick={() => {
+                                                    setShow(true); 
+                                                    gaContactTracker("New contact from message");
+                                                }}>
                                                     <Add />
                                                 </IconButton> :
                                                 <></>

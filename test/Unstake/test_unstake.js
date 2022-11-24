@@ -1,4 +1,4 @@
-const { expect } = require("chai");
+const { expect, assert } = require("chai");
 const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
@@ -279,7 +279,7 @@ describe("Test unstake functionality", async function() {
         await hre.ethers.provider.send("evm_mine")
         await user3Reward.claimRewards()
         let user3Balance = await dbxERC20.balanceOf(user3.address);
-        let user3BalanceDiv4 = BigNumber.from(user3Balance).div(BigNumber.from("4"));
+        let user3BalanceDiv4 = user3Balance.div(4);
         let balanceBigNumberFormat = BigNumber.from(user3BalanceDiv4.toString());
         await dbxERC20.connect(user3).approve(deb0xContract.address, user3Balance)
         await user3Reward.stakeDBX(balanceBigNumberFormat)
@@ -290,6 +290,8 @@ describe("Test unstake functionality", async function() {
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
+        expect(await deb0xViews.getAccWithdrawableStake(user3.address)).to.equal(balanceBigNumberFormat)
+
         await user3Reward.claimRewards();
         await user3Reward.stakeDBX(balanceBigNumberFormat)
 
@@ -297,6 +299,8 @@ describe("Test unstake functionality", async function() {
         await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
+        let expectedStake = balanceBigNumberFormat.mul(2);
+        expect(await deb0xViews.getAccWithdrawableStake(user3.address)).to.equal(expectedStake)
 
         try {
             await user3Reward.unstake("3700000000000000000000")
@@ -305,16 +309,60 @@ describe("Test unstake functionality", async function() {
         }
     })
 
-    it("Check multiple stake and unstake action in different cycles", async() => {
+    it("Should not be able to unstake in the same cycle in which DBX was staked(stake before message)", async function() {
         await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+
+        await user1Reward.claimRewards()
+
+        let user1Balance = await dbxERC20.balanceOf(user1.address)
+        await dbxERC20.connect(user1).approve(deb0xContract.address, user1Balance)
+
+        await user1Reward.stakeDBX(user1Balance.div(BigNumber.from("2")))
+        await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
+        try {
+            await user1Reward.unstake(user1Balance.div(BigNumber.from("2")))
+            assert.fail("Should have thrown error")
+        } catch (error) {
+            expect(error.message).to.include("Deb0x: amount greater than withdrawable stake");
+        }
+
+    })
+    it("Should not be able to unstake in the same cycle in which DBX was staked(stake after message)", async function() {
+        await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+
+        await user1Reward.claimRewards()
+
+        let user1Balance = await dbxERC20.balanceOf(user1.address)
+        await dbxERC20.connect(user1).approve(deb0xContract.address, user1Balance)
+
+        await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await user1Reward.stakeDBX(user1Balance.div(BigNumber.from("2")))
+
+        try {
+            await user1Reward.unstake(user1Balance.div(BigNumber.from("2")))
+            assert.fail("Should have thrown error")
+        } catch (error) {
+            expect(error.message).to.include("Deb0x: amount greater than withdrawable stake");
+        }
+
+    })
+    it("Can unstake next day if the stake was done before first message that day", async function() {
+        await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
         await user1Reward.claimRewards()
         let user1Balance = await dbxERC20.balanceOf(user1.address)
         await dbxERC20.connect(user1).approve(deb0xContract.address, user1Balance.mul(BigNumber.from("10")))
-        await user1Reward.stakeDBX(user1Balance.div(BigNumber.from("2")))
-
+        await user1Reward.stakeDBX(user1Balance.div(2))
         await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 
         await user1Reward.stakeDBX(user1Balance.div(BigNumber.from("2")))
@@ -323,15 +371,11 @@ describe("Test unstake functionality", async function() {
 
         await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await hre.ethers.provider.send("evm_mine")
+        expect(await deb0xViews.getAccWithdrawableStake(user1.address)).to.equal(user1Balance.div(BigNumber.from("2")))
 
-        await user1Reward.unstake(user1Balance.div(BigNumber.from("2")))
+        await user1Reward.unstake(user1Balance.div(2))
             // 50 token from last stake they will be free only in the next cycle! 
         expect(await deb0xViews.getAccWithdrawableStake(user1.address)).to.equal("0");
-
-        //Just to check for remaining tokens 
-        // await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-        // await hre.ethers.provider.send("evm_mine")
-        //console.log(await deb0xViews.getAccWithdrawableStake(user1.address))
     })
 
 });

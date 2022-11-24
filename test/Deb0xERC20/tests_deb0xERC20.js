@@ -20,7 +20,7 @@ describe("Test Deb0xERC20 contract", async function() {
         expect(actualBalanceForDeployer).to.equal(ethers.utils.parseEther("0"))
     });
 
-    it(`Test mintReward function`, async() => {
+    it(`User can't call mintReward function`, async() => {
         try {
             await user1InstanceContract.mintReward(deployer.address, ethers.utils.parseEther("100"));
         } catch (error) {
