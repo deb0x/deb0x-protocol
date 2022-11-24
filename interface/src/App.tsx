@@ -34,6 +34,7 @@ import HowTo from './components/HowTo';
 import ReactGA from 'react-ga';
 import { Home } from './components/App/Home';
 import useAnalyticsEventTracker from './components/Common/GaEventTracker';
+import { use } from 'chai';
 
 ReactGA.initialize("UA-151967719-3");
 
@@ -93,13 +94,14 @@ function App() {
 
     // handle logic to recognize the connector currently being activated
     const [activatingConnector, setActivatingConnector] = useState<any>()
-    const [selectedOption, setSelectedOption] = useState('Deb0x');
+    const [selectedOption, setSelectedOption] = useState('Home');
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [networkName, setNetworkName] = useState<any>();
     const [currentChainId, setCurrentChainId] = useState<any>();
     let errorMsg;
     const [isVisible, setIsVisible] = useState(false);
     let [show, setShow] = useState(false);
+    const [selectedIndex, setSelectedIndex] = useState<any>(1);
     let [walletInitialized, setWalletInitialized] = useState<any>();
     const [isOptionSelected, setIsOptionSelected] = useState(true);
     const gaEventTracker = useAnalyticsEventTracker('Login');
@@ -139,10 +141,10 @@ function App() {
         gaEventTracker("Connect Wallet");
     };
     
+
     function checkIfInit(initialized: any) {
         setWalletInitialized(initialized);
     }
-
 
     useEffect(() => {   
         window.ethereum ?
@@ -229,7 +231,7 @@ function App() {
                                     {selectedOption === "Deb0x" && <Decrypt account={account} checkIfInit={checkIfInit}/>}
                                     {selectedOption === "Stake" && <Stake />}
                                     {selectedOption === "Sent" && <Sent />}
-                                    {selectedOption === "Home" && <Home onChange={handleChange} />}
+                                    {selectedOption === "Home" && <Home onChange={handleChange}/>}
                                 </Box> : 
                                 <Box className="main-container" sx={{marginTop: 12}}>
                                     <Decrypt account={account} checkIfInit={checkIfInit}/>

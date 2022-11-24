@@ -48,9 +48,7 @@ export function Decrypt(props: any): any {
         getPublicEncryptionKey()
     }, [account]);
 
-    const getPublicEncryptionKey = async () => {
-        const deb0xContract = Deb0x(library, deb0xAddress)
-      
+    const getPublicEncryptionKey = async () => {      
         const key = await getKey(account);
         const initialized = (key != '') ? true : false
         setEncryptionKeyInitialized(initialized);
@@ -160,7 +158,7 @@ export function Decrypt(props: any): any {
                 user = ensName;
             } else {
                 savedContacts.map((contact: any) => {
-                    if (sender == contact.address) {
+                    if (sender == (contact.address).toLowerCase()) {
                         user = true;
                     }
                 })
@@ -207,7 +205,7 @@ export function Decrypt(props: any): any {
                                         <p>From: 
                                             {
                                                 checkSenderInLocalStorage(props.message.sender) ?
-                                                savedContacts.filter((contact: any) => props.message.sender == contact.address)
+                                                savedContacts.filter((contact: any) => props.message.sender == (contact.address).toLowerCase())
                                                     .map((filteredPerson: any) => (
                                                         filteredPerson.name
                                                     )) :
@@ -239,7 +237,7 @@ export function Decrypt(props: any): any {
                                             <strong>
                                             {
                                                 checkSenderInLocalStorage(props.message.sender) ?
-                                                    savedContacts.filter((contact: any) => props.message.sender == contact.address)
+                                                    savedContacts.filter((contact: any) => props.message.sender == (contact.address).toLowerCase())
                                                         .map((filteredPerson: any) => (
                                                             filteredPerson.name
                                                         )) :
@@ -412,7 +410,7 @@ export function Decrypt(props: any): any {
     
     if (encryptionKeyInitialized === true) {
         return (
-            <div className="content-box full-height">
+            <div className="content-box">
                 <GetMessages />
             </div>
         )

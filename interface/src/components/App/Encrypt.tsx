@@ -360,7 +360,7 @@ export function Encrypt(replyAddress?: any): any {
                                 onKeyDown={handleKeyDown}
                                 onChange={handleChange} />
                             <Stack direction="row" spacing={1}>
-                                <Box sx={{ width: '100%', margin: '0 auto' }}
+                                <Box
                                     className="address-list">
                                     {
                                         addressList.map((address: any) => {
@@ -387,18 +387,11 @@ export function Encrypt(replyAddress?: any): any {
                         editorClassName="editor"
                         onFocus={() => gaEventTracker("Compose message")}
                     />
-                    { messageSessionSentCounter === 0 ?
-                        <Box sx={{ display: "flex", 
-                            alignItems: "end", 
-                            justifyContent: "flex-end", 
-                            flexDirection: "column", 
-                            mr: 1 }}>
-                            {textToEncrypt != '' && senderAddress != '' ?
-                                <Box>
+                        <Box className="form-bottom">
+                            {textToEncrypt == '' || addressList.length === 0 ?
+                                <Box className='rewards'>
                                     <Typography>
-                                        <small>
-                                            est. rewards: {estimatedReward} DBX
-                                        </small>
+                                        {/* Estimated rewards: 9.62 DBX */}
                                     </Typography>
                                 </Box> : 
                                 null
@@ -411,44 +404,14 @@ export function Encrypt(replyAddress?: any): any {
                                     <img src={airplaneBlack} className="send-papper-airplane" alt="send-button"></img>
                                 }
                                 loadingPosition="end"
-                                sx={{ marginLeft: 2, marginTop: 1 }}
                                 disabled={textToEncrypt == '' || addressList.length === 0}
                                 onClick={() => {
                                     encryptText(textToEncrypt, addressList)
                                 }
-                                    
                                 } >
+                                    Send
                             </LoadingButton>
                         </Box>
-                        :
-                        <Box sx={{ display: "flex", 
-                            alignItems: "end", 
-                            justifyContent: "flex-end",
-                            flexDirection: "column",
-                            mr: 1 }}>
-                            {textToEncrypt != '' && senderAddress != '' ?
-                                <Box>
-                                    <Typography>
-                                        <small>
-                                            est. rewards: {estimatedReward} DBX
-                                        </small>
-                                    </Typography>
-                                </Box> : 
-                                null
-                            }
-
-                            <LoadingButton className="send-btn" 
-                                 loading={loading} 
-                                 endIcon={ loading ? 
-                                     null : 
-                                     <img src={airplaneBlack} className="send-papper-airplane" alt="send-button"></img>
-                                 }
-                                 loadingPosition="end"
-                                 sx={{ marginLeft: 2, marginTop: 1 }}
-                                onClick={() => encryptText(textToEncrypt, addressList)}>
-                            </LoadingButton>
-                        </Box>
-                    }
                 </Box>
             </div>
         </>
