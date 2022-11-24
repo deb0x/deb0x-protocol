@@ -257,7 +257,7 @@ describe("Test stake functionality", async function() {
 
     });
 
-    it.only("Multiple stake from multiple accounts ", async() => {
+    it("Multiple stake from multiple accounts ", async() => {
         await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -290,6 +290,7 @@ describe("Test stake functionality", async function() {
         expect(await deb0xViews.getAccWithdrawableStake(user3.address)).to.equal(expectedStake)
         await deb0xViews.getAccWithdrawableStake(user3.address);
         let user3BalanceAfterStake = await dbxERC20.balanceOf(user3.address);
+        // await user3Reward.claimFees();
         await deb0xViews.getUnclaimedFees(user3.address);
         // await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
         // expect(user3BalanceAfterStake).to.equal(balanceUser3.div(2));

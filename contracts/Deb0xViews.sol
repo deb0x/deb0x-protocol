@@ -55,7 +55,7 @@ contract Deb0xViews {
         uint256 lastStartedCycleTemp = deb0x.lastStartedCycle();
 
         if (calculatedCycle != deb0x.currentStartedCycle()) {
-            previousStartedCycleTemp = deb0x.lastStartedCycle() + 1;
+            previousStartedCycleTemp = lastStartedCycleTemp + 1;
             lastStartedCycleTemp = deb0x.currentStartedCycle();
         }
 
@@ -63,13 +63,16 @@ contract Deb0xViews {
             calculatedCycle > lastStartedCycleTemp &&
             deb0x.cycleFeesPerStakeSummed(lastStartedCycleTemp + 1) == 0
         ) {
-            uint256 feePerStake = (deb0x.cycleAccruedFees(
+            uint256 feePerStake = 0;
+            if(deb0x.summedCycleStakes(lastStartedCycleTemp) != 0){
+                feePerStake = ((deb0x.cycleAccruedFees(
                 lastStartedCycleTemp
-            ) * deb0x.SCALING_FACTOR()) /
+            ) + deb0x.pendingFees()) * deb0x.SCALING_FACTOR()) /
                 deb0x.summedCycleStakes(lastStartedCycleTemp);
+            }
 
             currentCycleFeesPerStakeSummed =
-                deb0x.cycleFeesPerStakeSummed(deb0x.previousStartedCycle()) +
+                deb0x.cycleFeesPerStakeSummed(previousStartedCycleTemp) +
                 feePerStake;
         } else {
             currentCycleFeesPerStakeSummed = deb0x.cycleFeesPerStakeSummed(
@@ -96,7 +99,8 @@ contract Deb0xViews {
 
         if (
             deb0x.accFirstStake(account) != 0 &&
-            calculatedCycle > deb0x.accFirstStake(account)
+            calculatedCycle > deb0x.accFirstStake(account) &&
+            lastStartedCycleTemp + 1 > deb0x.accFirstStake(account)
         ) {
             currentAccruedFees +=
                 (
@@ -108,7 +112,8 @@ contract Deb0xViews {
 
             if (
                 deb0x.accSecondStake(account) != 0 &&
-                calculatedCycle > deb0x.accSecondStake(account)
+                calculatedCycle > deb0x.accSecondStake(account) &&
+                lastStartedCycleTemp + 1 > deb0x.accSecondStake(account)
             ) {
                 currentAccruedFees +=
                     (

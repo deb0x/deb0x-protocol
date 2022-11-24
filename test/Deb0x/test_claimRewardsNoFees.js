@@ -177,7 +177,7 @@ describe("Test contract", async function() {
         expect(await dbxERC20.balanceOf(alice.address)).to.equal(aliceExpected);
     });
 
-    it.only("Reconstruct staging reward distribution", async function() {
+    it.ignore("Reconstruct staging reward distribution", async function() {
         //0xa907b9Ad914Be4E2E0AD5B5feCd3c6caD959ee5A
         await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         
