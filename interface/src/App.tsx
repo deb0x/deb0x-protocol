@@ -26,6 +26,7 @@ import ContactsProvider from './components/Contexts/ContactsProvider';
 import elephant from './photos/icons/elephant.svg';
 import logoGreen from './photos/icons/logo-green.svg';
 import logoDark from "./photos/logo-dark.svg";
+import maintenanceImg from './photos/empty.png';
 import { Spinner } from './components/App/Spinner';
 import { AppBarComponent } from './components/App/AppBar';
 import IconButton from "@mui/material/IconButton";
@@ -35,6 +36,8 @@ import ReactGA from 'react-ga';
 import { Home } from './components/App/Home';
 import useAnalyticsEventTracker from './components/Common/GaEventTracker';
 import { use } from 'chai';
+
+const maintenance = process.env.REACT_APP_MAINTENANCE_MODE;
 
 ReactGA.initialize("UA-151967719-3");
 
@@ -217,41 +220,48 @@ function App() {
             account ? 
             <ContactsProvider>
                 <div className="app-container container-fluid">
-                    <div className="row main-row">
-                        <div className="col col-md-3 col-sm-12 p-0 side-menu-container">
-                            <PermanentDrawer onChange={handleChange} walletInitialized={walletInitialized}/>
+                    { maintenance == "true" ?
+                        <div className="row main-row maintenance-mode">
+                            <img className="maintenance-img" src={maintenanceImg} />
+                            <h1>Maintenance Mode</h1>
+                            <h4>We're tightening some nuts and bolts round the back. We'll be back up and running soon.</h4>
+                        </div> :
+                        <div className="row main-row">
+                            <div className="col col-md-3 col-sm-12 p-0 side-menu-container">
+                                <PermanentDrawer onChange={handleChange} walletInitialized={walletInitialized}/>
+                            </div>
+                            <div className="col col-md-9 col-sm-12">
+                            <AppBarComponent walletInitialized={walletInitialized}/>
+                            {account ? 
+                                !!(library && account ) && (
+                                    walletInitialized ? 
+                                    <Box className="main-container" sx={{marginTop: 12}}>
+                                        {selectedOption === "Compose" && <Encrypt />}
+                                        {selectedOption === "Deb0x" && <Decrypt account={account} checkIfInit={checkIfInit}/>}
+                                        {selectedOption === "Stake" && <Stake />}
+                                        {selectedOption === "Sent" && <Sent />}
+                                        {selectedOption === "Home" && <Home onChange={handleChange} />}
+                                    </Box> : 
+                                    <Box className="main-container" sx={{marginTop: 12}}>
+                                        <Decrypt account={account} checkIfInit={checkIfInit}/>
+                                    </Box>
+                                ):
+                                    <Box className="home-page-box">
+                                        <Typography sx={{textAlign:"center",color:"gray"}} variant="h1">
+                                            The End To End Encrypted 
+                                            <br></br>
+                                            Decentralized Email Protocol 
+                                            <br></br> 
+                                            Owned By Its Users
+                                        </Typography>
+                                        <Typography sx={{ mt:10,textAlign:"center"}} variant="h3">
+                                            Please connect your wallet
+                                        </Typography>
+                                    </Box>
+                            }
+                            </div>
                         </div>
-                        <div className="col col-md-9 col-sm-12">
-                        <AppBarComponent walletInitialized={walletInitialized}/>
-                        {account ? 
-                            !!(library && account ) && (
-                                walletInitialized ? 
-                                <Box className="main-container" sx={{marginTop: 12}}>
-                                    {selectedOption === "Compose" && <Encrypt />}
-                                    {selectedOption === "Deb0x" && <Decrypt account={account} checkIfInit={checkIfInit}/>}
-                                    {selectedOption === "Stake" && <Stake />}
-                                    {selectedOption === "Sent" && <Sent />}
-                                    {selectedOption === "Home" && <Home onChange={handleChange}/>}
-                                </Box> : 
-                                <Box className="main-container" sx={{marginTop: 12}}>
-                                    <Decrypt account={account} checkIfInit={checkIfInit}/>
-                                </Box>
-                            ):
-                                <Box className="home-page-box">
-                                    <Typography sx={{textAlign:"center",color:"gray"}} variant="h1">
-                                        The End To End Encrypted 
-                                        <br></br>
-                                        Decentralized Email Protocol 
-                                        <br></br> 
-                                        Owned By Its Users
-                                    </Typography>
-                                    <Typography sx={{ mt:10,textAlign:"center"}} variant="h3">
-                                        Please connect your wallet
-                                    </Typography>
-                                </Box>
-                        }
-                        </div>
-                    </div>
+                    }
                 </div>
             </ContactsProvider> :
             <div className={`app-container p-0 ${isVisible ? "" : "d-none"}` }>
