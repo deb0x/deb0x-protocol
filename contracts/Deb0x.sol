@@ -238,7 +238,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         );
         
         cycleAccruedFees[currentCycle] += fee;
-        //optional: another idea?
         sendViaCall(payable(msg.sender), msg.value - fee - nativeTokenFee);
     }
 
