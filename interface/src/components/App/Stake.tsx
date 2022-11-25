@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import {
     Card, CardActions, CardContent, Button, Grid,
-    Typography, TextField, Divider,Box
+    Typography, TextField, Divider,Box, OutlinedInput
 } from '@mui/material';
 
 import ToggleButton from '@mui/material/ToggleButton';
@@ -776,9 +776,8 @@ export function Stake(props: any): any {
                     <Divider className="divider-pink " />
                     {approved && <Grid className="amount-row" container spacing={2}>
                         <Grid item>
-                            <TextField id="outlined-basic"
-                                label="Amount to stake"
-                                variant="outlined"
+                            <OutlinedInput id="outlined-basic"
+                                placeholder="Amount to stake"
                                 type="number"
                                 value={amountToStake}
                                 onChange={e => setAmountToStake(e.target.value)} />
@@ -792,9 +791,9 @@ export function Stake(props: any): any {
                         </Grid>
                     </Grid>}
                 </CardContent>
-                <CardActions>
-                    {approved && <LoadingButton disabled={!amountToStake} className="submit-btn " loading={loading} variant="contained" onClick={stake}>Stake</LoadingButton>}
-                    {!approved && <LoadingButton className="submit-btn" loading={loading} variant="contained" onClick={approveStaking}>Approve Staking</LoadingButton>}
+                <CardActions className='button-container'>
+                    {approved && <LoadingButton disabled={!amountToStake} className="collect-btn" loading={loading} variant="contained" onClick={stake}>Stake</LoadingButton>}
+                    {!approved && <LoadingButton className="collect-btn" loading={loading} variant="contained" onClick={approveStaking}>Approve Staking</LoadingButton>}
                 </CardActions>
                 </>
                 : 
@@ -825,11 +824,10 @@ export function Stake(props: any): any {
 
                     <Grid className="amount-row" container spacing={2}>
                         <Grid item>
-                            <TextField value={amountToUnstake}
+                            <OutlinedInput value={amountToUnstake}
                                 id="outlined-basic"
                                 className="max-field"
-                                label="Amount to unstake"
-                                variant="outlined"
+                                placeholder="Amount to unstake"
                                 onChange={e => setAmountToUnstake(e.target.value)}
                                 type="number" />
                         </Grid>
@@ -842,8 +840,8 @@ export function Stake(props: any): any {
                         </Grid>
                     </Grid>
                 </CardContent>
-                <CardActions>
-                    <LoadingButton className="submit-btn" disabled={!amountToUnstake} loading={loading} variant="contained" onClick={unstake}>Unstake</LoadingButton>
+                <CardActions className='button-container'>
+                    <LoadingButton className="collect-btn" disabled={!amountToUnstake} loading={loading} variant="contained" onClick={unstake}>Unstake</LoadingButton>
                 </CardActions>
                 </>
             }
@@ -897,12 +895,12 @@ export function Stake(props: any): any {
                 <div className="cards-grid">
                     <div className='row'>
                         <Grid item className="col col-md-6 ">
-                            <CyclePanel />
+                            <FeesPanel />
                             <RewardsPanel />
                         </Grid>
                         <Grid item className="col col-md-6">
+                            <CyclePanel />
                             <StakeUnstake/>
-                            <FeesPanel />
                         </Grid>
                     </div>
                 </div>

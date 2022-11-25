@@ -197,7 +197,11 @@ export function PermanentDrawer(props: any): any {
                                                                     onClick={() => {
                                                                         // setNotificationState({})
                                                                         localStorage.setItem("input", JSON.stringify(contact.address));
-                                                                        (document.querySelector(".editor") as HTMLElement).click();
+                                                                        if (document.querySelector(".editor")) {
+                                                                            (document.querySelector(".editor") as HTMLElement).click();
+                                                                        } else {
+                                                                            handleChange("Compose", 0)
+                                                                        }
                                                                     }}>
                                                                     <SendIcon className="send-icon" fontSize="small"/>
                                                                 </IconButton>

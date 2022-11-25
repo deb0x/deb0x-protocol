@@ -70,10 +70,6 @@ export function Encrypt(replyAddress?: any): any {
     useEffect(() => {  
         if(address)
             addressList.push(address)
-        
-        window.location.pathname == "/send" ?
-            setIsSendInUrl(true) :
-            setIsSendInUrl(false);
     }, []);
 
     useEffect(() => {
@@ -88,6 +84,13 @@ export function Encrypt(replyAddress?: any): any {
     //         getPublicEncryptionKey()
     //     }
     // }, []);
+
+    useEffect(() => {
+        (document.querySelector(".editor") as HTMLElement).click()
+        setTimeout(() => {
+            setTextToEncrypt("")
+        }, 100)
+    }, [])
 
     async function handleKeyDown(evt: any) {
         if (["Enter", "Tab", ","].includes(evt.key)) {
@@ -413,7 +416,7 @@ export function Encrypt(replyAddress?: any): any {
                                     <img src={airplaneBlack} className="send-papper-airplane" alt="send-button"></img>
                                 }
                                 loadingPosition="end"
-                                disabled={textToEncrypt == '' || addressList.length === 0}
+                                disabled={textToEncrypt == '' && addressList.length === 0}
                                 onClick={() => {
                                     encryptText(textToEncrypt, addressList)
                                 }

@@ -13,9 +13,9 @@ $randomNumber: random(4);
     overflow: hidden;
     .theme {
         display: inline-block;
-        padding: 5%;
+        padding: 7vh;
         width: 100%;
-        height: 100vh;
+        height: 100%;
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center;
@@ -28,7 +28,7 @@ $randomNumber: random(4);
     }
 }
 .app-container {
-    height: calc( 100%);
+    height: 100%;
     border-radius: 100px;
     box-shadow: 0px 3px 25px #0f0b1382;
     .main-row,
@@ -57,7 +57,7 @@ $randomNumber: random(4);
         .main-container {
             margin-top: 0;
             display: flex;
-            height: 85%;
+            height: 90%;
             min-height: 85%;
             .floating-btn {
                 position: fixed;
@@ -69,7 +69,7 @@ $randomNumber: random(4);
             }
             .content-box {
                 background-color: t('logo-bg');
-                margin: 15px 30px 45px 15px;
+                margin: 15px 15px 25px 15px;
                 padding: 0 15px;
                 box-shadow: t('box-shadow');
                 border-radius: 25px 10px 85px 25px;
@@ -569,4 +569,22 @@ $randomNumber: random(4);
 ::-webkit-scrollbar-thumb {
     background: rgb(204, 204, 204); 
     border-radius: 10px;
+}
+
+@media only screen and (min-width: 900px) {
+    .theme {
+        zoom: .8;
+    }
+}
+
+@media only screen and (min-width: 1050px) {
+    .theme {
+        zoom: .9;        
+    }
+}
+
+@media only screen and (min-width: 1200px) {
+    .theme {
+        zoom: 1;
+    }
 }
