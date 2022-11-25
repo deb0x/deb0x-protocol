@@ -320,7 +320,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         require(reward > 0, "Deb0x: account has no rewards");
 
         accRewards[_msgSender()] -= reward;
-        
         if (lastStartedCycle == currentStartedCycle) {
             pendingStakeWithdrawal += reward;
         } else {

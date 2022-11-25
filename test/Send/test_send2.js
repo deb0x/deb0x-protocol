@@ -252,4 +252,104 @@ describe("Test send messages and fetch functions", async function() {
         }
         expect(totalNumberOfMessagesSentByAlice).to.eq(0);
     })
+
+    it("Should test with payload array length != recipients length", async() => {
+        let ipfs = [
+            "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En0",
+            "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En1",
+            "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En2",
+            "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En3",
+            "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En4"
+        ]
+
+        let address = [
+            "0xa907b9Ad914Be4E2E0AD5B5feCd3c6caD959ee5A",
+            "0xA2784173d3DD644021F766951b00c8a00259887b",
+            "0x56E3a64b080B93683F52D4217D204D7f6C50F7B9",
+            "0xFBa408fEE62B16d185fdEC548A2609e27f46e027",
+        ]
+        let payloads = [];
+        let arguments = [];
+        for (let i = 0; i < ipfs.length; i++) {
+            payloads.push(Converter.convertStringToBytes32(ipfs[i]))
+        }
+        try {
+            await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"](address, payloads,
+                feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("1") })
+        } catch (error) {
+            expect(error.message).to.include("Deb0x: crefs and recipients lengths not equal");
+        }
+    });
+
+    it("Should test with recipients length === 0", async() => {
+        let ipfs = []
+        let address = []
+        let payloads = [];
+        let arguments = [];
+        for (let i = 0; i < ipfs.length; i++) {
+            payloads.push(Converter.convertStringToBytes32(ipfs[i]))
+        }
+
+        try {
+            await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"](address, payloads,
+                feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("1") })
+        } catch (error) {
+            expect(error.message).to.include("Deb0x: recipients array empty");
+        }
+    });
+
+    it("Limitation for send message", async() => {
+        let generated = 'a'.repeat(257);
+        let address = "0xa907b9Ad914Be4E2E0AD5B5feCd3c6caD959ee5A";
+        let cref = Converter.convertStringToBytes32(generated);
+        try {
+            await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([address], [cref],
+                feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("1") })
+        } catch (error) {
+            expect(error.message).to.include('Deb0x: cref too long')
+        }
+    });
+
+    it("Limitation for send multiple message", async() => {
+        let generated1 = 'a'.repeat(257);
+        let generated2 = 'a'.repeat(257);
+        let address = ["0xa907b9Ad914Be4E2E0AD5B5feCd3c6caD959ee5A", "0xa907b9Ad914Be4E2E0AD5B5feCd3c6caD959ee5A"]
+        let crefs = [Converter.convertStringToBytes32(generated1), Converter.convertStringToBytes32(generated2)]
+        try {
+            await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"](address, crefs,
+                feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("1") })
+        } catch (error) {
+            expect(error.message).to.include('Deb0x: cref too long')
+        }
+    });
+
+    it("Try to set msg > 100%", async() => {
+        let ipfs = [
+            "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En0",
+            "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En1",
+            "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En2",
+            "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En3",
+            "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En4"
+        ]
+
+        let address = [
+            "0xa907b9Ad914Be4E2E0AD5B5feCd3c6caD959ee5A",
+            "0xA2784173d3DD644021F766951b00c8a00259887b",
+            "0x56E3a64b080B93683F52D4217D204D7f6C50F7B9",
+            "0xFBa408fEE62B16d185fdEC548A2609e27f46e027",
+        ]
+        let payloads = [];
+        let arguments = [];
+        for (let i = 0; i < ipfs.length; i++) {
+            payloads.push(Converter.convertStringToBytes32(ipfs[i]))
+        }
+
+        try {
+            await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"](address, payloads,
+                feeReceiver.address, 10002, 0, { value: ethers.utils.parseEther("1") })
+        } catch (error) {
+            expect(error.message).to.include("Deb0x: reward fees exceed 10000 bps");
+        }
+    });
+
 });

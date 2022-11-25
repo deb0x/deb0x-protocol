@@ -63,6 +63,34 @@ describe("Test fee claiming for users/frontends", async function() {
 
     })
 
+    it("1. should test getUnclaimedFees function", async() => {
+
+        aliceBalance = await hre.ethers.provider.getBalance(alice.address)
+        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
+            feeReceiver.address, 200, 0, { value: ethers.utils.parseEther("2") })
+        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
+            feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("2") })
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
+            feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("2") })
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+
+        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
+            feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("2") })
+
+        let contractBalanceBefore = await hre.ethers.provider.getBalance(rewardedAlice.address);
+        let aliceFeesBefore = await deb0xViews.getUnclaimedFees(alice.address);
+
+        await rewardedAlice.claimFees();
+        contractBalanceAfter = await hre.ethers.provider.getBalance(rewardedAlice.address);
+        aliceFeesAfter = await deb0xViews.getUnclaimedFees(alice.address);
+        expect(aliceFeesAfter.toString()).to.eq("0");
+        expect(contractBalanceAfter).to.eq(contractBalanceBefore.sub(aliceFeesBefore))
+    })
+
+
     it("should send messages with allice and bob and claim fees after cycle0 but we have a difference", async() => {
 
         aliceBalance = await hre.ethers.provider.getBalance(alice.address)

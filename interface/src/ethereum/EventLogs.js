@@ -8,7 +8,7 @@ const APIKEY = 'ckey_b065aa22fc1e4b68a13efab2521';
 const baseURL = 'https://api.covalenthq.com/v1'
 const blockchainChainId = '137'
 const sentEventTopic = '0xa33bc9a10d8f3a335b59663beb6a02681748ac0b3db1251c7bb08f3e99dd0bb4';
-const startBlock = '35113469';
+const startBlock = '35637731';
 const endBlock = 'latest';
 const contractAddress = '0x3a473a59820929D42c47aAf1Ea9878a2dDa93E18';
 
@@ -31,6 +31,43 @@ async function getSetKeyEvents(secondaryTopicsData) {
 
 async function getSentMessageEvents() {
     const url = new URL(`${baseURL}/${blockchainChainId}/events/topics/${sentEventTopic}/?quote-currency=USD&format=JSON&starting-block=${startBlock}&ending-block=${endBlock}&sender-address=${contractAddress}&key=${APIKEY}`);
+    const response = await fetch(url);
+    const result = await response.json();
+    const data = result.data;
+    return data;
+}
+
+function calculateStartBlockAndEndBlock(currentCycle) {
+    let startBlockForLastEvents;
+    let endBlockForLastEvents;
+    if (currentCycle == 1) {
+        startBlockForLastEvents = startBlock;
+        endBlockForLastEvents = 'latest';
+    } else {
+        if (currentCycle == 2) {
+            startBlockForLastEvents = parseInt(startBlock);
+            endBlockForLastEvents = parseInt(startBlock) + 32000;
+        } else {
+            startBlockForLastEvents = (parseInt(startBlock) + ((currentCycle - 2) * 32000) + 1);
+            endBlockForLastEvents = (parseInt(startBlock) + ((currentCycle - 1) * 32000));
+        }
+    }
+    return { startBlockForLastEvents, endBlockForLastEvents }
+}
+
+async function getLast24HoursSentEvents(currentCycle) {
+    let { startBlockForLastEvents, endBlockForLastEvents } = calculateStartBlockAndEndBlock(currentCycle);
+    const url = new URL(`${baseURL}/${blockchainChainId}/events/topics/${sentEventTopic}/?quote-currency=USD&format=JSON&starting-block=${startBlockForLastEvents}&ending-block=${endBlockForLastEvents}&sender-address=${contractAddress}&key=${APIKEY}`);
+    const response = await fetch(url);
+    const result = await response.json();
+    const data = result.data;
+    return data;
+}
+
+async function get24HoursUserMessagessSent(currentCycle, secondaryTopicsData) {
+    let { startBlockForLastEvents, endBlockForLastEvents } = calculateStartBlockAndEndBlock(currentCycle);
+    console.log(startBlockForLastEvents, startBlockForLastEvents)
+    const url = new URL(`${baseURL}/${blockchainChainId}/events/topics/${sentEventTopic}/?quote-currency=USD&format=JSON&starting-block=${startBlockForLastEvents}&ending-block=${endBlockForLastEvents}&sender-address=${contractAddress}&secondary-topics=${secondaryTopicsData}&key=${APIKEY}`);
     const response = await fetch(url);
     const result = await response.json();
     const data = result.data;
@@ -132,5 +169,17 @@ export async function getKey(to) {
         }
     } else
         return '';
+}
 
+export function dailyStats(currentCycle) {
+    let events = getLast24HoursSentEvents(currentCycle)
+    return events;
+}
+
+export async function userDailyStas(sender, currentCycle) {
+    let secondaryTopics = '0x000000000000000000000000' + sender.slice(2);
+    let events = await get24HoursUserMessagessSent(currentCycle, secondaryTopics);
+    let filterAfterFrom = '0x000000000000000000000000' + sender.slice(2);
+    let froms = events.items.filter(element => (filterAfterFrom.toLowerCase() === element.raw_log_topics[2].toLowerCase()));
+    return froms.length / 2;
 }
