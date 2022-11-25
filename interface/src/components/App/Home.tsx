@@ -150,7 +150,7 @@ export function Home(props: any) {
             </div>
             <div className="home-bottom">
                 <p className="mb-0 mt-4">
-                    Have a look at our official publications on
+                    Have a look at our official publications on 
                     <a href="https://github.com/deb0x" target="_blank" className='logo-text-color ml-2'>
                         Mirror
                     </a>
