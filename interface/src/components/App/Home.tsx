@@ -23,9 +23,11 @@ export function Home(props: any) {
     }
     
     return (
-        <div className="content-box full-height home">
-            <h4>Welcome to deb0x</h4>
-            <p>Let's show you around our app</p>
+        <div className="content-box home">
+            <div className="heading mt-3">
+                <h4>Welcome to deb0x</h4>
+                <p>Let's show you around our app</p>
+            </div>
             <div className="tiles-container">
                 <div className="row">
                     <div className="col-3 tile">
@@ -118,7 +120,7 @@ export function Home(props: any) {
                     </div>
                     <div className="col-3 tile">
                         <div className="tile-content">
-                            <p>Look into collaborating opportunities. Have a look at our</p>
+                            <p>Have a look at our</p>
                             <a href="https://github.com/deb0x/deb0x-faberweb3" target="_blank" className='logo-text-color'>
                                 <Button className="github" 
                                     startIcon={
@@ -150,7 +152,7 @@ export function Home(props: any) {
             </div>
             <div className="home-bottom">
                 <p className="mb-0 mt-4">
-                    Have a look at our official publications on
+                    Have a look at our official publications on 
                     <a href="https://github.com/deb0x" target="_blank" className='logo-text-color ml-2'>
                         Mirror
                     </a>

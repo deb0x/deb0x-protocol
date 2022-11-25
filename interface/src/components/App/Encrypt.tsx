@@ -28,8 +28,8 @@ import useAnalyticsEventTracker from '../Common/GaEventTracker';
 import { convertStringToBytes32} from '../../../src/ethereum/Converter.js';
 
 const { BigNumber } = require("ethers");
-const deb0xAddress = "0x3a473a59820929D42c47aAf1Ea9878a2dDa93E18";
-const deb0xViewsAddress = "0x9FBbD4cAcf0f23c2015759522B298fFE888Cf005";
+const deb0xAddress = "0x3A274DD833726D9CfDb6cBc23534B2cF5e892347";
+const deb0xViewsAddress = "0xa3d5Ae4d06Ac2DfB909c90b4CedD6F19B0B22C02";
 const ethUtil = require('ethereumjs-util')
 const { whitelist } = dataFromWhitelist;
 
@@ -67,13 +67,9 @@ export function Encrypt(replyAddress?: any): any {
     const addressListForRewards: string[] = [];
     const [inputValue, setInputValue] = useState<number>(0);
 
-    useEffect(() => {        
+    useEffect(() => {  
         if(address)
             addressList.push(address)
-        
-        window.location.pathname == "/send" ?
-            setIsSendInUrl(true) :
-            setIsSendInUrl(false);
     }, []);
 
     useEffect(() => {
@@ -88,6 +84,13 @@ export function Encrypt(replyAddress?: any): any {
     //         getPublicEncryptionKey()
     //     }
     // }, []);
+
+    useEffect(() => {
+        (document.querySelector(".editor") as HTMLElement).click()
+        setTimeout(() => {
+            setTextToEncrypt("")
+        }, 100)
+    }, [])
 
     async function handleKeyDown(evt: any) {
         if (["Enter", "Tab", ","].includes(evt.key)) {
@@ -328,11 +331,20 @@ export function Encrypt(replyAddress?: any): any {
         const key = await getKey(account)
         setEncryptionKeyInitialized(key || '')
     }
-    const [editorState, setEditorState] = useState(() =>
+    const [editorState, setEditorState] = useState(() => 
         EditorState.createEmpty()
     );
 
     const handleEditorChange = (state: any) => {
+        if (senderAddress != '') {
+            isValid(senderAddress);
+        } else {
+            setNotificationState({
+                message: null,
+                severity: "error"
+            })
+            setError(null);
+        }
         setEditorState(state);
         sendContent();
     };
@@ -360,7 +372,7 @@ export function Encrypt(replyAddress?: any): any {
                                 onKeyDown={handleKeyDown}
                                 onChange={handleChange} />
                             <Stack direction="row" spacing={1}>
-                                <Box sx={{ width: '100%', margin: '0 auto' }}
+                                <Box
                                     className="address-list">
                                     {
                                         addressList.map((address: any) => {
@@ -387,23 +399,16 @@ export function Encrypt(replyAddress?: any): any {
                         editorClassName="editor"
                         onFocus={() => gaEventTracker("Compose message")}
                     />
-                    { messageSessionSentCounter === 0 ?
-                        <Box sx={{ display: "flex", 
-                            alignItems: "end", 
-                            justifyContent: "flex-end", 
-                            flexDirection: "column", 
-                            mr: 1 }}>
-                            {textToEncrypt != '' && senderAddress != '' ?
-                                <Box>
+                        <Box className="form-bottom">
+                            {textToEncrypt == '' || addressList.length === 0 ?
+                                <Box className='rewards'>
                                     <Typography>
-                                        <small>
-                                            est. rewards: {estimatedReward} DBX
-                                        </small>
+                                        {/* Estimated rewards: 9.62 DBX */}
                                     </Typography>
                                 </Box> : 
                                 null
                             }
-
+                            <div>
                             <LoadingButton className="send-btn" 
                                 loading={loading} 
                                 endIcon={ loading ? 
@@ -411,44 +416,15 @@ export function Encrypt(replyAddress?: any): any {
                                     <img src={airplaneBlack} className="send-papper-airplane" alt="send-button"></img>
                                 }
                                 loadingPosition="end"
-                                sx={{ marginLeft: 2, marginTop: 1 }}
-                                disabled={textToEncrypt == '' || addressList.length === 0}
+                                disabled={textToEncrypt == '' && addressList.length === 0}
                                 onClick={() => {
                                     encryptText(textToEncrypt, addressList)
                                 }
-                                    
                                 } >
+                                    Send
                             </LoadingButton>
+                            </div>
                         </Box>
-                        :
-                        <Box sx={{ display: "flex", 
-                            alignItems: "end", 
-                            justifyContent: "flex-end",
-                            flexDirection: "column",
-                            mr: 1 }}>
-                            {textToEncrypt != '' && senderAddress != '' ?
-                                <Box>
-                                    <Typography>
-                                        <small>
-                                            est. rewards: {estimatedReward} DBX
-                                        </small>
-                                    </Typography>
-                                </Box> : 
-                                null
-                            }
-
-                            <LoadingButton className="send-btn" 
-                                 loading={loading} 
-                                 endIcon={ loading ? 
-                                     null : 
-                                     <img src={airplaneBlack} className="send-papper-airplane" alt="send-button"></img>
-                                 }
-                                 loadingPosition="end"
-                                 sx={{ marginLeft: 2, marginTop: 1 }}
-                                onClick={() => encryptText(textToEncrypt, addressList)}>
-                            </LoadingButton>
-                        </Box>
-                    }
                 </Box>
             </div>
         </>

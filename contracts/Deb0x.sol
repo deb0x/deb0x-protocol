@@ -141,8 +141,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     mapping(address => uint256) public accSecondStake;
 
-    mapping(address => bool) public stakedDuringGapCycle;
-
     event ClientFeesClaimed(
         uint256 indexed cycle,
         address indexed account,
@@ -232,10 +230,9 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         _;
 
         uint256 fee = ((startGas - gasleft() + 37700) * tx.gasprice * PROTOCOL_FEE) / MAX_BPS;
-        
         require(
             msg.value - nativeTokenFee >= fee,
-            "Deb0x: value less than 10% of spent gas"
+            "Deb0x: value less than required protocol fee"
         );
         
         cycleAccruedFees[currentCycle] += fee;
@@ -316,13 +313,11 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         calculateCycle();
         updateCycleFeesPerStakeSummed();
         updateStats(_msgSender());
-        uint256 reward = accRewards[_msgSender()] -
-            accWithdrawableStake[_msgSender()];
+        uint256 reward = accRewards[_msgSender()] - accWithdrawableStake[_msgSender()];
 
         require(reward > 0, "Deb0x: account has no rewards");
 
         accRewards[_msgSender()] -= reward;
-        
         if (lastStartedCycle == currentStartedCycle) {
             pendingStakeWithdrawal += reward;
         } else {
@@ -401,7 +396,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
         if (lastStartedCycle == currentStartedCycle) {
             cycleToSet = currentCycle;
-            stakedDuringGapCycle[_msgSender()] = true;
         }
 
         if (
@@ -605,31 +599,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
         if (
             accFirstStake[account] != 0 &&
-            currentCycle - accFirstStake[account] >= 0 &&
-            stakedDuringGapCycle[account]
-        ) {
-            uint256 unlockedFirstStake = accStakeCycle[account][accFirstStake[account]];
-
-            accRewards[account] += unlockedFirstStake;
-            accWithdrawableStake[account] += unlockedFirstStake;
-            if (lastStartedCycle + 1 > accFirstStake[account]) {
-                accAccruedFees[account] = accAccruedFees[account] + 
-                (
-                    (accStakeCycle[account][accFirstStake[account]] * 
-                        (cycleFeesPerStakeSummed[lastStartedCycle + 1] - 
-                            cycleFeesPerStakeSummed[accFirstStake[account]]
-                        )
-                    )
-                ) /
-                SCALING_FACTOR;
-            }
-
-            accStakeCycle[account][accFirstStake[account]] = 0;
-            accFirstStake[account] = 0;
-            stakedDuringGapCycle[account] = false;
-        } else if (
-            accFirstStake[account] != 0 &&
-            currentCycle - accFirstStake[account] > 0
+            currentCycle > accFirstStake[account]
         ) {
             uint256 unlockedFirstStake = accStakeCycle[account][accFirstStake[account]];
 
@@ -651,7 +621,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
             accFirstStake[account] = 0;
 
             if (accSecondStake[account] != 0) {
-                if (currentCycle - accSecondStake[account] > 0) {
+                if (currentCycle > accSecondStake[account]) {
                     uint256 unlockedSecondStake = accStakeCycle[account][accSecondStake[account]];
 
                     accRewards[account] += unlockedSecondStake;
@@ -696,11 +666,12 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         require(recipients.length == crefs.length, "Deb0x: crefs and recipients lengths not equal");
         require(recipients.length > 0, "Deb0x: recipients array empty");
         for (uint256 idx = 0; idx < recipients.length - 1; idx++) {
+            require(crefs[recipients.length - 1].length > 0 , "Deb0x: empty cref");
             require(crefs[recipients.length - 1].length <= 8 , "Deb0x: cref too long");
         }
 
         for (uint256 idx = 0; idx < recipients.length - 1; idx++) {
-            bytes32 bodyHash = keccak256(abi.encodePacked(crefs[idx]));
+            bytes32 bodyHash = keccak256(abi.encode(crefs[idx]));
      
             emit Sent(
                 recipients[idx],
@@ -713,8 +684,9 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         }
 
         bytes32 selfBodyHash = keccak256(
-            abi.encodePacked(crefs[recipients.length - 1])
+            abi.encode(crefs[recipients.length - 1])
         );
+        require(crefs[recipients.length - 1].length > 0 , "Deb0x: empty cref");
         require(crefs[recipients.length - 1].length <= 8 , "Deb0x: cref too long");
 
         uint256 oldSentId = sentId;
