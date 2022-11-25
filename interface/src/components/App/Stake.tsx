@@ -26,9 +26,9 @@ import dataFromWhitelist from '../../constants.json';
 import useAnalyticsEventTracker from '../Common/GaEventTracker';
 
 const { whitelist } = dataFromWhitelist;
-const deb0xAddress = "0x3a473a59820929D42c47aAf1Ea9878a2dDa93E18";
-const deb0xViewsAddress = "0x9FBbD4cAcf0f23c2015759522B298fFE888Cf005";
-const deb0xERC20Address = "0x855201bA0e531DfdD84B41e34257165D745eE97F";
+const deb0xAddress = "0x3A274DD833726D9CfDb6cBc23534B2cF5e892347";
+const deb0xViewsAddress = "0xa3d5Ae4d06Ac2DfB909c90b4CedD6F19B0B22C02";
+const deb0xERC20Address = "0x58EE92DaDdF00334da39fb4Fab164c8662C794AD";
 
 export function Stake(props: any): any {
 
