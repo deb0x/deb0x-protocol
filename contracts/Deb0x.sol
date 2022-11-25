@@ -141,8 +141,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     mapping(address => uint256) public accSecondStake;
 
-    mapping(address => bool) public stakedDuringGapCycle;
-
     event ClientFeesClaimed(
         uint256 indexed cycle,
         address indexed account,
@@ -398,7 +396,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
         if (lastStartedCycle == currentStartedCycle) {
             cycleToSet = currentCycle;
-            stakedDuringGapCycle[_msgSender()] = true;
         }
 
         if (
