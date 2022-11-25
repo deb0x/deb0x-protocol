@@ -8,7 +8,7 @@ const APIKEY = 'ckey_b065aa22fc1e4b68a13efab2521';
 const baseURL = 'https://api.covalenthq.com/v1'
 const blockchainChainId = '137'
 const sentEventTopic = '0xa33bc9a10d8f3a335b59663beb6a02681748ac0b3db1251c7bb08f3e99dd0bb4';
-const startBlock = '35637731';
+const startBlock = '36051352';
 const endBlock = 'latest';
 const contractAddress = '0x3A274DD833726D9CfDb6cBc23534B2cF5e892347';
 
