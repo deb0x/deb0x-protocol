@@ -266,8 +266,6 @@ export function Sent(props: any): any {
         async function processMessages() {
             const deb0xContract = Deb0x(library, deb0xAddress)
             const sentMessages = await fetchSentMessages(account)
-            console.log(sentMessages);
-
             const sentMessagesRetrieved = sentMessages.map(async function (item: any) {
                 let intermediateValueForContentData = item[1];
                 let intermediateValueForRecipients = item[0];
