@@ -215,7 +215,7 @@
                 }
                 .message {
                     padding: 10px 15px;
-                    height: calc(100% - 100px);
+                    height: calc(100% - 320px);
                     overflow: auto;
                 }
                 .address {
@@ -264,7 +264,21 @@
                 }
 
             }
-            
+            &.full-height {
+                .message {
+                    height: calc(100% - 100px);
+                }
+            }
+            &.inbox {
+                .form-bottom .send-btn {
+                    top: 0;
+                    z-index: 9999;
+                }
+
+                .form-container {
+                    padding: 0 15px 50px;
+                }
+            }
         }
     }
 }
@@ -281,5 +295,4 @@
         overflow: hidden;
         margin-left: 3%;
     }
-    
 }

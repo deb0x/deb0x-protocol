@@ -229,7 +229,7 @@ export function Decrypt(props: any): any {
                         }/>
                     </ListItemButton>
                     {isDecrypted ? 
-                        <div className="message-right">
+                        <div className="message-right inbox">
                             <div className="message-right--container">
                                 <div className="message-heading">
                                     <div className="address">

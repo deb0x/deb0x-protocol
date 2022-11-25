@@ -208,7 +208,7 @@ export function Sent(props: any): any {
                     }/>
                 </ListItemButton>
                 {isDecrypted ? 
-                    <div className="message-right">
+                    <div className="message-right full-height">
                         <div className="message-right--container">
                             <div className="message-heading">
                                 <div className="address">
