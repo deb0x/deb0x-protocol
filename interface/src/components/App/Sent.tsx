@@ -270,16 +270,23 @@ export function Sent(props: any): any {
             const sentMessagesRetrieved = sentMessages.map(async function (item: any) {
                 let intermediateValueForContentData = item[1];
                 let intermediateValueForRecipients = item[0];
-                const fetchedMessageContent = await fetchMessage(intermediateValueForContentData[0].contentData.content)
-                const unixTimestamp = intermediateValueForContentData[0].contentData.timestamp.toString()
-
-                const milliseconds = unixTimestamp * 1000 
-
-                const dateObject = new Date(milliseconds)
-                const humanDateFormat = dateObject.toLocaleString()
-                return { fetchedMessage: fetchedMessageContent,
-                         recipients: intermediateValueForRecipients[0].recipients,
-                         timestamp: humanDateFormat}
+                if(intermediateValueForContentData[0].contentData !== undefined) {
+                    const fetchedMessageContent = await fetchMessage(intermediateValueForContentData[0].contentData.content)
+                    const unixTimestamp = intermediateValueForContentData[0].contentData.timestamp.toString()
+    
+                    const milliseconds = unixTimestamp * 1000 
+    
+                    const dateObject = new Date(milliseconds)
+                    const humanDateFormat = dateObject.toLocaleString()
+                    return { fetchedMessage: fetchedMessageContent,
+                             recipients: intermediateValueForRecipients[0].recipients,
+                             timestamp: humanDateFormat}
+                } else {
+                    return { fetchedMessage: "",
+                        recipients: intermediateValueForRecipients[0].recipients,
+                        timestamp: ""}
+                }
+                
             })
 
             const messages = await Promise.all(sentMessagesRetrieved)

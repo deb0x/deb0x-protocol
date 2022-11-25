@@ -1,16 +1,24 @@
 @import './theme.scss';
 
-.content-box.full-height.home {
+.content-box.home {
+    display: flex;
     flex-direction: column;
+    justify-content: space-between;
+    h4 {
+        font-size: 3vh;
+    }
+    p {
+        font-size: 2vh;
+    }
     .tiles-container {
         @include themed() {
             .tile {
                 .tile-content {
                     background-color: t('card-color');
                     border-radius: 25px;
-                    min-height: 210px;
+                    min-height: 22vh;
                     font-size: 2vh;
-                    padding: 28px;
+                    padding: 2vh;
                     display: flex;
                     flex-direction: column;
                     justify-content: space-between;
@@ -52,6 +60,7 @@
     .main-container {
         .content-box.full-height.home {
             align-items: flex-start;
+            overflow-y: auto;
         }
     }
 }

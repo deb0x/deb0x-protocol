@@ -119,7 +119,7 @@ export function AppBarComponent(props: any): any {
             setTotalStaked(parseFloat(ethers.utils.formatEther(currentStake.sub(pendingStakeWithdrawal))).toFixed(2))
         }
         return (
-            <p>Total tokens staked: {totalStaked} DBX</p>
+            <p className="mb-0">Total tokens staked: {totalStaked} DBX</p>
         )
     }
 
