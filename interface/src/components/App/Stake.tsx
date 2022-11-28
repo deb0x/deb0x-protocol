@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import {
     Card, CardActions, CardContent, Button, Grid,
-    Typography, TextField, Divider,Box
+    Typography, TextField, Divider,Box, OutlinedInput
 } from '@mui/material';
 
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Deb0x from "../../ethereum/deb0x"
+import Deb0xViews from "../../ethereum/deb0xViews";
 import Deb0xERC20 from "../../ethereum/deb0xerc20"
 import SnackbarNotification from './Snackbar';
 import { ethers } from "ethers";
@@ -21,15 +22,19 @@ import walletDark from "../../photos/icons/wallet--dark.svg";
 import trophyRewards from "../../photos/icons/trophyRewards.svg";
 import { signMetaTxRequest } from '../../ethereum/signer';
 import { createInstance } from '../../ethereum/forwarder'
-import { whitelist } from '../../constants.json'
+import dataFromWhitelist from '../../constants.json';
+import useAnalyticsEventTracker from '../Common/GaEventTracker';
 
-const deb0xAddress = "0x03B4a733d4083Eb92972740372Eb05664c937136"
-const deb0xERC20Address = "0x7c8B0C62c2cB8BEd8A60555D14722ACFf4D760e5"
+const { whitelist } = dataFromWhitelist;
+const deb0xAddress = "0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A";
+const deb0xViewsAddress = "0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997";
+const deb0xERC20Address = "0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b";
 
 export function Stake(props: any): any {
 
     const { account, library } = useWeb3React()
     const [notificationState, setNotificationState] = useState({})
+    const gaEventTracker = useAnalyticsEventTracker('Stake');
 
     function FeesPanel() {
         const [feesUnclaimed, setFeesUnclaimed] = useState("")
@@ -40,9 +45,9 @@ export function Stake(props: any): any {
         }, [feesUnclaimed]);
 
         async function feesAccrued() {
-            const deb0xContract = await Deb0x(library, deb0xAddress)
-
-            const unclaimedRewards = await deb0xContract.getUnclaimedFees(account);
+            const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress);
+            
+            const unclaimedRewards = await deb0xViewsContract.getUnclaimedFees(account);
 
             setFeesUnclaimed(ethers.utils.formatEther(unclaimedRewards))
         }
@@ -135,6 +140,8 @@ export function Stake(props: any): any {
 
                 try {
                     const request = await signMetaTxRequest(library, forwarder, { to, from, data });
+
+                    gaEventTracker("Success: Claim fees");
         
                     await fetchClaimFeesResult(request, url)
         
@@ -144,6 +151,8 @@ export function Stake(props: any): any {
                         open: true,
                         severity: "info"
                     })
+
+                    gaEventTracker("Rejected: Claim fees");
                 }
             } else {
                 await sendClaimFeesTx(deb0xContract)
@@ -177,9 +186,42 @@ export function Stake(props: any): any {
         )
     }
 
+    function CyclePanel() {
+        const [currentReward, setCurrentReward] = useState("")
+        useEffect(() => {
+            cycleReward()
+        }, [currentReward]);
+        async function cycleReward() {
+            const deb0xContract = await Deb0x(library, deb0xAddress);
+            const currentReward = await deb0xContract.currentCycleReward();
+            setCurrentReward(ethers.utils.formatEther(currentReward))
+        }
+        return (
+            <>
+            <Card variant="outlined" className="card-container">
+                <CardContent className="row">
+                    <div className="col-12 col-md-12 mb-2">
+                        <Typography variant="h4" component="div" className="rewards mb-3">
+                            DAILY STATS
+                        </Typography>
+                        <Typography >
+                            Total amount of daily cycle tokens: <strong>{currentReward}</strong>
+                        </Typography>
+                        {/* <Typography>
+                            Total amount of messages today: <strong>234</strong>
+                        </Typography>
+                        <Typography>
+                            You sent today: <strong>6 msg</strong>
+                        </Typography> */}
+                    </div>
+                </CardContent>
+            </Card>
+            </>
+        )
+    }
+
     function RewardsPanel() {
         
-
         const [rewardsUnclaimed, setRewardsUnclaimed] = useState("")
         const [feeSharePercentage, setFeeSharePercentage] = useState("")
         const [loading, setLoading] = useState(false)
@@ -193,25 +235,27 @@ export function Stake(props: any): any {
         }, [feeSharePercentage]);
 
         async function rewardsAccrued() {
-            const deb0xContract = await Deb0x(library, deb0xAddress)
+            const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress);
 
-            const unclaimedRewards = await deb0xContract.getUnclaimedRewards(account);
+            const unclaimedRewards = await deb0xViewsContract.getUnclaimedRewards(account);
 
             setRewardsUnclaimed(ethers.utils.formatEther(unclaimedRewards))
         }
 
         async function feeShare() {
-            const deb0xContract = await Deb0x(library, deb0xAddress)
+            const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress);
 
-            const unclaimedRewards = await deb0xContract.getUnclaimedRewards(account);
+            const deb0xContract = await Deb0x(library, deb0xAddress);
 
-            const userWithdrawableStake = await deb0xContract.getUserWithdrawableStake(account)
+            const unclaimedRewards = await deb0xViewsContract.getUnclaimedRewards(account);
+
+            const accWithdrawableStake = await deb0xViewsContract.getAccWithdrawableStake(account);
             
-            let balance = parseFloat((ethers.utils.formatEther(unclaimedRewards.add(userWithdrawableStake))))
+            let balance = parseFloat((ethers.utils.formatEther(unclaimedRewards.add(accWithdrawableStake))))
             
-            const currentCycle = await deb0xContract.currentStartedCycle()
+            const currentCycle = await deb0xContract.currentStartedCycle();
 
-            const totalSupply = await deb0xContract.summedCycleStakes(currentCycle)
+            const totalSupply = await deb0xContract.summedCycleStakes(currentCycle);
 
             const feeShare = balance * 100 / totalSupply
             setFeeSharePercentage(((Math.round(feeShare * 100) / 100).toFixed(2)).toString() + "%")
@@ -305,6 +349,8 @@ export function Stake(props: any): any {
 
                 try {
                     const request = await signMetaTxRequest(library, forwarder, { to, from, data });
+
+                    gaEventTracker("Success: Claim rewards");
         
                     await fetchClaimRewardsResult(request, url)
         
@@ -314,6 +360,8 @@ export function Stake(props: any): any {
                         open: true,
                         severity: "info"
                     })
+
+                    gaEventTracker("Rejected: Claim rewards");
                 }
             } else {
                 await sendClaimRewardsTx(deb0xContract)
@@ -346,7 +394,7 @@ export function Stake(props: any): any {
                     </div>
                 </CardContent>
                 <CardActions className='button-container'>
-                    <LoadingButton className="collect-btn" loading={loading} variant="contained" onClick={claimRewards}>Collect</LoadingButton>
+                    <LoadingButton className="collect-btn" loading={loading} variant="contained" onClick={claimRewards}>Claim</LoadingButton>
                 </CardActions>
             </Card>
             </>
@@ -371,6 +419,7 @@ export function Stake(props: any): any {
             newAlignment: string,
         ) => {
             setAlignment(newAlignment);
+            gaEventTracker(newAlignment + " tab");
         };
         
         const [theme, setTheme] = useState(localStorage.getItem('globalTheme'));
@@ -396,9 +445,9 @@ export function Stake(props: any): any {
 
         async function setStakedAmount() {
 
-            const deb0xContract = await Deb0x(library, deb0xAddress)
+            const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress)
 
-            const balance = await deb0xContract.getUserWithdrawableStake(account)
+            const balance = await deb0xViewsContract.getAccWithdrawableStake(account)
 
             setUserStakedAmount(ethers.utils.formatEther(balance))
         }
@@ -448,6 +497,8 @@ export function Stake(props: any): any {
                         })
                         setLoading(false)
 
+                        gaEventTracker("Success: Approve staking");
+
                     })
                     .catch((error: any) => {
                         setNotificationState({
@@ -455,6 +506,7 @@ export function Stake(props: any): any {
                             severity: "error"
                         })
                         setLoading(false)
+                        gaEventTracker("Error: Approve staking");
                     })
             } catch (error) {
                 setNotificationState({
@@ -462,6 +514,7 @@ export function Stake(props: any): any {
                     severity: "info"
                 })
                 setLoading(false)
+                gaEventTracker("Rejected: Approve staking");
             }
         }
 
@@ -555,6 +608,8 @@ export function Stake(props: any): any {
                 const to = deb0xContract.address
                 try {
                     const request = await signMetaTxRequest(library, forwarder, { to, from, data });
+
+                    gaEventTracker("Success: Unstake");
         
                     await fetchUnstakeResult(request, url)
         
@@ -565,6 +620,8 @@ export function Stake(props: any): any {
                         severity: "info"
                     })
                     setLoading(false)
+
+                    gaEventTracker("Rejected: Unstake");
                 }
             } else { 
                 await sendUnstakeTx(deb0xContract)
@@ -660,6 +717,8 @@ export function Stake(props: any): any {
 
                 try {
                     const request = await signMetaTxRequest(library, forwarder, { to, from, data });
+
+                    gaEventTracker("Success: Stake");
         
                     await fetchStakeResult(request, url)
         
@@ -670,6 +729,7 @@ export function Stake(props: any): any {
                         severity: "info"
                     })
                     setLoading(false)
+                    gaEventTracker("Rejected: Stake");
                 }
             } else {
                 await sendStakeTx(deb0xContract)
@@ -716,9 +776,8 @@ export function Stake(props: any): any {
                     <Divider className="divider-pink " />
                     {approved && <Grid className="amount-row" container spacing={2}>
                         <Grid item>
-                            <TextField id="outlined-basic"
-                                label="Amount to stake"
-                                variant="outlined"
+                            <OutlinedInput id="outlined-basic"
+                                placeholder="Amount to stake"
                                 type="number"
                                 value={amountToStake}
                                 onChange={e => setAmountToStake(e.target.value)} />
@@ -732,9 +791,9 @@ export function Stake(props: any): any {
                         </Grid>
                     </Grid>}
                 </CardContent>
-                <CardActions>
-                    {approved && <LoadingButton disabled={!amountToStake} className="submit-btn " loading={loading} variant="contained" onClick={stake}>Stake</LoadingButton>}
-                    {!approved && <LoadingButton className="submit-btn" loading={loading} variant="contained" onClick={approveStaking}>Approve Staking</LoadingButton>}
+                <CardActions className='button-container'>
+                    {approved && <LoadingButton disabled={!amountToStake} className="collect-btn" loading={loading} variant="contained" onClick={stake}>Stake</LoadingButton>}
+                    {!approved && <LoadingButton className="collect-btn" loading={loading} variant="contained" onClick={approveStaking}>Approve Staking</LoadingButton>}
                 </CardActions>
                 </>
                 : 
@@ -765,11 +824,10 @@ export function Stake(props: any): any {
 
                     <Grid className="amount-row" container spacing={2}>
                         <Grid item>
-                            <TextField value={amountToUnstake}
+                            <OutlinedInput value={amountToUnstake}
                                 id="outlined-basic"
                                 className="max-field"
-                                label="Amount to unstake"
-                                variant="outlined"
+                                placeholder="Amount to unstake"
                                 onChange={e => setAmountToUnstake(e.target.value)}
                                 type="number" />
                         </Grid>
@@ -782,8 +840,8 @@ export function Stake(props: any): any {
                         </Grid>
                     </Grid>
                 </CardContent>
-                <CardActions>
-                    <LoadingButton className="submit-btn" disabled={!amountToUnstake} loading={loading} variant="contained" onClick={unstake}>Unstake</LoadingButton>
+                <CardActions className='button-container'>
+                    <LoadingButton className="collect-btn" disabled={!amountToUnstake} loading={loading} variant="contained" onClick={unstake}>Unstake</LoadingButton>
                 </CardActions>
                 </>
             }
@@ -833,16 +891,16 @@ export function Stake(props: any): any {
     return (
         <>
             <SnackbarNotification state={notificationState} setNotificationState={setNotificationState} />
-            <Box className="container">
+            <Box className="content-box">
                 <div className="cards-grid">
                     <div className='row'>
                         <Grid item className="col col-md-6 ">
-                            <TotalStaked/>                        
+                            <FeesPanel />
                             <RewardsPanel />
                         </Grid>
                         <Grid item className="col col-md-6">
+                            <CyclePanel />
                             <StakeUnstake/>
-                            <FeesPanel />
                         </Grid>
                     </div>
                 </div>

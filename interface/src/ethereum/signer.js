@@ -49,7 +49,7 @@ async function signTypedData(signer, from, data) {
 async function buildRequest(forwarder, input, valueParam) {
     const value = valueParam ? valueParam : '0';
     const nonce = await forwarder.getNonce(input.from).then(nonce => nonce.toString());
-    return { value, gas: '1000000', nonce, validUntilTime: '0', ...input };
+    return { value, gas: '100000', nonce, validUntilTime: '0', ...input };
 }
 
 async function buildTypedData(forwarder, request) {

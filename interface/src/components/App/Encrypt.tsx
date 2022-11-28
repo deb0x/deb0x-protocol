@@ -19,14 +19,19 @@ import draftToHtml from 'draftjs-to-html';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { Editor } from 'react-draft-wysiwyg';
 import airplaneBlack from '../../photos/icons/airplane-black.svg';
-import { getKey } from '../Common/EventLogs.mjs';
+import {getKey} from "../../ethereum/EventLogs.js";
 import { signMetaTxRequest } from '../../ethereum/signer';
 import { createInstance } from '../../ethereum/forwarder'
-import { whitelist } from '../../constants.json'
+import dataFromWhitelist from '../../constants.json';
+import deb0xViews from '../../ethereum/deb0xViews';
+import useAnalyticsEventTracker from '../Common/GaEventTracker';
+import { convertStringToBytes32} from '../../../src/ethereum/Converter.js';
 
 const { BigNumber } = require("ethers");
-const deb0xAddress = "0x03B4a733d4083Eb92972740372Eb05664c937136";
+const deb0xAddress = "0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A";
+const deb0xViewsAddress = "0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997";
 const ethUtil = require('ethereumjs-util')
+const { whitelist } = dataFromWhitelist;
 
 const projectId = process.env.REACT_APP_PROJECT_ID
 const projectSecret = process.env.REACT_APP_PROJECT_SECRET
@@ -43,7 +48,8 @@ const client = create({
   },
 })
 
-export function Encrypt(replyAddress: any): any {
+
+export function Encrypt(replyAddress?: any): any {
     const { account, library } = useWeb3React()
     const [encryptionKey, setKey] = useState('')
     const [textToEncrypt, setTextToEncrypt] = useState('')
@@ -57,8 +63,11 @@ export function Encrypt(replyAddress: any): any {
     const [error, setError] = useState<string | null>(null);
     const [ input, setInput ] = useState(JSON.parse(localStorage.getItem('input') || 'null'));
     const [address, setAddress] = useState<string>(replyAddress.props);
+    const [isSendInUrl, setIsSendInUrl] = useState(false);
+    const addressListForRewards: string[] = [];
+    const [inputValue, setInputValue] = useState<number>(0);
 
-    useEffect(() => {
+    useEffect(() => {  
         if(address)
             addressList.push(address)
     }, []);
@@ -70,11 +79,18 @@ export function Encrypt(replyAddress: any): any {
 
     useEffect(() => setInput(JSON.parse(localStorage.getItem('input') || 'null')));
 
+    // useEffect(() => {
+    //     if (!encryptionKeyInitialized) {
+    //         getPublicEncryptionKey()
+    //     }
+    // }, []);
+
     useEffect(() => {
-        if (!encryptionKeyInitialized) {
-            getPublicEncryptionKey()
-        }
-    }, []);
+        (document.querySelector(".editor") as HTMLElement).click()
+        setTimeout(() => {
+            setTextToEncrypt("")
+        }, 100)
+    }, [])
 
     async function handleKeyDown(evt: any) {
         if (["Enter", "Tab", ","].includes(evt.key)) {
@@ -133,8 +149,8 @@ export function Encrypt(replyAddress: any): any {
     }
 
     async function isInitialized(address: any) {
-        const deb0xContract = Deb0x(library, deb0xAddress)
-        return await deb0xContract.getKey(address);
+        const deb0xViewsContract = deb0xViews(library, deb0xViewsAddress);
+        return await getKey(address);
     }
 
     function isInList(address: any) {
@@ -196,7 +212,7 @@ export function Encrypt(replyAddress: any): any {
             const overrides = 
                 { value: ethers.utils.parseUnits("0.01", "ether"),
                     gasLimit:BigNumber.from("1000000") }
-            const tx = await deb0xContract["send(address[],string[],address,uint256,uint256)"](recipients,
+            const tx = await deb0xContract["send(address[],bytes32[][],address,uint256,uint256)"](recipients,
                 cids,
                 ethers.constants.AddressZero,
                 0,
@@ -239,13 +255,14 @@ export function Encrypt(replyAddress: any): any {
         let recipients = replyAddress.props ? [replyAddress.props].flat() : destinationAddresses.flat()
         recipients.push(await signer.getAddress())
         const deb0xContract = Deb0x(signer, deb0xAddress);
+
         for (let address of recipients) {
             const destinationAddressEncryptionKey = await getKey(address);
             const encryptedMessage = ethUtil.bufferToHex(
                 Buffer.from(
                     JSON.stringify(
                         encrypt({
-                            publicKey: destinationAddressEncryptionKey,
+                            publicKey: destinationAddressEncryptionKey || '',
                             data: messageToEncrypt,
                             version: 'x25519-xsalsa20-poly1305'
                         }
@@ -254,20 +271,20 @@ export function Encrypt(replyAddress: any): any {
                     'utf8'
                 )
             )
-            const message = await client.add(encryptedMessage)
-            cids.push(message.path)
+            const message = await client.add(encryptedMessage);
+            cids.push(convertStringToBytes32(message.path))
         }
         const from = await signer.getAddress();
-
         if(whitelist.includes(from)) {
-            const url = "https://api.defender.openzeppelin.com/autotasks/428ba621-5ff5-4425-8f2e-71988912b6c8/runs/webhook/d090d479-22fb-450a-b747-40d46161c437/Qh5dJdtLpBZicAoVRmT98w";
+            const url ="https://api.defender.openzeppelin.com/autotasks/428ba621-5ff5-4425-8f2e-71988912b6c8/runs/webhook/d090d479-22fb-450a-b747-40d46161c437/Qh5dJdtLpBZicAoVRmT98w";
             const forwarder = createInstance(library)
-            const data = deb0xContract.interface.encodeFunctionData("send(address[],string[],address,uint256,uint256)",
+            const data = deb0xContract.interface.encodeFunctionData("send(address[],bytes32[][],address,uint256,uint256)",
             [recipients, cids, ethers.constants.AddressZero, 0, 0])
             const to = deb0xContract.address
 
             try {
                 const request = await signMetaTxRequest(library, forwarder, { to, from, data }, '100000000000000000');
+                gaEventTracker('Success: send message');
 
                 await fetchSendResult(request, url)
 
@@ -277,6 +294,7 @@ export function Encrypt(replyAddress: any): any {
                     open: true,
                     severity: "info"
                 })
+                gaEventTracker('Reject: send message');
             }
         } else {
             await sendMessageTx(deb0xContract, recipients, cids)
@@ -311,13 +329,22 @@ export function Encrypt(replyAddress: any): any {
     const getPublicEncryptionKey = async () => {
         const deb0xContract = Deb0x(library, deb0xAddress)
         const key = await getKey(account)
-        setEncryptionKeyInitialized(key)
+        setEncryptionKeyInitialized(key || '')
     }
-    const [editorState, setEditorState] = useState(() =>
+    const [editorState, setEditorState] = useState(() => 
         EditorState.createEmpty()
     );
 
     const handleEditorChange = (state: any) => {
+        if (senderAddress != '') {
+            isValid(senderAddress);
+        } else {
+            setNotificationState({
+                message: null,
+                severity: "error"
+            })
+            setError(null);
+        }
         setEditorState(state);
         sendContent();
     };
@@ -325,6 +352,8 @@ export function Encrypt(replyAddress: any): any {
     const sendContent = () => {
         setTextToEncrypt(draftToHtml(convertToRaw(editorState.getCurrentContent())));
     };
+
+    const gaEventTracker = useAnalyticsEventTracker('Encrypt');
 
     return (
         <>
@@ -343,7 +372,7 @@ export function Encrypt(replyAddress: any): any {
                                 onKeyDown={handleKeyDown}
                                 onChange={handleChange} />
                             <Stack direction="row" spacing={1}>
-                                <Box sx={{ width: '100%', margin: '0 auto' }}
+                                <Box
                                     className="address-list">
                                     {
                                         addressList.map((address: any) => {
@@ -368,24 +397,18 @@ export function Encrypt(replyAddress: any): any {
                         toolbarClassName="toolbar"
                         wrapperClassName="wrapper"
                         editorClassName="editor"
+                        onFocus={() => gaEventTracker("Compose message")}
                     />
-                    { messageSessionSentCounter === 0 ?
-                        <Box sx={{ display: "flex", 
-                            alignItems: "end", 
-                            justifyContent: "flex-end", 
-                            flexDirection: "column", 
-                            mr: 1 }}>
-                            {textToEncrypt != '' && senderAddress != '' ?
-                                <Box>
+                        <Box className="form-bottom">
+                            {textToEncrypt == '' || addressList.length === 0 ?
+                                <Box className='rewards'>
                                     <Typography>
-                                        <small>
-                                            est. rewards: {estimatedReward} DBX
-                                        </small>
+                                        {/* Estimated rewards: 9.62 DBX */}
                                     </Typography>
                                 </Box> : 
                                 null
                             }
-
+                            <div>
                             <LoadingButton className="send-btn" 
                                 loading={loading} 
                                 endIcon={ loading ? 
@@ -393,44 +416,15 @@ export function Encrypt(replyAddress: any): any {
                                     <img src={airplaneBlack} className="send-papper-airplane" alt="send-button"></img>
                                 }
                                 loadingPosition="end"
-                                sx={{ marginLeft: 2, marginTop: 1 }}
-                                disabled={textToEncrypt == '' || addressList.length === 0}
+                                disabled={textToEncrypt == '' && addressList.length === 0}
                                 onClick={() => {
                                     encryptText(textToEncrypt, addressList)
                                 }
-                                    
                                 } >
+                                    Send
                             </LoadingButton>
+                            </div>
                         </Box>
-                        :
-                        <Box sx={{ display: "flex", 
-                            alignItems: "end", 
-                            justifyContent: "flex-end",
-                            flexDirection: "column",
-                            mr: 1 }}>
-                            {textToEncrypt != '' && senderAddress != '' ?
-                                <Box>
-                                    <Typography>
-                                        <small>
-                                            est. rewards: {estimatedReward} DBX
-                                        </small>
-                                    </Typography>
-                                </Box> : 
-                                null
-                            }
-
-                            <LoadingButton className="send-btn" 
-                                 loading={loading} 
-                                 endIcon={ loading ? 
-                                     null : 
-                                     <img src={airplaneBlack} className="send-papper-airplane" alt="send-button"></img>
-                                 }
-                                 loadingPosition="end"
-                                 sx={{ marginLeft: 2, marginTop: 1 }}
-                                onClick={() => encryptText(textToEncrypt, addressList)}>
-                            </LoadingButton>
-                        </Box>
-                    }
                 </Box>
             </div>
         </>

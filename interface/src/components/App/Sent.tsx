@@ -16,10 +16,9 @@ import formatAccountName from '../Common/AccountName';
 import cloud1 from '../../photos/icons/clouds/cloud-1.svg';
 import cloud2 from '../../photos/icons/clouds/cloud-2.svg';
 import cloud3 from '../../photos/icons/clouds/cloud-3.svg';
-import {fetchSentMessages, getKey } from '../Common/EventLogs.mjs';
-
+import {fetchSentMessages,getKey} from '../../ethereum/EventLogs.js';;
 const axios = require('axios')
-const deb0xAddress = "0x03B4a733d4083Eb92972740372Eb05664c937136"
+const deb0xAddress = "0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A";
 
 export function Sent(props: any): any {
     const { account, library } = useWeb3React()
@@ -56,6 +55,7 @@ export function Sent(props: any): any {
     }
 
     function Message(props: any) {
+        const { chainId} = useWeb3React()
         const encryptMessage = props.message.fetchedMessage.data
         const [message, setMessage] = useState(props.message.fetchedMessage.data)
         const [recipients, setRecipients] = useState<string[]>([]);
@@ -89,13 +89,17 @@ export function Sent(props: any): any {
             var recipientsFiltered = recipients.filter(onlyUnique);
 
             for(let recipient of recipientsFiltered) {
-                let name = await library.lookupAddress(recipient);
-                if(name !== null)
-                {   
-                    recipientsTemp = [...recipientsTemp, name];
-                } else {
-                    recipientsTemp = [...recipientsTemp, recipient];
-                }
+
+                // not suported for Polygon
+                // let name = await library.lookupAddress(recipient);
+                // if(name !== null)
+                // {   
+                //     recipientsTemp = [...recipientsTemp, name];
+                // } else {
+                //     recipientsTemp = [...recipientsTemp, recipient];
+                // }
+                recipientsTemp = [...recipientsTemp, recipient];
+
             }
 
             setRecipients(recipientsTemp)
@@ -204,7 +208,7 @@ export function Sent(props: any): any {
                     }/>
                 </ListItemButton>
                 {isDecrypted ? 
-                    <div className="message-right">
+                    <div className="message-right full-height">
                         <div className="message-right--container">
                             <div className="message-heading">
                                 <div className="address">
@@ -265,16 +269,23 @@ export function Sent(props: any): any {
             const sentMessagesRetrieved = sentMessages.map(async function (item: any) {
                 let intermediateValueForContentData = item[1];
                 let intermediateValueForRecipients = item[0];
-                const fetchedMessageContent = await fetchMessage(intermediateValueForContentData[0].contentData.content)
-                const unixTimestamp = intermediateValueForContentData[0].contentData.timestamp.toString()
-
-                const milliseconds = unixTimestamp * 1000 
-
-                const dateObject = new Date(milliseconds)
-                const humanDateFormat = dateObject.toLocaleString()
-                return { fetchedMessage: fetchedMessageContent,
-                         recipients: intermediateValueForRecipients[0].recipients,
-                         timestamp: humanDateFormat}
+                if(intermediateValueForContentData[0].contentData !== undefined) {
+                    const fetchedMessageContent = await fetchMessage(intermediateValueForContentData[0].contentData.content)
+                    const unixTimestamp = intermediateValueForContentData[0].contentData.timestamp.toString()
+    
+                    const milliseconds = unixTimestamp * 1000 
+    
+                    const dateObject = new Date(milliseconds)
+                    const humanDateFormat = dateObject.toLocaleString()
+                    return { fetchedMessage: fetchedMessageContent,
+                             recipients: intermediateValueForRecipients[0].recipients,
+                             timestamp: humanDateFormat}
+                } else {
+                    return { fetchedMessage: "",
+                        recipients: intermediateValueForRecipients[0].recipients,
+                        timestamp: ""}
+                }
+                
             })
 
             const messages = await Promise.all(sentMessagesRetrieved)
@@ -323,7 +334,6 @@ export function Sent(props: any): any {
                         </List>
                         <Box className="intro-box sent col-md-8">
                             <div className="open-message">
-                                <p>Come on, don't be shy. Open a message</p>
                             </div>
                         </Box>
                     </div>

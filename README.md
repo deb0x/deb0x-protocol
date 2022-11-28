@@ -10,9 +10,10 @@ Decentralized Private Mail App and Protocol
 ### Steps to run the frontend
 
 1. `npm install` in root dir
-2. `cd interface` and then `npm install`
-3. `npm start`
-4. open http://localhost:3000/
+2. `npx hardhat compile` in root dir
+3. `cd interface` and then `npm install`
+4. `npm start`
+5. open http://localhost:3000
 
 For a quick overview and explanations, see the demo video: https://youtu.be/8coLe-z6jHg 
 
@@ -33,10 +34,16 @@ Run deploy script (Goerli testnet)
 npx hardhat run --network goerli scritps/deploy.js
 ```
 
+### run solhint
+1. `npm install` 
+2. `npx hardhat check`
+
+
 # Deb0x Contract Addresses 
 
-| Contract name            | Commit hash | Goerli Testnet                                 | Mainnet                                |
-| ------------------------ | ----------- | ------------------------------------------- | ------------------------------------------ | 
-| Deb0xERC20               |  -          | 0x7c8B0C62c2cB8BEd8A60555D14722ACFf4D760e5 |  |
-| Deb0x                    |  -          | 0x03B4a733d4083Eb92972740372Eb05664c937136  |  |
-
+| Contract name            | Commit hash | Staging                               | Mainnet                                    |
+| ------------------------ | ----------- | -------------------------------------------  | ------------------------------------------ | 
+| Forwarder                |  006a9ec    |0x30782c020FE90614f08a863B41CbB07A2D2D94fF                                            |                                            |
+| Deb0x                    |  29d18d6    | 0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A|                                        |
+| Deb0xERC20               |  ab8d403    | 0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b|                                        |
+| Deb0xView                |  437f608    | 0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997   |                                        |                                            

@@ -2,6 +2,9 @@ const { expect } = require("chai");
 const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
+const { Converter } = require("../utils/Converter.ts");
+let ipfsLink = "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En9";
+let payload = Converter.convertStringToBytes32(ipfsLink);
 
 describe("Test contract functionalities while having cycles with no messages sent", async function() {
     let rewardedAlice, rewardedBob, rewardedCarol, frontend, dbxERC20;
@@ -23,10 +26,10 @@ describe("Test contract functionalities while having cycles with no messages sen
 
 
     it("Should claim rewards from first day", async() => {
-        await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await rewardedBob["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 
         await hre.ethers.provider.send("evm_increaseTime", [2 * 60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
@@ -42,7 +45,7 @@ describe("Test contract functionalities while having cycles with no messages sen
     });
 
     it("Should be able to claim previous cycle rewards and not reset current messages counter", async() => {
-        await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
@@ -50,7 +53,7 @@ describe("Test contract functionalities while having cycles with no messages sen
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await rewardedBob["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
@@ -58,7 +61,7 @@ describe("Test contract functionalities while having cycles with no messages sen
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
@@ -73,20 +76,20 @@ describe("Test contract functionalities while having cycles with no messages sen
   5 ether gathered as fees should be fully distributed back to users/frontends
   `, async() => {
 
-        await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
             feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("1") })
-        await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
             feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("1") })
-        await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
             feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("1") })
-        await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+        await rewardedBob["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
             feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("1") })
-        await rewardedBob["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"],
+        await rewardedBob["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
             feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("1") })
 
         await hre.ethers.provider.send("evm_increaseTime", [2 * 60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
-        await frontend.claimFrontEndFees();
+        await frontend.claimClientFees();
 
         await hre.ethers.provider.send("evm_increaseTime", [2 * 60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
@@ -101,7 +104,7 @@ describe("Test contract functionalities while having cycles with no messages sen
         const feesCollected = await rewardedAlice.cycleAccruedFees(0);
 
         let totalFeesClaimedFrontend = BigNumber.from("0")
-        const feesClaimedAsFrontend = await frontend.queryFilter("FrontEndFeesClaimed");
+        const feesClaimedAsFrontend = await frontend.queryFilter("ClientFeesClaimed");
         for (let entry of feesClaimedAsFrontend) {
             totalFeesClaimedFrontend = totalFeesClaimedFrontend.add(entry.args.fees)
         }
@@ -115,7 +118,7 @@ describe("Test contract functionalities while having cycles with no messages sen
         await hre.ethers.provider.send("evm_mine")
 
         const aliceBalance = await hre.ethers.provider.getBalance(alice.address)
-        const tx = await rewardedAlice["send(address[],string[],address,uint256,uint256)"]([messageReceiver.address], ["ipfs://"], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("100") })
+        const tx = await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("100") })
         const receipt = await tx.wait()
         const aliceBalanceAfterSend = await hre.ethers.provider.getBalance(alice.address)
         const txCostPlusFees = aliceBalance.sub(aliceBalanceAfterSend)
