@@ -34,7 +34,15 @@ module.exports = {
             blockGasLimit: 3000000000,
             allowUnlimitedContractSize: true,
             timeout: 1800000
-        }
+        },
+        matic: {
+            url: "https://polygon-rpc.com",
+            chainId: 137,
+            gasPrice: "auto",
+            allowUnlimitedContractSize: true,
+            timeout: 1800000,
+            accounts: { mnemonic: mnemonic },
+        },
     },
     goerli: {
         apiKey: ""
@@ -42,7 +50,7 @@ module.exports = {
     gasReporter: {
         currency: 'USD',
         gasPrice: 21
-      }
+    }
     // gasReporter: {
     //     enabled: (process.env.REPORT_GAS) ? true : false
     //   }
