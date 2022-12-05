@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import {
     Card, CardActions, CardContent, Button, Grid,
-    Typography, TextField, Divider,Box, OutlinedInput
+    Typography, Box, OutlinedInput
 } from '@mui/material';
 
 import ToggleButton from '@mui/material/ToggleButton';
@@ -773,7 +773,6 @@ export function Stake(props: any): any {
                             <strong>{userUnstakedAmount} DBX</strong>
                         </Typography>
                     </div>
-                    <Divider className="divider-pink " />
                     {approved && <Grid className="amount-row" container spacing={2}>
                         <Grid item>
                             <OutlinedInput id="outlined-basic"
