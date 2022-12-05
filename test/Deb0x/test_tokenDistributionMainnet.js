@@ -89,6 +89,7 @@ async function test() {
             let intermediateForStake2 = BigNumber.from(totalAmountAtStakeaccSecondStake).add(BigNumber.from(amountInStake2));
             totalAmountAtStakeaccSecondStake = intermediateForStake2;
         }
+        console.log(addresses[i])
         console.log(await deb0xViewContract.getUnclaimedFees(addresses[i]))
     }
     console.log("IN WALLET " + totalBalanceOfDBX)

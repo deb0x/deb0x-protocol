@@ -8,7 +8,7 @@ const APIKEY = 'ckey_b065aa22fc1e4b68a13efab2521';
 const baseURL = 'https://api.covalenthq.com/v1'
 const blockchainChainId = '137'
 const sentEventTopic = '0xa33bc9a10d8f3a335b59663beb6a02681748ac0b3db1251c7bb08f3e99dd0bb4';
-const startBlock = '35113469';
+const startBlock = '35637731';
 const endBlock = 'latest';
 const contractAddress = '0x3a473a59820929D42c47aAf1Ea9878a2dDa93E18';
 
@@ -121,7 +121,9 @@ export async function fetchSentMessages(sender) {
 
 export async function getKey(to) {
     let secondaryTopics = '0x000000000000000000000000' + to.slice(2);
+    console.log(secondaryTopics)
     let events = await getSetKeyEvents(secondaryTopics);
+    console.log(events)
     if (events.items.length != 0) {
         for (let i = 0; i < events.items.length; i++) {
             if (events.items[i].raw_log_topics[1].toLowerCase() === secondaryTopics.toLowerCase()) {
