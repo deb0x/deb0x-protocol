@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import {
     Card, CardActions, CardContent, Button, Grid,
-    Typography, TextField, Divider,Box, OutlinedInput
+    Typography, Box, OutlinedInput
 } from '@mui/material';
 
 import ToggleButton from '@mui/material/ToggleButton';
@@ -27,7 +27,7 @@ import useAnalyticsEventTracker from '../Common/GaEventTracker';
 
 const { whitelist } = dataFromWhitelist;
 const deb0xAddress = "0x3A274DD833726D9CfDb6cBc23534B2cF5e892347";
-const deb0xViewsAddress = "0xa3d5Ae4d06Ac2DfB909c90b4CedD6F19B0B22C02";
+const deb0xViewsAddress = "0x3a6B3Aff418C7E50eE9F852D0bc7119296cc3644";
 const deb0xERC20Address = "0x58EE92DaDdF00334da39fb4Fab164c8662C794AD";
 
 export function Stake(props: any): any {
@@ -773,7 +773,6 @@ export function Stake(props: any): any {
                             <strong>{userUnstakedAmount} DBX</strong>
                         </Typography>
                     </div>
-                    <Divider className="divider-pink " />
                     {approved && <Grid className="amount-row" container spacing={2}>
                         <Grid item>
                             <OutlinedInput id="outlined-basic"
