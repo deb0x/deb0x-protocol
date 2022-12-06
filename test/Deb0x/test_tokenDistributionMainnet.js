@@ -6,7 +6,7 @@ const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.jso
 const { NumUtils } = require("../utils/NumUtils.ts");
 
 let DEBOX_ADDRESS = "0x3a473a59820929D42c47aAf1Ea9878a2dDa93E18";
-let DEBOXVIEW_ADDRESS = "0x9FBbD4cAcf0f23c2015759522B298fFE888Cf005";
+let DEBOXVIEW_ADDRESS = "0x3a6B3Aff418C7E50eE9F852D0bc7119296cc3644";
 let DBX_ADDRESS = "0x855201bA0e531DfdD84B41e34257165D745eE97F"
 let addresses = [
     "0x01eb619fde01ed6ef5c75b6111a9f019bf15c26a",
@@ -54,8 +54,6 @@ async function test() {
         totalRewardUntilCurrentCycle = middle
     }
 
-    console.log("TOTAL " + totalRewardUntilCurrentCycle)
-
     let totalAmountAtStakeFirstStake = BigNumber.from("0");;
     let totalAmountAtStakeaccSecondStake = BigNumber.from("0");;
     let totalBalanceOfDBX = BigNumber.from("0");
@@ -89,8 +87,6 @@ async function test() {
             let intermediateForStake2 = BigNumber.from(totalAmountAtStakeaccSecondStake).add(BigNumber.from(amountInStake2));
             totalAmountAtStakeaccSecondStake = intermediateForStake2;
         }
-        console.log(addresses[i])
-        console.log(await deb0xViewContract.getUnclaimedFees(addresses[i]))
     }
     console.log("IN WALLET " + totalBalanceOfDBX)
     console.log("UNCLAIMED REWARD " + totalUnclaimedReward)
