@@ -88,7 +88,7 @@
                     }
                 }
                 .collect-btn {
-                    font-size: 2vh;
+                    font-size: 1.5vh;
                     color: t('approve-stake-text');
                     margin: 0 auto;
                     background-color: t('bg');
@@ -96,6 +96,7 @@
                     border-radius: 33px;
                     box-shadow: none;
                     padding: 10px 40px;
+                    white-space: nowrap;
                 }
                 .amount-row {
                     align-items: center;
@@ -103,6 +104,9 @@
                     fieldset {
                         border-color: t('text');
                         border-radius: 50px;
+                        .legend {
+                            display: none;
+                        }
                     }
                     input {
                         padding: 5px 10px;
