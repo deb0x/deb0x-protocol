@@ -1,19 +1,19 @@
 {
   "files": {
-    "main.css": "/static/css/main.b9a3fd00.chunk.css",
-    "main.js": "/static/js/main.54b61380.chunk.js",
-    "main.js.map": "/static/js/main.54b61380.chunk.js.map",
-    "runtime-main.js": "/static/js/runtime-main.56b3622e.js",
-    "runtime-main.js.map": "/static/js/runtime-main.56b3622e.js.map",
+    "main.css": "/static/css/main.10859ca8.chunk.css",
+    "main.js": "/static/js/main.65ce9b86.chunk.js",
+    "main.js.map": "/static/js/main.65ce9b86.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.8d64e870.js",
+    "runtime-main.js.map": "/static/js/runtime-main.8d64e870.js.map",
     "static/css/2.8a34a99b.chunk.css": "/static/css/2.8a34a99b.chunk.css",
-    "static/js/2.9d42b899.chunk.js": "/static/js/2.9d42b899.chunk.js",
-    "static/js/2.9d42b899.chunk.js.map": "/static/js/2.9d42b899.chunk.js.map",
-    "static/js/3.66a63bdc.chunk.js": "/static/js/3.66a63bdc.chunk.js",
-    "static/js/3.66a63bdc.chunk.js.map": "/static/js/3.66a63bdc.chunk.js.map",
+    "static/js/2.e46c2809.chunk.js": "/static/js/2.e46c2809.chunk.js",
+    "static/js/2.e46c2809.chunk.js.map": "/static/js/2.e46c2809.chunk.js.map",
+    "static/js/3.749124f9.chunk.js": "/static/js/3.749124f9.chunk.js",
+    "static/js/3.749124f9.chunk.js.map": "/static/js/3.749124f9.chunk.js.map",
     "index.html": "/index.html",
     "static/css/2.8a34a99b.chunk.css.map": "/static/css/2.8a34a99b.chunk.css.map",
-    "static/css/main.b9a3fd00.chunk.css.map": "/static/css/main.b9a3fd00.chunk.css.map",
-    "static/js/2.9d42b899.chunk.js.LICENSE.txt": "/static/js/2.9d42b899.chunk.js.LICENSE.txt",
+    "static/css/main.10859ca8.chunk.css.map": "/static/css/main.10859ca8.chunk.css.map",
+    "static/js/2.e46c2809.chunk.js.LICENSE.txt": "/static/js/2.e46c2809.chunk.js.LICENSE.txt",
     "static/media/index.scss": "/static/media/no-message.21b3bbea.svg",
     "static/media/airplane-black.svg": "/static/media/airplane-black.e8545508.svg",
     "static/media/animal-1.svg": "/static/media/animal-1.ce0a7c89.svg",
@@ -93,10 +93,10 @@
     "static/media/wallet--light.60fbc32b.svg": "/static/media/wallet--light.60fbc32b.svg"
   },
   "entrypoints": [
-    "static/js/runtime-main.56b3622e.js",
+    "static/js/runtime-main.8d64e870.js",
     "static/css/2.8a34a99b.chunk.css",
-    "static/js/2.9d42b899.chunk.js",
-    "static/css/main.b9a3fd00.chunk.css",
-    "static/js/main.54b61380.chunk.js"
+    "static/js/2.e46c2809.chunk.js",
+    "static/css/main.10859ca8.chunk.css",
+    "static/js/main.65ce9b86.chunk.js"
   ]
 }
