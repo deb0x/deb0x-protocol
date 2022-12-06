@@ -20,7 +20,7 @@ import SnackbarNotification from './Snackbar';
 import '../../componentsStyling/appBar.scss';
 
 const deb0xAddress = "0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A";
-const deb0xViewsAddress = "0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997";
+const deb0xViewsAddress = "0xf4661D0776Ee5171956b25417F7E320fE365C21E";
 const deb0xERC20Address = "0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b"
 const tokenSymbol = 'DBX';
 
