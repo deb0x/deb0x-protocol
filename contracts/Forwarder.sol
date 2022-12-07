@@ -90,8 +90,6 @@ contract Forwarder is IForwarder, ERC165 {
         (success,ret) = req.to.call{gas : req.gas, value : req.value}(callData);
 
         // #if ENABLE_CONSOLE_LOG
-        console.log("execute result: success: %s ret:", success);
-        console.logBytes(ret);
         // #endif
 
         if ( req.value != 0 && address(this).balance>0 ) {

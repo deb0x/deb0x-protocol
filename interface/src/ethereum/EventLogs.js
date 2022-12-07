@@ -67,7 +67,6 @@ async function getLast24HoursSentEvents(currentCycle) {
 
 async function get24HoursUserMessagessSent(currentCycle, secondaryTopicsData) {
     let { startBlockForLastEvents, endBlockForLastEvents } = calculateStartBlockAndEndBlock(currentCycle);
-    console.log(startBlockForLastEvents, startBlockForLastEvents)
     const url = new URL(`${baseURL}/${blockchainChainId}/events/topics/${sentEventTopic}/?quote-currency=USD&format=JSON&starting-block=${startBlockForLastEvents}&ending-block=${endBlockForLastEvents}&sender-address=${contractAddress}&secondary-topics=${secondaryTopicsData}&key=${APIKEY}`);
     const response = await fetch(url);
     const result = await response.json();
