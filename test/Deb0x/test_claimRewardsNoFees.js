@@ -180,10 +180,10 @@ describe("Test contract", async function() {
     it.ignore("Reconstruct staging reward distribution", async function() {
         //0xa907b9Ad914Be4E2E0AD5B5feCd3c6caD959ee5A
         await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        
+
         //0xD1C740E1C900A586afC8a570A2C2eeDef5ffbD9d
         await rewardedBob["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        
+
         //0x5B4afcA3B882dbB0e35618608621A45a8068A729
         await rewardedCarol["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -195,13 +195,13 @@ describe("Test contract", async function() {
 
         //0xA2784173d3DD644021F766951b00c8a00259887b
         await rewardedFey["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-    
+
         await rewardedDean["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await rewardedDean["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-        
+
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
-        // 10000 DBX now available to claim
+            // 10000 DBX now available to claim
 
         //0x7BdBd04519A09aC1159980db0b03e6119053D885
         await rewardedGary["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -213,7 +213,7 @@ describe("Test contract", async function() {
 
         await rewardedDean["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await rewardedDean["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-    
+
         await rewardedDean.claimRewards()
         await rewardedDean.claimFees()
 
@@ -223,7 +223,7 @@ describe("Test contract", async function() {
         //0x1971D9f65Dc652B726dA023F09507629B3B358E5
         await rewardedGary["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await rewardedGary["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-    
+
         await dbxERC20Dean.transfer(gary.address, ethers.utils.parseEther("0.814473421101858361"))
         await dbxERC20Gary.transfer(hailey.address, ethers.utils.parseEther("0.314473421101858361"))
 
@@ -238,11 +238,10 @@ describe("Test contract", async function() {
         // --- should not be possibble ---
         await dbxERC20.connect(bob).approve(rewardedAlice.address, ethers.constants.MaxUint256)
         await rewardedBob.stakeDBX(ethers.utils.parseEther("568.87"))
-        console.log(await rewardedBob.accWithdrawableStake(bob.address))
         await rewardedBob.unstake(ethers.utils.parseEther("1"))
-        // await rewardedBob.stakeDBX(ethers.utils.parseEther("568.87"))
-        // await rewardedBob.unstake(ethers.utils.parseEther("568.87"))
-        // --- should not be possibble ---
+            // await rewardedBob.stakeDBX(ethers.utils.parseEther("568.87"))
+            // await rewardedBob.unstake(ethers.utils.parseEther("568.87"))
+            // --- should not be possibble ---
 
 
     })

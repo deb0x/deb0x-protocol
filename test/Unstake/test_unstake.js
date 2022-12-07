@@ -48,9 +48,9 @@ describe("Test unstake functionality", async function() {
         await dbxERC20.connect(user3).approve(deb0xContract.address, user3Balance)
         await user3Reward.stakeDBX(balanceBigNumberFormat)
 
-        console.log("Balance account after first stake: " + ethers.utils.formatEther(await dbxERC20.balanceOf(user3.address)))
+        //console.log("Balance account after first stake: " + ethers.utils.formatEther(await dbxERC20.balanceOf(user3.address)))
         await user3Reward.stakeDBX(balanceBigNumberFormat)
-        console.log("Balance account after second stake: " + ethers.utils.formatEther(await dbxERC20.balanceOf(user3.address)))
+            //console.log("Balance account after second stake: " + ethers.utils.formatEther(await dbxERC20.balanceOf(user3.address)))
 
         await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -60,8 +60,8 @@ describe("Test unstake functionality", async function() {
         await hre.ethers.provider.send("evm_mine")
         await user3Reward.claimRewards();
         await user3Reward.stakeDBX(balanceBigNumberFormat)
-        console.log("Balance account after third stake but in second cycle: " + ethers.utils.formatEther(await dbxERC20.balanceOf(user3.address)))
-        console.log("Acc  " + ethers.utils.formatEther(await deb0xViews.getAccWithdrawableStake(user3.address)))
+            //console.log("Balance account after third stake but in second cycle: " + ethers.utils.formatEther(await dbxERC20.balanceOf(user3.address)))
+            //console.log("Acc  " + ethers.utils.formatEther(await deb0xViews.getAccWithdrawableStake(user3.address)))
 
         await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -69,15 +69,15 @@ describe("Test unstake functionality", async function() {
         await hre.ethers.provider.send("evm_mine")
 
         let valueToUnstake = await deb0xViews.getAccWithdrawableStake(user3.address);
-        console.log(valueToUnstake)
+        //console.log(valueToUnstake)
         expect(valueToUnstake).to.equal(BigNumber.from("3750000000000000000000"))
-        console.log("Valoare la care trebuie facut unstake: " + ethers.utils.formatEther(valueToUnstake))
+            //console.log("Valut for unstake: " + ethers.utils.formatEther(valueToUnstake))
         await user3Reward.unstake("37000000000000000000")
 
-        console.log("Valoare dupa unstake  " + ethers.utils.formatEther(await deb0xViews.getAccWithdrawableStake(user3.address)))
+        //console.log("Value after unstake  " + ethers.utils.formatEther(await deb0xViews.getAccWithdrawableStake(user3.address)))
 
         let amoutToUnstakeAfterTwoStakeActionInFirstCycle = ethers.utils.formatEther(await deb0xViews.getAccWithdrawableStake(user3.address));
-        console.log("Valoare dupa unstake  " + amoutToUnstakeAfterTwoStakeActionInFirstCycle);
+        //console.log("Value after unstake  " + amoutToUnstakeAfterTwoStakeActionInFirstCycle);
 
     });
 
@@ -114,7 +114,7 @@ describe("Test unstake functionality", async function() {
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
-        console.log((await hre.ethers.provider.getBalance(deb0xContract.address)).toString())
+            //console.log((await hre.ethers.provider.getBalance(deb0xContract.address)).toString())
 
         await user1Reward.claimFees()
 
