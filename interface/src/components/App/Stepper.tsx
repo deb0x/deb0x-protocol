@@ -46,7 +46,7 @@ export default function HorizontalLinearStepper(props: any) {
 
     async function getEncryptionKey() {
         setLoading(true)
-        library.provider.request({
+        await library.provider.request({
             method: 'eth_getEncryptionPublicKey',
             params: [account],
         })
