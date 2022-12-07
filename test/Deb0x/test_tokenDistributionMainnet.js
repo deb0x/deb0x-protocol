@@ -151,10 +151,8 @@ async function test() {
 
     }
     let total = BigNumber.from(totalBalanceOfDBX).add(BigNumber.from(totalUnclaimedReward)).add(BigNumber.from(totalAmountAtStakeFirstStake)).add(BigNumber.from(totalAmountAtStakeaccSecondStake))
-        //EXPECT: 49800.797208933196589356 == 49800.79720893319658935 => 5 wei difference
-        //expect(totalRewardUntilCurrentCycle).to.equal(total)
+    expect(totalRewardUntilCurrentCycle).to.equal(total);
 };
 
+// Command for run this test: npx hardhat run --network matic test/Deb0x/test_tokenDistributionMainnet.js
 test();
-
-//Command for run this test: npx hardhat run --network matic test_tokenDistributionMainnet.js
