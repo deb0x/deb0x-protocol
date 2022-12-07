@@ -21,7 +21,7 @@ Decentralized communication and storage protocol implementation with reward toke
 5. open http://localhost:3000
 
 ### To redeploy the contracts
-_This section is only necessary if you want to redeploy the contracts._
+_The frontend is currently linked to Polygon mainnet contracts. This section is only necessary if you want to redeploy them._
 
 Add `.secrets.json` file in root directory and put your secret phrase as a json format. For example (do not use this mnemonic!):
 ```
