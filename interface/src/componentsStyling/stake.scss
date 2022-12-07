@@ -2,116 +2,129 @@
 
 .app-container {
     @include themed() {
-        .container{
+        .content-box{
             min-height: 65vh;
             background: t('stake-bg');
             box-shadow: t('box-shadow');
             border-radius: 25px 10px 85px 25px;
             margin-bottom: 35px;
-            .heading-card {
-                font-size: 24px;
-                border: 0;
-                box-shadow: none;
-                background: t('stake-bg');
-                color: t('text');
-                color: #D64933;
-                padding: 25px 50px;
-                h4 {
-                    .logo {
-                        padding-right: 15px;
+            .col {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                .heading-card {
+                    font-size: 3vh;
+                    border: 0;
+                    box-shadow: none;
+                    background: t('stake-bg');
+                    color: t('text');
+                    color: #D64933;
+                    padding: 25px 50px;
+                    h4 {
+                        .logo {
+                            padding-right: 15px;
+                        }
                     }
                 }
-            }
-            .card-container {
-                * {
-                    font-family: 'Karla';
-                    color: #fff;
-                }
-                background-color: t('card-color');
-                color: t('text');
-                border-radius: 25px;
-                margin: 15px;
-                position: relative;
-                overflow: unset;
-                .tab-container {
-                    background: t('logo-bg');
-                    width: 100%;
-                    border-radius: 25px 25px 0px 0px;
-                    .tab-btn {
+                .card-container {
+                    * {
+                        font-family: 'Karla';
+                    }
+                    background-color: t('card-color');
+                    color: t('text');
+                    border-radius: 25px;
+                    margin: 2vh;
+                    position: relative;
+                    overflow: unset;
+                    .tab-container {
+                        background: t('logo-bg');
                         width: 100%;
-                        border: 0;
-                        color: t('text');
-                        margin: 7px;
-                        &.Mui-selected {
-                            background-color: t('stake-unstake-bg');
-                            border-radius: 26px;
+                        border-radius: 25px 25px 0px 0px;
+                        .tab-btn {
                             width: 100%;
-                            color: #D64933;
-                        }
-                        &:hover {
-                            border-radius: 26px;
+                            border: 0;
+                            color: t('text');
+                            margin: 7px;
+                            &.Mui-selected {
+                                background-color: t('stake-unstake-bg');
+                                border-radius: 26px;
+                                width: 100%;
+                                color: #D64933;
+                            }
+                            &:hover {
+                                border-radius: 26px;
+                            }
                         }
                     }
+                    .button-container {
+                        position: absolute;
+                        bottom: -35px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                    }
                 }
-                .button-container {
-                    position: absolute;
-                    bottom: -35px;
-                    left: 50%;
-                    transform: translateX(-50%);
+                .submit-btn {
+                    font-size: 2vh;
+                    color: t('approve-stake-text');
+                    margin: 0 auto;
+                    background-color: t('card-color');
+                    border-radius: 4px;
+                    box-shadow: none;
                 }
-            }
-            .submit-btn {
-                font-size: 16px;
-                color: t('approve-stake-text');
-                margin: 0 auto;
-                background-color: t('card-color');
-                border-radius: 4px;
-                box-shadow: none;
-            }
-            .max-btn {
-                padding: 5px 25px;
-                background-color: #8dbf96;
-                font-size: 16px;
-                border-radius: 25px;
-            }
-            .max-field {
-                border-radius: 25px;
-                label {
-                    color: t('text');
+                .max-btn {
+                    padding: 5px 20px;
+                    background-color: #8dbf96;
+                    font-size: 1.5vh;
+                    border-radius: 25px;
                 }
-                fieldset {
-                    border-color: t('text');
-                    border-radius: 50px;
+                .max-field {
+                    border-radius: 25px;
+                    label {
+                        color: t('text');
+                    }
+                    fieldset {
+                        border-color: t('text');
+                        border-radius: 50px;
+                    }
                 }
-            }
-            .collect-btn {
-                font-size: 16px;
-                color: t('approve-stake-text');
-                margin: 0 auto;
-                background-color: t('bg');
-                border: 2px solid #F5B700;
-                border-radius: 33px;
-                box-shadow: none;
-                padding: 10px 40px;
-            }
-            .amount-row {
-                align-items: center;
-                margin: 10px 0;
-                fieldset {
-                    border-color: t('text');
-                    border-radius: 50px;
+                .collect-btn {
+                    font-size: 1.5vh;
+                    color: t('approve-stake-text');
+                    margin: 0 auto;
+                    background-color: t('bg');
+                    border: 2px solid #F5B700;
+                    border-radius: 33px;
+                    box-shadow: none;
+                    padding: 10px 40px;
+                    white-space: nowrap;
                 }
-                label {
-                    color: t('text');
+                .amount-row {
+                    align-items: center;
+                    margin: 5px 0 30px 0;
+                    fieldset {
+                        border-color: t('text');
+                        border-radius: 50px;
+                        .legend {
+                            display: none;
+                        }
+                    }
+                    input {
+                        padding: 5px 10px;
+                    }
+                    input,
+                    &::placeholder {
+                        color: t('text');
+                    }
                 }
-            }
-            .display-element {
-                display: block;
-                margin: 0 auto;
-                padding-bottom: 10px;
-            }
-            .rewards {
-                color: #D64933;
+                .display-element {
+                    display: block;
+                    margin: 0 auto;
+                    padding-bottom: 10px;
+                }
+                .rewards {
+                    color: #D64933;
+                    font-size: 4vh;
+                }
             }
         }
     }

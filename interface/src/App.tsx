@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import './App.css';
 import { 
     Web3ReactProvider,
@@ -15,7 +16,7 @@ import { PermanentDrawer } from './components/App/PermanentDrawer'
 import { create } from 'ipfs-http-client'
 import { Encrypt } from './components/App/Encrypt';
 import { Decrypt } from './components/App/Decrypt';
-import {Stake} from './components/App/Stake';
+import { Stake } from './components/App/Stake';
 import { Sent } from './components/App/Sent';
 import { Box,Typography, Fab, Button} from '@mui/material';
 import ThemeProvider from './components/Contexts/ThemeProvider';
@@ -25,11 +26,20 @@ import ContactsProvider from './components/Contexts/ContactsProvider';
 import elephant from './photos/icons/elephant.svg';
 import logoGreen from './photos/icons/logo-green.svg';
 import logoDark from "./photos/logo-dark.svg";
+import maintenanceImg from './photos/empty.png';
 import { Spinner } from './components/App/Spinner';
 import { AppBarComponent } from './components/App/AppBar';
 import IconButton from "@mui/material/IconButton";
 import { Add } from '@mui/icons-material';
-import HowTo from './components/HowTo'
+import HowTo from './components/HowTo';
+import ReactGA from 'react-ga';
+import { Home } from './components/App/Home';
+import useAnalyticsEventTracker from './components/Common/GaEventTracker';
+import { use } from 'chai';
+
+const maintenance = process.env.REACT_APP_MAINTENANCE_MODE;
+
+ReactGA.initialize("UA-151967719-3");
 
 const client = create({
   host: 'ipfs.infura.io',
@@ -38,7 +48,7 @@ const client = create({
 })
 
 const ethUtil = require('ethereumjs-util');
-const deb0xAddress = "0xF5c80c305803280B587F8cabBcCdC4d9BF522AbD";
+const deb0xAddress = "0x3A274DD833726D9CfDb6cBc23534B2cF5e892347";
 
 
 enum ConnectorNames { Injected = 'Injected', Network = 'Network' };
@@ -87,12 +97,18 @@ function App() {
 
     // handle logic to recognize the connector currently being activated
     const [activatingConnector, setActivatingConnector] = useState<any>()
-    const [selectedOption, setSelectedOption] = useState('Deb0x');
+    const [selectedOption, setSelectedOption] = useState('Home');
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [networkName, setNetworkName] = useState<any>();
+    const [currentChainId, setCurrentChainId] = useState<any>();
     let errorMsg;
     const [isVisible, setIsVisible] = useState(false);
     let [show, setShow] = useState(false);
+    const [selectedIndex, setSelectedIndex] = useState<any>(1);
+    let [walletInitialized, setWalletInitialized] = useState<any>();
+    const [isOptionSelected, setIsOptionSelected] = useState(true);
+    const gaEventTracker = useAnalyticsEventTracker('Login');
+    const gaEventMenuTracker = useAnalyticsEventTracker('Menu');
 
     useEffect(() => {
         injected.supportedChainIds?.forEach(chainId => 
@@ -110,25 +126,44 @@ function App() {
     useInactiveListener(!triedEager || !!activatingConnector)
 
     function handleChange(newValue: any) {
-        setSelectedOption(newValue)
+        setSelectedOption(newValue);
+        setIsOptionSelected(true);
+        gaEventMenuTracker(newValue);
     }
 
     useEffect(() => {
+        window.location.pathname == "/send" ?
+            setIsOptionSelected(false) :
+            setIsOptionSelected(true);
         localStorage.removeItem('input');
         setIsVisible(false);
     }, [])
 
     function handleClick (event: React.MouseEvent<HTMLElement>) {
         setAnchorEl(anchorEl ? null : event.currentTarget);
+        gaEventTracker("Connect Wallet");
     };
+    
 
-    useEffect(() => {    
+    function checkIfInit(initialized: any) {
+        setWalletInitialized(initialized);
+    }
+
+    useEffect(() => {   
         window.ethereum ?
             window.ethereum.request({method: "eth_requestAccounts"}).then(() => {
                 switchNetwork();               
             }).catch((err: any) => displayErrorMsg(err))
             : displayErrorMsg("Please install MetaMask")
         }, [])
+
+    useEffect(() => {
+        if(window.ethereum) {
+            window.ethereum.request({method: 'eth_chainId'}).then((chainId: any) => {
+                setCurrentChainId(chainId);
+            }).catch((err: any) => displayErrorMsg(err)) 
+        }
+    });
 
     async function switchNetwork() {
         try {
@@ -146,7 +181,7 @@ function App() {
                     {
                         chainId: '0x89', 
                         chainName:'Polygon Network',
-                        rpcUrls:['https://rpc-mainnet.maticvigil.com'],                   
+                        rpcUrls:['https://polygon-rpc.com/'],                   
                         blockExplorerUrls:['https://polygonscan.com/'],  
                         nativeCurrency: { 
                         symbol:'Matic',   
@@ -180,41 +215,53 @@ function App() {
             </p>
         }
     </div>
-    <ThemeProvider>
+        <ThemeProvider>
         {
             account ? 
             <ContactsProvider>
                 <div className="app-container container-fluid">
-                    <div className="row main-row">
-                        <div className="col col-md-3 col-sm-12 p-0 side-menu-container">
-                            <PermanentDrawer onChange={handleChange}/>
+                    { maintenance == "true" ?
+                        <div className="row main-row maintenance-mode">
+                            <img className="maintenance-img" src={maintenanceImg} />
+                            <h1>Maintenance Mode</h1>
+                            <h4>We're tightening some nuts and bolts round the back. We'll be back up and running soon.</h4>
+                        </div> :
+                        <div className="row main-row">
+                            <div className="col col-md-3 col-sm-12 p-0 side-menu-container">
+                                <PermanentDrawer onChange={handleChange} walletInitialized={walletInitialized}/>
+                            </div>
+                            <div className="col col-md-9 col-sm-12">
+                            <AppBarComponent walletInitialized={walletInitialized}/>
+                            {account ? 
+                                !!(library && account ) && (
+                                    walletInitialized ? 
+                                    <Box className="main-container" sx={{marginTop: 12}}>
+                                        {selectedOption === "Compose" && <Encrypt />}
+                                        {selectedOption === "Deb0x" && <Decrypt account={account} checkIfInit={checkIfInit}/>}
+                                        {selectedOption === "Stake" && <Stake />}
+                                        {selectedOption === "Sent" && <Sent />}
+                                        {selectedOption === "Home" && <Home onChange={handleChange} />}
+                                    </Box> : 
+                                    <Box className="main-container" sx={{marginTop: 12}}>
+                                        <Decrypt account={account} checkIfInit={checkIfInit}/>
+                                    </Box>
+                                ):
+                                    <Box className="home-page-box">
+                                        <Typography sx={{textAlign:"center",color:"gray"}} variant="h1">
+                                            The End To End Encrypted 
+                                            <br></br>
+                                            Decentralized Email Protocol 
+                                            <br></br> 
+                                            Owned By Its Users
+                                        </Typography>
+                                        <Typography sx={{ mt:10,textAlign:"center"}} variant="h3">
+                                            Please connect your wallet
+                                        </Typography>
+                                    </Box>
+                            }
+                            </div>
                         </div>
-                        <div className="col col-md-9 col-sm-12">
-                        <AppBarComponent />
-                        {account ? 
-                            !!(library && account) && (
-                                <Box className="main-container" sx={{marginTop: 12}}>
-                                    {selectedOption === "Compose" && <Encrypt />}
-                                    {selectedOption === "Deb0x" && <Decrypt account={account}/>}
-                                    {selectedOption === "Stake" && <Stake />}
-                                    {selectedOption === "Sent" && <Sent />}
-                                </Box>
-                            ):
-                                <Box className="home-page-box">
-                                    <Typography sx={{textAlign:"center",color:"gray"}} variant="h1">
-                                        The End To End Encrypted 
-                                        <br></br>
-                                        Decentralized Email Protocol 
-                                        <br></br> 
-                                        Owned By Its Users
-                                    </Typography>
-                                    <Typography sx={{ mt:10,textAlign:"center"}} variant="h3">
-                                        Please connect your wallet
-                                    </Typography>
-                                </Box>
-                        }
-                        </div>
-                    </div>
+                    }
                 </div>
             </ContactsProvider> :
             <div className={`app-container p-0 ${isVisible ? "" : "d-none"}` }>
@@ -226,7 +273,11 @@ function App() {
                                 <p>Let's get you started</p>
                                 
                                 <p>Connect your wallet & start using <img className="content-logo" src={logoGreen} /></p>
-                                <p>Here's how to do this in <IconButton className='info show-popup' onClick={() => setShow(true)}>3 easy steps</IconButton></p>
+                                {currentChainId === "0x89" ?
+                                    <p>Here's how to do this in 
+                                        <IconButton className='info show-popup' onClick={() => setShow(true)}>3 easy steps</IconButton>
+                                    </p> : ""
+                                }
                                 {show ? 
                                     <HowTo show={show} onClickOutside={() => setShow(false)}/> : 
                                         <></>
@@ -246,6 +297,7 @@ function App() {
                                                 () => {
                                                     setActivatingConnector(currentConnector)
                                                     activate(currentConnector)
+                                                    gaEventTracker("Connect Wallet");
                                                 } : 
                                                 handleClick}
                                                 className="connect-button">
@@ -287,7 +339,7 @@ function App() {
                 </div>
             </div>
         }
-    </ThemeProvider>
+        </ThemeProvider>
     </>
   )
 }
