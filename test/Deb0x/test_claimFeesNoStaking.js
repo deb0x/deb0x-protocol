@@ -30,7 +30,6 @@ describe("Test fee claiming for users/frontends without concurrently staking/uns
   `, async() => {
 
         const aliceBalance = await hre.ethers.provider.getBalance(alice.address)
-        console.log(ethers.utils.formatEther(aliceBalance))
         await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
             feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("1") })
 

@@ -35,7 +35,7 @@ describe("Test contract", async function() {
         await hre.ethers.provider.send("evm_mine")
 
         const claimedRewards = await rewardedAlice.claimRewards()
-        console.log(ethers.utils.formatEther(await dbxERC20.balanceOf(alice.address)))
+            //console.log(ethers.utils.formatEther(await dbxERC20.balanceOf(alice.address)))
     });
 
 
@@ -54,7 +54,7 @@ describe("Test contract", async function() {
         await hre.ethers.provider.send("evm_mine")
 
         const claimedRewards = await rewardedAlice.claimRewards()
-        console.log(ethers.utils.formatEther(await dbxERC20.balanceOf(alice.address)))
+            //console.log(ethers.utils.formatEther(await dbxERC20.balanceOf(alice.address)))
     });
 
     it(`
@@ -79,7 +79,7 @@ describe("Test contract", async function() {
         await hre.ethers.provider.send("evm_mine")
 
         await rewardedAlice.claimRewards()
-        console.log(ethers.utils.formatEther(await dbxERC20.balanceOf(alice.address)))
+            //console.log(ethers.utils.formatEther(await dbxERC20.balanceOf(alice.address)))
     });
 
 });
