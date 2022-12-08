@@ -12,8 +12,9 @@ const startBlock = '36051352';
 const endBlock = 'latest';
 const contractAddress = '0x3A274DD833726D9CfDb6cBc23534B2cF5e892347';
 
-async function getEvents(secondaryTopicsData) {
-    const url = new URL(`${baseURL}/${blockchainChainId}/events/topics/${sentEventTopic}/?quote-currency=USD&format=JSON&starting-block=${startBlock}&ending-block=${endBlock}&sender-address=${contractAddress}&secondary-topics=${secondaryTopicsData}&key=${APIKEY}`);
+async function getEvents(secondaryTopicsData, pageNumber) {
+    const pageSize = 100;
+    const url = new URL(`${baseURL}/${blockchainChainId}/events/topics/${sentEventTopic}/?quote-currency=USD&format=JSON&starting-block=${startBlock}&ending-block=${endBlock}&sender-address=${contractAddress}&secondary-topics=${secondaryTopicsData}&page-number=${pageNumber}&page-size=${pageSize}&key=${APIKEY}`);
     const response = await fetch(url);
     const result = await response.json();
     const data = result.data;
@@ -56,18 +57,20 @@ function calculateStartBlockAndEndBlock(currentCycle) {
     return { startBlockForLastEvents, endBlockForLastEvents }
 }
 
-async function getLast24HoursSentEvents(currentCycle) {
+async function getLast24HoursSentEvents(currentCycle, pageNumber) {
     let { startBlockForLastEvents, endBlockForLastEvents } = calculateStartBlockAndEndBlock(currentCycle);
-    const url = new URL(`${baseURL}/${blockchainChainId}/events/topics/${sentEventTopic}/?quote-currency=USD&format=JSON&starting-block=${startBlockForLastEvents}&ending-block=${endBlockForLastEvents}&sender-address=${contractAddress}&key=${APIKEY}`);
+    let pageSize = 100;
+    const url = new URL(`${baseURL}/${blockchainChainId}/events/topics/${sentEventTopic}/?quote-currency=USD&format=JSON&starting-block=${startBlockForLastEvents}&ending-block=${endBlockForLastEvents}&sender-address=${contractAddress}&page-number=${pageNumber}&page-size=${pageSize}&key=${APIKEY}`);
     const response = await fetch(url);
     const result = await response.json();
     const data = result.data;
     return data;
 }
 
-async function get24HoursUserMessagessSent(currentCycle, secondaryTopicsData) {
+async function get24HoursUserMessagessSent(currentCycle, secondaryTopicsData, pageNumber) {
+    let pageSize = 100;
     let { startBlockForLastEvents, endBlockForLastEvents } = calculateStartBlockAndEndBlock(currentCycle);
-    const url = new URL(`${baseURL}/${blockchainChainId}/events/topics/${sentEventTopic}/?quote-currency=USD&format=JSON&starting-block=${startBlockForLastEvents}&ending-block=${endBlockForLastEvents}&sender-address=${contractAddress}&secondary-topics=${secondaryTopicsData}&key=${APIKEY}`);
+    const url = new URL(`${baseURL}/${blockchainChainId}/events/topics/${sentEventTopic}/?quote-currency=USD&format=JSON&starting-block=${startBlockForLastEvents}&ending-block=${endBlockForLastEvents}&sender-address=${contractAddress}&secondary-topics=${secondaryTopicsData}&page-number=${pageNumber}&page-size=${pageSize}&key=${APIKEY}`);
     const response = await fetch(url);
     const result = await response.json();
     const data = result.data;
@@ -76,17 +79,45 @@ async function get24HoursUserMessagessSent(currentCycle, secondaryTopicsData) {
 
 export async function fetchMessageSenders(account) {
     let secondaryTopics = '0x000000000000000000000000' + account.slice(2);
-    let events = await getEvents(secondaryTopics);
-    let messageSenders = events.items.filter(element => (element.raw_log_topics[1].toLowerCase() === secondaryTopics.toLowerCase()) &&
+    let events = [];
+    let pageNumber = 0;
+    let intermediateEvents = await getEvents(secondaryTopics, pageNumber);
+    if (intermediateEvents.items.length > 0 && intermediateEvents != null)
+        events.push(intermediateEvents.items);
+    while (intermediateEvents.items.length > 0) {
+        pageNumber++;
+        intermediateEvents = await getEvents(secondaryTopics, pageNumber);
+        if (intermediateEvents != null) {
+            if (intermediateEvents.items.length > 0) {
+                events.push(intermediateEvents.items);
+            }
+        }
+    }
+    let newEvents = events.flat();
+    let messageSenders = newEvents.filter(element => (element.raw_log_topics[1].toLowerCase() === secondaryTopics.toLowerCase()) &&
         (secondaryTopics.toLowerCase() != element.raw_log_topics[2].toLowerCase())).map(element => '0x' + element.raw_log_topics[2].slice(26));
     return messageSenders
 }
 
 export async function fetchMessages(to, from) {
     let secondaryTopics = '0x000000000000000000000000' + to.slice(2);
-    let events = await getEvents(secondaryTopics);
+    let events = [];
+    let pageNumber = 0;
+    let intermediateEvents = await getEvents(secondaryTopics, pageNumber);
+    if (intermediateEvents.items.length > 0 && intermediateEvents != null)
+        events.push(intermediateEvents.items);
+    while (intermediateEvents.items.length > 0) {
+        pageNumber++;
+        intermediateEvents = await getEvents(secondaryTopics, pageNumber);
+        if (intermediateEvents != null) {
+            if (intermediateEvents.items.length > 0) {
+                events.push(intermediateEvents.items);
+            }
+        }
+    }
+    let newEvents = events.flat();
     let filterAfterFrom = '0x000000000000000000000000' + from.slice(2);
-    let froms = events.items.filter(element => (filterAfterFrom.toLowerCase() === element.raw_log_topics[2].toLowerCase()));
+    let froms = newEvents.filter(element => (filterAfterFrom.toLowerCase() === element.raw_log_topics[2].toLowerCase()));
     const typesArray = [
         { type: 'uint256', name: 'sentId' },
         { type: 'uint256', name: 'timestamp' },
@@ -122,6 +153,7 @@ export async function fetchSentMessages(sender) {
             }
         }
     }
+
     let newEvents = events.flat();
     const typesArray = [
         { type: 'uint256', name: 'sentId' },
@@ -173,6 +205,7 @@ export async function fetchSentMessages(sender) {
 export async function getKey(to) {
     let secondaryTopics = '0x000000000000000000000000' + to.slice(2);
     let events = await getSetKeyEvents(secondaryTopics);
+    console.log(events)
     if (events.items.length != 0) {
         for (let i = 0; i < events.items.length; i++) {
             if (events.items[i].raw_log_topics[1].toLowerCase() === secondaryTopics.toLowerCase()) {
@@ -185,15 +218,41 @@ export async function getKey(to) {
         return '';
 }
 
-export function dailyStats(currentCycle) {
-    let events = getLast24HoursSentEvents(currentCycle)
+export async function dailyStats(currentCycle) {
+    let events = [];
+    let pageNumber = 0;
+    let intermediateEvents = await getLast24HoursSentEvents(currentCycle, pageNumber);
+    if (intermediateEvents.items.length > 0 && intermediateEvents != null)
+        events.push(intermediateEvents.items);
+    while (intermediateEvents.items.length > 0) {
+        pageNumber++;
+        intermediateEvents = await getLast24HoursSentEvents(currentCycle, pageNumber);
+        if (intermediateEvents != null) {
+            if (intermediateEvents.items.length > 0) {
+                events.push(intermediateEvents.items);
+            }
+        }
+    }
     return events;
 }
 
 export async function userDailyStas(sender, currentCycle) {
     let secondaryTopics = '0x000000000000000000000000' + sender.slice(2);
-    let events = await get24HoursUserMessagessSent(currentCycle, secondaryTopics);
-    let filterAfterFrom = '0x000000000000000000000000' + sender.slice(2);
-    let froms = events.items.filter(element => (filterAfterFrom.toLowerCase() === element.raw_log_topics[2].toLowerCase()));
-    return froms.length / 2;
+    let events = [];
+    let pageNumber = 0;
+    let intermediateEvents = await get24HoursUserMessagessSent(currentCycle, secondaryTopics, pageNumber);
+    if (intermediateEvents.items.length > 0 && intermediateEvents != null)
+        events.push(intermediateEvents.items);
+    while (intermediateEvents.items.length > 0) {
+        pageNumber++;
+        intermediateEvents = await get24HoursUserMessagessSent(currentCycle, secondaryTopics, pageNumber);
+        if (intermediateEvents != null) {
+            if (intermediateEvents.items.length > 0) {
+                events.push(intermediateEvents.items);
+            }
+        }
+    }
+    let newEvents = events.flat();
+    let froms = newEvents.filter(element => (secondaryTopics.toLowerCase() === element.raw_log_topics[2].toLowerCase()));
+    return froms.length;
 }
