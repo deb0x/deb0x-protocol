@@ -401,7 +401,10 @@ export function Stake(props: any): any {
         )
     }
 
-
+    function floorPrecised(number:any) {
+        var power = Math.pow(10, 2);
+        return (Math.floor(parseFloat(number) * power) / power).toString();
+    }
 
     function StakeUnstake() {
         const [alignment, setAlignment] = useState("stake");
@@ -454,10 +457,8 @@ export function Stake(props: any): any {
 
         async function setUnstakedAmount() {
             const deb0xERC20Contract = await Deb0xERC20(library, deb0xERC20Address)
-
             const balance = await deb0xERC20Contract.balanceOf(account)
-
-            setUserUnstakedAmount(parseFloat(ethers.utils.formatEther(balance)).toFixed(2))
+            setUserUnstakedAmount(floorPrecised(ethers.utils.formatEther(balance)))
         }
 
         async function setApproval() {
@@ -868,7 +869,7 @@ export function Stake(props: any): any {
     
             // setTotalStaked(ethers.utils.formatEther(currentStake))
 
-            setTotalStaked(parseFloat(ethers.utils.formatEther(currentStake.sub(pendingStakeWithdrawal))).toFixed(2))
+            setTotalStaked(floorPrecised(ethers.utils.formatEther(currentStake.sub(pendingStakeWithdrawal))))
 
         }
 
