@@ -22,9 +22,9 @@ module.exports = {
     },
     networks: {
         hardhat: {
-            gas: 19000000,
-            allowUnlimitedContractSize: true,
-            timeout: 1800000
+            forking: {
+                url: "https://polygon-mainnet.g.alchemy.com/v2/jkt_Ah4ffnrTOeJkQ-CU0KqO5LixV6cb",
+              }
         },
         goerli: {
             url: "https://goerli.infura.io/v3/c4174820658a4db9a6e5d54efec43ede",

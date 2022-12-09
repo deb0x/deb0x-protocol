@@ -3,6 +3,7 @@ pragma solidity ^0.8.17;
 
 import "./Deb0x.sol";
 import "./Deb0xERC20.sol";
+import "hardhat/console.sol";
 
 contract Deb0xViews {
     Deb0x deb0x;
@@ -48,17 +49,18 @@ contract Deb0xViews {
     }
 
     function getUnclaimedFees(address account) external view returns (uint256) {
+        
         uint256 calculatedCycle = deb0x.getCurrentCycle();
         uint256 currentAccruedFees = deb0x.accAccruedFees(account);
         uint256 currentCycleFeesPerStakeSummed;
         uint256 previousStartedCycleTemp = deb0x.previousStartedCycle();
         uint256 lastStartedCycleTemp = deb0x.lastStartedCycle();
-
+        console.log("here");
         if (calculatedCycle != deb0x.currentStartedCycle()) {
             previousStartedCycleTemp = lastStartedCycleTemp + 1;
             lastStartedCycleTemp = deb0x.currentStartedCycle();
         }
-
+        
         if (
             calculatedCycle > lastStartedCycleTemp &&
             deb0x.cycleFeesPerStakeSummed(lastStartedCycleTemp + 1) == 0
@@ -79,13 +81,15 @@ contract Deb0xViews {
                 deb0x.previousStartedCycle()
             );
         }
-
+        
         uint256 currentRewards = getUnclaimedRewards(account);
 
         if (
             calculatedCycle > lastStartedCycleTemp &&
             deb0x.lastFeeUpdateCycle(account) != lastStartedCycleTemp + 1
         ) {
+            console.log(currentCycleFeesPerStakeSummed,
+            deb0x.cycleFeesPerStakeSummed(deb0x.lastFeeUpdateCycle(account)));
             currentAccruedFees +=
                 (
                     (currentRewards *
