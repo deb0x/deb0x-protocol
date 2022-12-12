@@ -218,7 +218,7 @@ describe("Test contract", async function() {
         await rewardedDean.claimFees()
 
         await dbxERC20.connect(dean).approve(rewardedAlice.address, ethers.constants.MaxUint256)
-        await rewardedDean.stakeDBX(ethers.utils.parseEther("3.577"))
+        await rewardedDean.stake(ethers.utils.parseEther("3.577"))
 
         //0x1971D9f65Dc652B726dA023F09507629B3B358E5
         await rewardedGary["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -228,18 +228,18 @@ describe("Test contract", async function() {
         await dbxERC20Gary.transfer(hailey.address, ethers.utils.parseEther("0.314473421101858361"))
 
         await dbxERC20.connect(gary).approve(rewardedAlice.address, ethers.constants.MaxUint256)
-        await rewardedGary.stakeDBX(ethers.utils.parseEther("0.2"))
+        await rewardedGary.stake(ethers.utils.parseEther("0.2"))
         await dbxERC20.connect(hailey).approve(rewardedAlice.address, ethers.constants.MaxUint256)
-        await rewardedHailey.stakeDBX(ethers.utils.parseEther("0.314473421101858361"))
+        await rewardedHailey.stake(ethers.utils.parseEther("0.314473421101858361"))
 
         await rewardedBob.claimRewards()
         await rewardedBob.claimFees()
 
         // --- should not be possibble ---
         await dbxERC20.connect(bob).approve(rewardedAlice.address, ethers.constants.MaxUint256)
-        await rewardedBob.stakeDBX(ethers.utils.parseEther("568.87"))
+        await rewardedBob.stake(ethers.utils.parseEther("568.87"))
         await rewardedBob.unstake(ethers.utils.parseEther("1"))
-            // await rewardedBob.stakeDBX(ethers.utils.parseEther("568.87"))
+            // await rewardedBob.stake(ethers.utils.parseEther("568.87"))
             // await rewardedBob.unstake(ethers.utils.parseEther("568.87"))
             // --- should not be possibble ---
 

@@ -57,7 +57,7 @@ describe("Test DBX tokens distributions", async function() {
         let balanceForBob = await dbxERC20.balanceOf(bob.address);
 
         await dbxERC20.connect(bob).approve(deb0x.address, balanceForBob)
-        await bobInstance.stakeDBX(await dbxERC20.balanceOf(bob.address));
+        await bobInstance.stake(await dbxERC20.balanceOf(bob.address));
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 2])
         await hre.ethers.provider.send("evm_mine");
 
@@ -86,7 +86,7 @@ describe("Test DBX tokens distributions", async function() {
         expect(balanceForBobAfterTwentyCycles).to.equal(balanceForBob);
 
         await dbxERC20.connect(bob).approve(deb0x.address, balanceForBob)
-        await bobInstance.stakeDBX(BigNumber.from(balanceForBobAfterTwentyCycles).div(2));
+        await bobInstance.stake(BigNumber.from(balanceForBobAfterTwentyCycles).div(2));
         let balanceAfterStake = await dbxERC20.balanceOf(bob.address);
         expect(balanceAfterStake).to.equal(BigNumber.from(balanceForBobAfterTwentyCycles).div(2));
 
@@ -117,7 +117,7 @@ describe("Test DBX tokens distributions", async function() {
         await bobInstance["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 
         await dbxERC20.connect(bob).approve(deb0x.address, balanceForBob)
-        await bobInstance.stakeDBX(BigNumber.from(balanceForBobAfterTwentyCycles).div(2));
+        await bobInstance.stake(BigNumber.from(balanceForBobAfterTwentyCycles).div(2));
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine");
@@ -128,7 +128,7 @@ describe("Test DBX tokens distributions", async function() {
         await hre.ethers.provider.send("evm_mine");
 
         await dbxERC20.connect(bob).approve(deb0x.address, balanceForBob)
-        await bobInstance.stakeDBX(BigNumber.from(balanceForBobAfterTwentyCycles).div(2));
+        await bobInstance.stake(BigNumber.from(balanceForBobAfterTwentyCycles).div(2));
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine");
