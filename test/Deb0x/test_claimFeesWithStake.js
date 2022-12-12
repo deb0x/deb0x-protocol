@@ -44,10 +44,10 @@ describe("Test fee claiming for users and concurrently stake/unstake", async fun
         const carolDBXBalance = await dbxERC20.balanceOf(carol.address)
         await dbxERC20.connect(carol).transfer(bob.address, carolDBXBalance.div(BigNumber.from("2")))
         await dbxERC20.connect(bob).approve(rewardedAlice.address, await dbxERC20.balanceOf(bob.address))
-        await rewardedBob.stakeDBX(await dbxERC20.balanceOf(bob.address))
+        await rewardedBob.stake(await dbxERC20.balanceOf(bob.address))
         await dbxERC20.connect(carol).transfer(alice.address, await dbxERC20.balanceOf(carol.address))
         await dbxERC20.connect(alice).approve(rewardedAlice.address, await dbxERC20.balanceOf(alice.address))
-        await rewardedAlice.stakeDBX(await dbxERC20.balanceOf(alice.address))
+        await rewardedAlice.stake(await dbxERC20.balanceOf(alice.address))
 
         await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -92,12 +92,12 @@ describe("Test fee claiming for users and concurrently stake/unstake", async fun
         await rewardedBob["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
         let balanceUser3 = await dbxERC20.balanceOf(bob.address);
         await dbxERC20.connect(bob).approve(rewardedBob.address, balanceUser3)
-        await rewardedBob.stakeDBX(balanceUser3.div(4));
+        await rewardedBob.stake(balanceUser3.div(4));
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
         await rewardedBob["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
-        await rewardedBob.stakeDBX(balanceUser3.div(4));
+        await rewardedBob.stake(balanceUser3.div(4));
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")

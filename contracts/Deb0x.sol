@@ -383,7 +383,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         emit ClientFeesClaimed(getCurrentCycle(), _msgSender(), fees);
     }
 
-    function stakeDBX(uint256 amount)
+    function stake(uint256 amount)
         external
         nonReentrant()
     {

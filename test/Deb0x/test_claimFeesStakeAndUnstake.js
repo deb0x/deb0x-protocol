@@ -52,7 +52,7 @@ describe("Test claimFeesStakeAndUnstake", async function() {
         await dbxERC20.connect(carol).transfer(bob.address, carolDBXBalance.div(BigNumber.from("2")))
         await dbxERC20.connect(bob).approve(rewardedAlice.address, await dbxERC20.balanceOf(bob.address))
         let BobStakeAmount = await dbxERC20.balanceOf(bob.address);
-        await rewardedBob.stakeDBX(await dbxERC20.balanceOf(bob.address))
+        await rewardedBob.stake(await dbxERC20.balanceOf(bob.address))
 
         let BobStakedAmount = BigNumber.from("0")
         const stakedValue = await rewardedBob.queryFilter("Staked");
@@ -65,7 +65,7 @@ describe("Test claimFeesStakeAndUnstake", async function() {
         await dbxERC20.connect(alice).approve(rewardedAlice.address, await dbxERC20.balanceOf(alice.address))
 
         let AliceStakeAmount = await dbxERC20.balanceOf(alice.address);
-        await rewardedAlice.stakeDBX(AliceStakeAmount)
+        await rewardedAlice.stake(AliceStakeAmount)
         let AliceAndBobStakedAmount = BigNumber.from("0")
         const stakedValueAlice = await rewardedBob.queryFilter("Staked");
         for (let entry of stakedValueAlice) {

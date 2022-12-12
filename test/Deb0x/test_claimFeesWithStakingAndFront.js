@@ -40,10 +40,10 @@ describe("Test fee claiming for both users and frontends and concurrently stake/
         const carolDBXBalance = await dbxERC20.balanceOf(carol.address)
         await dbxERC20.connect(carol).transfer(bob.address, carolDBXBalance.div(BigNumber.from("2")))
         await dbxERC20.connect(bob).approve(rewardedAlice.address, await dbxERC20.balanceOf(bob.address))
-        await rewardedBob.stakeDBX(await dbxERC20.balanceOf(bob.address))
+        await rewardedBob.stake(await dbxERC20.balanceOf(bob.address))
         await dbxERC20.connect(carol).transfer(alice.address, await dbxERC20.balanceOf(carol.address))
         await dbxERC20.connect(alice).approve(rewardedAlice.address, await dbxERC20.balanceOf(alice.address))
-        await rewardedAlice.stakeDBX(await dbxERC20.balanceOf(alice.address))
+        await rewardedAlice.stake(await dbxERC20.balanceOf(alice.address))
 
         await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 1000, 0, { value: ethers.utils.parseEther("1") })
         await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 1000, 0, { value: ethers.utils.parseEther("1") })
