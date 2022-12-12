@@ -19,9 +19,9 @@ import ListItem from '@mui/material/ListItem';
 import SnackbarNotification from './Snackbar';
 import '../../componentsStyling/appBar.scss';
 
-const deb0xAddress = "0x3A274DD833726D9CfDb6cBc23534B2cF5e892347";
-const deb0xViewsAddress = "0x3a6B3Aff418C7E50eE9F852D0bc7119296cc3644";
-const deb0xERC20Address = "0x58EE92DaDdF00334da39fb4Fab164c8662C794AD"
+const deb0xAddress = "0x5d198D91A1D489048BbF6EC23F5A9Cf4E8d7078b";
+const deb0xViewsAddress = "0x33F002B3601404180133175b20F8946351f87FA6";
+const deb0xERC20Address = "0xfb0B5076b671215f5982B0cCE100829F819e95D5"
 const tokenSymbol = 'DBX';
 
 const tokenDecimals = 18;

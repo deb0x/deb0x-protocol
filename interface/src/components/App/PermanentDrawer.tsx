@@ -31,7 +31,7 @@ import { Add } from '@mui/icons-material';
 import ContactsSetter from '../ContactsSetter';
 import useAnalyticsEventTracker from '../Common/GaEventTracker';
 
-const deb0xERC20Address = "0x58EE92DaDdF00334da39fb4Fab164c8662C794AD";
+const deb0xERC20Address = "0xfb0B5076b671215f5982B0cCE100829F819e95D5";
 
 enum ConnectorNames { Injected = 'Injected' };
 

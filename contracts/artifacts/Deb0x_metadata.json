@@ -103,14 +103,8 @@
 					{
 						"indexed": true,
 						"internalType": "bytes32",
-						"name": "hash",
-						"type": "bytes32"
-					},
-					{
-						"indexed": false,
-						"internalType": "string",
 						"name": "value",
-						"type": "string"
+						"type": "bytes32"
 					}
 				],
 				"name": "KeySet",
@@ -225,28 +219,22 @@
 						"type": "bytes32"
 					},
 					{
-						"components": [
-							{
-								"internalType": "string",
-								"name": "content",
-								"type": "string"
-							},
-							{
-								"internalType": "uint256",
-								"name": "timestamp",
-								"type": "uint256"
-							}
-						],
-						"indexed": false,
-						"internalType": "struct Deb0x.Envelope",
-						"name": "body",
-						"type": "tuple"
-					},
-					{
 						"indexed": false,
 						"internalType": "uint256",
 						"name": "sentId",
 						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "timestamp",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes32[]",
+						"name": "content",
+						"type": "bytes32[]"
 					}
 				],
 				"name": "Sent",
@@ -304,6 +292,19 @@
 			},
 			{
 				"inputs": [],
+				"name": "MAX_BPS",
+				"outputs": [
+					{
+						"internalType": "uint16",
+						"name": "",
+						"type": "uint16"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
 				"name": "PROTOCOL_FEE",
 				"outputs": [
 					{
@@ -355,7 +356,7 @@
 						"type": "address"
 					}
 				],
-				"name": "accCycleFeePercent",
+				"name": "accCycleGasOwed",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -374,7 +375,7 @@
 						"type": "address"
 					}
 				],
-				"name": "accCycleMessages",
+				"name": "accCycleGasUsed",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -540,7 +541,7 @@
 						"type": "address"
 					}
 				],
-				"name": "clientCycleFeePercent",
+				"name": "clientCycleGasEarned",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -693,7 +694,7 @@
 						"type": "uint256"
 					}
 				],
-				"name": "cycleTotalMessages",
+				"name": "cycleTotalGasUsed",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -841,7 +842,7 @@
 			},
 			{
 				"inputs": [],
-				"name": "pendingCycleRewardsStake",
+				"name": "pendingFees",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -902,9 +903,9 @@
 				"name": "publicKeys",
 				"outputs": [
 					{
-						"internalType": "string",
+						"internalType": "bytes32",
 						"name": "",
-						"type": "string"
+						"type": "bytes32"
 					}
 				],
 				"stateMutability": "view",
@@ -937,9 +938,9 @@
 						"type": "address[]"
 					},
 					{
-						"internalType": "string[]",
-						"name": "payload",
-						"type": "string[]"
+						"internalType": "bytes32[][]",
+						"name": "crefs",
+						"type": "bytes32[][]"
 					},
 					{
 						"internalType": "address",
@@ -978,9 +979,9 @@
 			{
 				"inputs": [
 					{
-						"internalType": "string",
+						"internalType": "bytes32",
 						"name": "publicKey",
-						"type": "string"
+						"type": "bytes32"
 					}
 				],
 				"name": "setKey",
@@ -996,28 +997,9 @@
 						"type": "uint256"
 					}
 				],
-				"name": "stakeDBX",
+				"name": "stake",
 				"outputs": [],
 				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					}
-				],
-				"name": "stakedDuringGapCycle",
-				"outputs": [
-					{
-						"internalType": "bool",
-						"name": "",
-						"type": "bool"
-					}
-				],
-				"stateMutability": "view",
 				"type": "function"
 			},
 			{
@@ -1055,12 +1037,114 @@
 		],
 		"devdoc": {
 			"kind": "dev",
-			"methods": {},
+			"methods": {
+				"claimClientFees()": {
+					"details": "Transfers newly accrued client fee share and transfers  the entire amount to caller address."
+				},
+				"claimClientRewards()": {
+					"details": "Mints newly accrued client rewards share and transfers the entire  allocated amount to the transaction sender address."
+				},
+				"claimFees()": {
+					"details": "Transfers newly accrued fees to sender's address."
+				},
+				"claimRewards()": {
+					"details": "Mints newly accrued account rewards and transfers the entire  allocated amount to the transaction sender address."
+				},
+				"constructor": {
+					"params": {
+						"forwarder": "forwarder contract address."
+					}
+				},
+				"getCurrentCycle()": {
+					"details": "Returns the index of the cycle at the current block time."
+				},
+				"send(address[],bytes32[][],address,uint256,uint256)": {
+					"details": "Sends messages to multiple accounts. Triggers helper functions  used to update cycle, rewards and fees related state. Optionally may include extra reward token fee and native coin fees on-top of the default protocol fee.  These fees are set by the transaction sender also called \"client\". ",
+					"params": {
+						"crefs": "content references to the messages.",
+						"feeReceiver": "client address.",
+						"msgFee": "on-top reward token fee charged by the client (in basis points). If 0, no reward token fee applies.",
+						"nativeTokenFee": "on-top native coin fee charged by the client. If 0, no ",
+						"to": "account addresses to send messages to."
+					}
+				},
+				"setKey(bytes32)": {
+					"details": "Stores the public key of the sender account. ",
+					"params": {
+						"publicKey": "as encoded by the client."
+					}
+				},
+				"stake(uint256)": {
+					"details": "Stakes the given amount and increases the share of the daily allocated rewards. The tokens are transfered from sender account to this contract. To receive the tokens back, the unstake function must be called by the same account address. ",
+					"params": {
+						"amount": "token amount to be staked (in wei)."
+					}
+				},
+				"unstake(uint256)": {
+					"details": "Unstakes the given amount and decreases the share of the daily allocated rewards. If the balance is availabe, the tokens are transfered from this contract to the sender account. ",
+					"params": {
+						"amount": "token amount to be unstaked (in wei)."
+					}
+				}
+			},
 			"version": 1
 		},
 		"userdoc": {
 			"kind": "user",
-			"methods": {},
+			"methods": {
+				"MAX_BPS()": {
+					"notice": "Basis points representation of 100 percent."
+				},
+				"PROTOCOL_FEE()": {
+					"notice": "Basis points (bps) representation of the protocol fee (i.e. 10 percent). Calls to send function charge 1000 bps of transaction cost."
+				},
+				"SCALING_FACTOR()": {
+					"notice": "Used to minimise division remainder when earned fees are calculated."
+				},
+				"accRewards(address)": {
+					"notice": "Current unclaimed rewards and staked amounts per account."
+				},
+				"currentCycle()": {
+					"notice": "Index (0-based) of the current cycle.  Updated upon cycle setup that is  triggered by contract interraction  (account sends message, claims fees, claims rewards, stakes or unstakes)."
+				},
+				"currentCycleReward()": {
+					"notice": "Reward token amount allocated for the current cycle."
+				},
+				"currentStartedCycle()": {
+					"notice": "Helper variable to store the index of the last active cycle."
+				},
+				"dbx()": {
+					"notice": "Deb0x Reward Token contract. Initialized in constructor."
+				},
+				"i_initialTimestamp()": {
+					"notice": "Contract creation timestamp. Initialized in constructor."
+				},
+				"i_periodDuration()": {
+					"notice": "Length of a reward distribution cycle.  Initialized in contstructor to 1 day."
+				},
+				"lastActiveCycle(address)": {
+					"notice": "The last cycle when an account has sent messages."
+				},
+				"lastCycleReward()": {
+					"notice": "Reward token amount allocated for the previous cycle."
+				},
+				"lastStartedCycle()": {
+					"notice": "Helper variable to store the index of the last active cycle."
+				},
+				"pendingStake()": {
+					"notice": "Helper variable to store pending stake amount.   "
+				},
+				"previousStartedCycle()": {
+					"notice": "Stores the value of penultimate active cycle plus one."
+				},
+				"rewardPerCycle(uint256)": {
+					"notice": "Total token rewards allocated per cycle."
+				},
+				"summedCycleStakes(uint256)": {
+					"notice": "Total unclaimed token reward and stake.   Updated when a new cycle starts and when an account claims rewards, stakes or unstakes externally owned tokens."
+				}
+			},
+			"notice": "Main deb0x protocol contract used to send messages, store public keys, allocate token rewards, distribute native token fees, stake and unstake.",
 			"version": 1
 		}
 	},
@@ -1074,7 +1158,7 @@
 			"bytecodeHash": "ipfs"
 		},
 		"optimizer": {
-			"enabled": true,
+			"enabled": false,
 			"runs": 200
 		},
 		"remappings": []
@@ -1120,6 +1204,22 @@
 				"dweb:/ipfs/QmZQg6gn1sUpM8wHzwNvSnihumUCAhxD119MpXeKp8B9s8"
 			]
 		},
+		"@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol": {
+			"keccak256": "0x07536242e24ee7067295d32c08e495a33e605f3c52f8ee4ec3bdcb7a351313d2",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://01f99dbf2ce567a64a03fc4d38b76d64d52bf1a2302922971446b1cf777220ec",
+				"dweb:/ipfs/QmSiotbcG2KMuXfbKyKTcHu9ujBp67jmbULJyYLDpsrpC1"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol": {
+			"keccak256": "0xf41ca991f30855bf80ffd11e9347856a517b977f0a6c2d52e6421a99b7840329",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://b2717fd2bdac99daa960a6de500754ea1b932093c946388c381da48658234b95",
+				"dweb:/ipfs/QmP6QVMn6UeA3ByahyJbYQr5M6coHKBKsf3ySZSfbyA8R7"
+			]
+		},
 		"@openzeppelin/contracts/utils/Context.sol": {
 			"keccak256": "0xe2e337e6dde9ef6b680e07338c493ebea1b5fd09b43424112868e9cc1706bca7",
 			"license": "MIT",
@@ -1128,20 +1228,52 @@
 				"dweb:/ipfs/QmRK2Y5Yc6BK7tGKkgsgn3aJEQGi5aakeSPZvS65PV8Xp3"
 			]
 		},
-		"contracts/Deb0x.sol": {
-			"keccak256": "0x89685187168c1c7574298930f7a88d71c56c8b9ea3bdc89ac285f99586ca5814",
+		"@openzeppelin/contracts/utils/Counters.sol": {
+			"keccak256": "0xf0018c2440fbe238dd3a8732fa8e17a0f9dce84d31451dc8a32f6d62b349c9f1",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://a5b14fc58fb2a3b0e0db7d2ae2a0f20e7ca13fe9497f7fc12850cae21d56bc88",
-				"dweb:/ipfs/QmcYkNBjeWWTYZ6skPGZTHBCE9QwCKLhhtA19Y4yLNPyUU"
+				"bzz-raw://59e1c62884d55b70f3ae5432b44bb3166ad71ae3acd19c57ab6ddc3c87c325ee",
+				"dweb:/ipfs/QmezuXg5GK5oeA4F91EZhozBFekhq5TD966bHPH18cCqhu"
+			]
+		},
+		"@openzeppelin/contracts/utils/Strings.sol": {
+			"keccak256": "0xaf159a8b1923ad2a26d516089bceca9bdeaeacd04be50983ea00ba63070f08a3",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://6f2cf1c531122bc7ca96b8c8db6a60deae60441e5223065e792553d4849b5638",
+				"dweb:/ipfs/QmPBdJmBBABMDCfyDjCbdxgiqRavgiSL88SYPGibgbPas9"
+			]
+		},
+		"@openzeppelin/contracts/utils/cryptography/ECDSA.sol": {
+			"keccak256": "0xdb7f5c28fc61cda0bd8ab60ce288e206b791643bcd3ba464a70cbec18895a2f5",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://bf52bdf22a33263f5ca6227a35faeac3b81e7d2c692fbcc6a079d488710c5900",
+				"dweb:/ipfs/QmcmsjkP4yq3UhiJbvyzwufaY2EKh1zhHaRK8ATag2cpD2"
+			]
+		},
+		"@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol": {
+			"keccak256": "0x6688fad58b9ec0286d40fa957152e575d5d8bd4c3aa80985efdb11b44f776ae7",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://8bc00ab7f133cdaafd212a5cc6a16c8d37319721105d130c8e5af0c4e8f170ba",
+				"dweb:/ipfs/QmVmf6LVMfFiEkvKYLzSv3bGHzymEW93AcUuFrNUdY3NtT"
+			]
+		},
+		"contracts/Deb0x.sol": {
+			"keccak256": "0x12d192adeb6133f2a896ef20e474c715bbba793a0a78b56bd5c93d2ec7607c6a",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://5a406a968c57a33f5d7aff1b2fb1fc7cffa0f108d230fad37eaaa93bd773e30e",
+				"dweb:/ipfs/QmTqpPkQu4TAyN8wTFiY4pV5bzTBi97HrHPKM6CwEi4WoQ"
 			]
 		},
 		"contracts/Deb0xERC20.sol": {
-			"keccak256": "0xa7f6df5a32e5ebdd3de2e39ed3914eabef3c5ba092aca2b8e65b9d8873382790",
+			"keccak256": "0xf59e2f1f6f4362550895d41a99108f6e72b004ce5ace908aabe6a68190b5eb67",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://768e76a643b109f5d7c84e8dc2717f71dc08a7548c3f924185795ed56222d173",
-				"dweb:/ipfs/QmPYbQBy9XVDzSJ4KbT5oPMzPssA2hUdR2dogSvcsRUxv8"
+				"bzz-raw://357e0e1d50717960c918b9a001bac93b3fe7013ab848d72dcd5d6ac2ae9b270d",
+				"dweb:/ipfs/QmZzxsWuh598YEiPAjwm4fexfZNrB7KvNEys2ZSTkXwi2s"
 			]
 		}
 	},

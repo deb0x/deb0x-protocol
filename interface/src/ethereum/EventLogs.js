@@ -10,7 +10,7 @@ const blockchainChainId = '137'
 const sentEventTopic = '0xa33bc9a10d8f3a335b59663beb6a02681748ac0b3db1251c7bb08f3e99dd0bb4';
 const startBlock = '36051352';
 const endBlock = 'latest';
-const contractAddress = '0x3A274DD833726D9CfDb6cBc23534B2cF5e892347';
+const contractAddress = '0x5d198D91A1D489048BbF6EC23F5A9Cf4E8d7078b';
 
 async function getEvents(secondaryTopicsData) {
     const url = new URL(`${baseURL}/${blockchainChainId}/events/topics/${sentEventTopic}/?quote-currency=USD&format=JSON&starting-block=${startBlock}&ending-block=${endBlock}&sender-address=${contractAddress}&secondary-topics=${secondaryTopicsData}&key=${APIKEY}`);

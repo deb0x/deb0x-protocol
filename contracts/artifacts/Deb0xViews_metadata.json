@@ -62,38 +62,6 @@
 				"type": "function"
 			},
 			{
-				"inputs": [],
-				"name": "getCurrentCycle",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "account",
-						"type": "address"
-					}
-				],
-				"name": "getKey",
-				"outputs": [
-					{
-						"internalType": "string",
-						"name": "",
-						"type": "string"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
 				"inputs": [
 					{
 						"internalType": "address",
@@ -134,12 +102,56 @@
 		],
 		"devdoc": {
 			"kind": "dev",
-			"methods": {},
+			"methods": {
+				"calculateCycleReward()": {
+					"returns": {
+						"_0": "the reward token amount allocated for the current cycle"
+					}
+				},
+				"constructor": {
+					"params": {
+						"_deb0x": "Deb0x.sol contract address"
+					}
+				},
+				"deb0xContractBalance()": {
+					"returns": {
+						"_0": "main deb0x contract native coin balance"
+					}
+				},
+				"getAccWithdrawableStake(address)": {
+					"details": "Withdrawable stake is the amount of deb0x reward tokens that are currently  'unlocked' and can be unstaked by a given account. ",
+					"params": {
+						"staker": "the address to query the withdrawable stake for"
+					},
+					"returns": {
+						"_0": "the amount in wei"
+					}
+				},
+				"getUnclaimedFees(address)": {
+					"details": "Unclaimed fees represent the native coin amount that has been allocated  to a given account but was not claimed yet. ",
+					"params": {
+						"account": "the address to query the unclaimed fees for"
+					},
+					"returns": {
+						"_0": "the amount in wei"
+					}
+				},
+				"getUnclaimedRewards(address)": {
+					"details": "Unclaimed rewards represent the amount of deb0x reward tokens  that were allocated but were not withdrawn by a given account. ",
+					"params": {
+						"account": "the address to query the unclaimed rewards for"
+					},
+					"returns": {
+						"_0": "the amount in wei"
+					}
+				}
+			},
 			"version": 1
 		},
 		"userdoc": {
 			"kind": "user",
 			"methods": {},
+			"notice": "Helper contract used to optimize deb0x state queries made by clients.",
 			"version": 1
 		}
 	},
@@ -153,7 +165,7 @@
 			"bytecodeHash": "ipfs"
 		},
 		"optimizer": {
-			"enabled": true,
+			"enabled": false,
 			"runs": 200
 		},
 		"remappings": []
@@ -199,6 +211,22 @@
 				"dweb:/ipfs/QmZQg6gn1sUpM8wHzwNvSnihumUCAhxD119MpXeKp8B9s8"
 			]
 		},
+		"@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol": {
+			"keccak256": "0x07536242e24ee7067295d32c08e495a33e605f3c52f8ee4ec3bdcb7a351313d2",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://01f99dbf2ce567a64a03fc4d38b76d64d52bf1a2302922971446b1cf777220ec",
+				"dweb:/ipfs/QmSiotbcG2KMuXfbKyKTcHu9ujBp67jmbULJyYLDpsrpC1"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol": {
+			"keccak256": "0xf41ca991f30855bf80ffd11e9347856a517b977f0a6c2d52e6421a99b7840329",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://b2717fd2bdac99daa960a6de500754ea1b932093c946388c381da48658234b95",
+				"dweb:/ipfs/QmP6QVMn6UeA3ByahyJbYQr5M6coHKBKsf3ySZSfbyA8R7"
+			]
+		},
 		"@openzeppelin/contracts/utils/Context.sol": {
 			"keccak256": "0xe2e337e6dde9ef6b680e07338c493ebea1b5fd09b43424112868e9cc1706bca7",
 			"license": "MIT",
@@ -207,28 +235,60 @@
 				"dweb:/ipfs/QmRK2Y5Yc6BK7tGKkgsgn3aJEQGi5aakeSPZvS65PV8Xp3"
 			]
 		},
-		"contracts/Deb0x.sol": {
-			"keccak256": "0x89685187168c1c7574298930f7a88d71c56c8b9ea3bdc89ac285f99586ca5814",
+		"@openzeppelin/contracts/utils/Counters.sol": {
+			"keccak256": "0xf0018c2440fbe238dd3a8732fa8e17a0f9dce84d31451dc8a32f6d62b349c9f1",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://a5b14fc58fb2a3b0e0db7d2ae2a0f20e7ca13fe9497f7fc12850cae21d56bc88",
-				"dweb:/ipfs/QmcYkNBjeWWTYZ6skPGZTHBCE9QwCKLhhtA19Y4yLNPyUU"
+				"bzz-raw://59e1c62884d55b70f3ae5432b44bb3166ad71ae3acd19c57ab6ddc3c87c325ee",
+				"dweb:/ipfs/QmezuXg5GK5oeA4F91EZhozBFekhq5TD966bHPH18cCqhu"
+			]
+		},
+		"@openzeppelin/contracts/utils/Strings.sol": {
+			"keccak256": "0xaf159a8b1923ad2a26d516089bceca9bdeaeacd04be50983ea00ba63070f08a3",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://6f2cf1c531122bc7ca96b8c8db6a60deae60441e5223065e792553d4849b5638",
+				"dweb:/ipfs/QmPBdJmBBABMDCfyDjCbdxgiqRavgiSL88SYPGibgbPas9"
+			]
+		},
+		"@openzeppelin/contracts/utils/cryptography/ECDSA.sol": {
+			"keccak256": "0xdb7f5c28fc61cda0bd8ab60ce288e206b791643bcd3ba464a70cbec18895a2f5",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://bf52bdf22a33263f5ca6227a35faeac3b81e7d2c692fbcc6a079d488710c5900",
+				"dweb:/ipfs/QmcmsjkP4yq3UhiJbvyzwufaY2EKh1zhHaRK8ATag2cpD2"
+			]
+		},
+		"@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol": {
+			"keccak256": "0x6688fad58b9ec0286d40fa957152e575d5d8bd4c3aa80985efdb11b44f776ae7",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://8bc00ab7f133cdaafd212a5cc6a16c8d37319721105d130c8e5af0c4e8f170ba",
+				"dweb:/ipfs/QmVmf6LVMfFiEkvKYLzSv3bGHzymEW93AcUuFrNUdY3NtT"
+			]
+		},
+		"contracts/Deb0x.sol": {
+			"keccak256": "0x12d192adeb6133f2a896ef20e474c715bbba793a0a78b56bd5c93d2ec7607c6a",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://5a406a968c57a33f5d7aff1b2fb1fc7cffa0f108d230fad37eaaa93bd773e30e",
+				"dweb:/ipfs/QmTqpPkQu4TAyN8wTFiY4pV5bzTBi97HrHPKM6CwEi4WoQ"
 			]
 		},
 		"contracts/Deb0xERC20.sol": {
-			"keccak256": "0xa7f6df5a32e5ebdd3de2e39ed3914eabef3c5ba092aca2b8e65b9d8873382790",
+			"keccak256": "0xf59e2f1f6f4362550895d41a99108f6e72b004ce5ace908aabe6a68190b5eb67",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://768e76a643b109f5d7c84e8dc2717f71dc08a7548c3f924185795ed56222d173",
-				"dweb:/ipfs/QmPYbQBy9XVDzSJ4KbT5oPMzPssA2hUdR2dogSvcsRUxv8"
+				"bzz-raw://357e0e1d50717960c918b9a001bac93b3fe7013ab848d72dcd5d6ac2ae9b270d",
+				"dweb:/ipfs/QmZzxsWuh598YEiPAjwm4fexfZNrB7KvNEys2ZSTkXwi2s"
 			]
 		},
 		"contracts/Deb0xViews.sol": {
-			"keccak256": "0x83faf5e644f23267ea7e3e9bab2f45a433fd27cf339fc6149228da1d454ee513",
+			"keccak256": "0x64ca80014b95c85b48603a9c2ed6e607f452e0a8e61dc4c7e32b74d480fe550c",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://9cd929d66e41a99c0770a37fb1d64bfbdcb82466316d395bfeb6afe95a536b83",
-				"dweb:/ipfs/QmTTkBojYMMMBezABUAa9JMDxnnSCfGqtuqMyHMQy3ixfj"
+				"bzz-raw://ac7001c7e9ab1a18c3cb72878e4e6998e1e3cd7f07b50973d36890572c70d886",
+				"dweb:/ipfs/QmePXHqpN2YwpV7JQJv7o64tVYGaoLQX8EUymfrnFS6y2W"
 			]
 		}
 	},
