@@ -55,7 +55,7 @@ describe("Test permit function", async function() {
         expect(await dbxERC20.nonces(alice.address)).to.equal('1');
         expect(await dbxERC20.allowance(alice.address, rewardedAlice.address)).to.equal(balance);
 
-        await rewardedAlice.stakeDBX(balance)
+        await rewardedAlice.stake(balance)
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 2])
         await hre.ethers.provider.send("evm_mine")

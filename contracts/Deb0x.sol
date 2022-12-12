@@ -425,8 +425,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
      * 
      * @param amount token amount to be staked (in wei).
      */
-    // TODO rename stakeDBX to stake
-    function stakeDBX(uint256 amount)
+    function stake(uint256 amount)
         external
         nonReentrant()
     {

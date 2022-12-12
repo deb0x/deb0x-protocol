@@ -46,10 +46,10 @@ describe("Test stake functionality", async function() {
         let user3BalanceDiv4 = BigNumber.from(user3Balance).div(BigNumber.from("4"))
         let balanceBigNumberFormat = BigNumber.from(user3BalanceDiv4.toString());
         await dbxERC20.connect(user3).approve(deb0xContract.address, user3Balance)
-        await user3Reward.stakeDBX(balanceBigNumberFormat)
+        await user3Reward.stake(balanceBigNumberFormat)
 
         //console.log("Balance account after first stake: " + ethers.utils.formatEther(await dbxERC20.balanceOf(user3.address)))
-        await user3Reward.stakeDBX(balanceBigNumberFormat)
+        await user3Reward.stake(balanceBigNumberFormat)
             //console.log("Balance account after second stake: " + ethers.utils.formatEther(await dbxERC20.balanceOf(user3.address)))
 
         await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -63,7 +63,7 @@ describe("Test stake functionality", async function() {
         let balanceInSecoundCycleAfterClaimRewards = ethers.utils.formatEther(await dbxERC20.balanceOf(user3.address));
         let rewardDistributedInSecoundCyle = balanceInSecoundCycleAfterClaimRewards - balanceInSecoundCycle;
         //console.log("Reward distributed from second cycle: " + rewardDistributedInSecoundCyle);
-        await user3Reward.stakeDBX(balanceBigNumberFormat)
+        await user3Reward.stake(balanceBigNumberFormat)
             //console.log("Balance account after third stake but in second cycle: " + ethers.utils.formatEther(await dbxERC20.balanceOf(user3.address)))
 
         await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -75,7 +75,7 @@ describe("Test stake functionality", async function() {
         let amoutToUnstakeAfterTwoStakeActionInFirstCycle = ethers.utils.formatEther(await deb0xViews.connect(user3).getAccWithdrawableStake(user3.address));
         expect(parseInt(amoutToUnstakeAfterTwoStakeActionInFirstCycle)).to.equal(3750);
 
-        await user3Reward.stakeDBX(balanceBigNumberFormat)
+        await user3Reward.stake(balanceBigNumberFormat)
             //console.log("Balance account after fourth stake but in second cycle: " + ethers.utils.formatEther(await dbxERC20.balanceOf(user3.address)))
 
         await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -101,7 +101,7 @@ describe("Test stake functionality", async function() {
         await user2Reward.claimRewards()
         const stakeFirstCycle = await dbxERC20.balanceOf(user2.address)
         await dbxERC20.connect(user2).approve(user1Reward.address, stakeFirstCycle)
-        await user2Reward.stakeDBX(await dbxERC20.balanceOf(user2.address))
+        await user2Reward.stake(await dbxERC20.balanceOf(user2.address))
 
         await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -113,17 +113,17 @@ describe("Test stake functionality", async function() {
         await user1Reward.claimRewards()
         let amountStakeInFirtCycleFirstAccount = ethers.utils.formatEther(await dbxERC20.balanceOf(user1.address));
         await dbxERC20.connect(user1).approve(user1Reward.address, await dbxERC20.balanceOf(user1.address))
-        await user1Reward.stakeDBX(await dbxERC20.balanceOf(user1.address))
+        await user1Reward.stake(await dbxERC20.balanceOf(user1.address))
 
         await user2Reward.claimRewards()
         await dbxERC20.connect(user2).approve(user1Reward.address, await dbxERC20.balanceOf(user2.address))
         const stakeSecondCycle = await dbxERC20.balanceOf(user2.address)
-        await user2Reward.stakeDBX(stakeSecondCycle)
+        await user2Reward.stake(stakeSecondCycle)
 
         await user3Reward.claimRewards()
         let amountStakeInFirtCycleThirdAccount = ethers.utils.formatEther(await dbxERC20.balanceOf(user3.address));
         await dbxERC20.connect(user3).approve(user1Reward.address, await dbxERC20.balanceOf(user3.address))
-        await user3Reward.stakeDBX(await dbxERC20.balanceOf(user3.address))
+        await user3Reward.stake(await dbxERC20.balanceOf(user3.address))
 
         await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -161,17 +161,17 @@ describe("Test stake functionality", async function() {
         await user1Reward.claimRewards()
         let balanceUser1 = await dbxERC20.balanceOf(user1.address);
         await dbxERC20.connect(user1).approve(user1Reward.address, balanceUser1)
-        await user1Reward.stakeDBX(balanceUser1)
+        await user1Reward.stake(balanceUser1)
 
         await user2Reward.claimRewards()
         let balanceUser2 = await dbxERC20.balanceOf(user2.address);
         await dbxERC20.connect(user2).approve(user1Reward.address, balanceUser2)
-        await user2Reward.stakeDBX(balanceUser2)
+        await user2Reward.stake(balanceUser2)
 
         await user3Reward.claimRewards()
         let balanceUser3 = await dbxERC20.balanceOf(user3.address);
         await dbxERC20.connect(user3).approve(user1Reward.address, balanceUser3)
-        await user3Reward.stakeDBX(balanceUser3)
+        await user3Reward.stake(balanceUser3)
 
         await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
         await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -188,7 +188,7 @@ describe("Test stake functionality", async function() {
         await user3Reward.claimRewards()
         let balanceUser3Cycle3 = await dbxERC20.balanceOf(user3.address);
         await dbxERC20.connect(user3).approve(user1Reward.address, balanceUser3Cycle3)
-        await user3Reward.stakeDBX(balanceUser3Cycle3)
+        await user3Reward.stake(balanceUser3Cycle3)
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 2])
         await hre.ethers.provider.send("evm_mine")
 
@@ -210,7 +210,7 @@ describe("Test stake functionality", async function() {
         await user3Reward.claimRewards()
         let balanceUser3Cycle20 = await dbxERC20.balanceOf(user3.address);
         await dbxERC20.connect(user3).approve(user1Reward.address, balanceUser3Cycle20)
-        await user3Reward.stakeDBX(balanceUser3Cycle20)
+        await user3Reward.stake(balanceUser3Cycle20)
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 2])
         await hre.ethers.provider.send("evm_mine")
@@ -236,12 +236,12 @@ describe("Test stake functionality", async function() {
         await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
         let balanceUser3 = await dbxERC20.balanceOf(user3.address);
         await dbxERC20.connect(user3).approve(user1Reward.address, balanceUser3)
-        await user3Reward.stakeDBX(balanceUser3.div(4));
+        await user3Reward.stake(balanceUser3.div(4));
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
         await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward.stakeDBX(balanceUser3.div(4));
+        await user3Reward.stake(balanceUser3.div(4));
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
@@ -271,12 +271,12 @@ describe("Test stake functionality", async function() {
         await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
         let balanceUser3 = await dbxERC20.balanceOf(user3.address);
         await dbxERC20.connect(user3).approve(user1Reward.address, balanceUser3);
-        await user3Reward.stakeDBX((balanceUser3).div(4));
+        await user3Reward.stake((balanceUser3).div(4));
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
         await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward.stakeDBX((balanceUser3).div(4));
+        await user3Reward.stake((balanceUser3).div(4));
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
@@ -310,13 +310,13 @@ describe("Test stake functionality", async function() {
         await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
         let balanceUser3 = await dbxERC20.balanceOf(user3.address);
         await dbxERC20.connect(user3).approve(user1Reward.address, balanceUser3)
-        await user3Reward.stakeDBX((balanceUser3).div(4));
+        await user3Reward.stake((balanceUser3).div(4));
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
         await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward.stakeDBX((balanceUser3).div(4));
-        await user3Reward.stakeDBX((balanceUser3).div(4));
+        await user3Reward.stake((balanceUser3).div(4));
+        await user3Reward.stake((balanceUser3).div(4));
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
@@ -331,7 +331,7 @@ describe("Test stake functionality", async function() {
         await deb0xViews.getAccWithdrawableStake(user3.address);
         await deb0xViews.getUnclaimedFees(user3.address);
         await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") })
-        await user3Reward.stakeDBX((balanceUser3).div(4));
+        await user3Reward.stake((balanceUser3).div(4));
         let actualBalanceForUSer3 = await dbxERC20.balanceOf(user3.address);
         expect(actualBalanceForUSer3).to.equal(0);
     });

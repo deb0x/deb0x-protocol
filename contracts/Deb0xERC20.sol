@@ -30,13 +30,12 @@ contract Deb0xERC20 is ERC20Permit {
      * implemented by the main deb0x contract, however an additional check 
      * that will never be triggered is added to reassure the reader.
      * 
-     * @param user the address of the reward token reciever
+     * @param account the address of the reward token reciever
      * @param amount wei to be minted
      */
-    //TODO rename user to account
-    function mintReward(address user, uint256 amount) external {
+    function mintReward(address account, uint256 amount) external {
         require(msg.sender == owner, "DBX: caller is not Deb0x contract.");
         require(super.totalSupply() < 5010000000000000000000000, "DBX: max supply already minted");
-        _mint(user, amount);
+        _mint(account, amount);
     }
 }
