@@ -20,6 +20,11 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     uint16 public constant PROTOCOL_FEE = 1000;
 
     /**
+     * Basis points representation of 100 percent.
+     */
+    uint16 public constant MAX_BPS = 10000;
+
+    /**
      * Used to minimise division remainder when earned fees are calculated.
      */
     uint256 public constant SCALING_FACTOR = 1e40;
@@ -65,7 +70,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     uint256 public lastStartedCycle;
 
     /**
-     * ???
+     * Stores the value of penultimate active cycle plus one.
      */
     uint256 public previousStartedCycle;
 
@@ -73,11 +78,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
      * Helper variable to store the index of the last active cycle.
      */
     uint256 public currentStartedCycle;
-
-    /**
-     * TODO - not used!!!
-     */
-    uint256 public pendingCycleRewardsStake;
 
     uint256 public pendingStakeWithdrawal;
 
@@ -140,8 +140,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     mapping(address => uint256) public accFirstStake;
 
     mapping(address => uint256) public accSecondStake;
-
-    mapping(address => bool) public stakedDuringGapCycle;
 
     event ClientFeesClaimed(
         uint256 indexed cycle,
@@ -225,9 +223,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         cycleTotalGasUsed[currentCycle] += gasConsumed;
 
         if (feeReceiver != address(0) && msgFee != 0) {
-            // TODO! - constant BPS
-            uint256 gasOwed = (gasConsumed * msgFee) / 10000;
-            // TODO! - wrap in if (gasOwed > 0)
+            uint256 gasOwed = (gasConsumed * msgFee) / MAX_BPS;
             gasConsumed -= gasOwed;
             clientCycleGasEarned[feeReceiver] += gasOwed;
         }
@@ -248,12 +244,10 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
         _;
 
-        // TODO! - 10000 bps constant
-        uint256 fee = ((startGas - gasleft() + 37700) * tx.gasprice * PROTOCOL_FEE) / 10000;
-        
+        uint256 fee = ((startGas - gasleft() + 37700) * tx.gasprice * PROTOCOL_FEE) / MAX_BPS;
         require(
             msg.value - nativeTokenFee >= fee,
-            "Deb0x: value less than 10% of spent gas"
+            "Deb0x: value less than required protocol fee"
         );
         
         cycleAccruedFees[currentCycle] += fee;
@@ -308,8 +302,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         gasUsed(feeReceiver, msgFee)
 
     {
-        // TODO! - <= bps constant
-        require(msgFee < 10001, "Deb0x: reward fees exceed 10000 bps");
+        require(msgFee <= MAX_BPS, "Deb0x: reward fees exceed 10000 bps");
 
         uint256 _sentId = _send(to, crefs);
         calculateCycle();
@@ -339,13 +332,11 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         calculateCycle();
         updateCycleFeesPerStakeSummed();
         updateStats(_msgSender());
-        uint256 reward = accRewards[_msgSender()] -
-            accWithdrawableStake[_msgSender()];
+        uint256 reward = accRewards[_msgSender()] - accWithdrawableStake[_msgSender()];
 
         require(reward > 0, "Deb0x: account has no rewards");
 
         accRewards[_msgSender()] -= reward;
-        
         if (lastStartedCycle == currentStartedCycle) {
             pendingStakeWithdrawal += reward;
         } else {
@@ -436,14 +427,12 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         calculateCycle();
         updateCycleFeesPerStakeSummed();
         updateStats(_msgSender());
-        // TODO! - amount > 0
-        require(amount != 0, "Deb0x: amount is zero");
+        require(amount > 0, "Deb0x: amount is zero");
         pendingStake += amount;
         uint256 cycleToSet = currentCycle + 1;
 
         if (lastStartedCycle == currentStartedCycle) {
             cycleToSet = currentCycle;
-            stakedDuringGapCycle[_msgSender()] = true;
         }
 
         if (
@@ -476,8 +465,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         calculateCycle();
         updateCycleFeesPerStakeSummed();
         updateStats(_msgSender());
-        // TODO! - amount > 0
-        require(amount != 0, "Deb0x: amount is zero");
+        require(amount > 0, "Deb0x: amount is zero");
 
         require(
             amount <= accWithdrawableStake[_msgSender()],
@@ -593,7 +581,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
             uint256 calculatedCycleReward = (lastCycleReward * 10000) / 10020;
             currentCycleReward = calculatedCycleReward;
             rewardPerCycle[currentCycle] = calculatedCycleReward;
-            pendingCycleRewardsStake = calculatedCycleReward;
 
             currentStartedCycle = currentCycle;
             
@@ -655,31 +642,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
         if (
             accFirstStake[account] != 0 &&
-            currentCycle - accFirstStake[account] >= 0 &&
-            stakedDuringGapCycle[account]
-        ) {
-            uint256 unlockedFirstStake = accStakeCycle[account][accFirstStake[account]];
-
-            accRewards[account] += unlockedFirstStake;
-            accWithdrawableStake[account] += unlockedFirstStake;
-            if (lastStartedCycle + 1 > accFirstStake[account]) {
-                accAccruedFees[account] = accAccruedFees[account] + 
-                (
-                    (accStakeCycle[account][accFirstStake[account]] * 
-                        (cycleFeesPerStakeSummed[lastStartedCycle + 1] - 
-                            cycleFeesPerStakeSummed[accFirstStake[account]]
-                        )
-                    )
-                ) /
-                SCALING_FACTOR;
-            }
-
-            accStakeCycle[account][accFirstStake[account]] = 0;
-            accFirstStake[account] = 0;
-            stakedDuringGapCycle[account] = false;
-        } else if (
-            accFirstStake[account] != 0 &&
-            currentCycle - accFirstStake[account] > 0
+            currentCycle > accFirstStake[account]
         ) {
             uint256 unlockedFirstStake = accStakeCycle[account][accFirstStake[account]];
 
@@ -701,7 +664,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
             accFirstStake[account] = 0;
 
             if (accSecondStake[account] != 0) {
-                if (currentCycle - accSecondStake[account] > 0) {
+                if (currentCycle > accSecondStake[account]) {
                     uint256 unlockedSecondStake = accStakeCycle[account][accSecondStake[account]];
 
                     accRewards[account] += unlockedSecondStake;
@@ -746,11 +709,12 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         require(recipients.length == crefs.length, "Deb0x: crefs and recipients lengths not equal");
         require(recipients.length > 0, "Deb0x: recipients array empty");
         for (uint256 idx = 0; idx < recipients.length - 1; idx++) {
+            require(crefs[recipients.length - 1].length > 0 , "Deb0x: empty cref");
             require(crefs[recipients.length - 1].length <= 8 , "Deb0x: cref too long");
         }
 
         for (uint256 idx = 0; idx < recipients.length - 1; idx++) {
-            bytes32 bodyHash = keccak256(abi.encodePacked(crefs[idx]));
+            bytes32 bodyHash = keccak256(abi.encode(crefs[idx]));
      
             emit Sent(
                 recipients[idx],
@@ -763,8 +727,9 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         }
 
         bytes32 selfBodyHash = keccak256(
-            abi.encodePacked(crefs[recipients.length - 1])
+            abi.encode(crefs[recipients.length - 1])
         );
+        require(crefs[recipients.length - 1].length > 0 , "Deb0x: empty cref");
         require(crefs[recipients.length - 1].length <= 8 , "Deb0x: cref too long");
 
         uint256 oldSentId = sentId;

@@ -10,7 +10,7 @@ describe("Test contract", async function() {
     let rewardedAlice, rewardedBob, rewardedCarol, dbxERC20;
     let alice, bob;
     beforeEach("Set enviroment", async() => {
-        [alice, bob, carol, messageReceiver, feeReceiver] = await ethers.getSigners();
+        [alice, bob, carol, dean, eric, fey, gary, hailey, messageReceiver, feeReceiver] = await ethers.getSigners();
 
         const Deb0x = await ethers.getContractFactory("Deb0x");
         rewardedAlice = await Deb0x.deploy(ethers.constants.AddressZero);
@@ -21,6 +21,13 @@ describe("Test contract", async function() {
 
         rewardedBob = rewardedAlice.connect(bob)
         rewardedCarol = rewardedAlice.connect(carol)
+        rewardedDean = rewardedAlice.connect(dean)
+        rewardedEric = rewardedAlice.connect(eric)
+        rewardedFey = rewardedAlice.connect(fey)
+        rewardedGary = rewardedAlice.connect(gary)
+        rewardedHailey = rewardedAlice.connect(hailey)
+        dbxERC20Dean = dbxERC20.connect(dean)
+        dbxERC20Gary = dbxERC20.connect(gary)
     });
 
     it("Should claim no rewards after 2 cycles pass", async() => {
@@ -169,4 +176,73 @@ describe("Test contract", async function() {
         const aliceExpected = NumUtils.day1().add(NumUtils.day2());
         expect(await dbxERC20.balanceOf(alice.address)).to.equal(aliceExpected);
     });
+
+    it.ignore("Reconstruct staging reward distribution", async function() {
+        //0xa907b9Ad914Be4E2E0AD5B5feCd3c6caD959ee5A
+        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
+        //0xD1C740E1C900A586afC8a570A2C2eeDef5ffbD9d
+        await rewardedBob["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
+        //0x5B4afcA3B882dbB0e35618608621A45a8068A729
+        await rewardedCarol["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
+        //0xb64D32Ed2d062e6400B2Db51FDC3d0ba8e1D9336
+        await rewardedDean["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await rewardedDean["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await rewardedDean["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
+        //0xA2784173d3DD644021F766951b00c8a00259887b
+        await rewardedFey["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
+        await rewardedDean["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await rewardedDean["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+            // 10000 DBX now available to claim
+
+        //0x7BdBd04519A09aC1159980db0b03e6119053D885
+        await rewardedGary["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await rewardedGary["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await rewardedGary["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await rewardedGary["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await rewardedGary["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await rewardedGary["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
+        await rewardedDean["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await rewardedDean["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
+        await rewardedDean.claimRewards()
+        await rewardedDean.claimFees()
+
+        await dbxERC20.connect(dean).approve(rewardedAlice.address, ethers.constants.MaxUint256)
+        await rewardedDean.stakeDBX(ethers.utils.parseEther("3.577"))
+
+        //0x1971D9f65Dc652B726dA023F09507629B3B358E5
+        await rewardedGary["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+        await rewardedGary["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
+        await dbxERC20Dean.transfer(gary.address, ethers.utils.parseEther("0.814473421101858361"))
+        await dbxERC20Gary.transfer(hailey.address, ethers.utils.parseEther("0.314473421101858361"))
+
+        await dbxERC20.connect(gary).approve(rewardedAlice.address, ethers.constants.MaxUint256)
+        await rewardedGary.stakeDBX(ethers.utils.parseEther("0.2"))
+        await dbxERC20.connect(hailey).approve(rewardedAlice.address, ethers.constants.MaxUint256)
+        await rewardedHailey.stakeDBX(ethers.utils.parseEther("0.314473421101858361"))
+
+        await rewardedBob.claimRewards()
+        await rewardedBob.claimFees()
+
+        // --- should not be possibble ---
+        await dbxERC20.connect(bob).approve(rewardedAlice.address, ethers.constants.MaxUint256)
+        await rewardedBob.stakeDBX(ethers.utils.parseEther("568.87"))
+        await rewardedBob.unstake(ethers.utils.parseEther("1"))
+            // await rewardedBob.stakeDBX(ethers.utils.parseEther("568.87"))
+            // await rewardedBob.unstake(ethers.utils.parseEther("568.87"))
+            // --- should not be possibble ---
+
+
+    })
 });

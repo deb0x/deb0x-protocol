@@ -42,17 +42,17 @@ describe("Memory intensive tests: ERC20 supply limit", async function() {
             }
         }
 
-        console.log(`Last cycle:   ${await user1Reward.getCurrentCycle()}`);
-        console.log(`Last reward:  ${await user1Reward.calculateCycleReward()}`);
-        console.log(`User balance: ${await dbxERC20.balanceOf(user1.address)}`);
-        console.log(`Total supply: ${await dbxERC20.totalSupply()}`);
+        //console.log(`Last cycle:   ${await user1Reward.getCurrentCycle()}`);
+        //console.log(`Last reward:  ${await user1Reward.calculateCycleReward()}`);
+        //console.log(`User balance: ${await dbxERC20.balanceOf(user1.address)}`);
+        //console.log(`Total supply: ${await dbxERC20.totalSupply()}`);
 
-        console.log("Rewards should be ended. Adding 10 more sends");
+        //console.log("Rewards should be ended. Adding 10 more sends");
         for (let i = 0; i < 10; i++) {
             await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
             await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
             await hre.ethers.provider.send("evm_mine")
-            console.log(`Extra days past: ${i}`);
+                //console.log(`Extra days past: ${i}`);
         }
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])

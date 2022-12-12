@@ -26,16 +26,7 @@ contract Deb0xViews {
 
         if (
             deb0x.accFirstStake(staker) != 0 &&
-            deb0x.currentCycle() - deb0x.accFirstStake(staker) >= 0 &&
-            deb0x.stakedDuringGapCycle(staker)
-        ) {
-            unlockedStake += deb0x.accStakeCycle(
-                staker,
-                deb0x.accFirstStake(staker)
-            );
-        } else if (
-            deb0x.accFirstStake(staker) != 0 &&
-            calculatedCycle - deb0x.accFirstStake(staker) > 0
+            calculatedCycle > deb0x.accFirstStake(staker)
         ) {
             unlockedStake += deb0x.accStakeCycle(
                 staker,
@@ -44,7 +35,7 @@ contract Deb0xViews {
 
             if (
                 deb0x.accSecondStake(staker) != 0 &&
-                calculatedCycle - deb0x.accSecondStake(staker) > 0
+                calculatedCycle > deb0x.accSecondStake(staker)
             ) {
                 unlockedStake += deb0x.accStakeCycle(
                     staker,
@@ -64,7 +55,7 @@ contract Deb0xViews {
         uint256 lastStartedCycleTemp = deb0x.lastStartedCycle();
 
         if (calculatedCycle != deb0x.currentStartedCycle()) {
-            previousStartedCycleTemp = deb0x.lastStartedCycle() + 1;
+            previousStartedCycleTemp = lastStartedCycleTemp + 1;
             lastStartedCycleTemp = deb0x.currentStartedCycle();
         }
 
@@ -72,13 +63,16 @@ contract Deb0xViews {
             calculatedCycle > lastStartedCycleTemp &&
             deb0x.cycleFeesPerStakeSummed(lastStartedCycleTemp + 1) == 0
         ) {
-            uint256 feePerStake = (deb0x.cycleAccruedFees(
+            uint256 feePerStake = 0;
+            if(deb0x.summedCycleStakes(lastStartedCycleTemp) != 0){
+                feePerStake = ((deb0x.cycleAccruedFees(
                 lastStartedCycleTemp
-            ) * deb0x.SCALING_FACTOR()) /
+            ) + deb0x.pendingFees()) * deb0x.SCALING_FACTOR()) /
                 deb0x.summedCycleStakes(lastStartedCycleTemp);
+            }
 
             currentCycleFeesPerStakeSummed =
-                deb0x.cycleFeesPerStakeSummed(deb0x.previousStartedCycle()) +
+                deb0x.cycleFeesPerStakeSummed(previousStartedCycleTemp) +
                 feePerStake;
         } else {
             currentCycleFeesPerStakeSummed = deb0x.cycleFeesPerStakeSummed(
@@ -105,7 +99,8 @@ contract Deb0xViews {
 
         if (
             deb0x.accFirstStake(account) != 0 &&
-            calculatedCycle - deb0x.accFirstStake(account) > 1
+            calculatedCycle > deb0x.accFirstStake(account) &&
+            lastStartedCycleTemp + 1 > deb0x.accFirstStake(account)
         ) {
             currentAccruedFees +=
                 (
@@ -117,7 +112,8 @@ contract Deb0xViews {
 
             if (
                 deb0x.accSecondStake(account) != 0 &&
-                calculatedCycle - deb0x.accSecondStake(account) > 1
+                calculatedCycle > deb0x.accSecondStake(account) &&
+                lastStartedCycleTemp + 1 > deb0x.accSecondStake(account)
             ) {
                 currentAccruedFees +=
                     (
@@ -133,15 +129,6 @@ contract Deb0xViews {
         }
 
         return currentAccruedFees;
-    }
-
-    /**
-     * TODO! - duplicate - to delete
-     */
-    function getCurrentCycle() public view returns (uint256) {
-        return
-            (block.timestamp - deb0x.i_initialTimestamp()) /
-            deb0x.i_periodDuration();
     }
 
     function calculateCycleReward() public view returns (uint256) {
@@ -165,13 +152,6 @@ contract Deb0xViews {
                 deb0x.cycleTotalGasUsed(deb0x.lastActiveCycle(account));
 
             currentRewards += lastCycleAccReward;
-
-            if (deb0x.accCycleGasOwed(account) != 0) {
-                uint256 accLastActiveCycle = deb0x.lastActiveCycle(account);
-                uint256 accRewardsOwed = (deb0x.accCycleGasOwed(account) * deb0x.rewardPerCycle(accLastActiveCycle)) / 
-                    deb0x.cycleTotalGasUsed(accLastActiveCycle);
-                currentRewards -= accRewardsOwed;
-            }
         }
 
         return currentRewards;

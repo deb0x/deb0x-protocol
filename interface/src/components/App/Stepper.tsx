@@ -15,7 +15,7 @@ import dataFromWhitelist from '../../constants.json';
 import { ConstructionOutlined } from '@mui/icons-material';
 
 const steps = ['Start your deb0x account.', 'Get validated as deb0x user on blockchain.'];
-const deb0xAddress = "0x3a473a59820929D42c47aAf1Ea9878a2dDa93E18";
+const deb0xAddress = "0x3A274DD833726D9CfDb6cBc23534B2cF5e892347";
 const ethers = require('ethers')
 const utils = ethers.utils
 
@@ -81,7 +81,7 @@ export default function HorizontalLinearStepper(props: any) {
                             setNotificationState({message: "Deb0x was succesfully initialized.", open: true,
                                     severity:"success"})
                                     setLoading(false)
-                                    props.onDeboxInitialization(true)
+                                    props.onDeboxInitialization()
                         } else {
                             setNotificationState({message: "Deb0x couldn't be initialized!", open: true,
                                 severity:"error"})

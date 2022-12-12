@@ -31,7 +31,7 @@ import ReadedMessagesProvider from '../Contexts/ReadedMessagesProvider';
 import { Encrypt } from './Encrypt';
 import useAnalyticsEventTracker from '../Common/GaEventTracker';
 
-const deb0xAddress = "0x3a473a59820929D42c47aAf1Ea9878a2dDa93E18";
+const deb0xAddress = "0x3A274DD833726D9CfDb6cBc23534B2cF5e892347";
 
 export function Decrypt(props: any): any {
     const { account, library } = useWeb3React()
@@ -48,9 +48,7 @@ export function Decrypt(props: any): any {
         getPublicEncryptionKey()
     }, [account]);
 
-    const getPublicEncryptionKey = async () => {
-        const deb0xContract = Deb0x(library, deb0xAddress)
-      
+    const getPublicEncryptionKey = async () => {      
         const key = await getKey(account);
         const initialized = (key != '') ? true : false
         setEncryptionKeyInitialized(initialized);
@@ -160,7 +158,7 @@ export function Decrypt(props: any): any {
                 user = ensName;
             } else {
                 savedContacts.map((contact: any) => {
-                    if (sender == contact.address) {
+                    if (sender == (contact.address).toLowerCase()) {
                         user = true;
                     }
                 })
@@ -207,7 +205,7 @@ export function Decrypt(props: any): any {
                                         <p>From: 
                                             {
                                                 checkSenderInLocalStorage(props.message.sender) ?
-                                                savedContacts.filter((contact: any) => props.message.sender == contact.address)
+                                                savedContacts.filter((contact: any) => props.message.sender == (contact.address).toLowerCase())
                                                     .map((filteredPerson: any) => (
                                                         filteredPerson.name
                                                     )) :
@@ -231,7 +229,7 @@ export function Decrypt(props: any): any {
                         }/>
                     </ListItemButton>
                     {isDecrypted ? 
-                        <div className="message-right">
+                        <div className="message-right inbox">
                             <div className="message-right--container">
                                 <div className="message-heading">
                                     <div className="address">
@@ -239,7 +237,7 @@ export function Decrypt(props: any): any {
                                             <strong>
                                             {
                                                 checkSenderInLocalStorage(props.message.sender) ?
-                                                    savedContacts.filter((contact: any) => props.message.sender == contact.address)
+                                                    savedContacts.filter((contact: any) => props.message.sender == (contact.address).toLowerCase())
                                                         .map((filteredPerson: any) => (
                                                             filteredPerson.name
                                                         )) :
@@ -412,7 +410,7 @@ export function Decrypt(props: any): any {
     
     if (encryptionKeyInitialized === true) {
         return (
-            <div className="content-box full-height">
+            <div className="content-box">
                 <GetMessages />
             </div>
         )

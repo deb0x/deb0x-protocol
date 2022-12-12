@@ -31,7 +31,6 @@ describe("Test fee claiming for users/frontends", async function() {
     it("1. should test sending some messages and claiming some fees with only 1 account", async() => {
 
         aliceBalance = await hre.ethers.provider.getBalance(alice.address)
-        let curCycle = parseInt((await deb0xViews.getCurrentCycle()).toString())
 
         await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
             feeReceiver.address, 200, 0, { value: ethers.utils.parseEther("2") })
@@ -64,6 +63,34 @@ describe("Test fee claiming for users/frontends", async function() {
 
     })
 
+    it("1. should test getUnclaimedFees function", async() => {
+
+        aliceBalance = await hre.ethers.provider.getBalance(alice.address)
+        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
+            feeReceiver.address, 200, 0, { value: ethers.utils.parseEther("2") })
+        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
+            feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("2") })
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
+            feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("2") })
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+
+        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
+            feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("2") })
+
+        let contractBalanceBefore = await hre.ethers.provider.getBalance(rewardedAlice.address);
+        let aliceFeesBefore = await deb0xViews.getUnclaimedFees(alice.address);
+
+        await rewardedAlice.claimFees();
+        contractBalanceAfter = await hre.ethers.provider.getBalance(rewardedAlice.address);
+        aliceFeesAfter = await deb0xViews.getUnclaimedFees(alice.address);
+        expect(aliceFeesAfter.toString()).to.eq("0");
+        expect(contractBalanceAfter).to.eq(contractBalanceBefore.sub(aliceFeesBefore))
+    })
+
+
     it("should send messages with allice and bob and claim fees after cycle0 but we have a difference", async() => {
 
         aliceBalance = await hre.ethers.provider.getBalance(alice.address)
@@ -82,47 +109,6 @@ describe("Test fee claiming for users/frontends", async function() {
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
-
-        // console.log("...................................................................................................")
-        // aliceBalance = await hre.ethers.provider.getBalance(alice.address)
-        // curCycle = parseInt((await rewardedAlice.getCurrentCycle()).toString())
-        // console.log("aliceBalance: ",ethers.utils.formatEther(aliceBalance))
-        // console.log("current Cycle: ", curCycle);
-        // console.log("funct accWithdrawableStake: ",(await rewardedAlice.getAccWithdrawableStake(alice.address)).toString());
-        // console.log("mapping accWithdrawableStake: ",(await rewardedAlice.getAccWithdrawableStake(alice.address)).toString());
-        // console.log("contractBalance: ", (await rewardedAlice.contractBalance()).toString());
-        // console.log("accRewards:  ", (await rewardedAlice.accRewards(alice.address)).toString());
-        // console.log("addressAccuredFees:  ", (await rewardedAlice.accAccruedFees(alice.address)).toString());
-        // console.log("rewardPerCycle: ", (await rewardedAlice.rewardPerCycle(curCycle)).toString());
-        // console.log("summedCycleStakes: ",(await rewardedAlice.summedCycleStakes(curCycle)).toString());
-        // console.log("cycle accured fees: ", (await rewardedAlice.cycleAccruedFees(curCycle)).toString());
-        // console.log("cycle Fees Per Stake: ", (await rewardedAlice.cycleFeesPerStake(curCycle)).toString());
-        // console.log("cycleFeesPerStakeSummed: ", (await rewardedAlice.cycleFeesPerStakeSummed(curCycle)).toString());
-        // console.log("user unclaimed fee: ", (await rewardedAlice.getUnclaimedFees(alice.address)).toString());
-        // console.log("user unclaimed rewards: ", (await rewardedAlice.getUnclaimedRewards(alice.address)).toString());
-        // console.log("...................................................................................................")
-
-        // console.log("...................................................................................................")
-        // bobBalance = await hre.ethers.provider.getBalance(bob.address)
-        // curCycle = parseInt((await rewardedAlice.getCurrentCycle()).toString())
-        // console.log("bobBalance: ",ethers.utils.formatEther(bobBalance))
-        // console.log("current Cycle: ", curCycle);
-        // console.log("funct accWithdrawableStake: ",(await rewardedAlice.getAccWithdrawableStake(bob.address)).toString());
-        // console.log("mapping accWithdrawableStake: ",(await rewardedAlice.getAccWithdrawableStake(bob.address)).toString());
-        // console.log("contractBalance: ", (await rewardedAlice.contractBalance()).toString());
-        // console.log("accRewards:  ", (await rewardedAlice.accRewards(bob.address)).toString());
-        // console.log("addressAccuredFees:  ", (await rewardedAlice.accAccruedFees(bob.address)).toString());
-        // console.log("rewardPerCycle: ", (await rewardedAlice.rewardPerCycle(curCycle)).toString());
-        // console.log("summedCycleStakes: ",(await rewardedAlice.summedCycleStakes(curCycle)).toString());
-        // console.log("cycle accured fees: ", (await rewardedAlice.cycleAccruedFees(curCycle)).toString());
-        // console.log("cycle Fees Per Stake: ", (await rewardedAlice.cycleFeesPerStake(curCycle)).toString());
-        // console.log("cycleFeesPerStakeSummed: ", (await rewardedAlice.cycleFeesPerStakeSummed(curCycle)).toString());
-        // console.log("user unclaimed fee: ", (await rewardedAlice.getUnclaimedFees(bob.address)).toString());
-        // console.log("user unclaimed rewards: ", (await rewardedAlice.getUnclaimedRewards(bob.address)).toString());
-        // console.log("...................................................................................................")
-
-        // console.log("clientRewards: ",await rewardedAlice.getUnclaimedFees(frontend.address))
-        // console.log("clientRewards: ",await rewardedAlice.accAccruedFees(frontend.address))
 
         await rewardedAlice.claimFees();
         await rewardedBob.claimFees();

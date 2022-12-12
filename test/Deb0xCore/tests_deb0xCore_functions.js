@@ -24,7 +24,6 @@ describe("Test Deb0xCore contract", async function() {
         let transaction = await deboxCore.setKey(Array.from(ethers.utils.base64.decode(publicKey)));
         let receipt = await transaction.wait();
         expect(deployer.address).to.equal(receipt.events[0].args.to)
-        console.log("TO: " + receipt.events[0].args.to + " HASH: " + receipt.events[0].args.hash + " VALUE: " + receipt.events[0].args.value);
     });
 
     it(`Test getKey function`, async() => {
@@ -106,6 +105,23 @@ describe("Test Deb0xCore contract", async function() {
             expect(Converter.convertBytes32ToString(Array.from((arguments3)))).to.equal(ipfsLink);
             arguments3 = [];
         }
+    });
+
+    it(`Should revert the _send with empty crefs`, async() => {
+        let addresses = [add1.address, add2.address, add2.address];
+        let cids = [
+            [],
+            [],
+            []
+        ];
+
+        try {
+            await deboxCore.send(addresses, cids, ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+
+        } catch (error) {
+            expect(error.message).to.include("Deb0x: empty cref");
+        }
+
     });
 
 })

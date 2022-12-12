@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import {
     Card, CardActions, CardContent, Button, Grid,
-    Typography, TextField, Divider,Box
+    Typography, Box, OutlinedInput
 } from '@mui/material';
 
 import ToggleButton from '@mui/material/ToggleButton';
@@ -26,9 +26,9 @@ import dataFromWhitelist from '../../constants.json';
 import useAnalyticsEventTracker from '../Common/GaEventTracker';
 
 const { whitelist } = dataFromWhitelist;
-const deb0xAddress = "0x3a473a59820929D42c47aAf1Ea9878a2dDa93E18";
-const deb0xViewsAddress = "0x9FBbD4cAcf0f23c2015759522B298fFE888Cf005";
-const deb0xERC20Address = "0x855201bA0e531DfdD84B41e34257165D745eE97F";
+const deb0xAddress = "0x3A274DD833726D9CfDb6cBc23534B2cF5e892347";
+const deb0xViewsAddress = "0x3a6B3Aff418C7E50eE9F852D0bc7119296cc3644";
+const deb0xERC20Address = "0x58EE92DaDdF00334da39fb4Fab164c8662C794AD";
 
 export function Stake(props: any): any {
 
@@ -186,9 +186,42 @@ export function Stake(props: any): any {
         )
     }
 
+    function CyclePanel() {
+        const [currentReward, setCurrentReward] = useState("")
+        useEffect(() => {
+            cycleReward()
+        }, [currentReward]);
+        async function cycleReward() {
+            const deb0xContract = await Deb0x(library, deb0xAddress);
+            const currentReward = await deb0xContract.currentCycleReward();
+            setCurrentReward(ethers.utils.formatEther(currentReward))
+        }
+        return (
+            <>
+            <Card variant="outlined" className="card-container">
+                <CardContent className="row">
+                    <div className="col-12 col-md-12 mb-2">
+                        <Typography variant="h4" component="div" className="rewards mb-3">
+                            DAILY STATS
+                        </Typography>
+                        <Typography >
+                            Total amount of daily cycle tokens: <strong>{currentReward}</strong>
+                        </Typography>
+                        {/* <Typography>
+                            Total amount of messages today: <strong>234</strong>
+                        </Typography>
+                        <Typography>
+                            You sent today: <strong>6 msg</strong>
+                        </Typography> */}
+                    </div>
+                </CardContent>
+            </Card>
+            </>
+        )
+    }
+
     function RewardsPanel() {
         
-
         const [rewardsUnclaimed, setRewardsUnclaimed] = useState("")
         const [feeSharePercentage, setFeeSharePercentage] = useState("")
         const [loading, setLoading] = useState(false)
@@ -361,7 +394,7 @@ export function Stake(props: any): any {
                     </div>
                 </CardContent>
                 <CardActions className='button-container'>
-                    <LoadingButton className="collect-btn" loading={loading} variant="contained" onClick={claimRewards}>Collect</LoadingButton>
+                    <LoadingButton className="collect-btn" loading={loading} variant="contained" onClick={claimRewards}>Claim</LoadingButton>
                 </CardActions>
             </Card>
             </>
@@ -740,12 +773,10 @@ export function Stake(props: any): any {
                             <strong>{userUnstakedAmount} DBX</strong>
                         </Typography>
                     </div>
-                    <Divider className="divider-pink " />
                     {approved && <Grid className="amount-row" container spacing={2}>
                         <Grid item>
-                            <TextField id="outlined-basic"
-                                label="Amount to stake"
-                                variant="outlined"
+                            <OutlinedInput id="outlined-basic"
+                                placeholder="Amount to stake"
                                 type="number"
                                 value={amountToStake}
                                 onChange={e => setAmountToStake(e.target.value)} />
@@ -759,9 +790,9 @@ export function Stake(props: any): any {
                         </Grid>
                     </Grid>}
                 </CardContent>
-                <CardActions>
-                    {approved && <LoadingButton disabled={!amountToStake} className="submit-btn " loading={loading} variant="contained" onClick={stake}>Stake</LoadingButton>}
-                    {!approved && <LoadingButton className="submit-btn" loading={loading} variant="contained" onClick={approveStaking}>Approve Staking</LoadingButton>}
+                <CardActions className='button-container'>
+                    {approved && <LoadingButton disabled={!amountToStake} className="collect-btn" loading={loading} variant="contained" onClick={stake}>Stake</LoadingButton>}
+                    {!approved && <LoadingButton className="collect-btn" loading={loading} variant="contained" onClick={approveStaking}>Approve Staking</LoadingButton>}
                 </CardActions>
                 </>
                 : 
@@ -792,11 +823,10 @@ export function Stake(props: any): any {
 
                     <Grid className="amount-row" container spacing={2}>
                         <Grid item>
-                            <TextField value={amountToUnstake}
+                            <OutlinedInput value={amountToUnstake}
                                 id="outlined-basic"
                                 className="max-field"
-                                label="Amount to unstake"
-                                variant="outlined"
+                                placeholder="Amount to unstake"
                                 onChange={e => setAmountToUnstake(e.target.value)}
                                 type="number" />
                         </Grid>
@@ -809,8 +839,8 @@ export function Stake(props: any): any {
                         </Grid>
                     </Grid>
                 </CardContent>
-                <CardActions>
-                    <LoadingButton className="submit-btn" disabled={!amountToUnstake} loading={loading} variant="contained" onClick={unstake}>Unstake</LoadingButton>
+                <CardActions className='button-container'>
+                    <LoadingButton className="collect-btn" disabled={!amountToUnstake} loading={loading} variant="contained" onClick={unstake}>Unstake</LoadingButton>
                 </CardActions>
                 </>
             }
@@ -860,16 +890,16 @@ export function Stake(props: any): any {
     return (
         <>
             <SnackbarNotification state={notificationState} setNotificationState={setNotificationState} />
-            <Box className="container">
+            <Box className="content-box">
                 <div className="cards-grid">
                     <div className='row'>
                         <Grid item className="col col-md-6 ">
-                            <TotalStaked/>                        
+                            <FeesPanel />
                             <RewardsPanel />
                         </Grid>
                         <Grid item className="col col-md-6">
+                            <CyclePanel />
                             <StakeUnstake/>
-                            <FeesPanel />
                         </Grid>
                     </div>
                 </div>

@@ -62,7 +62,7 @@ describe("Test send event with bytes32[] parameter", async function() {
         for (let entry of sentEvent) {
             arguments.push(ethers.utils.arrayify(entry.args.content[0]))
             arguments.push(ethers.utils.arrayify(ethers.utils.stripZeros(entry.args.content[1])))
-            console.log(Converter.convertBytes32ToString(Array.from((arguments))));
+                //console.log(Converter.convertBytes32ToString(Array.from((arguments))));
             arguments = [];
         }
     });
