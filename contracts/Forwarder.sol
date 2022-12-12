@@ -84,10 +84,6 @@ contract Forwarder is IForwarder, ERC165 {
         require(gasleft()*63/64 >= req.gas + gasForTransfer, "FWD: insufficient gas");
         // solhint-disable-next-line avoid-low-level-calls
         (success,ret) = req.to.call{gas : req.gas, value : req.value}(callData);
-
-        // #if ENABLE_CONSOLE_LOG
-        // #endif
-
         if ( req.value != 0 && address(this).balance>0 ) {
             // can't fail: req.from signed (off-chain) the request, so it must be an EOA...
             payable(msg.sender).transfer(address(this).balance);
