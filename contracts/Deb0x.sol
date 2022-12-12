@@ -5,6 +5,11 @@ import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./Deb0xERC20.sol";
 
+/**
+ * Main deb0x protocol contract used to send messages,
+ * store public keys, allocate token rewards,
+ * distribute native token fees, stake and unstake.
+ */
 contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     /**
@@ -420,6 +425,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
      * 
      * @param amount token amount to be staked (in wei).
      */
+    // TODO rename stakeDBX to stake
     function stakeDBX(uint256 amount)
         external
         nonReentrant()
