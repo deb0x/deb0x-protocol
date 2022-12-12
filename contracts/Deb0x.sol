@@ -234,7 +234,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         }
 
         accCycleGasUsed[_msgSender()] += gasConsumed;
-        
     }
 
     /**
@@ -573,7 +572,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
             
             cycleFeesPerStakeSummed[lastStartedCycle + 1] = cycleFeesPerStakeSummed[previousStartedCycle] + feePerStake;
         }
-
     }
 
     /**
@@ -607,7 +605,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
                 summedCycleStakes[currentStartedCycle]
             );
         }
-
     }
 
     /**
@@ -695,7 +692,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
                 }
             }
         }
-
     }
 
     /**
