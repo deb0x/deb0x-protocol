@@ -249,7 +249,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
         _;
 
-        uint256 fee = ((startGas - gasleft() + 37700) * tx.gasprice * PROTOCOL_FEE) / MAX_BPS;
+        uint256 fee = ((startGas - gasleft() + 39700) * tx.gasprice * PROTOCOL_FEE) / MAX_BPS;
         require(
             msg.value - nativeTokenFee >= fee,
             "Deb0x: value less than required protocol fee"
