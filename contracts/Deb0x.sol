@@ -5,6 +5,11 @@ import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./Deb0xERC20.sol";
 
+/**
+ * Main deb0x protocol contract used to send messages,
+ * store public keys, allocate token rewards,
+ * distribute native token fees, stake and unstake.
+ */
 contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     /**
@@ -205,6 +210,14 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         bytes32 indexed value
     );
 
+    /**
+     * @dev Measures the amount of consummed gas.
+     * In case a fee is applied, the corresponded percentage will be recorded 
+     * as consummed by the feeReceiver instead of the caller.
+     * 
+     * @param feeReceiver the address of the fee receiver (client).
+     * @param msgFee fee percentage expressed in basis points.
+     */
     modifier gasUsed(address feeReceiver, uint256 msgFee) {
         uint256 startGas = gasleft();
 
@@ -221,9 +234,15 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         }
 
         accCycleGasUsed[_msgSender()] += gasConsumed;
-        
     }
 
+    /**
+     * @dev Checks that the caller has sent an amount that is equal or greater 
+     * than the sum of the protocol fee and the client's native token fee. 
+     * The change is sent back to the caller.
+     * 
+     * @param nativeTokenFee the amount charged by the client.
+     */
     modifier gasWrapper(uint256 nativeTokenFee) {
         uint256 startGas = gasleft();
 
@@ -306,6 +325,10 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         );
     }
 
+    /**
+     * @dev Mints newly accrued account rewards and transfers the entire 
+     * allocated amount to the transaction sender address.
+     */
     function claimRewards()
         external
         nonReentrant()
@@ -328,6 +351,10 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         emit RewardsClaimed(currentCycle, _msgSender(), reward);
     }
 
+    /**
+     * @dev Mints newly accrued client rewards share and transfers the entire 
+     * allocated amount to the transaction sender address.
+     */
     function claimClientRewards()
         external
         nonReentrant()
@@ -351,6 +378,9 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         emit ClientRewardsClaimed(currentCycle, _msgSender(), reward);
     }
 
+    /**
+     * @dev Transfers newly accrued fees to sender's address.
+     */
     function claimFees()
         external
         nonReentrant()
@@ -367,6 +397,10 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         emit FeesClaimed(getCurrentCycle(), _msgSender(), fees);
     }
 
+    /**
+     * @dev Transfers newly accrued client fee share and transfers 
+     * the entire amount to caller address.
+     */
     function claimClientFees()
         external
         nonReentrant()
@@ -383,6 +417,13 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         emit ClientFeesClaimed(getCurrentCycle(), _msgSender(), fees);
     }
 
+    /**
+     * @dev Stakes the given amount and increases the share of the daily allocated rewards.
+     * The tokens are transfered from sender account to this contract.
+     * To receive the tokens back, the unstake function must be called by the same account address.
+     * 
+     * @param amount token amount to be staked (in wei).
+     */
     function stake(uint256 amount)
         external
         nonReentrant()
@@ -415,6 +456,12 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         emit Staked(cycleToSet, _msgSender(), amount);
     }
 
+    /**
+     * @dev Unstakes the given amount and decreases the share of the daily allocated rewards.
+     * If the balance is availabe, the tokens are transfered from this contract to the sender account.
+     * 
+     * @param amount token amount to be unstaked (in wei).
+     */
     function unstake(uint256 amount)
         external
         nonReentrant()
@@ -525,7 +572,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
             
             cycleFeesPerStakeSummed[lastStartedCycle + 1] = cycleFeesPerStakeSummed[previousStartedCycle] + feePerStake;
         }
-
     }
 
     /**
@@ -559,7 +605,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
                 summedCycleStakes[currentStartedCycle]
             );
         }
-
     }
 
     /**
@@ -647,7 +692,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
                 }
             }
         }
-
     }
 
     /**
