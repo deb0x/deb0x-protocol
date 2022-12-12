@@ -205,7 +205,6 @@ export async function fetchSentMessages(sender) {
 export async function getKey(to) {
     let secondaryTopics = '0x000000000000000000000000' + to.slice(2);
     let events = await getSetKeyEvents(secondaryTopics);
-    console.log(events)
     if (events.items.length != 0) {
         for (let i = 0; i < events.items.length; i++) {
             if (events.items[i].raw_log_topics[1].toLowerCase() === secondaryTopics.toLowerCase()) {
