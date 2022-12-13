@@ -36,6 +36,9 @@
                     margin: 2vh;
                     position: relative;
                     overflow: unset;
+                    .data-height{
+                        min-height: 35px !important;
+                    }
                     .tab-container {
                         background: t('logo-bg');
                         width: 100%;

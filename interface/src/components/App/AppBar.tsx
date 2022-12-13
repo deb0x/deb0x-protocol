@@ -216,56 +216,54 @@ export function AppBarComponent(props: any): any {
     }
     
     return (
-        <>
-            <div className="app-bar--top">
-                <Box className="main-menu--left">
-                    <TotalStaked/>
-                </Box>
-                <Box className="main-menu--right">
-                
-                { (() =>  {
-                    const currentConnector = connectorsByName[ConnectorNames.Injected]
-                    const activating = currentConnector === activatingConnector
-                    const connected = currentConnector === connector
-                    const disabled = !triedEager || !!activatingConnector || connected || !!error
+        <ClickAwayListener onClickAway={handleClickAway}>
+            <div>
+                <div className="app-bar--top">
+                    <Box className="main-menu--left">
+                        <TotalStaked/>
+                    </Box>
+                    <Box className="main-menu--right">
+                    
+                    { (() =>  {
+                        const currentConnector = connectorsByName[ConnectorNames.Injected]
+                        const activating = currentConnector === activatingConnector
+                        const connected = currentConnector === connector
+                        const disabled = !triedEager || !!activatingConnector || connected || !!error
 
-                    return (
-                        <ClickAwayListener onClickAway={handleClickAway}>
-                            <Button variant="contained"
-                                key={ConnectorNames.Injected}
-                                aria-describedby={id}
-                                onClick={!connected ? 
-                                    () => {
-                                        setActivatingConnector(currentConnector)
-                                        activate(currentConnector)
-                                    } : 
-                                    handleClick
-                                }>
-                                
-                                { activating ? 
-                                    <Spinner color={'black'} /> :
-                                    !connected ? 
-                                        "Connect Wallet" :
-                                        <span>
-                                            {account === undefined ? 
-                                                `Unsupported Network. Switch to ${networkName}` : 
-                                                account ? 
-                                                    ensName === "" ? 
-                                                        `${formatAccountName(account)}` :
-                                                        `${ensName.toLowerCase()} 
-                                                        (${formatAccountName(account)})`
-                                                : ''}
-                                        </span>
-                                }
-                            </Button>
-                        </ClickAwayListener> 
-
-                    )
-                }) ()}
-                        
-                    <ThemeSetter />
-                </Box>
-            </div>
+                        return (
+                                <Button variant="contained"
+                                    key={ConnectorNames.Injected}
+                                    aria-describedby={id}
+                                    onClick={!connected ? 
+                                        () => {
+                                            setActivatingConnector(currentConnector)
+                                            activate(currentConnector)
+                                        } : 
+                                        handleClick
+                                    }>
+                                    
+                                    { activating ? 
+                                        <Spinner color={'black'} /> :
+                                        !connected ? 
+                                            "Connect Wallet" :
+                                            <span>
+                                                {account === undefined ? 
+                                                    `Unsupported Network. Switch to ${networkName}` : 
+                                                    account ? 
+                                                        ensName === "" ? 
+                                                            `${formatAccountName(account)}` :
+                                                            `${ensName.toLowerCase()} 
+                                                            (${formatAccountName(account)})`
+                                                    : ''}
+                                            </span>
+                                    }
+                                </Button>
+                        )
+                    }) ()}
+                            
+                        <ThemeSetter />
+                    </Box>
+                </div>
                 <Popper className={`popper ${theme === "classic" ? "classic" : "dark"}` } id={id} open={open} anchorEl={anchorEl}>
                     <ul>
                         <li>
@@ -305,6 +303,7 @@ export function AppBarComponent(props: any): any {
                     </Button>  
 
                 </Popper>
-        </>
+            </div>
+        </ClickAwayListener>
     );
 }
