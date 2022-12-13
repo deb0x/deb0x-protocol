@@ -1,4 +1,4 @@
-import {useState, Fragment} from 'react';
+import {useState, Fragment, useEffect} from 'react';
 import { useWeb3React } from '@web3-react/core';
 import { signMetaTxRequest } from '../../ethereum/signer';
 import { createInstance } from '../../ethereum/forwarder'

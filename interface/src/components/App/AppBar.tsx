@@ -200,7 +200,7 @@ export function AppBarComponent(props: any): any {
 
     function handleChange(text: any, index: any) {
         // setSelectedIndex(index)
-        // props.onChange(text)
+        props.onChange(text)
         if(index !== 0)
             localStorage.removeItem('input')
     }
