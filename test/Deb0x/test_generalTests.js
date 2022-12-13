@@ -643,7 +643,7 @@ describe("Test DBX tokens distributions", async function() {
         let amountToStake = NumUtils.day(1).div(2);
         await user3Reward.claimRewards()
         await dbxERC20.connect(user3).approve(userReward.address, await dbxERC20.balanceOf(user3.address))
-        await user3Reward.stakeDBX(await dbxERC20.balanceOf(user3.address))
+        await user3Reward.stake(await dbxERC20.balanceOf(user3.address))
 
         await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -714,7 +714,7 @@ describe("Test DBX tokens distributions", async function() {
         let cycle1User2Reward = NumUtils.day(1).mul(user2GasUsed).div(cycleTotalGasUsed)
         await user2Reward.claimRewards()
         await dbxERC20.connect(user2).approve(user1Reward.address, await dbxERC20.balanceOf(user2.address))
-        await user2Reward.stakeDBX(await dbxERC20.balanceOf(user2.address))
+        await user2Reward.stake(await dbxERC20.balanceOf(user2.address))
 
         await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 2000, 0, { value: ethers.utils.parseEther("1") })
         await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], feeReceiver.address, 2000, 0, { value: ethers.utils.parseEther("1") })
@@ -873,10 +873,10 @@ describe("Test DBX tokens distributions", async function() {
 
         await user3Reward.claimRewards()
         await dbxERC20.connect(user3).approve(userReward.address, await dbxERC20.balanceOf(user3.address))
-        await user3Reward.stakeDBX(await dbxERC20.balanceOf(user3.address))
+        await user3Reward.stake(await dbxERC20.balanceOf(user3.address))
 
         try {
-            await user2Reward.stakeDBX(await deb0xViews.getAccWithdrawableStake(user2.address))
+            await user2Reward.stake(await deb0xViews.getAccWithdrawableStake(user2.address))
         } catch (error) {
             expect(error.message).to.include("Deb0x: amount is zero");
         }
@@ -924,7 +924,7 @@ describe("Test DBX tokens distributions", async function() {
 
         await user3Reward.claimRewards()
         await dbxERC20.connect(user3).approve(userReward.address, await dbxERC20.balanceOf(user3.address))
-        await user3Reward.stakeDBX(await dbxERC20.balanceOf(user3.address))
+        await user3Reward.stake(await dbxERC20.balanceOf(user3.address))
 
         await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -933,7 +933,7 @@ describe("Test DBX tokens distributions", async function() {
 
         await user3Reward.claimRewards()
         await dbxERC20.connect(user3).approve(userReward.address, await dbxERC20.balanceOf(user3.address))
-        await user3Reward.stakeDBX(await dbxERC20.balanceOf(user3.address))
+        await user3Reward.stake(await dbxERC20.balanceOf(user3.address))
 
         await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -949,7 +949,7 @@ describe("Test DBX tokens distributions", async function() {
         await deb0xViews.getAccWithdrawableStake(user3.address);
         await user3Reward.claimRewards()
         await dbxERC20.connect(user3).approve(userReward.address, await dbxERC20.balanceOf(user3.address))
-        await user3Reward.stakeDBX(await dbxERC20.balanceOf(user3.address))
+        await user3Reward.stake(await dbxERC20.balanceOf(user3.address))
 
         await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -964,7 +964,7 @@ describe("Test DBX tokens distributions", async function() {
         await deb0xViews.getAccWithdrawableStake(user3.address);
         await user3Reward.claimRewards()
         await dbxERC20.connect(user3).approve(userReward.address, await dbxERC20.balanceOf(user3.address))
-        await user3Reward.stakeDBX(await dbxERC20.balanceOf(user3.address))
+        await user3Reward.stake(await dbxERC20.balanceOf(user3.address))
 
         await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
@@ -972,7 +972,7 @@ describe("Test DBX tokens distributions", async function() {
 
         await user3Reward.claimRewards()
         await dbxERC20.connect(user3).approve(userReward.address, await dbxERC20.balanceOf(user3.address))
-        await user3Reward.stakeDBX(await dbxERC20.balanceOf(user3.address))
+        await user3Reward.stake(await dbxERC20.balanceOf(user3.address))
 
         await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
@@ -980,7 +980,7 @@ describe("Test DBX tokens distributions", async function() {
 
         await user3Reward.claimRewards()
         await dbxERC20.connect(user3).approve(userReward.address, await dbxERC20.balanceOf(user3.address))
-        await user3Reward.stakeDBX(await dbxERC20.balanceOf(user3.address))
+        await user3Reward.stake(await dbxERC20.balanceOf(user3.address))
 
         let expectedValue = await deb0xViews.getAccWithdrawableStake(user3.address);
         await user3Reward.unstake(await deb0xViews.getAccWithdrawableStake(user3.address))
