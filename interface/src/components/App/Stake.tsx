@@ -12,7 +12,7 @@ import Deb0x from "../../ethereum/deb0x"
 import Deb0xViews from "../../ethereum/deb0xViews";
 import Deb0xERC20 from "../../ethereum/deb0xerc20"
 import SnackbarNotification from './Snackbar';
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import "../../componentsStyling/stake.scss";
 import token from "../../photos/icons/token.svg"
 import coinBagLight from "../../photos/icons/coin-bag-solid--light.svg";
@@ -444,20 +444,25 @@ export function Stake(props: any): any {
         }, [approved]);
 
         async function setStakedAmount() {
-
+            const deb0xContract = await Deb0x(library, deb0xAddress)
             const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress)
-
             const balance = await deb0xViewsContract.getAccWithdrawableStake(account)
-
-            setUserStakedAmount(ethers.utils.formatEther(balance))
+            let firstStakeCycle = await deb0xContract.accFirstStake(account)
+            let secondStakeCycle =  await deb0xContract.accSecondStake(account)
+            let firstStakeCycleAmount = await deb0xContract.accStakeCycle(account,firstStakeCycle);
+            let secondStakeCycleAmount = await deb0xContract.accStakeCycle(account,secondStakeCycle);
+            let withdawbleStake = await deb0xContract.accWithdrawableStake(account);
+            let totalStakedAmount = BigNumber.from(firstStakeCycleAmount).add(BigNumber.from(secondStakeCycleAmount)).add(BigNumber.from(withdawbleStake))
+            setUserStakedAmount(ethers.utils.formatEther(totalStakedAmount))
         }
 
         async function setUnstakedAmount() {
             const deb0xERC20Contract = await Deb0xERC20(library, deb0xERC20Address)
 
             const balance = await deb0xERC20Contract.balanceOf(account)
-
-            setUserUnstakedAmount(parseFloat(ethers.utils.formatEther(balance)).toFixed(2))
+            console.log(ethers.utils.formatEther(balance))
+            let number = ethers.utils.formatEther(balance);
+            setUserUnstakedAmount(parseFloat(number.slice(0, (number.indexOf(".")) +3)).toString()) 
         }
 
         async function setApproval() {
