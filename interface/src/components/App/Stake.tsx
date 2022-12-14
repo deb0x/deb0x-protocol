@@ -179,7 +179,14 @@ export function Stake(props: any): any {
                     </div>
                 </CardContent>
                 <CardActions className='button-container'>
-                    <LoadingButton className="collect-btn" disabled={feesUnclaimed=="0.0"} loading={loading} variant="contained" onClick={claimFees}>Collect</LoadingButton>
+                    <LoadingButton 
+                        className="collect-btn"
+                        disabled={feesUnclaimed=="0.0"}
+                        loading={loading}
+                        variant="contained"
+                        onClick={claimFees}>
+                            Collect
+                    </LoadingButton>
                 </CardActions>
             </Card>
             </>
@@ -795,6 +802,7 @@ export function Stake(props: any): any {
                                 placeholder="Amount to stake"
                                 type="number"
                                 value={amountToStake}
+                                inputProps={{ min: 0 }}
                                 onChange={e => setAmountToStake(e.target.value)} />
                         </Grid>
                         <Grid className="max-btn-container" item>
@@ -808,7 +816,21 @@ export function Stake(props: any): any {
                 </CardContent>
                 <CardActions className='button-container'>
                     {approved && <LoadingButton disabled={!amountToStake} className="collect-btn" loading={loading} variant="contained" onClick={stake}>Stake</LoadingButton>}
-                    {!approved && <LoadingButton className="collect-btn" loading={loading} variant="contained" onClick={approveStaking}>Approve Staking</LoadingButton>}
+                    {!approved &&
+                        <>
+                            <LoadingButton 
+                                className="collect-btn" 
+                                loading={loading}
+                                variant="contained"
+                                disabled={ userUnstakedAmount === '0.00' }
+                                onClick={approveStaking}>
+                                    Initialize Staking
+                            </LoadingButton>
+                            <span>
+                                You first need to have tokens in your wallet before you can Initialize Staking.
+                            </span>
+                        </> 
+                    }
                 </CardActions>
                 </>
                 : 
@@ -844,6 +866,7 @@ export function Stake(props: any): any {
                                 className="max-field"
                                 placeholder="Amount to unstake"
                                 onChange={e => setAmountToUnstake(e.target.value)}
+                                inputProps={{ min: 0 }}
                                 type="number" />
                         </Grid>
                         <Grid className="max-btn-container" item>

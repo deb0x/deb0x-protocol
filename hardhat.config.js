@@ -36,7 +36,7 @@ module.exports = {
             timeout: 1800000
         },
         matic: {
-            url: "https://polygon-rpc.com",
+            url: "https://rpc-mainnet.maticvigil.com",
             chainId: 137,
             gasPrice: "auto",
             allowUnlimitedContractSize: true,
