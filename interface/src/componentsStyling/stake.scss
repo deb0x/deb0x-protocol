@@ -60,10 +60,9 @@
                         }
                     }
                     .button-container {
-                        position: absolute;
-                        bottom: -35px;
-                        left: 50%;
-                        transform: translateX(-50%);
+                        span {
+                            padding-left: 1vh;
+                        }
                     }
                 }
                 .submit-btn {
@@ -93,7 +92,6 @@
                 .collect-btn {
                     font-size: 1.5vh;
                     color: t('approve-stake-text');
-                    margin: 0 auto;
                     background-color: t('bg');
                     border: 2px solid #F5B700;
                     border-radius: 33px;
@@ -114,6 +112,10 @@
                     position: relative;
                     left: 0;
                     transform: none;
+                }
+                .collect-btn:disabled {
+                    border: 2px solid t('btn-disabled');
+                    color: t('btn-disabled');
                 }
                 .amount-row {
                     align-items: center;
