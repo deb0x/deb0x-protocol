@@ -36,6 +36,9 @@
                     margin: 2vh;
                     position: relative;
                     overflow: unset;
+                    .data-height{
+                        min-height: 35px !important;
+                    }
                     .tab-container {
                         background: t('logo-bg');
                         width: 100%;
@@ -97,6 +100,20 @@
                     box-shadow: none;
                     padding: 10px 40px;
                     white-space: nowrap;
+                    .MuiLoadingButton-loadingIndicator {
+                        color: #F5B700;
+                        margin: 0 5px 2px 0;
+                        .MuiCircularProgress-root {
+                            width: 20px !important;
+                            height: 20px !important;
+                        }
+                    }
+                }
+                .MuiLoadingButton-loadingIndicator {
+                    color: t('text');
+                    position: relative;
+                    left: 0;
+                    transform: none;
                 }
                 .amount-row {
                     align-items: center;

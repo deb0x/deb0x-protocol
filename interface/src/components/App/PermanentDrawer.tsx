@@ -18,7 +18,8 @@ import { injected } from '../../connectors';
 import { Spinner } from './Spinner'
 import { useEagerConnect } from '../../hooks';
 import IconButton from "@mui/material/IconButton";
-import GitHubIcon from '@mui/icons-material/GitHub';
+import { faDiscord, faTwitter, faGithub } from "@fortawesome/free-brands-svg-icons";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Deb0xERC20 from "../../ethereum/deb0xerc20"
 import { ethers } from "ethers";
 import "../../componentsStyling/permanentDrawer.scss";
@@ -230,9 +231,17 @@ export function PermanentDrawer(props: any): any {
                                 </div>
                             }
                             <div className="content">
-                                <a href="https://github.com/deb0x" target="_blank" className='logo-text-color'>
-                                <GitHubIcon  />
-                                </a>
+                                <div className="social-media">
+                                    <a href="https://mobile.twitter.com/deb0xDAO" target="_blank" className="logo-text-color">
+                                        <FontAwesomeIcon icon={faTwitter} size="xl"/>
+                                    </a>
+                                    <a href="https://discord.com/invite/btejt3kUcN" target="_blank" className="logo-text-color">
+                                        <FontAwesomeIcon icon={faDiscord} size="xl"/>
+                                    </a>
+                                    <a href="https://github.com/deb0x" target="_blank" className="logo-text-color">
+                                        <FontAwesomeIcon icon={faGithub} size="xl"/>
+                                    </a>
+                                </div>
                                 <a href="https://www.deb0x.org" target="_blank" className='logo-text-color'>
                                     www.deb0x.org
                                 </a>
