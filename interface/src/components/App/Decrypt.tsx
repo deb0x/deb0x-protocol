@@ -293,6 +293,7 @@ export function Decrypt(props: any): any {
             const deb0xContract = Deb0x(library, deb0xAddress)
             const senderAddresses = 
                 await fetchMessageSenders(account);
+                if(senderAddresses.length!=0){
             const cidsPromises = 
                 senderAddresses.map(async function(sender:any) {
                     return { 
@@ -352,7 +353,11 @@ export function Decrypt(props: any): any {
             setFetchedMessages(transactions)
             setSortedMessages(transactions)
             setLoading(false)
-
+        } else {
+            setFetchedMessages([])
+            setSortedMessages([])
+            setLoading(false)
+        }
         }
 
         if(!loading) {

@@ -524,7 +524,6 @@ export function Stake(props: any): any {
                         gaEventTracker("Error: Approve staking");
                     })
             } catch (error) {
-                console.log(error)
                 setNotificationState({
                     message: "You rejected the transaction. Contract hasn't been approved for staking.", open: true,
                     severity: "info"
