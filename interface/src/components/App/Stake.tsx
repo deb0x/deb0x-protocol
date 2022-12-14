@@ -486,9 +486,9 @@ export function Stake(props: any): any {
 
             const signer = await library.getSigner(0)
             const deb0xERC20Contract = await Deb0xERC20(signer, deb0xERC20Address)
-            const getBalance = await deb0xERC20Contract.balanceOf(account)
+
             try {
-                const tx = await deb0xERC20Contract.approve(deb0xAddress, ethers.utils.parseEther(getBalance.toString()))
+                const tx = await deb0xERC20Contract.approve(deb0xAddress, ethers.utils.parseEther("5010000"))
                 tx.wait()
                     .then((result: any) => {
                         setNotificationState({
