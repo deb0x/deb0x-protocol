@@ -42,24 +42,39 @@
     padding: 0 15px 15px 15px;
     margin-top: 15px !important;
     border-radius: 25px;
+    ul{
+        margin-top: 15px;
+        list-style: none;
+        padding-left: 0;
+        li {
+            padding: 10px 0;
+            border-bottom: 2px solid;
+            span {
+                float: right;
+                font-weight: normal
+            }
+        }
+        
+
+    }
     &.classic {
         background-color: #ffeee8;
         box-shadow: 0px 3px 15px #1A152054;
         ul {
-            margin-top: 15px;
-            list-style: none;
-            padding-left: 0;
             color: #19141f;
+            li {
+                border-color: #f2e2dc;
+            }
         }
     }
     &.dark {
         background-color: #2b2235;
         box-shadow: 0px 3px 15px #0f0b1373;
         ul {
-            margin-top: 15px;
-            list-style: none;
-            padding-left: 0;
             color: #fff;
+            li {
+                border-color: #1f1826;
+            }
         }
     }
     background-color: transparent;
@@ -75,28 +90,22 @@
         }
     }
     .logout-btn, .add-token-btn, .copy-wallet-btn {
-        margin-top: 15px;
-        border-radius: 25px;
         width: 100%;
-        font-size: 12px;
-        color: #fff;
-        background-color: #d34832;
+        padding: 5px 0px;
+        justify-content: left;
+        font-weight: bold;
+        text-transform: none;
+        text-align: left;
+        color: #CE4760;
         border: none;
-        padding: 5px 25px;
-        &:hover {
-            background-color: #d34832;
+        span {
+            margin-right: 10px;
         }
     }
     .add-token-btn {
-        background-color: #7f9acd;
-        &:hover {
-            background-color: #7f9acd;
-        }
+        color: #7f9acd;
     }
     .copy-wallet-btn {
-        background-color: #1dd882;
-        &:hover {
-            background-color: #1dd882;
-        }
+        color: #91c499;
     }
 }
