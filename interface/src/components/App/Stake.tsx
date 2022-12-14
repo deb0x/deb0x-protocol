@@ -467,7 +467,6 @@ export function Stake(props: any): any {
             const deb0xERC20Contract = await Deb0xERC20(library, deb0xERC20Address)
 
             const allowance = await deb0xERC20Contract.allowance(account, deb0xAddress)
-
             allowance > 0 ? setApproved(true) : setApproved(false)
         }
 
@@ -486,12 +485,10 @@ export function Stake(props: any): any {
             setLoading(true)
 
             const signer = await library.getSigner(0)
-
             const deb0xERC20Contract = await Deb0xERC20(signer, deb0xERC20Address)
-
+            const getBalance = await deb0xERC20Contract.balanceOf(account)
             try {
-                const tx = await deb0xERC20Contract.approve(deb0xAddress, ethers.utils.parseEther("1000000"))
-
+                const tx = await deb0xERC20Contract.approve(deb0xAddress, ethers.utils.parseEther(getBalance.toString()))
                 tx.wait()
                     .then((result: any) => {
                         setNotificationState({
@@ -512,6 +509,7 @@ export function Stake(props: any): any {
                         gaEventTracker("Error: Approve staking");
                     })
             } catch (error) {
+                console.log(error)
                 setNotificationState({
                     message: "You rejected the transaction. Contract hasn't been approved for staking.", open: true,
                     severity: "info"
