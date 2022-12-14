@@ -297,7 +297,7 @@ export function Encrypt(replyAddress?: any): any {
                 gaEventTracker('Reject: send message');
             }
         } else {
-            await sendMessageTx(deb0xContract, recipients, cids)
+            await sendMessageTx(deb0xContract, recipients, cids).then(() => gaEventTracker('Sending message'));
         }
         
 
@@ -349,6 +349,18 @@ export function Encrypt(replyAddress?: any): any {
         sendContent();
     };
 
+    const handleAddressBlur = (state: any) => {
+        if (senderAddress != '') {
+            isValid(senderAddress);
+        } else {
+            setNotificationState({
+                message: null,
+                severity: "error"
+            })
+            setError(null);
+        }
+    };
+
     const sendContent = () => {
         setTextToEncrypt(draftToHtml(convertToRaw(editorState.getCurrentContent())));
     };
@@ -369,6 +381,7 @@ export function Encrypt(replyAddress?: any): any {
                                 placeholder="Ethereum address (e.g.0x31dc...) or ENS domain name (e.g test.deb0x.eth)"
                                 value={senderAddress}
                                 onPaste={handlePaste}
+                                onBlur={handleAddressBlur}
                                 onKeyDown={handleKeyDown}
                                 onChange={handleChange} />
                             <Stack direction="row" spacing={1}>

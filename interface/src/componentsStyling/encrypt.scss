@@ -90,6 +90,7 @@
                         bottom: -25px;
                         margin: 0;
                         z-index: 2;
+                        background: #4F425B;
                         .rdw-option-wrapper, 
                         .rdw-dropdown-wrapper {
                             border: none;
@@ -108,7 +109,8 @@
                                 color: #000;
                             }
                         }
-                        .rdw-link-modal * {
+                        .rdw-link-modal *,
+                        .rdw-dropdown-selectedtext {
                             color: #000;
                         }
                     }
