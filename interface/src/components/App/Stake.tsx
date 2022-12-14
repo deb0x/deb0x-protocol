@@ -179,7 +179,14 @@ export function Stake(props: any): any {
                     </div>
                 </CardContent>
                 <CardActions className='button-container'>
-                    <LoadingButton className="collect-btn" disabled={feesUnclaimed=="0.0"} loading={loading} variant="contained" onClick={claimFees}>Collect</LoadingButton>
+                    <LoadingButton 
+                        className="collect-btn"
+                        disabled={feesUnclaimed=="0.0"}
+                        loading={loading}
+                        variant="contained"
+                        onClick={claimFees}>
+                            Collect
+                    </LoadingButton>
                 </CardActions>
             </Card>
             </>
@@ -411,6 +418,7 @@ export function Stake(props: any): any {
 
         const [userStakedAmount, setUserStakedAmount] = useState("")
         const [userUnstakedAmount, setUserUnstakedAmount] = useState("")
+        const [tokensForUnstake, setTokenForUnstake] = useState("");
         const [totalStaked, setTotalStaked] = useState("")
         const [amountToUnstake, setAmountToUnstake] = useState("")
         const [amountToStake, setAmountToStake] = useState("")
@@ -438,6 +446,11 @@ export function Stake(props: any): any {
             totalAmountStaked()
         }, [totalStaked]);
 
+
+        useEffect(() => {
+            setTokensForUntakedAmount()
+        },[]);
+
         useEffect(() => {
             setUnstakedAmount()
         }, [userUnstakedAmount]);
@@ -457,6 +470,12 @@ export function Stake(props: any): any {
             let withdawbleStake = await deb0xContract.accWithdrawableStake(account);
             let totalStakedAmount = BigNumber.from(firstStakeCycleAmount).add(BigNumber.from(secondStakeCycleAmount)).add(BigNumber.from(withdawbleStake))
             setUserStakedAmount(ethers.utils.formatEther(totalStakedAmount))
+        }
+
+        async function setTokensForUntakedAmount() {
+            const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress)
+            const balance = await deb0xViewsContract.getAccWithdrawableStake(account)
+            setTokenForUnstake(ethers.utils.formatEther(balance.toString()));
         }
 
         async function setUnstakedAmount() {
@@ -750,7 +769,7 @@ export function Stake(props: any): any {
                     className="tab-container"
                 >
                     <ToggleButton className="tab-btn" value="stake">Stake</ToggleButton>
-                    <ToggleButton className="tab-btn" value="unstake">Unstake</ToggleButton>
+                    <ToggleButton className="tab-btn" value="unstake" disabled={!approved}>Unstake</ToggleButton>
 
                 </ToggleButtonGroup>
               
@@ -783,6 +802,7 @@ export function Stake(props: any): any {
                                 placeholder="Amount to stake"
                                 type="number"
                                 value={amountToStake}
+                                inputProps={{ min: 0 }}
                                 onChange={e => setAmountToStake(e.target.value)} />
                         </Grid>
                         <Grid className="max-btn-container" item>
@@ -796,7 +816,21 @@ export function Stake(props: any): any {
                 </CardContent>
                 <CardActions className='button-container'>
                     {approved && <LoadingButton disabled={!amountToStake} className="collect-btn" loading={loading} variant="contained" onClick={stake}>Stake</LoadingButton>}
-                    {!approved && <LoadingButton className="collect-btn" loading={loading} variant="contained" onClick={approveStaking}>Approve Staking</LoadingButton>}
+                    {!approved &&
+                        <>
+                            <LoadingButton 
+                                className="collect-btn" 
+                                loading={loading}
+                                variant="contained"
+                                disabled={ userUnstakedAmount === '0.00' }
+                                onClick={approveStaking}>
+                                    Initialize Staking
+                            </LoadingButton>
+                            <span>
+                                You first need to have tokens in your wallet before you can Initialize Staking.
+                            </span>
+                        </> 
+                    }
                 </CardActions>
                 </>
                 : 
@@ -807,16 +841,16 @@ export function Stake(props: any): any {
                         <div className="col-6 p-1">
                             <img className="display-element" src={theme === "classic" ? coinBagDark : coinBagLight} alt="coinbag" />
                             <Typography className="d-flex justify-content-center p-1">
-                                Your staked amount:
+                                Available to unstake:
                             </Typography>
-                            <Typography variant="h6" className="d-flex justify-content-center p-1 data-height">
-                                <strong>{userStakedAmount} DBX</strong>
+                            <Typography variant="h6" className="d-flex justify-content-center p-1">
+                                <strong>{tokensForUnstake} DBX</strong>
                             </Typography>
                         </div>
                         <div className="col-6 p-1">
                             <img className="display-element" src={theme === "classic" ? walletDark : walletLight} alt="coinbag" />
                             <Typography className="d-flex justify-content-center p-1">
-                                Your tokens in wallet:
+                                Your actual stake:
                             </Typography>
                             <Typography variant="h6" className="d-flex justify-content-center p-1 data-height">
                                 <strong>{userUnstakedAmount} DBX</strong>
@@ -832,12 +866,13 @@ export function Stake(props: any): any {
                                 className="max-field"
                                 placeholder="Amount to unstake"
                                 onChange={e => setAmountToUnstake(e.target.value)}
+                                inputProps={{ min: 0 }}
                                 type="number" />
                         </Grid>
                         <Grid className="max-btn-container" item>
                             <Button className="max-btn"
                                 size="small" variant="contained" color="error" 
-                                onClick = {()=>setAmountToUnstake(userStakedAmount)  }>
+                                onClick = {()=>setAmountToUnstake(tokensForUnstake)  }>
                                 max
                             </Button>
                         </Grid>

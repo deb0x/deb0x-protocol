@@ -22,6 +22,10 @@ $cards-color-bg--dark: #2E2438;
 $cards-color-bg--light: #F7E7E1;
 $stake-bg--light: #F2E2DC;
 $stake-bg--dark: #271F30;
+$btn-disabled--light: #4D4D4E;
+$btn-disabled--dark: #6B6274;
+$toolbar-background--dark: #4F425B;
+$toolbar-background--light: #FFEEE8;
 
 
 $themes: (
@@ -40,6 +44,8 @@ $themes: (
         approve-stake-text: $bg--dark,
         card-color: $cards-color-bg--light,
         stake-bg: $stake-bg--light,
+        btn-disabled: $btn-disabled--light,
+        toolbar-bg: $toolbar-background--light,
     ),
     dark: (
         bg: $bg--dark,
@@ -55,6 +61,8 @@ $themes: (
         approve-stake-text: $yellow-text,
         card-color: $cards-color-bg--dark,
         stake-bg: $stake-bg--dark,
+        btn-disabled: $btn-disabled--dark,
+        toolbar-bg: $toolbar-background--dark,
     ),
 );
 
