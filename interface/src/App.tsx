@@ -275,7 +275,7 @@ function App() {
                                 <p>Connect your wallet & start using <img className="content-logo" src={logoGreen} /></p>
                                 {currentChainId === "0x89" ?
                                     <p>Here's how to do this in 
-                                        <IconButton className='info show-popup' onClick={() => setShow(true)}>3 easy steps</IconButton>
+                                        <IconButton className='info show-popup' onClick={() => setShow(true)}> 3 easy steps</IconButton>
                                     </p> : ""
                                 }
                                 {show ? 
