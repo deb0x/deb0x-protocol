@@ -170,7 +170,7 @@ export function Stake(props: any): any {
                         <Typography >
                             Your unclaimed fees:
                         </Typography>
-                        <Typography variant="h6" className="mb-3">
+                        <Typography variant="h6" className="mb-3 data-height">
                             <strong>{feesUnclaimed}</strong>
                         </Typography>
                     </div>
@@ -204,7 +204,7 @@ export function Stake(props: any): any {
                         <Typography variant="h4" component="div" className="rewards mb-3">
                             DAILY STATS
                         </Typography>
-                        <Typography >
+                        <Typography className="data-height">
                             Total amount of daily cycle tokens: <strong>{currentReward}</strong>
                         </Typography>
                         {/* <Typography>
@@ -379,13 +379,13 @@ export function Stake(props: any): any {
                         <Typography >
                             Your unclaimed rewards:
                         </Typography>
-                        <Typography variant="h6" className="mb-3">
+                        <Typography variant="h6" className="mb-3 data-height">
                             <strong>{rewardsUnclaimed}</strong>
                         </Typography>
                         <Typography>
                             Your share from fees:
                         </Typography>
-                        <Typography variant="h6" className="mb-3">
+                        <Typography variant="h6" className="mb-3 data-height">
                             <strong>{feeSharePercentage}</strong>
                         </Typography>
                     </div>
@@ -401,7 +401,10 @@ export function Stake(props: any): any {
         )
     }
 
-
+    function floorPrecised(number:any) {
+        var power = Math.pow(10, 2);
+        return (Math.floor(parseFloat(number) * power) / power).toString();
+    }
 
     function StakeUnstake() {
         const [alignment, setAlignment] = useState("stake");
@@ -761,7 +764,7 @@ export function Stake(props: any): any {
                         <Typography className="d-flex justify-content-center p-1">
                             Your staked amount:
                         </Typography>
-                        <Typography variant="h6" className="d-flex justify-content-center p-1">
+                        <Typography variant="h6" className="d-flex justify-content-center p-1 data-height">
                             <strong>{userStakedAmount} DBX</strong>
                         </Typography>
                     </div>
@@ -770,7 +773,7 @@ export function Stake(props: any): any {
                         <Typography className="d-flex justify-content-center p-1">
                             Your tokens in wallet:
                         </Typography>
-                        <Typography variant="h6" className="d-flex justify-content-center p-1">
+                        <Typography variant="h6" className="d-flex justify-content-center p-1" data-height>
                             <strong>{userUnstakedAmount} DBX</strong>
                         </Typography>
                     </div>
@@ -806,7 +809,7 @@ export function Stake(props: any): any {
                             <Typography className="d-flex justify-content-center p-1">
                                 Your staked amount:
                             </Typography>
-                            <Typography variant="h6" className="d-flex justify-content-center p-1">
+                            <Typography variant="h6" className="d-flex justify-content-center p-1 data-height">
                                 <strong>{userStakedAmount} DBX</strong>
                             </Typography>
                         </div>
@@ -815,7 +818,7 @@ export function Stake(props: any): any {
                             <Typography className="d-flex justify-content-center p-1">
                                 Your tokens in wallet:
                             </Typography>
-                            <Typography variant="h6" className="d-flex justify-content-center p-1">
+                            <Typography variant="h6" className="d-flex justify-content-center p-1 data-height">
                                 <strong>{userUnstakedAmount} DBX</strong>
                             </Typography>
                         </div>
@@ -869,7 +872,7 @@ export function Stake(props: any): any {
     
             // setTotalStaked(ethers.utils.formatEther(currentStake))
 
-            setTotalStaked(parseFloat(ethers.utils.formatEther(currentStake.sub(pendingStakeWithdrawal))).toFixed(2))
+            setTotalStaked(floorPrecised(ethers.utils.formatEther(currentStake.sub(pendingStakeWithdrawal))))
 
         }
 
