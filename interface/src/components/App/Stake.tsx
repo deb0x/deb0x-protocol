@@ -458,9 +458,7 @@ export function Stake(props: any): any {
 
         async function setUnstakedAmount() {
             const deb0xERC20Contract = await Deb0xERC20(library, deb0xERC20Address)
-
             const balance = await deb0xERC20Contract.balanceOf(account)
-            console.log(ethers.utils.formatEther(balance))
             let number = ethers.utils.formatEther(balance);
             setUserUnstakedAmount(parseFloat(number.slice(0, (number.indexOf(".")) +3)).toString()) 
         }
