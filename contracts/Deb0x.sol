@@ -278,7 +278,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     /**
      * @dev Emitted when calling {send} marking the new current `cycle`,
      * `calculatedCycleReward` and `summedCycleStakes`.
-     * 
      */
     event NewCycleStarted(
         uint256 indexed cycle,
