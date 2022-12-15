@@ -24,9 +24,9 @@ import disconnectIcon from '../../photos/icons/diconnect.svg';
 import { disconnect } from 'process';
 
 
-const deb0xAddress = "0x3A274DD833726D9CfDb6cBc23534B2cF5e892347";
-const deb0xViewsAddress = "0x3a6B3Aff418C7E50eE9F852D0bc7119296cc3644";
-const deb0xERC20Address = "0x58EE92DaDdF00334da39fb4Fab164c8662C794AD"
+const deb0xAddress = "0xA06735da049041eb523Ccf0b8c3fB9D36216c646";
+const deb0xViewsAddress = "0xf6AbCBe192789D0c5322C64abaC3E4DC507E90E6";
+const deb0xERC20Address = "0x22c3f74d4AA7c7e11A7637d589026aa85c7AF88a"
 const tokenSymbol = 'DBX';
 
 const tokenDecimals = 18;
