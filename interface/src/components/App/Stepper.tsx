@@ -81,7 +81,7 @@ export default function HorizontalLinearStepper(props: any) {
                             setNotificationState({message: "Deb0x was succesfully initialized.", open: true,
                                     severity:"success"})
                                     setLoading(false)
-                                    props.onDeboxInitialization()
+                                    props.onDeboxInitialization(true)
                         } else {
                             setNotificationState({message: "Deb0x couldn't be initialized!", open: true,
                                 severity:"error"})
@@ -146,7 +146,7 @@ export default function HorizontalLinearStepper(props: any) {
             try {
                 const request = await signMetaTxRequest(library, forwarder, { to, from, data });
     
-                await fetchInitializeResult(request, url).then((result: any) => console.log(result))
+                await fetchInitializeResult(request, url)
             } catch(error: any) {
                     setNotificationState({message: "You rejected the transaction. Deb0x was not initialized.", open: true,
                         severity:"info"})
