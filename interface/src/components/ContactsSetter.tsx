@@ -1,6 +1,7 @@
 import { Add, SettingsPhoneTwoTone } from "@mui/icons-material";
 import { Box, IconButton, Modal } from "@mui/material";
 import { useContext, useEffect, useRef, useState } from "react";
+import { ethers } from "ethers";
 import SnackbarNotification from '../components/App/Snackbar';
 
 
@@ -15,14 +16,23 @@ export default function ContactsSetter(props: any) {
     const { onClickOutside } = props;
     const [theme, setTheme] = useState(localStorage.getItem('globalTheme'));
     const [notificationState, setNotificationState] = useState({})
+    const addressInput =  useRef<any>();
     var found: any;
 
-    const addContact = () => {
-        found = contacts.some(e => e.address.toLowerCase() === address.toLowerCase())
+    const addContact = () => {  
+        const addressValue = addressInput.current.value.toLowerCase()
+        found = contacts.some(e => e.address.toLowerCase() === addressValue)
         if (!found) {
-            contacts.push({name: name, address: address});
-            setContacts([...contacts])
-            onClickOutside && onClickOutside();
+            if (!isAddress(addressValue)) {
+                setNotificationState({
+                    message: `${addressValue} is not a valid ethereum address.`, open: true,
+                    severity: "error"
+                })
+            } else {
+                contacts.push({name: name, address: addressValue});
+                setContacts([...contacts])
+                onClickOutside && onClickOutside();
+            }
         } else {
             setNotificationState({
                 message: "This address is already saved", open: true,
@@ -31,13 +41,12 @@ export default function ContactsSetter(props: any) {
         }
     }
 
-    function handleOnCancel() {
-        onClickOutside && onClickOutside();
+    function isAddress(address: any) {
+        return ethers.utils.isAddress(address);
     }
 
-    function handleChange(event: any) {
-        if(event.target)
-            setAddress(event.target.value)
+    function handleOnCancel() {
+        onClickOutside && onClickOutside();
     }
 
     useEffect(() => {
@@ -76,9 +85,9 @@ export default function ContactsSetter(props: any) {
                         <div className="form-group for-field">
                             <label className="for-label">Address</label>
                             { address ?
-                                <input readOnly key="address" className="form-control inputs"
+                                <input ref={addressInput} readOnly key="address" className="form-control inputs"
                                     value={address}/> :
-                                <input key="address" className="form-control inputs" placeholder="Type here" onChange={handleChange} />    
+                                <input  ref={addressInput} key="address" className="form-control inputs" placeholder="Type here" />
                             }
                         </div>
                         <div className="buttons-container">

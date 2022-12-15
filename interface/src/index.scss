@@ -125,17 +125,21 @@ $randomNumber: random(4);
                 color: t('text');
             }
         }
+        .editor span {
+            color: t('text') !important;
+        }
     }
     .initial-page {
         height: 100%;
         .row {
             height: 100%;
+            overflow: hidden;
             .img-container {
                 align-items: center;
                 height: 100%;
                 position: relative;
                 .image--left {
-                    left: 80px;
+                    left: 13%;
                     width: 752px;
                     height: 652px;
                     position: absolute;
@@ -172,7 +176,8 @@ $randomNumber: random(4);
                         border: 1px solid #F5B700;
                         border-radius: 33px;
                         box-shadow: none;
-                        margin-left: 110px;
+                        left: 50%;
+                        transform: translateX(-50%);
                         margin-top: 50px;
                         padding: 10px 25px;
                         width: 235px;
@@ -206,6 +211,7 @@ $randomNumber: random(4);
         .show-popup {
             font-size: 27px;
             margin-top: -5px;
+            margin-left: 5px;
             font-weight: bold;
             padding: 0;
             color: #78C3FB;
@@ -282,7 +288,7 @@ $randomNumber: random(4);
     width: 100%;
     max-width: 750px;
     margin-left: 50%;
-    transform: translate(-50%,  50%);
+    transform: translate(-50%, 40%);
     .close-popup {
         text-decoration: none;
     }
@@ -293,8 +299,8 @@ $randomNumber: random(4);
         border: 1px solid #2B2235;
 
         .close-popup {
-            background: #FFEEE8;
-            color: #333;
+            background: #2B2235;
+            color: #fff;
             border: 1px solid #fff;
         }
         .add-contact-text {
@@ -325,6 +331,9 @@ $randomNumber: random(4);
                 background: #1F1826 0% 0% no-repeat padding-box;
                 border: #1F1826;
             }
+        }
+        h3, h4 {
+            color: #fff;
         }
     }
     &.classic {
@@ -461,6 +470,10 @@ $randomNumber: random(4);
         vertical-align: baseline;
     }
 
+    h4 {
+        font-size: 20px;
+    }
+
     h4 img {
         max-height: 30px;
         vertical-align: baseline;
@@ -470,7 +483,6 @@ $randomNumber: random(4);
 .initial-page-popup {
     .modal-box {
         width: 90%;
-        margin-left: 5%;
 
         .how-to-use-list {
             align-items: center;

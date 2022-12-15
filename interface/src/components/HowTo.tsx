@@ -5,6 +5,7 @@ import icon1 from '../photos/icons/icon-1.png';
 import icon2 from '../photos/icons/icon-2.png';
 import icon3 from '../photos/icons/icon-3.png';
 import logoDark from "../photos/logo-dark.svg";
+import logoLight from "../photos/logo-light.svg";
 import iconParty from "../photos/party-popper.png"
 
 export default function HowTo(props: any) {
@@ -36,7 +37,7 @@ export default function HowTo(props: any) {
                 <Box ref={ref} className={`modal-box ${theme === "classic" ? "classic" : "dark"}` }>
                     <div className="how-to-use-list">
                         <a href="#" onClick={() => handleOnCancel()} className="close-popup">x</a>
-                        <h3>Before connecting to <img src={logoDark} />, make sure you:</h3>
+                        <h3>Before connecting to <img src={theme === "classic" ? logoDark : logoLight} />, make sure you:</h3>
                         <ul>
                             <li>
                                 <img src={icon1} />
@@ -45,16 +46,14 @@ export default function HowTo(props: any) {
                             </li>
                             <li>
                                 <img src={icon2} />
-                                <h4>Switch to <span>Goerli testnet</span> network</h4>
-                                <a href="https://blog.cryptostars.is/goerli-g%C3%B6rli-testnet-network-to-metamask-and-receiving-test-ethereum-in-less-than-2-min-de13e6fe5677" target="_blank">Read more</a>
+                                <h4>Switch to <span>Polygon</span> network</h4>
                             </li>
                             <li>
                                 <img src={icon3} />
-                                <h4>Get <span>Goerli testnet</span> funds</h4>
-                                <a href="https://goerlifaucet.com/" target="_blank">https://goerlifaucet.com/</a>
+                                <h4>Connect your <span>wallet</span></h4>
                             </li>
                         </ul>
-                        <h4>After all these steps, you should be ready to use demo.deb0x.org <img src={iconParty} /></h4>
+                        <h4>After all these steps, you should be ready to use app.deb0x.org <img src={iconParty} /></h4>
                    </div>
                 </Box>
             </Modal>
