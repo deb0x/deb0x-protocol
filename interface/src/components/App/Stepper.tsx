@@ -81,7 +81,7 @@ export default function HorizontalLinearStepper(props: any) {
                             setNotificationState({message: "Deb0x was succesfully initialized.", open: true,
                                     severity:"success"})
                                     setLoading(false)
-                                    props.onDeboxInitialization()
+                                    props.onDeboxInitialization(true)
                         } else {
                             setNotificationState({message: "Deb0x couldn't be initialized!", open: true,
                                 severity:"error"})
