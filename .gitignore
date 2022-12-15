@@ -110,3 +110,5 @@ dist
 artifacts/
 cache/
 build/
+
+.secrets.json
