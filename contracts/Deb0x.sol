@@ -64,7 +64,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     /**
      * Index (0-based) of the current cycle.
      * 
-     * Updated upon cycle setup that is  triggered by contract interraction 
+     * Updated upon cycle setup that is triggered by contract interraction 
      * (account sends message, claims fees, claims rewards, stakes or unstakes).
      */
     uint256 public currentCycle;
@@ -75,7 +75,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     uint256 public lastStartedCycle;
 
     /**
-     * Stores the value of penultimate active cycle plus one.
+     * Stores the index of the penultimate active cycle plus one.
      */
     uint256 public previousStartedCycle;
 
@@ -84,31 +84,72 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
      */
     uint256 public currentStartedCycle;
 
+    /**
+     * Stores the amount of stake that will be subracted from the total
+     * stake once a new cycle starts.
+     */
     uint256 public pendingStakeWithdrawal;
 
+    /**
+     * Accumulates fees while there are no tokens staked after the
+     * entire token supply has been distributed. Once tokens are
+     * staked again, these fees will be distributed in the next
+     * active cycle.
+     */
     uint256 public pendingFees;
 
+    /**
+     * Message ID that is incremented every time a message is sent.
+     */
     uint256 public sentId = 1;
 
+    /**
+     * Stores the public keys of accounts.
+     */
     mapping(address => bytes32) public publicKeys;
 
+    /**
+     * The amount of gas an account owes towards clients.
+     */
     mapping(address => uint256) public accCycleGasOwed;
 
+    /**
+     * The amount of gas a client has received from owed
+     * account gas.
+     */
     mapping(address => uint256) public clientCycleGasEarned;
 
+    /**
+     * The amount of gas an account has spent sending messages.
+     * Resets during a new cycle when an account performs an action
+     * that updates its stats.
+     */
     mapping(address => uint256) public accCycleGasUsed;
 
+    /**
+     * The total amount of gas all accounts have spent sending
+     * messages per cycle.
+     */
     mapping(uint256 => uint256) public cycleTotalGasUsed;
 
     /**
-     * The last cycle when an account has sent messages.
+     * The last cycle in which an account has sent messages.
      */
     mapping(address => uint256) public lastActiveCycle;
 
+    /**
+     * The last cycle in which the client had its reward updated.
+     */
     mapping(address => uint256) public clientLastRewardUpdate;
 
+    /**
+     * The last cycle in which the client had its earned fees updated.
+     */
     mapping(address => uint256) public clientLastFeeUpdate;
 
+    /**
+     * The fee amount the client can withdraw.
+     */
     mapping(address => uint256) public clientAccruedFees;
 
     /**
@@ -116,8 +157,14 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
      */
     mapping(address => uint256) public accRewards;
 
+    /**
+     * The fee amount the account can withdraw.
+     */
     mapping(address => uint256) public accAccruedFees;
 
+    /**
+     * Current unclaimed rewards per client.
+     */
     mapping(address => uint256) public clientRewards;
 
     /**
@@ -132,20 +179,45 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
      */
     mapping(uint256 => uint256) public summedCycleStakes;
 
+    /**
+     * The last cycle in which the account had its fees updated.
+     */ 
     mapping(address => uint256) public lastFeeUpdateCycle;
 
+    /**
+     * The total amount of accrued fees per cycle.
+     */
     mapping(uint256 => uint256) public cycleAccruedFees;
 
+    /**
+     * Sum of previous total cycle accrued fees divided by cycle stake.
+     */
     mapping(uint256 => uint256) public cycleFeesPerStakeSummed;
 
+    /**
+     * Amount an account has staked and is locked during given cycle.
+     */
     mapping(address => mapping(uint256 => uint256)) public accStakeCycle;
 
+    /**
+     * Stake amount an account can currently withdraw.
+     */
     mapping(address => uint256) public accWithdrawableStake;
 
+    /**
+     * Cycle in which an account's stake is locked and begins generating fees.
+     */
     mapping(address => uint256) public accFirstStake;
 
+    /**
+     * Same as accFirstStake, but stores the second stake seperately 
+     * in case the account stakes in two consecutive active cycles.
+     */
     mapping(address => uint256) public accSecondStake;
 
+    /**
+     * Emmited when a client claimed native token fees.
+     */
     event ClientFeesClaimed(
         uint256 indexed cycle,
         address indexed account,
@@ -212,8 +284,8 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     /**
      * @dev Measures the amount of consummed gas.
-     * In case a fee is applied, the corresponded percentage will be recorded 
-     * as consummed by the feeReceiver instead of the caller.
+     * In case a fee is applied, the corresponding percentage will be recorded 
+     * as consumed by the feeReceiver instead of the caller.
      * 
      * @param feeReceiver the address of the fee receiver (client).
      * @param msgFee fee percentage expressed in basis points.
@@ -284,13 +356,13 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
      * @dev Sends messages to multiple accounts. Triggers helper functions 
      * used to update cycle, rewards and fees related state.
      * Optionally may include extra reward token fee and native coin fees on-top of the default protocol fee. 
-     * These fees are set by the transaction sender also called "client".
+     * These fees are set in the client user intarface the transaction sender interacts with.
      * 
      * @param to account addresses to send messages to.
      * @param crefs content references to the messages.
      * @param feeReceiver client address.
      * @param msgFee on-top reward token fee charged by the client (in basis points). If 0, no reward token fee applies.
-     * @param nativeTokenFee on-top native coin fee charged by the client. If 0, no 
+     * @param nativeTokenFee on-top native coin fee charged by the client. If 0, no native token fee applies.
      */
     function send(
         address[] memory to,
@@ -418,7 +490,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     }
 
     /**
-     * @dev Stakes the given amount and increases the share of the daily allocated rewards.
+     * @dev Stakes the given amount and increases the share of the daily allocated fees.
      * The tokens are transfered from sender account to this contract.
      * To receive the tokens back, the unstake function must be called by the same account address.
      * 
@@ -457,7 +529,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     }
 
     /**
-     * @dev Unstakes the given amount and decreases the share of the daily allocated rewards.
+     * @dev Unstakes the given amount and decreases the share of the daily allocated fees.
      * If the balance is availabe, the tokens are transfered from this contract to the sender account.
      * 
      * @param amount token amount to be unstaked (in wei).
@@ -575,7 +647,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     }
 
     /**
-     * @dev Updates the global state related to the opening of a new cycle along 
+     * @dev Updates the global state related to starting a new cycle along 
      * with helper state variables used in computation of staking rewards.
      */
     function setUpNewCycle() internal {
@@ -751,8 +823,8 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     /**
      * Recommended method to use to send native coins.
      * 
-     * @param to receiving address
-     * @param amount in wei
+     * @param to receiving address.
+     * @param amount in wei.
      */
     function sendViaCall(address payable to, uint256 amount) internal {
         (bool sent, ) = to.call{value: amount}("");
