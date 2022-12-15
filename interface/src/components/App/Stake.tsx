@@ -12,7 +12,7 @@ import Deb0x from "../../ethereum/deb0x"
 import Deb0xViews from "../../ethereum/deb0xViews";
 import Deb0xERC20 from "../../ethereum/deb0xerc20"
 import SnackbarNotification from './Snackbar';
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import "../../componentsStyling/stake.scss";
 import token from "../../photos/icons/token.svg"
 import coinBagLight from "../../photos/icons/coin-bag-solid--light.svg";
@@ -170,7 +170,7 @@ export function Stake(props: any): any {
                         <Typography >
                             Your unclaimed fees:
                         </Typography>
-                        <Typography variant="h6" className="mb-3">
+                        <Typography variant="h6" className="mb-3 data-height">
                             <strong>{feesUnclaimed}</strong>
                         </Typography>
                     </div>
@@ -179,7 +179,14 @@ export function Stake(props: any): any {
                     </div>
                 </CardContent>
                 <CardActions className='button-container'>
-                    <LoadingButton className="collect-btn" disabled={feesUnclaimed=="0.0"} loading={loading} variant="contained" onClick={claimFees}>Collect</LoadingButton>
+                    <LoadingButton 
+                        className="collect-btn"
+                        disabled={feesUnclaimed=="0.0"}
+                        loading={loading}
+                        variant="contained"
+                        onClick={claimFees}>
+                            Collect
+                    </LoadingButton>
                 </CardActions>
             </Card>
             </>
@@ -204,7 +211,7 @@ export function Stake(props: any): any {
                         <Typography variant="h4" component="div" className="rewards mb-3">
                             DAILY STATS
                         </Typography>
-                        <Typography >
+                        <Typography className="data-height">
                             Total amount of daily cycle tokens: <strong>{currentReward}</strong>
                         </Typography>
                         {/* <Typography>
@@ -379,13 +386,13 @@ export function Stake(props: any): any {
                         <Typography >
                             Your unclaimed rewards:
                         </Typography>
-                        <Typography variant="h6" className="mb-3">
+                        <Typography variant="h6" className="mb-3 data-height">
                             <strong>{rewardsUnclaimed}</strong>
                         </Typography>
                         <Typography>
                             Your share from fees:
                         </Typography>
-                        <Typography variant="h6" className="mb-3">
+                        <Typography variant="h6" className="mb-3 data-height">
                             <strong>{feeSharePercentage}</strong>
                         </Typography>
                     </div>
@@ -401,13 +408,17 @@ export function Stake(props: any): any {
         )
     }
 
-
+    function floorPrecised(number:any) {
+        var power = Math.pow(10, 2);
+        return (Math.floor(parseFloat(number) * power) / power).toString();
+    }
 
     function StakeUnstake() {
         const [alignment, setAlignment] = useState("stake");
 
         const [userStakedAmount, setUserStakedAmount] = useState("")
         const [userUnstakedAmount, setUserUnstakedAmount] = useState("")
+        const [tokensForUnstake, setTokenForUnstake] = useState("");
         const [totalStaked, setTotalStaked] = useState("")
         const [amountToUnstake, setAmountToUnstake] = useState("")
         const [amountToStake, setAmountToStake] = useState("")
@@ -435,6 +446,11 @@ export function Stake(props: any): any {
             totalAmountStaked()
         }, [totalStaked]);
 
+
+        useEffect(() => {
+            setTokensForUntakedAmount()
+        },[]);
+
         useEffect(() => {
             setUnstakedAmount()
         }, [userUnstakedAmount]);
@@ -444,27 +460,35 @@ export function Stake(props: any): any {
         }, [approved]);
 
         async function setStakedAmount() {
-
+            const deb0xContract = await Deb0x(library, deb0xAddress)
             const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress)
-
             const balance = await deb0xViewsContract.getAccWithdrawableStake(account)
+            let firstStakeCycle = await deb0xContract.accFirstStake(account)
+            let secondStakeCycle =  await deb0xContract.accSecondStake(account)
+            let firstStakeCycleAmount = await deb0xContract.accStakeCycle(account,firstStakeCycle);
+            let secondStakeCycleAmount = await deb0xContract.accStakeCycle(account,secondStakeCycle);
+            let withdawbleStake = await deb0xContract.accWithdrawableStake(account);
+            let totalStakedAmount = BigNumber.from(firstStakeCycleAmount).add(BigNumber.from(secondStakeCycleAmount)).add(BigNumber.from(withdawbleStake))
+            setUserStakedAmount(ethers.utils.formatEther(totalStakedAmount))
+        }
 
-            setUserStakedAmount(ethers.utils.formatEther(balance))
+        async function setTokensForUntakedAmount() {
+            const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress)
+            const balance = await deb0xViewsContract.getAccWithdrawableStake(account)
+            setTokenForUnstake(ethers.utils.formatEther(balance.toString()));
         }
 
         async function setUnstakedAmount() {
             const deb0xERC20Contract = await Deb0xERC20(library, deb0xERC20Address)
-
             const balance = await deb0xERC20Contract.balanceOf(account)
-
-            setUserUnstakedAmount(parseFloat(ethers.utils.formatEther(balance)).toFixed(2))
+            let number = ethers.utils.formatEther(balance);
+            setUserUnstakedAmount(parseFloat(number.slice(0, (number.indexOf(".")) +3)).toString()) 
         }
 
         async function setApproval() {
             const deb0xERC20Contract = await Deb0xERC20(library, deb0xERC20Address)
 
             const allowance = await deb0xERC20Contract.allowance(account, deb0xAddress)
-
             allowance > 0 ? setApproved(true) : setApproved(false)
         }
 
@@ -483,12 +507,10 @@ export function Stake(props: any): any {
             setLoading(true)
 
             const signer = await library.getSigner(0)
-
             const deb0xERC20Contract = await Deb0xERC20(signer, deb0xERC20Address)
 
             try {
-                const tx = await deb0xERC20Contract.approve(deb0xAddress, ethers.utils.parseEther("1000000"))
-
+                const tx = await deb0xERC20Contract.approve(deb0xAddress, ethers.utils.parseEther("5010000"))
                 tx.wait()
                     .then((result: any) => {
                         setNotificationState({
@@ -509,6 +531,7 @@ export function Stake(props: any): any {
                         gaEventTracker("Error: Approve staking");
                     })
             } catch (error) {
+                console.log(error)
                 setNotificationState({
                     message: "You rejected the transaction. Contract hasn't been approved for staking.", open: true,
                     severity: "info"
@@ -672,7 +695,7 @@ export function Stake(props: any): any {
 
         async function sendStakeTx(deb0xContract: any) {
             try {
-                const tx = await deb0xContract.stake(ethers.utils.parseEther(amountToStake.toString()))
+                const tx = await deb0xContract.stakeDBX(ethers.utils.parseEther(amountToStake.toString()))
 
                 tx.wait()
                     .then((result: any) => {
@@ -711,7 +734,7 @@ export function Stake(props: any): any {
             if(whitelist.includes(from)){
                 const url = "https://api.defender.openzeppelin.com/autotasks/b939da27-4a61-4464-8d7e-4b0c5dceb270/runs/webhook/f662ac31-8f56-4b4c-9526-35aea314af63/SPs6smVfv41kLtz4zivxr8";
                 const forwarder = createInstance(library)
-                const data = deb0xContract.interface.encodeFunctionData("stake",
+                const data = deb0xContract.interface.encodeFunctionData("stakeDBX",
                     [ethers.utils.parseEther(amountToStake.toString())])
                 const to = deb0xContract.address
 
@@ -746,7 +769,7 @@ export function Stake(props: any): any {
                     className="tab-container"
                 >
                     <ToggleButton className="tab-btn" value="stake">Stake</ToggleButton>
-                    <ToggleButton className="tab-btn" value="unstake">Unstake</ToggleButton>
+                    <ToggleButton className="tab-btn" value="unstake" disabled={!approved}>Unstake</ToggleButton>
 
                 </ToggleButtonGroup>
               
@@ -760,7 +783,7 @@ export function Stake(props: any): any {
                         <Typography className="d-flex justify-content-center p-1">
                             Your staked amount:
                         </Typography>
-                        <Typography variant="h6" className="d-flex justify-content-center p-1">
+                        <Typography variant="h6" className="d-flex justify-content-center p-1 data-height">
                             <strong>{userStakedAmount} DBX</strong>
                         </Typography>
                     </div>
@@ -769,7 +792,7 @@ export function Stake(props: any): any {
                         <Typography className="d-flex justify-content-center p-1">
                             Your tokens in wallet:
                         </Typography>
-                        <Typography variant="h6" className="d-flex justify-content-center p-1">
+                        <Typography variant="h6" className="d-flex justify-content-center p-1" data-height>
                             <strong>{userUnstakedAmount} DBX</strong>
                         </Typography>
                     </div>
@@ -779,6 +802,7 @@ export function Stake(props: any): any {
                                 placeholder="Amount to stake"
                                 type="number"
                                 value={amountToStake}
+                                inputProps={{ min: 0 }}
                                 onChange={e => setAmountToStake(e.target.value)} />
                         </Grid>
                         <Grid className="max-btn-container" item>
@@ -792,7 +816,21 @@ export function Stake(props: any): any {
                 </CardContent>
                 <CardActions className='button-container'>
                     {approved && <LoadingButton disabled={!amountToStake} className="collect-btn" loading={loading} variant="contained" onClick={stake}>Stake</LoadingButton>}
-                    {!approved && <LoadingButton className="collect-btn" loading={loading} variant="contained" onClick={approveStaking}>Approve Staking</LoadingButton>}
+                    {!approved &&
+                        <>
+                            <LoadingButton 
+                                className="collect-btn" 
+                                loading={loading}
+                                variant="contained"
+                                disabled={ userUnstakedAmount === '0.00' }
+                                onClick={approveStaking}>
+                                    Initialize Staking
+                            </LoadingButton>
+                            <span>
+                                You first need to have tokens in your wallet before you can Initialize Staking.
+                            </span>
+                        </> 
+                    }
                 </CardActions>
                 </>
                 : 
@@ -803,18 +841,18 @@ export function Stake(props: any): any {
                         <div className="col-6 p-1">
                             <img className="display-element" src={theme === "classic" ? coinBagDark : coinBagLight} alt="coinbag" />
                             <Typography className="d-flex justify-content-center p-1">
-                                Your staked amount:
+                                Available to unstake:
                             </Typography>
                             <Typography variant="h6" className="d-flex justify-content-center p-1">
-                                <strong>{userStakedAmount} DBX</strong>
+                                <strong>{tokensForUnstake} DBX</strong>
                             </Typography>
                         </div>
                         <div className="col-6 p-1">
                             <img className="display-element" src={theme === "classic" ? walletDark : walletLight} alt="coinbag" />
                             <Typography className="d-flex justify-content-center p-1">
-                                Your tokens in wallet:
+                                Your actual stake:
                             </Typography>
-                            <Typography variant="h6" className="d-flex justify-content-center p-1">
+                            <Typography variant="h6" className="d-flex justify-content-center p-1 data-height">
                                 <strong>{userUnstakedAmount} DBX</strong>
                             </Typography>
                         </div>
@@ -828,12 +866,13 @@ export function Stake(props: any): any {
                                 className="max-field"
                                 placeholder="Amount to unstake"
                                 onChange={e => setAmountToUnstake(e.target.value)}
+                                inputProps={{ min: 0 }}
                                 type="number" />
                         </Grid>
                         <Grid className="max-btn-container" item>
                             <Button className="max-btn"
                                 size="small" variant="contained" color="error" 
-                                onClick = {()=>setAmountToUnstake(userStakedAmount)  }>
+                                onClick = {()=>setAmountToUnstake(tokensForUnstake)  }>
                                 max
                             </Button>
                         </Grid>
@@ -868,7 +907,7 @@ export function Stake(props: any): any {
     
             // setTotalStaked(ethers.utils.formatEther(currentStake))
 
-            setTotalStaked(parseFloat(ethers.utils.formatEther(currentStake.sub(pendingStakeWithdrawal))).toFixed(2))
+            setTotalStaked(floorPrecised(ethers.utils.formatEther(currentStake.sub(pendingStakeWithdrawal))))
 
         }
 

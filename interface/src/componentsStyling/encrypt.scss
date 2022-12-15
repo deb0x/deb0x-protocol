@@ -5,6 +5,10 @@
         .content-box.form-container {
             position: relative;
             form {
+                display: flex;
+                flex-flow: column;
+                align-items: stretch;
+                height: 100%;
                 padding-top: 15px;
                 .MuiFormControl-root {
                     width: 100%;
@@ -33,11 +37,13 @@
                     }
                 }
                 .address-list {
-                    padding: 5px;
-                    max-height: 46px;
+                    margin: 10px 0;
+                    max-height: 50px;
                     overflow: auto;
+                    overflow-y: hidden;
+                    white-space: nowrap;
                     div.MuiButtonBase-root {
-                        margin: 2px 0;
+                        margin: 0 5px 5px 0;
                         background-color: t('bg');
                         color: t('text');
                         border: 1px solid t('text');
@@ -74,6 +80,8 @@
                     border-radius: 25px 25px 0 0px;
                     margin-bottom: 50px;
                     position: relative;
+                    flex: 1 1 auto;
+                
                     .rdw-editor-toolbar {
                         border-radius: 0 0 25px 25px;
                         border: none;
@@ -82,6 +90,7 @@
                         bottom: -25px;
                         margin: 0;
                         z-index: 2;
+                        background: t('toolbar-bg');
                         .rdw-option-wrapper, 
                         .rdw-dropdown-wrapper {
                             border: none;
@@ -100,13 +109,14 @@
                                 color: #000;
                             }
                         }
-                        .rdw-link-modal * {
+                        .rdw-link-modal *,
+                        .rdw-dropdown-selectedtext {
                             color: #000;
                         }
                     }
                 }
                 .editor {
-                    height: 40vh;
+                    // height: 40vh;
                     padding: 15px;
                     .public-DraftEditor-content > div  {
                         padding-bottom: 50px;
@@ -115,6 +125,7 @@
 
                 .form-bottom {
                     position: relative;
+                    flex: 0 1 60px;
                     .send-btn {
                         font-size: 16px;
                         background-color:  #F5B700;

@@ -18,7 +18,7 @@ export default function ContactsSetter(props: any) {
     var found: any;
 
     const addContact = () => {
-        found = contacts.some(e => e.address == address)
+        found = contacts.some(e => e.address.toLowerCase() === address.toLowerCase())
         if (!found) {
             contacts.push({name: name, address: address});
             setContacts([...contacts])

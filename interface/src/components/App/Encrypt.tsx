@@ -73,17 +73,23 @@ export function Encrypt(replyAddress?: any): any {
     }, []);
 
     useEffect(() => {
-        if(input !== null && input.match(/^0x[a-fA-F0-9]{40}$/g))
-            addressList.push(input);
+        if(input !== null && input.match(/^0x[a-fA-F0-9]{40}$/g)) {
+            isValid(input).then((result: any) => {
+                if(result)
+                    addressList.push(input);
+                else
+                localStorage.removeItem('input');
+            })
+        }
     }, [input]);
 
     useEffect(() => setInput(JSON.parse(localStorage.getItem('input') || 'null')));
 
-    // useEffect(() => {
-    //     if (!encryptionKeyInitialized) {
-    //         getPublicEncryptionKey()
-    //     }
-    // }, []);
+    useEffect(() => {
+        if (!encryptionKeyInitialized) {
+            getPublicEncryptionKey()
+        }
+    }, []);
 
     useEffect(() => {
         (document.querySelector(".editor") as HTMLElement).click()
@@ -297,7 +303,7 @@ export function Encrypt(replyAddress?: any): any {
                 gaEventTracker('Reject: send message');
             }
         } else {
-            await sendMessageTx(deb0xContract, recipients, cids)
+            await sendMessageTx(deb0xContract, recipients, cids).then(() => gaEventTracker('Sending message'));
         }
         
 
@@ -349,6 +355,18 @@ export function Encrypt(replyAddress?: any): any {
         sendContent();
     };
 
+    const handleAddressBlur = (state: any) => {
+        if (senderAddress != '') {
+            isValid(senderAddress);
+        } else {
+            setNotificationState({
+                message: null,
+                severity: "error"
+            })
+            setError(null);
+        }
+    };
+
     const sendContent = () => {
         setTextToEncrypt(draftToHtml(convertToRaw(editorState.getCurrentContent())));
     };
@@ -369,6 +387,7 @@ export function Encrypt(replyAddress?: any): any {
                                 placeholder="Ethereum address (e.g.0x31dc...) or ENS domain name (e.g test.deb0x.eth)"
                                 value={senderAddress}
                                 onPaste={handlePaste}
+                                onBlur={handleAddressBlur}
                                 onKeyDown={handleKeyDown}
                                 onChange={handleChange} />
                             <Stack direction="row" spacing={1}>
