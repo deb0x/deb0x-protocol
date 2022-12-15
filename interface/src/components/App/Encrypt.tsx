@@ -92,10 +92,12 @@ export function Encrypt(replyAddress?: any): any {
     }, []);
 
     useEffect(() => {
-        setTimeout(() => {
-            (document.querySelector("#standard-basic") as HTMLElement).click();
-            setTextToEncrypt("")
-        }, 200)
+        if(replyAddress.props === undefined) {
+            setTimeout(() => {
+                (document.querySelector("#standard-basic") as HTMLElement).click();
+                setTextToEncrypt("")
+            }, 200)
+        }
     }, [input])
 
     async function handleKeyDown(evt: any) {
