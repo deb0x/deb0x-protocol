@@ -146,7 +146,7 @@ export default function HorizontalLinearStepper(props: any) {
             try {
                 const request = await signMetaTxRequest(library, forwarder, { to, from, data });
     
-                await fetchInitializeResult(request, url)
+                await fetchInitializeResult(request, url).then((result: any) => console.log(result))
             } catch(error: any) {
                     setNotificationState({message: "You rejected the transaction. Deb0x was not initialized.", open: true,
                         severity:"info"})

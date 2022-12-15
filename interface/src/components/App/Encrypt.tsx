@@ -92,11 +92,11 @@ export function Encrypt(replyAddress?: any): any {
     }, []);
 
     useEffect(() => {
-        (document.querySelector(".editor") as HTMLElement).click()
         setTimeout(() => {
+            (document.querySelector("#standard-basic") as HTMLElement).click();
             setTextToEncrypt("")
-        }, 100)
-    }, [])
+        }, 200)
+    }, [input])
 
     async function handleKeyDown(evt: any) {
         if (["Enter", "Tab", ","].includes(evt.key)) {
@@ -118,6 +118,7 @@ export function Encrypt(replyAddress?: any): any {
 
     function handleDelete(item: any) {
         setAddressList(addressList.filter(i => i !== item))
+        localStorage.removeItem('input');
     }
 
     async function handlePaste(evt: any) {
