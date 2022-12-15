@@ -531,7 +531,6 @@ export function Stake(props: any): any {
                         gaEventTracker("Error: Approve staking");
                     })
             } catch (error) {
-                console.log(error)
                 setNotificationState({
                     message: "You rejected the transaction. Contract hasn't been approved for staking.", open: true,
                     severity: "info"
@@ -769,7 +768,7 @@ export function Stake(props: any): any {
                     className="tab-container"
                 >
                     <ToggleButton className="tab-btn" value="stake">Stake</ToggleButton>
-                    <ToggleButton className="tab-btn" value="unstake" disabled={!approved}>Unstake</ToggleButton>
+                    <ToggleButton className="tab-btn" value="unstake" >Unstake</ToggleButton>
 
                 </ToggleButtonGroup>
               
@@ -853,7 +852,7 @@ export function Stake(props: any): any {
                                 Your actual stake:
                             </Typography>
                             <Typography variant="h6" className="d-flex justify-content-center p-1 data-height">
-                                <strong>{userUnstakedAmount} DBX</strong>
+                                <strong>{userStakedAmount} DBX</strong>
                             </Typography>
                         </div>
                     </div>
