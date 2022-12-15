@@ -216,7 +216,8 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     mapping(address => uint256) public accSecondStake;
 
     /**
-     * Emmited when a client claimed native token fees.
+     * @dev Emitted when the client operating `account` claims an amount of `fees` 
+     * in native token through {claimClientFees} in `cycle`.
      */
     event ClientFeesClaimed(
         uint256 indexed cycle,
@@ -224,42 +225,72 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         uint256 fees
     );
 
+    /**
+     * @dev Emitted when `account` claims an amount of `fees` in native token
+     * through {claimFees} in `cycle`.
+     */
     event FeesClaimed(
         uint256 indexed cycle,
         address indexed account,
         uint256 fees
     );
 
+    /**
+     * @dev Emitted when `account` stakes `amount` DBX tokens through
+     * {stake} in `cycle`.
+     */
     event Staked(
         uint256 indexed cycle,
         address indexed account,
         uint256 amount
     );
 
+    /**
+     * @dev Emitted when `account` unstakes `amount` DBX tokens through
+     * {unstake} in `cycle`.
+     */
     event Unstaked(
         uint256 indexed cycle,
         address indexed account,
         uint256 amount
     );
 
+    /**
+     * @dev Emitted when client operating `account` claims `amount` DBX 
+     * token rewards through {claimRewards} in `cycle`.
+     */
     event ClientRewardsClaimed(
         uint256 indexed cycle,
         address indexed account,
         uint256 amount
     );
 
+    /**
+     * @dev Emitted when `account` claims `amount` DBX 
+     * token rewards through {claimRewards} in `cycle`.
+     */
     event RewardsClaimed(
         uint256 indexed cycle,
         address indexed account,
         uint256 reward
     );
 
+    /**
+     * @dev Emitted when calling {send} marking the new current `cycle`,
+     * `calculatedCycleReward` and `summedCycleStakes`.
+     */
     event NewCycleStarted(
         uint256 indexed cycle,
         uint256 calculatedCycleReward,
         uint256 summedCycleStakes
     );
 
+    /**
+     * @dev Emitted when calling {send} in the current `cycle`,
+     * containing the message details such as which `sentId` it has,
+     * who the `feeReceiver` is and what `msgFee` it set, respectively
+     * any additional `nativeTokenFee` that was paid.
+     */
     event SendEntryCreated(
         uint256 indexed cycle,
         uint256 indexed sentId,
@@ -268,6 +299,12 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         uint256 nativeTokenFee
     );
 
+    /**
+     * @dev Emitted when calling {send} containing the message 
+     * details such as `to` destination address, `from` sender
+     * address, `hash` of the content reference, `sentId`,
+     * `timestamp` and `content`.
+     */
     event Sent(
         address indexed to,
         address indexed from,
@@ -276,7 +313,10 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         uint256 timestamp,
         bytes32[] content
     );
-
+    
+    /**
+     * @dev Emitted when calling {setKey}, `to` being assigned this key `value`.
+     */
     event KeySet(
         address indexed to, 
         bytes32 indexed value
