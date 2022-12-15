@@ -28,8 +28,8 @@ import useAnalyticsEventTracker from '../Common/GaEventTracker';
 import { convertStringToBytes32} from '../../../src/ethereum/Converter.js';
 
 const { BigNumber } = require("ethers");
-const deb0xAddress = "0x3A274DD833726D9CfDb6cBc23534B2cF5e892347";
-const deb0xViewsAddress = "0x3a6B3Aff418C7E50eE9F852D0bc7119296cc3644";
+const deb0xAddress = "0xA06735da049041eb523Ccf0b8c3fB9D36216c646";
+const deb0xViewsAddress = "0xf6AbCBe192789D0c5322C64abaC3E4DC507E90E6";
 const ethUtil = require('ethereumjs-util')
 const { whitelist } = dataFromWhitelist;
 
@@ -92,11 +92,13 @@ export function Encrypt(replyAddress?: any): any {
     }, []);
 
     useEffect(() => {
-        (document.querySelector(".editor") as HTMLElement).click()
-        setTimeout(() => {
-            setTextToEncrypt("")
-        }, 100)
-    }, [])
+        if(replyAddress.props === undefined) {
+            setTimeout(() => {
+                (document.querySelector("#standard-basic") as HTMLElement).click();
+                setTextToEncrypt("")
+            }, 200)
+        }
+    }, [input])
 
     async function handleKeyDown(evt: any) {
         if (["Enter", "Tab", ","].includes(evt.key)) {
@@ -118,6 +120,7 @@ export function Encrypt(replyAddress?: any): any {
 
     function handleDelete(item: any) {
         setAddressList(addressList.filter(i => i !== item))
+        localStorage.removeItem('input');
     }
 
     async function handlePaste(evt: any) {

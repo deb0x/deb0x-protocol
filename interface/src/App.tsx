@@ -48,7 +48,7 @@ const client = create({
 })
 
 const ethUtil = require('ethereumjs-util');
-const deb0xAddress = "0x3A274DD833726D9CfDb6cBc23534B2cF5e892347";
+const deb0xAddress = "0xA06735da049041eb523Ccf0b8c3fB9D36216c646";
 
 
 enum ConnectorNames { Injected = 'Injected', Network = 'Network' };
@@ -274,8 +274,9 @@ function App() {
                                 
                                 <p>Connect your wallet & start using <img className="content-logo" src={logoGreen} /></p>
                                 {currentChainId === "0x89" ?
-                                    <p>Here's how to do this in 
+                                    <p>Here's how to do this in {'\u00A0'}
                                         <IconButton className='info show-popup' onClick={() => setShow(true)}>3 easy steps</IconButton>
+
                                     </p> : ""
                                 }
                                 {show ? 

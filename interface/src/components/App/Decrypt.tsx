@@ -31,7 +31,7 @@ import ReadedMessagesProvider from '../Contexts/ReadedMessagesProvider';
 import { Encrypt } from './Encrypt';
 import useAnalyticsEventTracker from '../Common/GaEventTracker';
 
-const deb0xAddress = "0x3A274DD833726D9CfDb6cBc23534B2cF5e892347";
+const deb0xAddress = "0xA06735da049041eb523Ccf0b8c3fB9D36216c646";
 
 export function Decrypt(props: any): any {
     const { account, library } = useWeb3React()
@@ -293,6 +293,7 @@ export function Decrypt(props: any): any {
             const deb0xContract = Deb0x(library, deb0xAddress)
             const senderAddresses = 
                 await fetchMessageSenders(account);
+                if(senderAddresses.length!=0){
             const cidsPromises = 
                 senderAddresses.map(async function(sender:any) {
                     return { 
@@ -352,7 +353,11 @@ export function Decrypt(props: any): any {
             setFetchedMessages(transactions)
             setSortedMessages(transactions)
             setLoading(false)
-
+        } else {
+            setFetchedMessages([])
+            setSortedMessages([])
+            setLoading(false)
+        }
         }
 
         if(!loading) {
