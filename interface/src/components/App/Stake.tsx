@@ -170,7 +170,7 @@ export function Stake(props: any): any {
                         <Typography >
                             Your unclaimed fees:
                         </Typography>
-                        <Typography variant="h6" className="mb-3 data-height">
+                        <Typography variant="h6" className="data-height">
                             <strong>{feesUnclaimed}</strong>
                         </Typography>
                     </div>
@@ -178,7 +178,7 @@ export function Stake(props: any): any {
                         <img src={trophyRewards} alt="trophyRewards" className="p-3"/>
                     </div>
                 </CardContent>
-                <CardActions className='button-container'>
+                <CardActions className='button-container px-3'>
                     <LoadingButton 
                         className="collect-btn"
                         disabled={feesUnclaimed=="0.0"}
@@ -386,13 +386,13 @@ export function Stake(props: any): any {
                         <Typography >
                             Your unclaimed rewards:
                         </Typography>
-                        <Typography variant="h6" className="mb-3 data-height">
+                        <Typography variant="h6" className="data-height">
                             <strong>{rewardsUnclaimed}</strong>
                         </Typography>
                         <Typography>
                             Your share from fees:
                         </Typography>
-                        <Typography variant="h6" className="mb-3 data-height">
+                        <Typography variant="h6" className="data-height">
                             <strong>{feeSharePercentage}</strong>
                         </Typography>
                     </div>
@@ -400,7 +400,7 @@ export function Stake(props: any): any {
                         <img src={trophyRewards} alt="trophyRewards" className="p-3"/>
                     </div>
                 </CardContent>
-                <CardActions className='button-container'>
+                <CardActions className='button-container px-3'>
                     <LoadingButton className="collect-btn" loading={loading} variant="contained" onClick={claimRewards}>Claim</LoadingButton>
                 </CardActions>
             </Card>
@@ -531,7 +531,6 @@ export function Stake(props: any): any {
                         gaEventTracker("Error: Approve staking");
                     })
             } catch (error) {
-                console.log(error)
                 setNotificationState({
                     message: "You rejected the transaction. Contract hasn't been approved for staking.", open: true,
                     severity: "info"
@@ -769,7 +768,7 @@ export function Stake(props: any): any {
                     className="tab-container"
                 >
                     <ToggleButton className="tab-btn" value="stake">Stake</ToggleButton>
-                    <ToggleButton className="tab-btn" value="unstake" disabled={!approved}>Unstake</ToggleButton>
+                    <ToggleButton className="tab-btn" value="unstake" >Unstake</ToggleButton>
 
                 </ToggleButtonGroup>
               
@@ -778,25 +777,25 @@ export function Stake(props: any): any {
                 
                 <>
                 <CardContent className="row">
-                    <div className="col-6 p-1">
+                    <div className="col-6 px-3">
                         <img className="display-element" src={theme === "classic" ? coinBagDark : coinBagLight} alt="coinbag" />
-                        <Typography className="d-flex justify-content-center p-1">
+                        <Typography className="p-0">
                             Your staked amount:
                         </Typography>
-                        <Typography variant="h6" className="d-flex justify-content-center p-1 data-height">
+                        <Typography variant="h6" className="p-0 data-height">
                             <strong>{userStakedAmount} DBX</strong>
                         </Typography>
                     </div>
-                    <div className="col-6 p-1">
+                    <div className="col-6 px-3">
                         <img className="display-element" src={theme === "classic" ? walletDark : walletLight} alt="coinbag" />
-                        <Typography className="d-flex justify-content-center p-1">
+                        <Typography className="p-0">
                             Your tokens in wallet:
                         </Typography>
-                        <Typography variant="h6" className="d-flex justify-content-center p-1" data-height>
+                        <Typography variant="h6" className="p-0" data-height>
                             <strong>{userUnstakedAmount} DBX</strong>
                         </Typography>
                     </div>
-                    {approved && <Grid className="amount-row" container spacing={2}>
+                    {approved && <Grid className="amount-row px-3" container>
                         <Grid item>
                             <OutlinedInput id="outlined-basic"
                                 placeholder="Amount to stake"
@@ -814,7 +813,7 @@ export function Stake(props: any): any {
                         </Grid>
                     </Grid>}
                 </CardContent>
-                <CardActions className='button-container'>
+                <CardActions className='button-container px-3'>
                     {approved && <LoadingButton disabled={!amountToStake} className="collect-btn" loading={loading} variant="contained" onClick={stake}>Stake</LoadingButton>}
                     {!approved &&
                         <>
@@ -822,11 +821,11 @@ export function Stake(props: any): any {
                                 className="collect-btn" 
                                 loading={loading}
                                 variant="contained"
-                                disabled={ userUnstakedAmount === '0.00' }
+                                disabled={ userUnstakedAmount === '0.00' ||  userUnstakedAmount === '0'}
                                 onClick={approveStaking}>
                                     Initialize Staking
                             </LoadingButton>
-                            <span>
+                            <span className="text">
                                 You first need to have tokens in your wallet before you can Initialize Staking.
                             </span>
                         </> 
@@ -836,30 +835,28 @@ export function Stake(props: any): any {
                 : 
 
                 <>
-                <CardContent>
-                    <div className="row">
-                        <div className="col-6 p-1">
-                            <img className="display-element" src={theme === "classic" ? coinBagDark : coinBagLight} alt="coinbag" />
-                            <Typography className="d-flex justify-content-center p-1">
-                                Available to unstake:
-                            </Typography>
-                            <Typography variant="h6" className="d-flex justify-content-center p-1">
-                                <strong>{tokensForUnstake} DBX</strong>
-                            </Typography>
-                        </div>
-                        <div className="col-6 p-1">
-                            <img className="display-element" src={theme === "classic" ? walletDark : walletLight} alt="coinbag" />
-                            <Typography className="d-flex justify-content-center p-1">
-                                Your actual stake:
-                            </Typography>
-                            <Typography variant="h6" className="d-flex justify-content-center p-1 data-height">
-                                <strong>{userUnstakedAmount} DBX</strong>
-                            </Typography>
-                        </div>
+                <CardContent className="row">
+                    <div className="col-6 px-3">
+                        <img className="display-element" src={theme === "classic" ? coinBagDark : coinBagLight} alt="coinbag" />
+                        <Typography className="p-0">
+                            Available to unstake:
+                        </Typography>
+                        <Typography variant="h6" className="p-0">
+                            <strong>{tokensForUnstake} DBX</strong>
+                        </Typography>
+                    </div>
+                    <div className="col-6 px-3">
+                        <img className="display-element" src={theme === "classic" ? walletDark : walletLight} alt="coinbag" />
+                        <Typography className="p-0">
+                            Your actual stake:
+                        </Typography>
+                        <Typography variant="h6" className="p-0 data-height">
+                            <strong>{userStakedAmount} DBX</strong>
+                        </Typography>
                     </div>
                   
 
-                    <Grid className="amount-row" container spacing={2}>
+                    <Grid className="amount-row px-3" container>
                         <Grid item>
                             <OutlinedInput value={amountToUnstake}
                                 id="outlined-basic"
@@ -878,7 +875,7 @@ export function Stake(props: any): any {
                         </Grid>
                     </Grid>
                 </CardContent>
-                <CardActions className='button-container'>
+                <CardActions className='button-container px-3'>
                     <LoadingButton className="collect-btn" disabled={!amountToUnstake} loading={loading} variant="contained" onClick={unstake}>Unstake</LoadingButton>
                 </CardActions>
                 </>

@@ -33,7 +33,7 @@
                     background-color: t('card-color');
                     color: t('text');
                     border-radius: 25px;
-                    margin: 2vh;
+                    margin: 2vh 0;
                     position: relative;
                     overflow: unset;
                     .data-height{
@@ -60,7 +60,8 @@
                         }
                     }
                     .button-container {
-                        span {
+                        margin-bottom: 2vh;
+                        span.text {
                             padding-left: 1vh;
                         }
                     }
@@ -74,10 +75,14 @@
                     box-shadow: none;
                 }
                 .max-btn {
-                    padding: 5px 20px;
-                    background-color: #8dbf96;
+                    padding: 2px 20px;
+                    border: 2px solid #91C499;
+                    background-color: t('card-color');
+                    color: t('text');
                     font-size: 1.5vh;
                     border-radius: 25px;
+                    margin-left: 10px;
+                    box-shadow: none;
                 }
                 .max-field {
                     border-radius: 25px;
@@ -119,7 +124,8 @@
                 }
                 .amount-row {
                     align-items: center;
-                    margin: 5px 0 30px 0;
+                    margin: 5px 0 15px 0;
+                    padding: 0;
                     fieldset {
                         border-color: t('text');
                         border-radius: 50px;
@@ -137,8 +143,8 @@
                 }
                 .display-element {
                     display: block;
-                    margin: 0 auto;
                     padding-bottom: 10px;
+                    margin-left: 1px;
                 }
                 .rewards {
                     color: #D64933;
