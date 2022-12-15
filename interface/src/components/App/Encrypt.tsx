@@ -73,17 +73,23 @@ export function Encrypt(replyAddress?: any): any {
     }, []);
 
     useEffect(() => {
-        if(input !== null && input.match(/^0x[a-fA-F0-9]{40}$/g))
-            addressList.push(input);
+        if(input !== null && input.match(/^0x[a-fA-F0-9]{40}$/g)) {
+            isValid(input).then((result: any) => {
+                if(result)
+                    addressList.push(input);
+                else
+                localStorage.removeItem('input');
+            })
+        }
     }, [input]);
 
     useEffect(() => setInput(JSON.parse(localStorage.getItem('input') || 'null')));
 
-    // useEffect(() => {
-    //     if (!encryptionKeyInitialized) {
-    //         getPublicEncryptionKey()
-    //     }
-    // }, []);
+    useEffect(() => {
+        if (!encryptionKeyInitialized) {
+            getPublicEncryptionKey()
+        }
+    }, []);
 
     useEffect(() => {
         (document.querySelector(".editor") as HTMLElement).click()
