@@ -20,8 +20,8 @@ export default function ContactsSetter(props: any) {
     var found: any;
 
     const addContact = () => {  
-        const addressValue = addressInput.current.value
-        found = contacts.some(e => e.address.toLowerCase() === addressValue.toLowerCase())
+        const addressValue = addressInput.current.value.toLowerCase()
+        found = contacts.some(e => e.address.toLowerCase() === addressValue)
         if (!found) {
             if (!isAddress(addressValue)) {
                 setNotificationState({
