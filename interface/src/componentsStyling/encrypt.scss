@@ -75,12 +75,12 @@
                     border-radius: 13px;
                 }
                 .wrapper {
-                    border: 1px solid t('text-field-color');
                     background-color: t('text-field-color');
                     border-radius: 25px 25px 0 0px;
-                    margin-bottom: 50px;
+                    margin-bottom: 4vh;
                     position: relative;
                     flex: 1 1 auto;
+                    max-height: 50vh;
                 
                     .rdw-editor-toolbar {
                         border-radius: 0 0 25px 25px;
@@ -116,8 +116,8 @@
                     }
                 }
                 .editor {
-                    // height: 40vh;
                     padding: 15px;
+                    overflow-y: auto;
                     .public-DraftEditor-content > div  {
                         padding-bottom: 50px;
                     }
