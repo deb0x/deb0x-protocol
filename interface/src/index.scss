@@ -135,7 +135,7 @@ $randomNumber: random(4);
             height: 100%;
             overflow: hidden;
             .img-container {
-                align-items: center;
+                text-align: center;
                 height: 100%;
                 position: relative;
                 .image--left {
@@ -176,13 +176,10 @@ $randomNumber: random(4);
                         border: 1px solid #F5B700;
                         border-radius: 33px;
                         box-shadow: none;
-                        left: 50%;
-                        transform: translateX(-50%);
                         margin-top: 50px;
                         padding: 10px 25px;
                         width: 235px;
                         height: 50px;
-                        right: 25px;
                     }
                 }
             }
