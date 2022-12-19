@@ -57,8 +57,8 @@ $randomNumber: random(4);
         .main-container {
             margin-top: 0;
             display: flex;
-            height: 90%;
-            min-height: 85%;
+            height: 80vh;
+            overflow-y: auto;
             .floating-btn {
                 position: fixed;
                 bottom: 75px;
