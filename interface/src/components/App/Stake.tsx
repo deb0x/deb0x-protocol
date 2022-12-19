@@ -27,7 +27,7 @@ import useAnalyticsEventTracker from '../Common/GaEventTracker';
 
 const { whitelist } = dataFromWhitelist;
 const deb0xAddress = "0xA06735da049041eb523Ccf0b8c3fB9D36216c646";
-const deb0xViewsAddress = "0xf6AbCBe192789D0c5322C64abaC3E4DC507E90E6";
+const deb0xViewsAddress = "0x51CcBf6DA6c14b6A31Bc0FcA07056151fA003aBC";
 const deb0xERC20Address = "0x22c3f74d4AA7c7e11A7637d589026aa85c7AF88a";
 
 export function Stake(props: any): any {
@@ -245,15 +245,8 @@ export function Stake(props: any): any {
             const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress);
 
             const unclaimedRewards = await deb0xViewsContract.getUnclaimedRewards(account);
-            const signer = await library.getSigner(0)
-            const deb0xContract = Deb0x(signer, deb0xAddress)
-
-            const accRewards = await deb0xContract.accRewards(account)
-            const accWithdrawableStake = await deb0xContract.accWithdrawableStake(account)
-
-            accRewards - accWithdrawableStake <= 0 ?
-                setRewardsUnclaimed("0.00") :
-                setRewardsUnclaimed(ethers.utils.formatEther(unclaimedRewards))
+         
+            setRewardsUnclaimed(ethers.utils.formatEther(unclaimedRewards))
         }
 
         async function feeShare() {
