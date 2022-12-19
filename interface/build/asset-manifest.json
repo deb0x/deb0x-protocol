@@ -1,19 +1,19 @@
 {
   "files": {
-    "main.css": "/static/css/main.4992622f.chunk.css",
-    "main.js": "/static/js/main.a3986177.chunk.js",
-    "main.js.map": "/static/js/main.a3986177.chunk.js.map",
-    "runtime-main.js": "/static/js/runtime-main.47a64e62.js",
-    "runtime-main.js.map": "/static/js/runtime-main.47a64e62.js.map",
-    "static/css/2.c0cb1d7d.chunk.css": "/static/css/2.c0cb1d7d.chunk.css",
-    "static/js/2.1465cfa8.chunk.js": "/static/js/2.1465cfa8.chunk.js",
-    "static/js/2.1465cfa8.chunk.js.map": "/static/js/2.1465cfa8.chunk.js.map",
-    "static/js/3.697af65f.chunk.js": "/static/js/3.697af65f.chunk.js",
-    "static/js/3.697af65f.chunk.js.map": "/static/js/3.697af65f.chunk.js.map",
+    "main.css": "/static/css/main.28411e27.chunk.css",
+    "main.js": "/static/js/main.61a3e765.chunk.js",
+    "main.js.map": "/static/js/main.61a3e765.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.963dbe43.js",
+    "runtime-main.js.map": "/static/js/runtime-main.963dbe43.js.map",
+    "static/css/2.8a34a99b.chunk.css": "/static/css/2.8a34a99b.chunk.css",
+    "static/js/2.43f5437f.chunk.js": "/static/js/2.43f5437f.chunk.js",
+    "static/js/2.43f5437f.chunk.js.map": "/static/js/2.43f5437f.chunk.js.map",
+    "static/js/3.d2d93dd4.chunk.js": "/static/js/3.d2d93dd4.chunk.js",
+    "static/js/3.d2d93dd4.chunk.js.map": "/static/js/3.d2d93dd4.chunk.js.map",
     "index.html": "/index.html",
-    "static/css/2.c0cb1d7d.chunk.css.map": "/static/css/2.c0cb1d7d.chunk.css.map",
-    "static/css/main.4992622f.chunk.css.map": "/static/css/main.4992622f.chunk.css.map",
-    "static/js/2.1465cfa8.chunk.js.LICENSE.txt": "/static/js/2.1465cfa8.chunk.js.LICENSE.txt",
+    "static/css/2.8a34a99b.chunk.css.map": "/static/css/2.8a34a99b.chunk.css.map",
+    "static/css/main.28411e27.chunk.css.map": "/static/css/main.28411e27.chunk.css.map",
+    "static/js/2.43f5437f.chunk.js.LICENSE.txt": "/static/js/2.43f5437f.chunk.js.LICENSE.txt",
     "static/media/index.scss": "/static/media/no-message.21b3bbea.svg",
     "static/media/airplane-black.svg": "/static/media/airplane-black.e8545508.svg",
     "static/media/animal-1.svg": "/static/media/animal-1.ce0a7c89.svg",
@@ -96,10 +96,10 @@
     "static/media/wallet.0d69376a.svg": "/static/media/wallet.0d69376a.svg"
   },
   "entrypoints": [
-    "static/js/runtime-main.47a64e62.js",
-    "static/css/2.c0cb1d7d.chunk.css",
-    "static/js/2.1465cfa8.chunk.js",
-    "static/css/main.4992622f.chunk.css",
-    "static/js/main.a3986177.chunk.js"
+    "static/js/runtime-main.963dbe43.js",
+    "static/css/2.8a34a99b.chunk.css",
+    "static/js/2.43f5437f.chunk.js",
+    "static/css/main.28411e27.chunk.css",
+    "static/js/main.61a3e765.chunk.js"
   ]
 }
