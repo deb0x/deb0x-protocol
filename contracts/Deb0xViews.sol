@@ -181,7 +181,7 @@ contract Deb0xViews {
         view
         returns (uint256)
     {
-        uint256 currentRewards = deb0x.accRewards(account);
+        uint256 currentRewards = deb0x.accRewards(account) -  deb0x.accWithdrawableStake(account);
         uint256 calculatedCycle = deb0x.getCurrentCycle();
 
        if (
