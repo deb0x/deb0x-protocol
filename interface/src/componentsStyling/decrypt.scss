@@ -276,7 +276,9 @@
                 }
 
                 .form-container {
-                    padding: 0 15px 50px;
+                    .wrapper {
+                        border-radius: 25px;
+                    }
                 }
             }
         }

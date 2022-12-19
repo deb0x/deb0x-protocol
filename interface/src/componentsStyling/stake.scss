@@ -2,7 +2,7 @@
 
 .app-container {
     @include themed() {
-        .content-box{
+        .content-box {
             min-height: 65vh;
             background: t('stake-bg');
             box-shadow: t('box-shadow');
@@ -150,6 +150,16 @@
                     color: #D64933;
                     font-size: 4vh;
                 }
+            }
+        }
+    }
+}
+
+.app-container {
+    @include themed() {
+        .main-container {
+            .content-box {
+                overflow-y: auto!important;
             }
         }
     }

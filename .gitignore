@@ -111,3 +111,5 @@ dist
 cache/
 build/
 !interface/build/
+
+.secrets.json
