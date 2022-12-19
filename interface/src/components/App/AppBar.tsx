@@ -25,7 +25,7 @@ import { disconnect } from 'process';
 
 
 const deb0xAddress = "0xA06735da049041eb523Ccf0b8c3fB9D36216c646";
-const deb0xViewsAddress = "0xf6AbCBe192789D0c5322C64abaC3E4DC507E90E6";
+const deb0xViewsAddress = "0x51CcBf6DA6c14b6A31Bc0FcA07056151fA003aBC";
 const deb0xERC20Address = "0x22c3f74d4AA7c7e11A7637d589026aa85c7AF88a"
 const tokenSymbol = 'DBX';
 

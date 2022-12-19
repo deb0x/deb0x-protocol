@@ -6,7 +6,7 @@ const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.jso
 const { NumUtils } = require("../utils/NumUtils.ts");
 
 let DEBOX_ADDRESS = "0xA06735da049041eb523Ccf0b8c3fB9D36216c646";
-let DEBOXVIEW_ADDRESS = "0xf6AbCBe192789D0c5322C64abaC3E4DC507E90E6";
+let DEBOXVIEW_ADDRESS = "0x51CcBf6DA6c14b6A31Bc0FcA07056151fA003aBC";
 let DBX_ADDRESS = "0x22c3f74d4AA7c7e11A7637d589026aa85c7AF88a"
 let addresses = [
     "0x00611057ee8eff397c5007370cff5537ebf36eb3",
