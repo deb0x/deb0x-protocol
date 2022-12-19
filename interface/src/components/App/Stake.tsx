@@ -245,8 +245,15 @@ export function Stake(props: any): any {
             const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress);
 
             const unclaimedRewards = await deb0xViewsContract.getUnclaimedRewards(account);
+            const signer = await library.getSigner(0)
+            const deb0xContract = Deb0x(signer, deb0xAddress)
 
-            setRewardsUnclaimed(ethers.utils.formatEther(unclaimedRewards))
+            const accRewards = await deb0xContract.accRewards(account)
+            const accWithdrawableStake = await deb0xContract.accWithdrawableStake(account)
+
+            accRewards - accWithdrawableStake <= 0 ?
+                setRewardsUnclaimed("0.00") :
+                setRewardsUnclaimed(ethers.utils.formatEther(unclaimedRewards))
         }
 
         async function feeShare() {
