@@ -19,7 +19,7 @@ import draftToHtml from 'draftjs-to-html';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { Editor } from 'react-draft-wysiwyg';
 import airplaneBlack from '../../photos/icons/airplane-black.svg';
-import {getKey} from "../../ethereum/EventLogs.js";
+import {getKeyMoralis} from "../../ethereum/EventLogsMoralis";
 import { signMetaTxRequest } from '../../ethereum/signer';
 import { createInstance } from '../../ethereum/forwarder'
 import dataFromWhitelist from '../../constants.json';
@@ -159,7 +159,7 @@ export function Encrypt(replyAddress?: any): any {
 
     async function isInitialized(address: any) {
         const deb0xViewsContract = deb0xViews(library, deb0xViewsAddress);
-        return await getKey(address);
+        return await getKeyMoralis(address);
     }
 
     function isInList(address: any) {
@@ -266,7 +266,7 @@ export function Encrypt(replyAddress?: any): any {
         const deb0xContract = Deb0x(signer, deb0xAddress);
 
         for (let address of recipients) {
-            const destinationAddressEncryptionKey = await getKey(address);
+            const destinationAddressEncryptionKey = await getKeyMoralis(address);
             const encryptedMessage = ethUtil.bufferToHex(
                 Buffer.from(
                     JSON.stringify(
@@ -337,7 +337,7 @@ export function Encrypt(replyAddress?: any): any {
 
     const getPublicEncryptionKey = async () => {
         const deb0xContract = Deb0x(library, deb0xAddress)
-        const key = await getKey(account)
+        const key = await getKeyMoralis(account)
         setEncryptionKeyInitialized(key || '')
     }
     const [editorState, setEditorState] = useState(() => 
