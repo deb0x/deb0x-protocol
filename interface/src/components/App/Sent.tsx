@@ -16,7 +16,8 @@ import formatAccountName from '../Common/AccountName';
 import cloud1 from '../../photos/icons/clouds/cloud-1.svg';
 import cloud2 from '../../photos/icons/clouds/cloud-2.svg';
 import cloud3 from '../../photos/icons/clouds/cloud-3.svg';
-import {fetchSentMessages,getKey} from '../../ethereum/EventLogs.js';;
+import {fetchSentMessagesMoralis,getKeyMoralis} from '../../ethereum/EventLogsMoralis.js';;
+
 const axios = require('axios')
 const deb0xAddress = "0xA06735da049041eb523Ccf0b8c3fB9D36216c646";
 
@@ -33,7 +34,7 @@ export function Sent(props: any): any {
 
     const getPublicEncryptionKey = async () => {
         const deb0xContract = Deb0x(library, deb0xAddress)
-        const key = await getKey(account)
+        const key = await getKeyMoralis(account)
         const initialized = (key != '') ? true : false
         setEncryptionKeyInitialized(initialized)
     }
@@ -265,7 +266,7 @@ export function Sent(props: any): any {
 
         async function processMessages() {
             const deb0xContract = Deb0x(library, deb0xAddress)
-            const sentMessages = await fetchSentMessages(account)
+            const sentMessages = await fetchSentMessagesMoralis(account)
             const sentMessagesRetrieved = sentMessages.map(async function (item: any) {
                 let intermediateValueForContentData = item[1];
                 let intermediateValueForRecipients = item[0];
