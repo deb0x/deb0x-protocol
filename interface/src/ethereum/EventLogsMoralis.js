@@ -261,6 +261,7 @@ export async function fetchSentMessagesMoralis(from) {
             mapForEnvelope.set(dataAboutEvent[0], { "timestamp": dataAboutEvent[1], "content": contentValue })
         } else {
             mapForRecipients.set(dataAboutEvent[0], ['0x' + onlySentEvents[i].topic1.slice(26)])
+            mapForEnvelope.set(dataAboutEvent[0], { "timestamp": dataAboutEvent[1], "content": contentValue })
         }
         argumentsArray = [];
         contentValue = '';
