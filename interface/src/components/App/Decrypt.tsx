@@ -2,7 +2,7 @@ import { useState, useEffect, useContext, createContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Deb0x from "../../ethereum/deb0x"
 import { ethers } from "ethers";
-import {fetchMessageSenders, fetchMessages, getKey} from '../../ethereum/EventLogs.js';
+import { getKeyMoralis,fetchMessageSendersMoralis, fetchMessagesMoralis} from '../../ethereum/EventLogsMoralis.js';
 import {
     Tooltip, List, ListItem, ListItemText, ListItemButton, Typography, Box, 
     CircularProgress,
@@ -49,7 +49,7 @@ export function Decrypt(props: any): any {
     }, [account]);
 
     const getPublicEncryptionKey = async () => {      
-        const key = await getKey(account);
+        const key = await getKeyMoralis(account);
         const initialized = (key != '') ? true : false
         setEncryptionKeyInitialized(initialized);
         props.checkIfInit(initialized)
@@ -292,12 +292,12 @@ export function Decrypt(props: any): any {
         async function processMessages() {
             const deb0xContract = Deb0x(library, deb0xAddress)
             const senderAddresses = 
-                await fetchMessageSenders(account);
+                await fetchMessageSendersMoralis(account);
                 if(senderAddresses.length!=0){
             const cidsPromises = 
                 senderAddresses.map(async function(sender:any) {
                     return { 
-                        cids: await fetchMessages(account,sender),
+                        cids: await fetchMessagesMoralis(account,sender),
                         sender: sender
                     }
                 })
