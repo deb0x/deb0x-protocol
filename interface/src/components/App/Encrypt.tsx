@@ -29,7 +29,7 @@ import { convertStringToBytes32} from '../../../src/ethereum/Converter.js';
 
 const { BigNumber } = require("ethers");
 const deb0xAddress = "0xA06735da049041eb523Ccf0b8c3fB9D36216c646";
-const deb0xViewsAddress = "0xf6AbCBe192789D0c5322C64abaC3E4DC507E90E6";
+const deb0xViewsAddress = "0x51CcBf6DA6c14b6A31Bc0FcA07056151fA003aBC";
 const ethUtil = require('ethereumjs-util')
 const { whitelist } = dataFromWhitelist;
 
