@@ -5,6 +5,7 @@ const Web3 = require('web3');
 const web3 = new Web3();
 const deb0xAddress = "0xA06735da049041eb523Ccf0b8c3fB9D36216c646";
 let { convertBytes32ToString } = require('./Converter.js')
+let moralisKey = process.env.REACT_APP_MORALIS_KEY;
 
 async function setKeyEvent(secondaryTopic) {
 
@@ -23,7 +24,7 @@ async function setKeyEvent(secondaryTopic) {
         headers: {
             accept: 'application/json',
             'content-type': 'application/json',
-            'X-API-Key': '5QcYsvCGVDVUdkugsq85agwYqYOyo5i2QUGrNQrZszo28SkF65xqDBfVaiVrpQhb'
+            'X-API-Key': moralisKey
         },
         data: data.abi
     };
@@ -43,16 +44,16 @@ async function getAllEventsWithSecondaryTopic(secondaryTopic) {
             chain: 'polygon',
             from_block: '36051352',
             topic0: data.topic,
-            topic1: secondaryTopic
+            topic1: secondaryTopic,
+            limit: 500
         },
         headers: {
             accept: 'application/json',
             'content-type': 'application/json',
-            'X-API-Key': '5QcYsvCGVDVUdkugsq85agwYqYOyo5i2QUGrNQrZszo28SkF65xqDBfVaiVrpQhb'
+            'X-API-Key': moralisKey
         },
         data: data.abi
     };
-
     let requestValue = await axios.request(options)
 
     return requestValue.data.result;
@@ -76,11 +77,10 @@ async function fetchMessagesWithSecondaryAndThirdTopic(secondaryTopic, thirdTopi
         headers: {
             accept: 'application/json',
             'content-type': 'application/json',
-            'X-API-Key': '5QcYsvCGVDVUdkugsq85agwYqYOyo5i2QUGrNQrZszo28SkF65xqDBfVaiVrpQhb'
+            'X-API-Key': moralisKey
         },
         data: data.abi
     };
-
     let requestValue = await axios.request(options)
     return requestValue.data.result;
 }
@@ -101,11 +101,10 @@ async function getSentMessageEvents(thirdTopic) {
         headers: {
             accept: 'application/json',
             'content-type': 'application/json',
-            'X-API-Key': '5QcYsvCGVDVUdkugsq85agwYqYOyo5i2QUGrNQrZszo28SkF65xqDBfVaiVrpQhb'
+            'X-API-Key': moralisKey
         },
         data: data.abi
     };
-
     let requestValue = await axios.request(options)
     return requestValue.data;
 }
