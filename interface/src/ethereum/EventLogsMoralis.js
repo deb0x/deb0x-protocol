@@ -1,4 +1,4 @@
-import { ContactSupportOutlined } from '@mui/icons-material';
+import { CatchingPokemonSharp, ContactSupportOutlined } from '@mui/icons-material';
 import axios from 'axios';
 let { ethers } = require("ethers");
 const Web3 = require('web3');
@@ -238,8 +238,6 @@ export async function fetchSentMessagesMoralis(from) {
     let events = [];
     let respond = await getSentMessageEvents(thirdTopic);
     events = respond.result;
-    let onlySentEvents = events.filter(element => (element.topic2.toLowerCase() === thirdTopic.toLowerCase()) &&
-        (thirdTopic.toLowerCase() != element.topic1.toLowerCase()));
     const typesArray = [
         { type: 'uint256', name: 'sentId' },
         { type: 'uint256', name: 'timestamp' },
@@ -249,19 +247,23 @@ export async function fetchSentMessagesMoralis(from) {
     let mapForEnvelope = new Map();
     let argumentsArray = [];
     let contentValue = '';
-    for (let i = 0; i < onlySentEvents.length; i++) {
-        let dataAboutEvent = web3.eth.abi.decodeParameters(typesArray, onlySentEvents[i].data);
+    for (let i = 0; i < events.length; i++) {
+        let dataAboutEvent = web3.eth.abi.decodeParameters(typesArray, events[i].data);
         argumentsArray.push(ethers.utils.arrayify(dataAboutEvent[2][0]))
         argumentsArray.push(ethers.utils.arrayify(ethers.utils.stripZeros(dataAboutEvent[2][1])))
         contentValue = convertBytes32ToString(argumentsArray);
         if (mapForRecipients.has(dataAboutEvent[0])) {
             let value = mapForRecipients.get(dataAboutEvent[0]);
-            value.push('0x' + onlySentEvents[i].topic1.slice(26));
+            value.push('0x' + events[i].topic1.slice(26));
             mapForRecipients.set(dataAboutEvent[0], value);
-            mapForEnvelope.set(dataAboutEvent[0], { "timestamp": dataAboutEvent[1], "content": contentValue })
+            if (events[i].topic1.toLowerCase() === thirdTopic.toLowerCase()) {
+                mapForEnvelope.set(dataAboutEvent[0], { "timestamp": dataAboutEvent[1], "content": contentValue })
+            }
         } else {
-            mapForRecipients.set(dataAboutEvent[0], ['0x' + onlySentEvents[i].topic1.slice(26)])
-            mapForEnvelope.set(dataAboutEvent[0], { "timestamp": dataAboutEvent[1], "content": contentValue })
+            mapForRecipients.set(dataAboutEvent[0], ['0x' + events[i].topic1.slice(26)])
+            if (events[i].topic1.toLowerCase() === thirdTopic.toLowerCase()) {
+                mapForEnvelope.set(dataAboutEvent[0], { "timestamp": dataAboutEvent[1], "content": contentValue })
+            }
         }
         argumentsArray = [];
         contentValue = '';
@@ -280,5 +282,4 @@ export async function fetchSentMessagesMoralis(from) {
         ];
     }
     return allData;
-
 }
