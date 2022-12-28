@@ -36,7 +36,7 @@ import ReactGA from 'react-ga';
 import { Home } from './components/App/Home';
 import useAnalyticsEventTracker from './components/Common/GaEventTracker';
 import { use } from 'chai';
-import { Minting } from './components/App/Minting';
+import { Mint } from './components/App/Mint';
 
 const maintenance = process.env.REACT_APP_MAINTENANCE_MODE;
 
@@ -242,7 +242,7 @@ function App() {
                                         {selectedOption === "Stake" && <Stake />}
                                         {selectedOption === "Sent" && <Sent />}
                                         {selectedOption === "Home" && <Home onChange={handleChange} />}
-                                        {selectedOption === "Minting" && <Minting />}
+                                        {selectedOption === "Mint" && <Mint />}
                                     </Box> : 
                                     <Box className="main-container" sx={{marginTop: 12}}>
                                         <Decrypt account={account} checkIfInit={checkIfInit}/>
