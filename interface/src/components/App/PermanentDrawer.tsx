@@ -56,7 +56,7 @@ export function PermanentDrawer(props: any): any {
     const [ensName, setEnsName] = useState<any>("");
     // const [balance, setBalance] = useState<any>("8.13");
     const [userUnstakedAmount,setUserUnstakedAmount] = useState<any>(0);
-    const menuItems = ['Compose', 'Deb0x', 'Stake', 'Sent', 'Minting'];
+    const menuItems = ['Compose', 'Deb0x', 'Stake', 'Sent', 'Mint'];
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popper' : undefined;

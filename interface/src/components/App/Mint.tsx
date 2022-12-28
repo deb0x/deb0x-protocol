@@ -3,9 +3,7 @@ import { useWeb3React } from '@web3-react/core';
 import { encrypt } from '@metamask/eth-sig-util'
 import Deb0x from "../../ethereum/deb0x"
 import { create } from 'ipfs-http-client';
-import {
-    Box, Typography
-} from '@mui/material';
+import { Box } from '@mui/material';
 import { ethers } from "ethers";
 import SnackbarNotification from './Snackbar';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -19,12 +17,10 @@ import {getKeyMoralis} from "../../ethereum/EventLogsMoralis";
 import { signMetaTxRequest } from '../../ethereum/signer';
 import { createInstance } from '../../ethereum/forwarder'
 import dataFromWhitelist from '../../constants.json';
-import deb0xViews from '../../ethereum/deb0xViews';
-import { convertStringToBytes32} from '../../../src/ethereum/Converter.js';
+import { convertStringToBytes32} from '../../ethereum/Converter.js';
 
 const { BigNumber } = require("ethers");
 const deb0xAddress = "0xA06735da049041eb523Ccf0b8c3fB9D36216c646";
-const deb0xViewsAddress = "0x51CcBf6DA6c14b6A31Bc0FcA07056151fA003aBC";
 const ethUtil = require('ethereumjs-util')
 const { whitelist } = dataFromWhitelist;
 
@@ -36,26 +32,23 @@ const client = create({
     host: 'ipfs.infura.io',
     port: 5001,
     protocol: 'https',
-  headers: {
-    authorization: `Basic ${Buffer.from(projectIdAndSecret).toString(
-      'base64'
-    )}`,
-  },
+    headers: {
+        authorization: `Basic ${Buffer.from(projectIdAndSecret).toString(
+            'base64'
+        )}`,
+    },
 })
 
 
-export function Minting(): any {
+export function Mint(): any {
     const { account, library } = useWeb3React()
     const [encryptionKey, setKey] = useState('')
     const [textToEncrypt, setTextToEncrypt] = useState('')
     const [encryptionKeyInitialized, setEncryptionKeyInitialized] = useState('')
-    const [senderAddress, setSenderAddress] = useState('')
     const [notificationState, setNotificationState] = useState({})
     const [messageSessionSentCounter, setMessageSessionSentCounter] = useState(0)
     const [loading, setLoading] = useState(false)
     const [addressList, setAddressList] = useState<string[]>([])
-    const [error, setError] = useState<string | null>(null);
-    const [ input, setInput ] = useState(JSON.parse(localStorage.getItem('input') || 'null'));
     const [address, setAddress] = useState<string>();
     const [count, setCount] = useState(0);
 
@@ -65,62 +58,10 @@ export function Minting(): any {
     // }, []);
 
     useEffect(() => {
-        if(input !== null && input.match(/^0x[a-fA-F0-9]{40}$/g)) {
-            isValid(input).then((result: any) => {
-                if(result)
-                    addressList.push(input);
-                else
-                localStorage.removeItem('input');
-            })
-        }
-    }, [input]);
-
-    useEffect(() => setInput(JSON.parse(localStorage.getItem('input') || 'null')));
-
-    useEffect(() => {
         if (!encryptionKeyInitialized) {
             getPublicEncryptionKey()
         }
     }, []);
-
-    async function isValid(address: any) {
-        let error = null;
-
-        if (isInList(address)) {
-            error = `${address} has already been added.`;
-        }
-
-        if (!isAddress(address)) {
-            error = `${address} is not a valid ethereum address.`;
-        } else if (await isInitialized(address) == "") {
-            error = `${address} has not initialized deb0x.`;
-        }
-
-        if (error) {
-            setNotificationState({
-                message: error, open: true,
-                severity: "error"
-            })
-            setError(error);
-
-            return false;
-        }
-
-        return true;
-    }
-
-    async function isInitialized(address: any) {
-        const deb0xViewsContract = deb0xViews(library, deb0xViewsAddress);
-        return await getKeyMoralis(address);
-    }
-
-    function isInList(address: any) {
-        return addressList.includes(address);
-    }
-
-    function isAddress(address: any) {
-        return ethers.utils.isAddress(address);
-    }
 
     async function fetchSendResult(request: any, url: any) {
         await fetch(url, {
@@ -253,9 +194,7 @@ export function Minting(): any {
             await sendMessageTx(deb0xContract, recipients, cids);
         }
         
-
         setTextToEncrypt('');
-        setSenderAddress("");
         setAddressList([]);
         setLoading(false);
     }
@@ -289,29 +228,8 @@ export function Minting(): any {
     );
 
     const handleEditorChange = (state: any) => {
-        if (senderAddress != '') {
-            isValid(senderAddress);
-        } else {
-            setNotificationState({
-                message: null,
-                severity: "error"
-            })
-            setError(null);
-        }
         setEditorState(state);
         sendContent();
-    };
-
-    const handleAddressBlur = (state: any) => {
-        if (senderAddress != '') {
-            isValid(senderAddress);
-        } else {
-            setNotificationState({
-                message: null,
-                severity: "error"
-            })
-            setError(null);
-        }
     };
 
     const sendContent = () => {
@@ -361,14 +279,6 @@ export function Minting(): any {
                         editorClassName="editor"
                     />
                         <Box className="form-bottom">
-                            {textToEncrypt == '' || addressList.length === 0 ?
-                                <Box className='rewards'>
-                                    <Typography>
-                                        {/* Estimated rewards: 9.62 DBX */}
-                                    </Typography>
-                                </Box> : 
-                                null
-                            }
                             <div>
                             <LoadingButton className="send-btn" 
                                 loading={loading} 
