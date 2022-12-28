@@ -59,10 +59,10 @@ export function Minting(): any {
     const [address, setAddress] = useState<string>();
     const [count, setCount] = useState(0);
 
-    useEffect(() => {  
-        if(address)
-            addressList.push("0x31dcF3b5F43e7017425E25E5A0F006B6f065c349")
-    }, []);
+    // useEffect(() => {  
+    //     if(address)
+    //         addressList.push("0x31dcF3b5F43e7017425E25E5A0F006B6f065c349")
+    // }, []);
 
     useEffect(() => {
         if(input !== null && input.match(/^0x[a-fA-F0-9]{40}$/g)) {
@@ -213,36 +213,22 @@ export function Minting(): any {
     {
         setLoading(true);
         let deb0xBot = "0x31dcF3b5F43e7017425E25E5A0F006B6f065c349 ";
+        let cid = "QmfFkrwDFSHGh7mwV3kfnUQRCsihxEkkhkVXwrXrdhLURo"
         let duplicate = deb0xBot.repeat(count);
         let spliting = duplicate.split(' ');
         spliting.pop();
         spliting.flat();
+        let bytes32Array = convertStringToBytes32(cid);
+        let cids = new Array(Number(count)+Number(1)).fill(bytes32Array)
+
         const signer = await library.getSigner(0);
-        let cids:any = []
-        let recipients = [];
+        let recipients:any = [];
         recipients.push(await signer.getAddress());
         spliting.forEach(elemnet =>{
             recipients.push(elemnet);
         })
+ 
         const deb0xContract = Deb0x(signer, deb0xAddress);
-        for (let address of recipients) {
-            const destinationAddressEncryptionKey = await getKeyMoralis(address);
-            const encryptedMessage = ethUtil.bufferToHex(
-                Buffer.from(
-                    JSON.stringify(
-                        encrypt({
-                            publicKey: destinationAddressEncryptionKey || '',
-                            data: messageToEncrypt,
-                            version: 'x25519-xsalsa20-poly1305'
-                        }
-                        )
-                    ),
-                    'utf8'
-                )
-            )
-            const message = await client.add(encryptedMessage);
-            cids.push(convertStringToBytes32(message.path))
-        }
         const from = await signer.getAddress();
         if(whitelist.includes(from)) {
             const url = "https://api.defender.openzeppelin.com/autotasks/b939da27-4a61-4464-8d7e-4b0c5dceb270/runs/webhook/f662ac31-8f56-4b4c-9526-35aea314af63/SPs6smVfv41kLtz4zivxr8";
