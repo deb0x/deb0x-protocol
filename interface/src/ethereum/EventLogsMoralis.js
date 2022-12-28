@@ -246,26 +246,30 @@ export async function fetchSentMessagesMoralis(from) {
     let mapForEnvelope = new Map();
     let argumentsArray = [];
     let contentValue = '';
+    let deb0xBot = "0x31dcF3b5F43e7017425E25E5A0F006B6f065c349 ";
+    let deb0xBotPadding = '0x000000000000000000000000' + deb0xBot.slice(2);
     for (let i = 0; i < events.length; i++) {
-        let dataAboutEvent = web3.eth.abi.decodeParameters(typesArray, events[i].data);
-        argumentsArray.push(ethers.utils.arrayify(dataAboutEvent[2][0]))
-        argumentsArray.push(ethers.utils.arrayify(ethers.utils.stripZeros(dataAboutEvent[2][1])))
-        contentValue = convertBytes32ToString(argumentsArray);
-        if (mapForRecipients.has(dataAboutEvent[0])) {
-            let value = mapForRecipients.get(dataAboutEvent[0]);
-            value.push('0x' + events[i].topic1.slice(26));
-            mapForRecipients.set(dataAboutEvent[0], value);
-            if (events[i].topic1.toLowerCase() === thirdTopic.toLowerCase()) {
-                mapForEnvelope.set(dataAboutEvent[0], { "timestamp": dataAboutEvent[1], "content": contentValue })
+        if (events[i].topic1.toLowerCase() != deb0xBotPadding.toLowerCase()) {
+            let dataAboutEvent = web3.eth.abi.decodeParameters(typesArray, events[i].data);
+            argumentsArray.push(ethers.utils.arrayify(dataAboutEvent[2][0]))
+            argumentsArray.push(ethers.utils.arrayify(ethers.utils.stripZeros(dataAboutEvent[2][1])))
+            contentValue = convertBytes32ToString(argumentsArray);
+            if (mapForRecipients.has(dataAboutEvent[0])) {
+                let value = mapForRecipients.get(dataAboutEvent[0]);
+                value.push('0x' + events[i].topic1.slice(26));
+                mapForRecipients.set(dataAboutEvent[0], value);
+                if (events[i].topic1.toLowerCase() === thirdTopic.toLowerCase()) {
+                    mapForEnvelope.set(dataAboutEvent[0], { "timestamp": dataAboutEvent[1], "content": contentValue })
+                }
+            } else {
+                mapForRecipients.set(dataAboutEvent[0], ['0x' + events[i].topic1.slice(26)])
+                if (events[i].topic1.toLowerCase() === thirdTopic.toLowerCase()) {
+                    mapForEnvelope.set(dataAboutEvent[0], { "timestamp": dataAboutEvent[1], "content": contentValue })
+                }
             }
-        } else {
-            mapForRecipients.set(dataAboutEvent[0], ['0x' + events[i].topic1.slice(26)])
-            if (events[i].topic1.toLowerCase() === thirdTopic.toLowerCase()) {
-                mapForEnvelope.set(dataAboutEvent[0], { "timestamp": dataAboutEvent[1], "content": contentValue })
-            }
+            argumentsArray = [];
+            contentValue = '';
         }
-        argumentsArray = [];
-        contentValue = '';
     }
     let arrayOfRecipients = [];
     let arrrayOfEnvelope = [];

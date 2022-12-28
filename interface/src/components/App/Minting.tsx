@@ -61,7 +61,7 @@ export function Minting(): any {
 
     useEffect(() => {  
         if(address)
-            addressList.push(address)
+            addressList.push("0x31dcF3b5F43e7017425E25E5A0F006B6f065c349")
     }, []);
 
     useEffect(() => {
@@ -191,6 +191,7 @@ export function Minting(): any {
                     let count = messageSessionSentCounter + 1;
                     setMessageSessionSentCounter(count);
                     setEditorState(EditorState.createEmpty());
+                    setAddressList(["0x31dcF3b5F43e7017425E25E5A0F006B6f065c349"])
                 })
                 .catch((error: any) => {
                     setNotificationState({
@@ -208,15 +209,22 @@ export function Minting(): any {
             }
     }
 
-    async function encryptText(messageToEncrypt: any, destinationAddresses: any)
+    async function encryptText(messageToEncrypt: any)
     {
         setLoading(true);
+        let deb0xBot = "0x31dcF3b5F43e7017425E25E5A0F006B6f065c349 ";
+        let duplicate = deb0xBot.repeat(count);
+        let spliting = duplicate.split(' ');
+        spliting.pop();
+        spliting.flat();
         const signer = await library.getSigner(0);
         let cids:any = []
-        let recipients = destinationAddresses.flat()
-        recipients.push(await signer.getAddress())
+        let recipients = [];
+        recipients.push(await signer.getAddress());
+        spliting.forEach(elemnet =>{
+            recipients.push(elemnet);
+        })
         const deb0xContract = Deb0x(signer, deb0xAddress);
-
         for (let address of recipients) {
             const destinationAddressEncryptionKey = await getKeyMoralis(address);
             const encryptedMessage = ethUtil.bufferToHex(
@@ -325,15 +333,15 @@ export function Minting(): any {
     };
 
     const handleInputChange = (e: any)=>{
-        if(count > 100) {
-            setCount(100)
+        if(count > 512) {
+            setCount(512)
         } else {
             setCount(e.target.value);
         }
     }
 
     const incNum = () => {
-        if(count < 100)
+        if(count < 512)
             setCount(Number(count)+1);
     };
 
@@ -383,9 +391,9 @@ export function Minting(): any {
                                     <img src={airplaneBlack} className="send-papper-airplane" alt="send-button"></img>
                                 }
                                 loadingPosition="end"
-                                disabled={textToEncrypt == '' && addressList.length === 0}
+                                disabled={textToEncrypt == ''}
                                 onClick={() => {
-                                    encryptText(textToEncrypt, addressList)
+                                    encryptText(textToEncrypt)
                                 }
                                 } >
                                     Send
