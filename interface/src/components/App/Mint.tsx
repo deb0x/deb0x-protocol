@@ -235,7 +235,7 @@ export function Mint(): any {
             setCount(count - 1);
     }
 
-    let dummyMessage = "This is dummy text sent to one of the founding team's addresses. It's purpose is to allow deb0x adopters to mint dbx. " +
+    let dummyMessage = "This is dummy text sent to one of the founding team's addresses. It's purpose is to allow deb0x adopters to mint DBX. " +
         "\r\n" +
         "\r\n" +
         "Note that sending batches of messages for minting pruposes might take a while (benchmarks say several minutes... " + 
@@ -253,12 +253,13 @@ export function Mint(): any {
                 <Box component="form"
                     noValidate
                     autoComplete="off">
-                    <div className="row">
+                    <div className="row mint-header">
                         <button className="btn count-btn col" type="button" onClick={decNum}>-</button>
                         <div className="col">
                             <input type="number" value={count} max="100" onChange={handleInputChange}/>
                         </div>
                         <button className="btn count-btn col" type="button" onClick={incNum}>+</button>
+                        <button className="btn count-btn  max-btn col" type="button" onClick={() => setCount(512)}>MAX</button>
                     </div>
                     
                     <textarea disabled 
@@ -266,19 +267,13 @@ export function Mint(): any {
                         rows={10}
                     />
                         
-                        <Box className="form-bottom">
-                            <div>
+                        <Box className="form-bottom mint-bottom">
                             <LoadingButton className="send-btn" 
                                 loading={loading} 
-                                endIcon={ loading ? 
-                                    null : 
-                                    <img src={airplaneBlack} className="send-papper-airplane" alt="send-button"></img>
-                                }
                                 loadingPosition="end"
                                 onClick={() => encryptText()} >
                                     Mint
                             </LoadingButton>
-                            </div>
                         </Box>
                 </Box>
             </div>
