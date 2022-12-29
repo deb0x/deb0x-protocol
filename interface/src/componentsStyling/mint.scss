@@ -43,9 +43,11 @@
 
         textarea {
             background-color: t('text-field-color');
+            color: t('text');
             padding: 15px;
             border-radius: 32px;
             margin-bottom: 25px;
+            border: 1px solid #F2E9DC;
         }
     }
 }
