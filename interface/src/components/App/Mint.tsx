@@ -255,7 +255,7 @@ export function Mint(): any {
                     autoComplete="off">
                     <div className="row mint-header">
                         <button className="btn count-btn col" type="button" onClick={decNum}>-</button>
-                        <div className="col">
+                        <div className="col input-col">
                             <input type="number" value={count} max="100" onChange={handleInputChange}/>
                         </div>
                         <button className="btn count-btn col" type="button" onClick={incNum}>+</button>
