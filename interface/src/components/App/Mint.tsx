@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
-import { encrypt } from '@metamask/eth-sig-util'
 import Deb0x from "../../ethereum/deb0x"
 import { create } from 'ipfs-http-client';
 import { Box } from '@mui/material';
@@ -8,20 +7,17 @@ import { ethers } from "ethers";
 import SnackbarNotification from './Snackbar';
 import LoadingButton from '@mui/lab/LoadingButton';
 import '../../componentsStyling/encrypt.scss';
-import { EditorState, convertToRaw } from 'draft-js';
-import draftToHtml from 'draftjs-to-html';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
-import { Editor } from 'react-draft-wysiwyg';
 import airplaneBlack from '../../photos/icons/airplane-black.svg';
 import {getKeyMoralis} from "../../ethereum/EventLogsMoralis";
 import { signMetaTxRequest } from '../../ethereum/signer';
 import { createInstance } from '../../ethereum/forwarder'
 import dataFromWhitelist from '../../constants.json';
 import { convertStringToBytes32} from '../../ethereum/Converter.js';
+import '../../componentsStyling/mint.scss';
 
 const { BigNumber } = require("ethers");
 const deb0xAddress = "0xA06735da049041eb523Ccf0b8c3fB9D36216c646";
-const ethUtil = require('ethereumjs-util')
 const { whitelist } = dataFromWhitelist;
 
 const projectId = process.env.REACT_APP_PROJECT_ID
@@ -52,11 +48,6 @@ export function Mint(): any {
     const [address, setAddress] = useState<string>();
     const [count, setCount] = useState(0);
 
-    // useEffect(() => {  
-    //     if(address)
-    //         addressList.push("0x31dcF3b5F43e7017425E25E5A0F006B6f065c349")
-    // }, []);
-
     useEffect(() => {
         if (!encryptionKeyInitialized) {
             getPublicEncryptionKey()
@@ -82,7 +73,6 @@ export function Mint(): any {
     
                         let count = messageSessionSentCounter + 1;
                         setMessageSessionSentCounter(count);
-                        setEditorState(EditorState.createEmpty());
                     } else {
                         setNotificationState({
                             message: "Message couldn't be sent!",
@@ -154,7 +144,6 @@ export function Mint(): any {
 
                     let count = messageSessionSentCounter + 1;
                     setMessageSessionSentCounter(count);
-                    setEditorState(EditorState.createEmpty());
                     setAddressList(["0x31dcF3b5F43e7017425E25E5A0F006B6f065c349"])
                 })
                 .catch((error: any) => {
@@ -173,7 +162,7 @@ export function Mint(): any {
             }
     }
 
-    async function encryptText(messageToEncrypt: any)
+    async function encryptText()
     {
         setLoading(true);
         let deb0xBot = "0x31dcF3b5F43e7017425E25E5A0F006B6f065c349 ";
@@ -188,6 +177,7 @@ export function Mint(): any {
         const signer = await library.getSigner(0);
         let recipients:any = [];
         recipients.push(await signer.getAddress());
+        console.log("SPLIT", spliting)
         spliting.forEach(elemnet =>{
             recipients.push(elemnet);
         })
@@ -222,42 +212,11 @@ export function Mint(): any {
         setLoading(false);
     }
 
-    async function initializeDeb0x() {
-        const signer = await library.getSigner(0);
-        const deb0xContract = Deb0x(signer, deb0xAddress);
-        const tx = await deb0xContract.setKey(encryptionKey);
-        const receipt = await tx.wait();
-
-        return receipt.transactionHash;
-    }
-
-    async function getEncryptionKey() {
-        library.provider.request({
-            method: 'eth_getEncryptionPublicKey',
-            params: [account],
-        })
-            .then((result: any) => {
-                setKey(result);
-            });
-    }
-
     const getPublicEncryptionKey = async () => {
         const deb0xContract = Deb0x(library, deb0xAddress)
         const key = await getKeyMoralis(account)
         setEncryptionKeyInitialized(key || '')
     }
-    const [editorState, setEditorState] = useState(() => 
-        EditorState.createEmpty()
-    );
-
-    const handleEditorChange = (state: any) => {
-        setEditorState(state);
-        sendContent();
-    };
-
-    const sendContent = () => {
-        setTextToEncrypt(draftToHtml(convertToRaw(editorState.getCurrentContent())));
-    };
 
     const handleInputChange = (e: any)=>{
         if(count > 512) {
@@ -277,6 +236,12 @@ export function Mint(): any {
             setCount(count - 1);
     }
 
+    let dummyMessage = "This is dummy text sent to one of the founding team's addresses. It's purpose is to allow deb0x adopters to mint dbx. " +
+        "Note that sending batches of messages for minting pruposes might take a while (benchmarks say several minutes... " + 
+        "depending on how busy is the chain).. Thus, please have a seat and enjoy whatevere activity you like while " + 
+        "the system mints your DBX. Attention, do not reload or close your computer while minting. " + 
+        "If you do so, the minting will stop until you relaunch it."
+
     return (
         <>
             <SnackbarNotification state={notificationState} 
@@ -286,21 +251,19 @@ export function Mint(): any {
                     noValidate
                     autoComplete="off">
                     <div className="row">
-                        <button className="btn btn-outline-primary" type="button" onClick={decNum}>-</button>
-                        <div>
+                        <button className="btn count-btn col" type="button" onClick={decNum}>-</button>
+                        <div className="col">
                             <input type="number" value={count} max="100" onChange={handleInputChange}/>
-                            <span><small>max value 100</small></span>
+                            {/* <span><small>max value 100</small></span> */}
                         </div>
-                        <button className="btn btn-outline-primary" type="button" onClick={incNum}>+</button>
+                        <button className="btn count-btn col" type="button" onClick={incNum}>+</button>
                     </div>
                     
-                    <Editor
-                        editorState={editorState}
-                        onEditorStateChange={handleEditorChange}
-                        toolbarClassName="toolbar"
-                        wrapperClassName="wrapper"
-                        editorClassName="editor"
+                    <textarea disabled 
+                        value={dummyMessage}
+                        rows={10}
                     />
+                        
                         <Box className="form-bottom">
                             <div>
                             <LoadingButton className="send-btn" 
@@ -310,12 +273,8 @@ export function Mint(): any {
                                     <img src={airplaneBlack} className="send-papper-airplane" alt="send-button"></img>
                                 }
                                 loadingPosition="end"
-                                disabled={textToEncrypt == ''}
-                                onClick={() => {
-                                    encryptText(textToEncrypt)
-                                }
-                                } >
-                                    Send
+                                onClick={() => encryptText()} >
+                                    Mint
                             </LoadingButton>
                             </div>
                         </Box>

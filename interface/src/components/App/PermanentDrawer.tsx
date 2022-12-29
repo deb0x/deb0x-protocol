@@ -12,6 +12,7 @@ import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
 import add from '../../photos/icons/ios-compose.svg';
 import trophy from '../../photos/icons/trophy.svg';
+import coins from '../../photos/icons/coins-solid.svg';
 import Button from '@mui/material/Button'
 import Popper from '@mui/material/Popper'
 import { injected } from '../../connectors';
@@ -164,7 +165,7 @@ export function PermanentDrawer(props: any): any {
                                             {index === 1 && <InboxIcon />} 
                                             {index === 2 && <img src={trophy} />}
                                             {index === 3 && <SendIcon className="sent-icon-color"/>}
-                                            {index === 4}
+                                            {index === 4 && <img src={coins} />}
                                         </ListItemIcon>
                                         <ListItemText className="text" primary={text} />
                                     </ListItem>
