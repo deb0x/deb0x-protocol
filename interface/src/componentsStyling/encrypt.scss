@@ -126,6 +126,8 @@
                 .form-bottom {
                     position: relative;
                     flex: 0 1 60px;
+                    display: flex;
+                    justify-content: flex-end;
                     .send-btn {
                         font-size: 16px;
                         background-color:  #F5B700;

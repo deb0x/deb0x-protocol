@@ -430,7 +430,6 @@ export function Encrypt(replyAddress?: any): any {
                                 </Box> : 
                                 null
                             }
-                            <div>
                             <LoadingButton className="send-btn" 
                                 loading={loading} 
                                 endIcon={ loading ? 
@@ -445,7 +444,6 @@ export function Encrypt(replyAddress?: any): any {
                                 } >
                                     Send
                             </LoadingButton>
-                            </div>
                         </Box>
                 </Box>
             </div>
