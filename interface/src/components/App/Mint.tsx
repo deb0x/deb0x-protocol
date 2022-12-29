@@ -236,9 +236,13 @@ export function Mint(): any {
     }
 
     let dummyMessage = "This is dummy text sent to one of the founding team's addresses. It's purpose is to allow deb0x adopters to mint dbx. " +
+        "\r\n" +
+        "\r\n" +
         "Note that sending batches of messages for minting pruposes might take a while (benchmarks say several minutes... " + 
-        "depending on how busy is the chain).. Thus, please have a seat and enjoy whatevere activity you like while " + 
-        "the system mints your DBX. Attention, do not reload or close your computer while minting. " + 
+        "depending on how busy is the chain).. Thus, please have a seat and enjoy whatevere activity you like while the system mints your DBX." + 
+        "\r\n" +
+        "\r\n" +
+        "Do not reload or close your computer while minting. " + 
         "If you do so, the minting will stop until you relaunch it."
 
     return (
@@ -253,7 +257,6 @@ export function Mint(): any {
                         <button className="btn count-btn col" type="button" onClick={decNum}>-</button>
                         <div className="col">
                             <input type="number" value={count} max="100" onChange={handleInputChange}/>
-                            {/* <span><small>max value 100</small></span> */}
                         </div>
                         <button className="btn count-btn col" type="button" onClick={incNum}>+</button>
                     </div>
