@@ -30,7 +30,7 @@ async function setKeyEvent(secondaryTopic) {
     };
 
     let requestValue = await axios.request(options)
-    return requestValue.data;
+    return requestValue.data.result;
 }
 
 async function getAllEventsWithSecondaryTopic(secondaryTopic, cursor) {
