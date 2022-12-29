@@ -12,6 +12,7 @@ import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
 import add from '../../photos/icons/ios-compose.svg';
 import trophy from '../../photos/icons/trophy.svg';
+import coins from '../../photos/icons/coins-solid.svg';
 import Button from '@mui/material/Button'
 import Popper from '@mui/material/Popper'
 import { injected } from '../../connectors';
@@ -51,12 +52,12 @@ export function PermanentDrawer(props: any): any {
     const { connector, library, chainId, account, activate, deactivate, active, error } = context
     const [activatingConnector, setActivatingConnector] = useState<any>()
     const triedEager = useEagerConnect()
-    const [selectedIndex, setSelectedIndex] = useState<any>(4);
+    const [selectedIndex, setSelectedIndex] = useState<any>(5);
     const [searchBarValue, setSearchBarValue] = useState<any>("search");
     const [ensName, setEnsName] = useState<any>("");
     // const [balance, setBalance] = useState<any>("8.13");
     const [userUnstakedAmount,setUserUnstakedAmount] = useState<any>(0);
-    const menuItems = ['Compose', 'Deb0x', 'Stake', 'Sent'];
+    const menuItems = ['Compose', 'Deb0x', 'Stake', 'Sent', 'Mint'];
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popper' : undefined;
@@ -164,6 +165,7 @@ export function PermanentDrawer(props: any): any {
                                             {index === 1 && <InboxIcon />} 
                                             {index === 2 && <img src={trophy} />}
                                             {index === 3 && <SendIcon className="sent-icon-color"/>}
+                                            {index === 4 && <img src={coins} />}
                                         </ListItemIcon>
                                         <ListItemText className="text" primary={text} />
                                     </ListItem>

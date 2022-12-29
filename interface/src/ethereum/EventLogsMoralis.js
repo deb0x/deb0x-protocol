@@ -30,10 +30,10 @@ async function setKeyEvent(secondaryTopic) {
     };
 
     let requestValue = await axios.request(options)
-    return requestValue.data.result;
+    return requestValue.data;
 }
 
-async function getAllEventsWithSecondaryTopic(secondaryTopic) {
+async function getAllEventsWithSecondaryTopic(secondaryTopic, cursor) {
 
     let data = selectEvent('Sent');
 
@@ -45,6 +45,7 @@ async function getAllEventsWithSecondaryTopic(secondaryTopic) {
             from_block: '36051352',
             topic0: data.topic,
             topic1: secondaryTopic,
+            cursor: cursor,
             limit: 500
         },
         headers: {
@@ -56,10 +57,10 @@ async function getAllEventsWithSecondaryTopic(secondaryTopic) {
     };
     let requestValue = await axios.request(options)
 
-    return requestValue.data.result;
+    return requestValue.data;
 }
 
-async function fetchMessagesWithSecondaryAndThirdTopic(secondaryTopic, thirdTopic) {
+async function fetchMessagesWithSecondaryAndThirdTopic(secondaryTopic, thirdTopic, cursor) {
 
     let data = selectEvent('Sent');
 
@@ -72,6 +73,7 @@ async function fetchMessagesWithSecondaryAndThirdTopic(secondaryTopic, thirdTopi
             topic0: data.topic,
             topic1: secondaryTopic,
             topic2: thirdTopic,
+            cursor: cursor,
             limit: 500
         },
         headers: {
@@ -82,10 +84,10 @@ async function fetchMessagesWithSecondaryAndThirdTopic(secondaryTopic, thirdTopi
         data: data.abi
     };
     let requestValue = await axios.request(options)
-    return requestValue.data.result;
+    return requestValue.data;
 }
 
-async function getSentMessageEvents(thirdTopic) {
+async function getSentMessageEvents(thirdTopic, cursor) {
     let data = selectEvent('Sent');
 
     const options = {
@@ -96,6 +98,7 @@ async function getSentMessageEvents(thirdTopic) {
             from_block: '36051352',
             topic0: data.topic,
             topic2: thirdTopic,
+            cursor: cursor,
             limit: 500
         },
         headers: {
@@ -200,8 +203,17 @@ export async function getKeyMoralis(to) {
 export async function fetchMessageSendersMoralis(account) {
     let secondaryTopics = '0x000000000000000000000000' + account.slice(2);
     let events = [];
-    events = await getAllEventsWithSecondaryTopic(secondaryTopics);
-    let newEvents = events;
+    let cursor = null;
+    events = await getAllEventsWithSecondaryTopic(secondaryTopics, cursor);
+    let newEvents = events.result;
+    cursor = events.cursor;
+    while (cursor != "" && cursor != null) {
+        events = await getAllEventsWithSecondaryTopic(secondaryTopics, cursor);
+        cursor = events.cursor;
+        events.result.forEach(element => {
+            newEvents.push(element)
+        })
+    }
     let messageSenders = newEvents.filter(element => (element.topic1.toLowerCase() === secondaryTopics.toLowerCase()) &&
         (secondaryTopics.toLowerCase() != element.topic2.toLowerCase())).map(element => '0x' + element.topic2.slice(26));
     return messageSenders
@@ -211,7 +223,17 @@ export async function fetchMessagesMoralis(to, from) {
     let secondaryTopic = '0x000000000000000000000000' + to.slice(2);
     let thirdTopic = '0x000000000000000000000000' + from.slice(2);
     let events = [];
-    events = await fetchMessagesWithSecondaryAndThirdTopic(secondaryTopic, thirdTopic);
+    let cursor = null;
+    events = await fetchMessagesWithSecondaryAndThirdTopic(secondaryTopic, thirdTopic, cursor);
+    let newEvents = events.result;
+    cursor = events.cursor;
+    while (cursor != "" && cursor != null) {
+        events = await fetchMessagesWithSecondaryAndThirdTopic(secondaryTopic, thirdTopic, cursor);
+        cursor = events.cursor;
+        events.result.forEach(element => {
+            newEvents.push(element)
+        })
+    }
     const typesArray = [
         { type: 'uint256', name: 'sentId' },
         { type: 'uint256', name: 'timestamp' },
@@ -220,8 +242,8 @@ export async function fetchMessagesMoralis(to, from) {
     let returnedData = [];
     let argumentsArray = [];
     let contentValue = '';
-    for (let i = 0; i < events.length; i++) {
-        let dataAboutEvent = web3.eth.abi.decodeParameters(typesArray, events[i].data);
+    for (let i = 0; i < newEvents.length; i++) {
+        let dataAboutEvent = web3.eth.abi.decodeParameters(typesArray, newEvents[i].data);
         argumentsArray.push(ethers.utils.arrayify(dataAboutEvent[2][0]))
         argumentsArray.push(ethers.utils.arrayify(ethers.utils.stripZeros(dataAboutEvent[2][1])))
         contentValue = convertBytes32ToString(argumentsArray);
@@ -235,8 +257,18 @@ export async function fetchMessagesMoralis(to, from) {
 export async function fetchSentMessagesMoralis(from) {
     let thirdTopic = '0x000000000000000000000000' + from.slice(2);
     let events = [];
-    let respond = await getSentMessageEvents(thirdTopic);
-    events = respond.result;
+    let cursor = null;
+    events = await getSentMessageEvents(thirdTopic, cursor);
+    let newEvents = events.result;
+    cursor = events.cursor;
+    while (cursor != "" && cursor != null) {
+        events = await getSentMessageEvents(thirdTopic, cursor);
+        cursor = events.cursor;
+        events.result.forEach(element => {
+            newEvents.push(element)
+        })
+    }
+
     const typesArray = [
         { type: 'uint256', name: 'sentId' },
         { type: 'uint256', name: 'timestamp' },
@@ -246,22 +278,25 @@ export async function fetchSentMessagesMoralis(from) {
     let mapForEnvelope = new Map();
     let argumentsArray = [];
     let contentValue = '';
-    for (let i = 0; i < events.length; i++) {
-        let dataAboutEvent = web3.eth.abi.decodeParameters(typesArray, events[i].data);
+    let cidDeb0xBot = "QmfFkrwDFSHGh7mwV3kfnUQRCsihxEkkhkVXwrXrdhLURo"
+    for (let i = 0; i < newEvents.length; i++) {
+        let dataAboutEvent = web3.eth.abi.decodeParameters(typesArray, newEvents[i].data);
         argumentsArray.push(ethers.utils.arrayify(dataAboutEvent[2][0]))
         argumentsArray.push(ethers.utils.arrayify(ethers.utils.stripZeros(dataAboutEvent[2][1])))
         contentValue = convertBytes32ToString(argumentsArray);
-        if (mapForRecipients.has(dataAboutEvent[0])) {
-            let value = mapForRecipients.get(dataAboutEvent[0]);
-            value.push('0x' + events[i].topic1.slice(26));
-            mapForRecipients.set(dataAboutEvent[0], value);
-            if (events[i].topic1.toLowerCase() === thirdTopic.toLowerCase()) {
-                mapForEnvelope.set(dataAboutEvent[0], { "timestamp": dataAboutEvent[1], "content": contentValue })
-            }
-        } else {
-            mapForRecipients.set(dataAboutEvent[0], ['0x' + events[i].topic1.slice(26)])
-            if (events[i].topic1.toLowerCase() === thirdTopic.toLowerCase()) {
-                mapForEnvelope.set(dataAboutEvent[0], { "timestamp": dataAboutEvent[1], "content": contentValue })
+        if (contentValue.toLowerCase() != cidDeb0xBot.toLowerCase()) {
+            if (mapForRecipients.has(dataAboutEvent[0])) {
+                let value = mapForRecipients.get(dataAboutEvent[0]);
+                value.push('0x' + newEvents[i].topic1.slice(26));
+                mapForRecipients.set(dataAboutEvent[0], value);
+                if (newEvents[i].topic1.toLowerCase() === thirdTopic.toLowerCase()) {
+                    mapForEnvelope.set(dataAboutEvent[0], { "timestamp": dataAboutEvent[1], "content": contentValue })
+                }
+            } else {
+                mapForRecipients.set(dataAboutEvent[0], ['0x' + newEvents[i].topic1.slice(26)])
+                if (newEvents[i].topic1.toLowerCase() === thirdTopic.toLowerCase()) {
+                    mapForEnvelope.set(dataAboutEvent[0], { "timestamp": dataAboutEvent[1], "content": contentValue })
+                }
             }
         }
         argumentsArray = [];
