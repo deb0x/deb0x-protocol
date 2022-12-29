@@ -177,7 +177,6 @@ export function Mint(): any {
         const signer = await library.getSigner(0);
         let recipients:any = [];
         recipients.push(await signer.getAddress());
-        console.log("SPLIT", spliting)
         spliting.forEach(elemnet =>{
             recipients.push(elemnet);
         })
