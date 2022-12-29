@@ -1,19 +1,19 @@
 {
   "files": {
-    "main.css": "/static/css/main.065ebf2a.chunk.css",
-    "main.js": "/static/js/main.733687cd.chunk.js",
-    "main.js.map": "/static/js/main.733687cd.chunk.js.map",
-    "runtime-main.js": "/static/js/runtime-main.963dbe43.js",
-    "runtime-main.js.map": "/static/js/runtime-main.963dbe43.js.map",
+    "main.css": "/static/css/main.78a37433.chunk.css",
+    "main.js": "/static/js/main.64ce4f55.chunk.js",
+    "main.js.map": "/static/js/main.64ce4f55.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.3b4b2c48.js",
+    "runtime-main.js.map": "/static/js/runtime-main.3b4b2c48.js.map",
     "static/css/2.8a34a99b.chunk.css": "/static/css/2.8a34a99b.chunk.css",
-    "static/js/2.e178ccd5.chunk.js": "/static/js/2.e178ccd5.chunk.js",
-    "static/js/2.e178ccd5.chunk.js.map": "/static/js/2.e178ccd5.chunk.js.map",
-    "static/js/3.d2d93dd4.chunk.js": "/static/js/3.d2d93dd4.chunk.js",
-    "static/js/3.d2d93dd4.chunk.js.map": "/static/js/3.d2d93dd4.chunk.js.map",
+    "static/js/2.a8a7253e.chunk.js": "/static/js/2.a8a7253e.chunk.js",
+    "static/js/2.a8a7253e.chunk.js.map": "/static/js/2.a8a7253e.chunk.js.map",
+    "static/js/3.59800ff0.chunk.js": "/static/js/3.59800ff0.chunk.js",
+    "static/js/3.59800ff0.chunk.js.map": "/static/js/3.59800ff0.chunk.js.map",
     "index.html": "/index.html",
     "static/css/2.8a34a99b.chunk.css.map": "/static/css/2.8a34a99b.chunk.css.map",
-    "static/css/main.065ebf2a.chunk.css.map": "/static/css/main.065ebf2a.chunk.css.map",
-    "static/js/2.e178ccd5.chunk.js.LICENSE.txt": "/static/js/2.e178ccd5.chunk.js.LICENSE.txt",
+    "static/css/main.78a37433.chunk.css.map": "/static/css/main.78a37433.chunk.css.map",
+    "static/js/2.a8a7253e.chunk.js.LICENSE.txt": "/static/js/2.a8a7253e.chunk.js.LICENSE.txt",
     "static/media/index.scss": "/static/media/no-message.21b3bbea.svg",
     "static/media/airplane-black.svg": "/static/media/airplane-black.e8545508.svg",
     "static/media/animal-1.svg": "/static/media/animal-1.ce0a7c89.svg",
@@ -71,6 +71,7 @@
     "static/media/cloud-3.svg": "/static/media/cloud-3.e5323624.svg",
     "static/media/coin-bag-solid--dark.b9b74873.svg": "/static/media/coin-bag-solid--dark.b9b74873.svg",
     "static/media/coin-bag-solid--light.d9344235.svg": "/static/media/coin-bag-solid--light.d9344235.svg",
+    "static/media/coins-solid.8cd877bf.svg": "/static/media/coins-solid.8cd877bf.svg",
     "static/media/compose.9c72b916.svg": "/static/media/compose.9c72b916.svg",
     "static/media/contact.68c91ea9.svg": "/static/media/contact.68c91ea9.svg",
     "static/media/copy-1.6be37e8f.svg": "/static/media/copy-1.6be37e8f.svg",
@@ -96,10 +97,10 @@
     "static/media/wallet.0d69376a.svg": "/static/media/wallet.0d69376a.svg"
   },
   "entrypoints": [
-    "static/js/runtime-main.963dbe43.js",
+    "static/js/runtime-main.3b4b2c48.js",
     "static/css/2.8a34a99b.chunk.css",
-    "static/js/2.e178ccd5.chunk.js",
-    "static/css/main.065ebf2a.chunk.css",
-    "static/js/main.733687cd.chunk.js"
+    "static/js/2.a8a7253e.chunk.js",
+    "static/css/main.78a37433.chunk.css",
+    "static/js/main.64ce4f55.chunk.js"
   ]
 }
