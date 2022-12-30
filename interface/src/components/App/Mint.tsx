@@ -239,7 +239,7 @@ export function Mint(): any {
         "\r\n" +
         "\r\n" +
         "Note that sending batches of messages for minting pruposes might take a while (benchmarks say several minutes... " + 
-        "depending on how busy is the chain).. Thus, please have a seat and enjoy whatevere activity you like while the system mints your DBX."
+        "depending on how busy is the chain).. Thus, please have a seat and enjoy whatever activity you like while the system mints your DBX."
     return (
         <>
             <SnackbarNotification state={notificationState} 
