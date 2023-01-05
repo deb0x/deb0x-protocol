@@ -353,7 +353,8 @@ export async function getInitializedAddresses() {
     events.result.forEach(element => {
         let data = element.topic1;
         let address = '0x' + data.slice(26);
-        newEvents.push(address)
+        if(!newEvents.includes(address))
+            newEvents.push(address)
     })
     cursor = events.cursor;
     while (cursor != "" && cursor != null) {
@@ -362,7 +363,8 @@ export async function getInitializedAddresses() {
         events.result.forEach(element => {
             let data = element.topic1;
             let address = '0x' + data.slice(26);
-            newEvents.push(address)
+            if(!newEvents.includes(address))
+                newEvents.push(address)
         })
     }
 

@@ -37,6 +37,7 @@ import { Home } from './components/App/Home';
 import useAnalyticsEventTracker from './components/Common/GaEventTracker';
 import { use } from 'chai';
 import { Mint } from './components/App/Mint';
+import { AllInitializedAddresses } from './components/App/AllInitializedAddresses';
 
 const maintenance = process.env.REACT_APP_MAINTENANCE_MODE;
 
@@ -243,6 +244,7 @@ function App() {
                                         {selectedOption === "Sent" && <Sent />}
                                         {selectedOption === "Home" && <Home onChange={handleChange} />}
                                         {selectedOption === "Mint" && <Mint />}
+                                        {selectedOption === "DBX Yellow pages" && <AllInitializedAddresses onChange={handleChange} />}
                                     </Box> : 
                                     <Box className="main-container" sx={{marginTop: 12}}>
                                         <Decrypt account={account} checkIfInit={checkIfInit}/>
