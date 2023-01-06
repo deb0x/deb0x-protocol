@@ -1,10 +1,8 @@
 import { IconButton } from "@mui/material";
 import { useEffect, useState } from "react";
 import { getInitializedAddresses } from "../../ethereum/EventLogsMoralis";
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import SendIcon from '@mui/icons-material/Send';
 import "../../componentsStyling/addresses.scss";
-import SnackbarNotification from "./Snackbar";
 import { useWeb3React } from "@web3-react/core";
 
 export function AllInitializedAddresses(props: any) {
