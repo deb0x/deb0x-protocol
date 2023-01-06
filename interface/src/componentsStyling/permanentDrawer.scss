@@ -212,7 +212,7 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
                             }
                         }
                         ul.menu-list {
-                            height: 45%;
+                            height: 50%;
                             box-shadow: 4px 0px 11px #1A152036;
                             padding-top: 0;
                             display: flex;
@@ -244,6 +244,9 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
                                         color: #78C3FB;
                                     }
                                 }
+                                &:nth-child(6) {
+                                    color: #F5B700;
+                                }
                             }
                         }
                         
@@ -251,7 +254,7 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
                 }
                 .side-menu--bottom {
                     display: flex;
-                    height: 40%;
+                    height: 35%;
                     align-items: center;
                     justify-content: space-between;
                     flex-direction: column;

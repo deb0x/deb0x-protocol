@@ -63,22 +63,22 @@ export function Encrypt(replyAddress?: any): any {
     const [error, setError] = useState<string | null>(null);
     const [ input, setInput ] = useState(JSON.parse(localStorage.getItem('input') || 'null'));
     const [address, setAddress] = useState<string>(replyAddress.props);
-    const [isSendInUrl, setIsSendInUrl] = useState(false);
-    const addressListForRewards: string[] = [];
-    const [inputValue, setInputValue] = useState<number>(0);
 
-    useEffect(() => {  
+    useEffect(() => setAddress(replyAddress.props), []);
+
+    useEffect(() => {
         if(address)
-            addressList.push(address)
-    }, []);
+            setAddressList([...addressList, address])
+    }, [addressList]);
 
     useEffect(() => {
         if(input !== null && input.match(/^0x[a-fA-F0-9]{40}$/g)) {
             isValid(input).then((result: any) => {
-                if(result)
-                    addressList.push(input);
+                if(result) {
+                    setAddressList([...addressList, input]);
+                }
                 else
-                localStorage.removeItem('input');
+                    localStorage.removeItem('input');
             })
         }
     }, [input]);
@@ -90,15 +90,6 @@ export function Encrypt(replyAddress?: any): any {
             getPublicEncryptionKey()
         }
     }, []);
-
-    useEffect(() => {
-        if(replyAddress.props === undefined) {
-            setTimeout(() => {
-                (document.querySelector("#standard-basic") as HTMLElement).click();
-                setTextToEncrypt("")
-            }, 200)
-        }
-    }, [input])
 
     async function handleKeyDown(evt: any) {
         if (["Enter", "Tab", ","].includes(evt.key)) {

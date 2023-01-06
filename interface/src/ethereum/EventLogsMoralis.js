@@ -1,4 +1,4 @@
-import { CatchingPokemonSharp, ContactSupportOutlined } from '@mui/icons-material';
+import { CatchingPokemonSharp, CollectionsOutlined, ContactSupportOutlined } from '@mui/icons-material';
 import axios from 'axios';
 let { ethers } = require("ethers");
 const Web3 = require('web3');
@@ -111,6 +111,33 @@ async function getSentMessageEvents(thirdTopic, cursor) {
     let requestValue = await axios.request(options)
     return requestValue.data;
 }
+
+async function setKeyAllEvents(cursor) {
+
+    let data = selectEvent('KeySet');
+
+    const options = {
+        method: 'GET',
+        url: `https://deep-index.moralis.io/api/v2/${deb0xAddress}/logs`,
+        params: {
+            chain: 'polygon',
+            from_block: '36051352',
+            topic0: data.topic,
+            cursor: cursor,
+            limit: 500
+        },
+        headers: {
+            accept: 'application/json',
+            'content-type': 'application/json',
+            'X-API-Key': moralisKey
+        },
+        data: data.abi
+    };
+
+    let requestValue = await axios.request(options)
+    return requestValue.data;
+}
+
 
 function selectEvent(name) {
     let abi, topic;
@@ -316,4 +343,30 @@ export async function fetchSentMessagesMoralis(from) {
         ];
     }
     return allData;
+}
+
+export async function getInitializedAddresses() {
+    let events = [];
+    let cursor = null;
+    events = await setKeyAllEvents(cursor);
+    let newEvents = [];
+    events.result.forEach(element => {
+        let data = element.topic1;
+        let address = '0x' + data.slice(26);
+        if(!newEvents.includes(address))
+            newEvents.push(address)
+    })
+    cursor = events.cursor;
+    while (cursor != "" && cursor != null) {
+        events = await setKeyAllEvents(cursor);
+        cursor = events.cursor;
+        events.result.forEach(element => {
+            let data = element.topic1;
+            let address = '0x' + data.slice(26);
+            if(!newEvents.includes(address))
+                newEvents.push(address)
+        })
+    }
+
+    return newEvents;
 }
