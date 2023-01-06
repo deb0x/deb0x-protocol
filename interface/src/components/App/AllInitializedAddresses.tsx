@@ -34,7 +34,7 @@ export function AllInitializedAddresses(props: any) {
     }
 
     async function checkENS() {
-        if(chainId !=137){
+        if(chainId != 137){
             let name = await library.lookupAddress(props.message.sender);
             if(name !== null) {   
                 setEnsName(name);
