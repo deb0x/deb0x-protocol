@@ -326,7 +326,7 @@ export function Decrypt(props: any): any {
                 })
 
             const encryptedMessages = await Promise.all(encryptedMessagesPromisesArray)
-            const sortedEncryptedMessages = encryptedMessages?.flat().reverse()
+            const sortedEncryptedMessages = encryptedMessages?.flat();
             let sendersArray:any[] = [];
             let timestampArray:any[] = [];
             let transactions:any[] = [];
