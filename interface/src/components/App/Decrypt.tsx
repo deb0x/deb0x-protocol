@@ -140,7 +140,6 @@ export function Decrypt(props: any): any {
             const decryptedMessage = await decrypt(message)
             
             if(decryptedMessage) {
-                setIsDecrypted(false);
                 setMessage(decryptedMessage);
                 setIsDecrypted(true);
                 props.setPreviousIndex(props.index);
