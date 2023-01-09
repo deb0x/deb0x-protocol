@@ -67,11 +67,6 @@ export function Encrypt(replyAddress?: any): any {
     useEffect(() => setAddress(replyAddress.props), []);
 
     useEffect(() => {
-        if(address)
-            setAddressList([...addressList, address])
-    }, [addressList]);
-
-    useEffect(() => {
         if(input !== null && input.match(/^0x[a-fA-F0-9]{40}$/g)) {
             isValid(input).then((result: any) => {
                 if(result) {
