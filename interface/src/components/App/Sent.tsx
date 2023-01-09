@@ -291,7 +291,7 @@ export function Sent(props: any): any {
 
             const messages = await Promise.all(sentMessagesRetrieved)
             setFetchedMessages(messages)
-            setSortedMessages(messages.reverse())
+            setSortedMessages(messages)
             setLoading(false)
         }
 
