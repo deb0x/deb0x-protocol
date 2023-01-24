@@ -26,26 +26,18 @@ export function Home(props: any) {
         setLoading(true)
         setTimeout(() => {
             getPublicEncryptionKey();
-            console.log("iiii", encryptionKeyInitialized)
         }, 8000)
-        
-        console.log(library.provider)
     }, [account, library]);
 
     useEffect(() => {
         setLoading(true)
         getPublicEncryptionKey()
-        
-        console.log("DAAAMN", library.provider)
     }, [account]);
 
     const getPublicEncryptionKey = async () => {  
         await getKeyMoralis(account).then((result: any) => {
             const initialized = (result != '') ? true : false
             setEncryptionKeyInitialized(initialized);
-            
-            console.log("KEY", result)
-            console.log("init", initialized)
         })
         
     }
