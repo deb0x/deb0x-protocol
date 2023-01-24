@@ -214,17 +214,21 @@ function selectEvent(name) {
 
 export async function getKeyMoralis(to) {
     let secondaryTopics = '0x000000000000000000000000' + to.slice(2);
-    let events = await setKeyEvent(secondaryTopics);
-    if (events.length != 0) {
-        for (let i = 0; i < events.length; i++) {
-            if (events[i].topic1.toLowerCase() === secondaryTopics.toLowerCase()) {
-                return ethers.utils.base64.encode(ethers.utils.arrayify(events[i].topic2));
-            } else {
-                return '';
+    let result = ''
+    await setKeyEvent(secondaryTopics).then((events) => {
+        if (events.length != 0) {
+            for (let i = 0; i < events.length; i++) {
+                if (events[i].topic1.toLowerCase() === secondaryTopics.toLowerCase()) {
+                    result = ethers.utils.base64.encode(ethers.utils.arrayify(events[i].topic2));
+                } else {
+                    result = '';
+                }
             }
-        }
-    } else
-        return '';
+        } else
+        result = '';
+    })
+    
+    return result;
 }
 
 export async function fetchMessageSendersMoralis(account) {

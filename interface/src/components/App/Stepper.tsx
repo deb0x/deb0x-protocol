@@ -78,10 +78,12 @@ export default function HorizontalLinearStepper(props: any) {
                         const {tx: txReceipt} = JSON.parse(data.result)
                     
                         if(txReceipt.status == 1){
-                            setNotificationState({message: "Deb0x was succesfully initialized.", open: true,
+                            setTimeout(() => {
+                                setNotificationState({message: "Deb0x was succesfully initialized.", open: true,
                                     severity:"success"})
-                                    setLoading(false)
-                                    props.onDeboxInitialization(true)
+                                setLoading(false)
+                                props.onDeboxInitialization(true)
+                            }, 10000)
                         } else {
                             setNotificationState({message: "Deb0x couldn't be initialized!", open: true,
                                 severity:"error"})
@@ -111,10 +113,15 @@ export default function HorizontalLinearStepper(props: any) {
 
             tx.wait()
             .then((result: any) => {
-                setNotificationState({message: "Deb0x was succesfully initialized.", open: true,
-                severity:"success"})
-                setLoading(false)
-                props.onDeboxInitialization(true)
+                if(result) {
+                    setTimeout(() => {
+                        setNotificationState({message: "Deb0x was succesfully initialized.", open: true,
+                            severity:"success"})
+                        setLoading(false)
+                        props.onDeboxInitialization(true)
+                    }, 10000)
+                }
+                
 
             })
             .catch((error: any) => {
@@ -153,7 +160,7 @@ export default function HorizontalLinearStepper(props: any) {
                         setLoading(false)
             }
         } else {
-            await sendInitializeTx(deb0xContract.connect(signer))
+            sendInitializeTx(deb0xContract.connect(signer))
         }
     }
 
