@@ -107,7 +107,6 @@ function App() {
     const [isVisible, setIsVisible] = useState(false);
     let [show, setShow] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState<any>(1);
-    let [walletInitialized, setWalletInitialized] = useState<any>();
     const [isOptionSelected, setIsOptionSelected] = useState(true);
     const gaEventTracker = useAnalyticsEventTracker('Login');
     const gaEventMenuTracker = useAnalyticsEventTracker('Menu');
@@ -145,11 +144,6 @@ function App() {
         setAnchorEl(anchorEl ? null : event.currentTarget);
         gaEventTracker("Connect Wallet");
     };
-    
-
-    function checkIfInit(initialized: any) {
-        setWalletInitialized(initialized);
-    }
 
     useEffect(() => {   
         window.ethereum ?
@@ -230,38 +224,34 @@ function App() {
                         </div> :
                         <div className="row main-row">
                             <div className="col col-md-3 col-sm-12 p-0 side-menu-container">
-                                <PermanentDrawer onChange={handleChange} walletInitialized={walletInitialized}/>
+                                <PermanentDrawer onChange={handleChange} />
                             </div>
                             <div className="col col-md-9 col-sm-12">
-                            <AppBarComponent walletInitialized={walletInitialized}/>
+                            <AppBarComponent />
                             {account ? 
-                                !!(library && account ) && (
-                                    walletInitialized ? 
-                                    <Box className="main-container" sx={{marginTop: 12}}>
-                                        {selectedOption === "Compose" && <Encrypt />}
-                                        {selectedOption === "Deb0x" && <Decrypt account={account} checkIfInit={checkIfInit}/>}
-                                        {selectedOption === "Stake" && <Stake />}
-                                        {selectedOption === "Sent" && <Sent />}
-                                        {selectedOption === "Home" && <Home onChange={handleChange} />}
-                                        {selectedOption === "Mint" && <Mint />}
-                                        {selectedOption === "DBX Yellow pages" && <AllInitializedAddresses onChange={handleChange} />}
-                                    </Box> : 
-                                    <Box className="main-container" sx={{marginTop: 12}}>
-                                        <Decrypt account={account} checkIfInit={checkIfInit}/>
-                                    </Box>
-                                ):
-                                    <Box className="home-page-box">
-                                        <Typography sx={{textAlign:"center",color:"gray"}} variant="h1">
-                                            The End To End Encrypted 
-                                            <br></br>
-                                            Decentralized Email Protocol 
-                                            <br></br> 
-                                            Owned By Its Users
-                                        </Typography>
-                                        <Typography sx={{ mt:10,textAlign:"center"}} variant="h3">
-                                            Please connect your wallet
-                                        </Typography>
-                                    </Box>
+                            !!(library && account) && (
+                                <Box className="main-container" sx={{marginTop: 12}}>
+                                    {selectedOption === "Compose" && <Encrypt />}
+                                    {selectedOption === "Deb0x" && <Decrypt account={account}/>}
+                                    {selectedOption === "Stake" && <Stake />}
+                                    {selectedOption === "Sent" && <Sent />}
+                                    {selectedOption === "Home" && <Home onChange={handleChange} />}
+                                    {selectedOption === "Mint" && <Mint />}
+                                    {selectedOption === "DBX Yellow pages" && <AllInitializedAddresses onChange={handleChange} />}
+                                </Box>
+                            ):
+                                <Box className="home-page-box">
+                                    <Typography sx={{textAlign:"center",color:"gray"}} variant="h1">
+                                        The End To End Encrypted 
+                                        <br></br>
+                                        Decentralized Email Protocol 
+                                        <br></br> 
+                                        Owned By Its Users
+                                    </Typography>
+                                    <Typography sx={{ mt:10,textAlign:"center"}} variant="h3">
+                                        Please connect your wallet
+                                    </Typography>
+                                </Box>
                             }
                             </div>
                         </div>
