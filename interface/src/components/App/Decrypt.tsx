@@ -49,11 +49,7 @@ export function Decrypt(props: any): any {
     }, [account]);
 
     const getPublicEncryptionKey = async () => {      
-        const key = await getKeyMoralis(account).then((result: any) => { 
-            result !== '' ? props.checkIfInit(true) : props.checkIfInit(false);
-            
-            return result
-        });
+        const key = await getKeyMoralis(account);
         const initialized = (key != '') ? true : false
         setEncryptionKeyInitialized(initialized);
     }
