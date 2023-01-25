@@ -27,7 +27,7 @@ export function Home(props: any) {
         setTimeout(() => {
             getPublicEncryptionKey();
         }, 8000)
-    }, [account, library]);
+    }, [library]);
 
     useEffect(() => {
         setLoading(true)
