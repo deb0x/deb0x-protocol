@@ -50,6 +50,8 @@ export function AppBarComponent(props: any): any {
     const [userStakedAmount, setUserStakedAmount] = useState("")
     const [rewardsUnclaimed, setRewardsUnclaimed] = useState("")
     const [open, setOpen] = useState<any>();
+    const deb0xViewsContract = Deb0xViews(library, deb0xViewsAddress)
+    const [totalStaked, setTotalStaked] = useState("")
 
     const id = open ? 'simple-popper' : undefined;
 
@@ -57,6 +59,10 @@ export function AppBarComponent(props: any): any {
         checkENS();
         setUnstakedAmount();
     }
+
+    useEffect(() => {
+        totalAmountStaked()
+    }, [totalAmountStaked]);
 
     useEffect(() => {
         setTheme(localStorage.getItem('globalTheme'));
@@ -73,8 +79,9 @@ export function AppBarComponent(props: any): any {
     async function setUnstakedAmount() {
         const deb0xERC20Contract = Deb0xERC20(library, deb0xERC20Address)
         if(account){
-            const balance = await deb0xERC20Contract.balanceOf(account)
-            setUserUnstakedAmount(floorPrecised(ethers.utils.formatEther(balance)))
+            await deb0xERC20Contract.balanceOf(account).then((result: any) => 
+                setUserUnstakedAmount(floorPrecised(ethers.utils.formatEther(result)))
+            )
         }
     }
 
@@ -94,10 +101,6 @@ export function AppBarComponent(props: any): any {
         }
     },[])
 
-    useEffect(() => {
-        setUnstakedAmount();
-    },[userUnstakedAmount])
-
     async function checkENS(){
         if(chainId !=137){
             var name = await library.lookupAddress(account);
@@ -108,27 +111,18 @@ export function AppBarComponent(props: any): any {
         }
        
     }
-    function TotalStaked() {
-        const [totalStaked, setTotalStaked] = useState("")
-        useEffect(() => {
-            totalAmountStaked()
-        }, [totalStaked]);
-        async function totalAmountStaked() {
-            const deb0xContract = await Deb0x(library, deb0xAddress)
-            const currentCycle= await deb0xContract.currentStartedCycle()
-            const currentStake = await deb0xContract.summedCycleStakes(currentCycle)
-            const pendingStakeWithdrawal = await deb0xContract.pendingStakeWithdrawal()
-            // setTotalStaked(ethers.utils.formatEther(currentStake))
-            setTotalStaked(floorPrecised(ethers.utils.formatEther(currentStake.sub(pendingStakeWithdrawal))))
-        }
-        return (
-            <p className="mb-0">Total tokens staked: {totalStaked} DBX</p>
-        )
-    }
 
     function floorPrecised(number:any) {
         var power = Math.pow(10, 2);
         return (Math.floor(parseFloat(number) * power) / power).toString();
+    }
+
+    async function totalAmountStaked() {
+        const deb0xContract = Deb0x(library, deb0xAddress)
+        const currentCycle= await deb0xContract.currentStartedCycle()
+        const currentStake = await deb0xContract.summedCycleStakes(currentCycle)
+        const pendingStakeWithdrawal = await deb0xContract.pendingStakeWithdrawal()
+        setTotalStaked(floorPrecised(ethers.utils.formatEther(currentStake.sub(pendingStakeWithdrawal))))
     }
 
     async function addToken() {
@@ -177,27 +171,21 @@ export function AppBarComponent(props: any): any {
     }
 
     async function rewardsAccrued() {
-        const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress);
-        const unclaimedRewards = await deb0xViewsContract.getUnclaimedRewards(account);
-        setRewardsUnclaimed(floorPrecised(ethers.utils.formatEther(unclaimedRewards)))
+        await deb0xViewsContract.getUnclaimedRewards(account).then((result: any) => 
+            setRewardsUnclaimed(floorPrecised(ethers.utils.formatEther(result)))
+        )
     }
 
     async function setStakedAmount() {
-        const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress)
-        const balance = await deb0xViewsContract.getAccWithdrawableStake(account)
-        setUserStakedAmount(floorPrecised(ethers.utils.formatEther(balance)))
+        await deb0xViewsContract.getAccWithdrawableStake(account).then((result: any) => 
+            setUserStakedAmount(floorPrecised(ethers.utils.formatEther(result)))
+        )
     }
 
-    useEffect(() => {
-        rewardsAccrued()
-    }, [rewardsUnclaimed]);
-
-    useEffect(() => {
-        setStakedAmount()
-    }, [userStakedAmount]);
-
-
     const handleClick = (event: any) => {
+        rewardsAccrued();
+        setStakedAmount();
+        setUnstakedAmount();
         const { currentTarget } = event;
         setAnchorEl(currentTarget)
         setOpen(!open)
@@ -206,21 +194,13 @@ export function AppBarComponent(props: any): any {
      const handleClickAway = () => {
         setOpen(false)
       };
-
-
-    function handleChange(text: any, index: any) {
-        // setSelectedIndex(index)
-        // props.onChange(text)
-        if(index !== 0)
-            localStorage.removeItem('input')
-    }
     
     return (
         <ClickAwayListener onClickAway={handleClickAway}>
             <div>
                 <div className="app-bar--top">
                     <Box className="main-menu--left">
-                        <TotalStaked/>
+                        <p className="mb-0">Total tokens staked: {totalStaked} DBX</p>
                     </Box>
                     <Box className="main-menu--right">
                     
@@ -264,7 +244,8 @@ export function AppBarComponent(props: any): any {
                         <ThemeSetter />
                     </Box>
                 </div>
-                <Popper className={`popper ${theme === "classic" ? "classic" : "dark"}` } id={id} open={open} anchorEl={anchorEl}>
+                <Popper className={`popper ${theme === "classic" ? "classic" : "dark"}` }  
+                    id={id} open={open} anchorEl={anchorEl}>
                     <ul>
                         <li>
                             Unclaimed rewards: <br/> 
@@ -280,16 +261,12 @@ export function AppBarComponent(props: any): any {
                         </li>
                     </ul>
                     <Button 
-                        onClick={(event: any) => {
-                            copyWalletID()
-                        }}
+                        onClick={() => copyWalletID() }
                         className="copy-wallet-btn">
                         <span><img src={copyIcon} /></span>Copy wallet ID
                     </Button>
                     <Button
-                        onClick={(event: any) => {
-                            addToken()
-                        }}
+                        onClick={() => addToken() }
                         className="add-token-btn">
                          <span><img src={walletIcon}/></span>Add token to wallet
                     </Button>
