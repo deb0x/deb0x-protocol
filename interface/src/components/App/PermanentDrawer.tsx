@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
-import CssBaseline from '@mui/material/CssBaseline';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -14,18 +13,12 @@ import add from '../../photos/icons/ios-compose.svg';
 import trophy from '../../photos/icons/trophy.svg';
 import coins from '../../photos/icons/coins-solid.svg';
 import users from '../../photos/icons/users-solid.svg';
-import Button from '@mui/material/Button'
-import Popper from '@mui/material/Popper'
 import { injected } from '../../connectors';
-import { Spinner } from './Spinner'
-import { useEagerConnect } from '../../hooks';
 import IconButton from "@mui/material/IconButton";
 import { faDiscord, faTwitter, faGithub } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Deb0xERC20 from "../../ethereum/deb0xerc20"
 import { ethers } from "ethers";
 import "../../componentsStyling/permanentDrawer.scss";
-import ThemeSetter from '../ThemeSetter';
 import ScreenSize from '../Common/ScreenSize';
 import ContactsContext from '../Contexts/ContactsContext';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -33,14 +26,7 @@ import SnackbarNotification from './Snackbar';
 import { Add } from '@mui/icons-material';
 import ContactsSetter from '../ContactsSetter';
 import useAnalyticsEventTracker from '../Common/GaEventTracker';
-
-const deb0xERC20Address = "0x22c3f74d4AA7c7e11A7637d589026aa85c7AF88a";
-
-enum ConnectorNames { Injected = 'Injected' };
-
-const connectorsByName: { [connectorName in ConnectorNames]: any } = {
-    [ConnectorNames.Injected]: injected
-}
+import { getKeyMoralis } from '../../ethereum/EventLogsMoralis';
 
 declare global {
     interface Window {
@@ -50,31 +36,19 @@ declare global {
 
 export function PermanentDrawer(props: any): any {
     const context = useWeb3React()
-    const { connector, library, chainId, account, activate, deactivate, active, error } = context
+    const { connector, account, library } = context
     const [activatingConnector, setActivatingConnector] = useState<any>()
-    const triedEager = useEagerConnect()
     const [selectedIndex, setSelectedIndex] = useState<any>(6);
-    const [searchBarValue, setSearchBarValue] = useState<any>("search");
-    const [ensName, setEnsName] = useState<any>("");
-    // const [balance, setBalance] = useState<any>("8.13");
-    const [userUnstakedAmount,setUserUnstakedAmount] = useState<any>(0);
     const menuItems = ['Compose', 'Deb0x', 'Stake', 'Sent', 'Mint', 'DBX Yellow pages'];
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const open = Boolean(anchorEl);
-    const id = open ? 'simple-popper' : undefined;
     const dimensions = ScreenSize();
     const useContacts = () => useContext(ContactsContext);
     const { contacts, setContacts } = useContacts()!;
     const [notificationState, setNotificationState] = useState({});
     const [networkName, setNetworkName] = useState<any>();
-    let errorMessage;
     let [show, setShow] = useState(false);
     const gaEventTracker = useAnalyticsEventTracker('Add Contact');
-
-    if(library){
-        // checkENS();
-        setUnstakedAmount();
-    }
+    const [encryptionKeyInitialized, setEncryptionKeyInitialized] = 
+        useState<boolean|undefined>(undefined);
 
     useEffect(() => {
         injected.supportedChainIds?.forEach(chainId => 
@@ -82,33 +56,8 @@ export function PermanentDrawer(props: any): any {
         if (activatingConnector && activatingConnector === connector) {
             setActivatingConnector(undefined)
         }
+
     }, [activatingConnector, connector])
-
-    async function setUnstakedAmount() {
-        const deb0xERC20Contract = Deb0xERC20(library, deb0xERC20Address)
-        if(account){
-            const balance = await deb0xERC20Contract.balanceOf(account)
-            setUserUnstakedAmount(ethers.utils.formatEther(balance))
-        }
-    }
-
-    async function checkENS(){
-        if(chainId !=137){
-            var name = await library.lookupAddress(account);
-            if(name !== null)
-            {   
-                setEnsName(name);
-            }
-        }
-    }
-
-    useEffect(() => {
-        setUnstakedAmount();
-    },[userUnstakedAmount])
-
-    function handleClick (event: React.MouseEvent<HTMLElement>) {
-        setAnchorEl(anchorEl ? null : event.currentTarget);
-    };
 
     function handleChange(text: any, index: any) {
         setSelectedIndex(index)
@@ -122,29 +71,30 @@ export function PermanentDrawer(props: any): any {
         setContacts(contactsList);
     }
 
-    const [display, setDisplay] = useState();
-
-    function getErrorMessage(error: string) {
-        errorMessage = error;
-        return errorMessage;
-    }
-
     useEffect(() => {
         setTimeout(() => {setNotificationState({})}, 2000)
     }, [notificationState])
 
+    useEffect(() => {
+        if(selectedIndex === 6) {
+            getPublicEncryptionKey()
+        }
+    }, [library, account]);
+
+    const getPublicEncryptionKey = async () => {  
+        await getKeyMoralis(account).then((result: any) => {
+            const initialized = (result != '') ? true : false
+            setEncryptionKeyInitialized(initialized);
+        })
+        
+    }
+
     return (
         <>
-            {/* <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                {!!errorMessage && 
-                    <p className='alert alert-danger position-fixed' style={{ marginTop: '4rem', marginBottom: '0' }}>
-                        {getErrorMessage(errorMessage)}
-                    </p>
-                }
-            </div> */}
             <SnackbarNotification state={notificationState} 
                 setNotificationState={setNotificationState} />
-            <Box className="side-menu-box" sx={{ display: 'flex' }}>
+            <Box className={`side-menu-box ${encryptionKeyInitialized ? "" : "init"}` } 
+                sx={{ display: 'flex' }}>
                 <Drawer variant="permanent"
                     anchor={dimensions.width > 768 ? 'left' : 'bottom'}
                     className="side-menu">
@@ -152,7 +102,7 @@ export function PermanentDrawer(props: any): any {
                         onClick={() => handleChange("Home", 4)}>
                         <div className="img"></div>
                     </div>
-                    { account  && 
+                    { account && encryptionKeyInitialized ? 
                         <List className="menu-list">
                             {menuItems.map((text, index) => (
                                 <>
@@ -173,11 +123,12 @@ export function PermanentDrawer(props: any): any {
                                     </ListItem>
                                 </>
                             ))}
-                        </List>
+                        </List> :
+                        <></>
                     }
                     
                     <div className="side-menu--bottom">
-                        { account && 
+                        { account && encryptionKeyInitialized ?
                             <div className="contacts">
                                 <List>
                                     {contacts.map((contact: any, index: any) => (
@@ -197,7 +148,6 @@ export function PermanentDrawer(props: any): any {
                                                 </IconButton>
                                                 <IconButton size="small"
                                                     onClick={() => {
-                                                        // setNotificationState({})
                                                         localStorage.setItem("input", JSON.stringify(contact.address));
                                                         if (document.querySelector(".editor")) {
                                                             (document.querySelector(".editor") as HTMLElement).click();
@@ -227,7 +177,8 @@ export function PermanentDrawer(props: any): any {
                                         <></>
                                     }    
                                 </>
-                            </div>
+                            </div> :
+                            <></>
                         }
                         <div className="content">
                             <div className="social-media">

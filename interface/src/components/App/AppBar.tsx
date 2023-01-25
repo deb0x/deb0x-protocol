@@ -39,6 +39,7 @@ const connectorsByName: { [connectorName in ConnectorNames]: any } = {
 export function AppBarComponent(props: any): any {
     const context = useWeb3React();
     const { connector, library, chainId, account, activate, deactivate, active, error } = context
+    const deb0xViewsContract = Deb0xViews(library, deb0xViewsAddress);
     const [activatingConnector, setActivatingConnector] = useState<any>();
     const [networkName, setNetworkName] = useState<any>();
     const [userUnstakedAmount,setUserUnstakedAmount] = useState<any>(0);
@@ -177,15 +178,15 @@ export function AppBarComponent(props: any): any {
     }
 
     async function rewardsAccrued() {
-        const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress);
-        const unclaimedRewards = await deb0xViewsContract.getUnclaimedRewards(account);
-        setRewardsUnclaimed(floorPrecised(ethers.utils.formatEther(unclaimedRewards)))
+        await deb0xViewsContract.getUnclaimedRewards(account).then((result: any) =>
+            setRewardsUnclaimed(floorPrecised(ethers.utils.formatEther(result)))
+        )
     }
 
     async function setStakedAmount() {
-        const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress)
-        const balance = await deb0xViewsContract.getAccWithdrawableStake(account)
-        setUserStakedAmount(floorPrecised(ethers.utils.formatEther(balance)))
+        await deb0xViewsContract.getAccWithdrawableStake(account).then((result: any) =>
+            setUserStakedAmount(floorPrecised(ethers.utils.formatEther(result)))
+        )
     }
 
     useEffect(() => {
@@ -206,14 +207,6 @@ export function AppBarComponent(props: any): any {
      const handleClickAway = () => {
         setOpen(false)
       };
-
-
-    function handleChange(text: any, index: any) {
-        // setSelectedIndex(index)
-        // props.onChange(text)
-        if(index !== 0)
-            localStorage.removeItem('input')
-    }
     
     return (
         <ClickAwayListener onClickAway={handleClickAway}>
