@@ -101,26 +101,22 @@ export function Mint(): any {
 
     async function sendMessageTx(deb0xContract: any, recipients: any, cids: any) {
         let gasLimitIntervalValue = BigNumber.from("1000000");
-        let value =  "0.01";
+        let value =  "1";
 
         if(count > 99 && count < 200){
              gasLimitIntervalValue = BigNumber.from("2000000");
-              value =  "0.02";
         }
 
         if(count > 199 && count < 300){
             gasLimitIntervalValue = BigNumber.from("3000000");
-             value =  "0.03";
        }
 
        if(count > 299 && count < 400){
         gasLimitIntervalValue = BigNumber.from("4000000");
-         value =  "0.04";
         }
 
         if(count > 399 && count < 513){
             gasLimitIntervalValue = BigNumber.from("5000000");
-             value =  "0.05";
         }
 
         try {
