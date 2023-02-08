@@ -15,6 +15,8 @@ import { createInstance } from '../../ethereum/forwarder'
 import dataFromWhitelist from '../../constants.json';
 import { convertStringToBytes32} from '../../ethereum/Converter.js';
 import '../../componentsStyling/mint.scss';
+import axios, { Method } from 'axios';
+import web3 from 'web3';
 
 const { BigNumber } = require("ethers");
 const deb0xAddress = "0xA06735da049041eb523Ccf0b8c3fB9D36216c646";
@@ -53,6 +55,15 @@ export function Mint(): any {
             getPublicEncryptionKey()
         }
     }, []);
+
+    useEffect(() => {
+        if (count > 512) {
+            setCount(512)
+        }
+        if (count < 0 ) {
+            setCount(1)
+        }
+    }, [count])
 
     async function fetchSendResult(request: any, url: any) {
         await fetch(url, {
@@ -99,10 +110,32 @@ export function Mint(): any {
             })
     }
 
+    async function getCurrentPrice(){
+        let method: Method = 'POST';
+        const options = {
+            method: method,
+            url: 'https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3 ',
+            port: 443,
+            headers: {
+                'Content-Type': 'application/json'
+              },
+            data: JSON.stringify({
+                "jsonrpc":"2.0","method":"eth_gasPrice","params": [],"id":1
+              })
+        };
+
+        let requestValue = await axios.request(options)
+        return web3.utils.fromWei(requestValue.data.result.toString(), "Gwei")
+    }
+
+    async  function estimationValue(gasLimitIntervalValue: number){
+        let price = Number(await getCurrentPrice());
+        let fee = gasLimitIntervalValue * price * 0.1 / 1000000000;
+        return fee;
+    }
+    
     async function sendMessageTx(deb0xContract: any, recipients: any, cids: any) {
         let gasLimitIntervalValue = BigNumber.from("1000000");
-        let value =  "1";
-
         if(count > 99 && count < 200){
              gasLimitIntervalValue = BigNumber.from("2000000");
         }
@@ -118,10 +151,11 @@ export function Mint(): any {
         if(count > 399 && count < 513){
             gasLimitIntervalValue = BigNumber.from("5000000");
         }
+       let value = await estimationValue(gasLimitIntervalValue);
 
         try {
             const overrides = 
-                { value: ethers.utils.parseUnits(value, "ether"),
+                { value: ethers.utils.parseUnits(value.toString(), "ether"),
                     gasLimit:gasLimitIntervalValue }
             const tx = await deb0xContract["send(address[],bytes32[][],address,uint256,uint256)"](recipients,
                 cids,
@@ -247,7 +281,7 @@ export function Mint(): any {
                     <div className="row mint-header">
                         <button className="btn count-btn col" type="button" onClick={decNum}>-</button>
                         <div className="col input-col">
-                            <input type="number" value={count} max="100" onChange={handleInputChange}/>
+                            <input type="number" value={count} max="512" onChange={handleInputChange}/>
                         </div>
                         <button className="btn count-btn col" type="button" onClick={incNum}>+</button>
                         <button className="btn count-btn  max-btn col" type="button" onClick={() => setCount(512)}>MAX</button>
